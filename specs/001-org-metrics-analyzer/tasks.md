@@ -24,13 +24,13 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create Python package structure `devex_metrics/` per plan.md project layout
-- [ ] T002 Initialize pyproject.toml with Python 3.11+ and dependencies (typer, pandas, requests, jinja2, plotly, pyyaml, pytest)
-- [ ] T003 [P] Create README.md with installation and quick start instructions
-- [ ] T004 [P] Configure pytest with conftest.py in tests/ directory
-- [ ] T005 [P] Setup .gitignore for Python (venv/, __pycache__/, *.pyc, .pytest_cache/)
-- [ ] T006 Create devex_metrics/__init__.py and devex_metrics/__main__.py entry points
-- [ ] T007 Create devex_metrics/version.py with version string "0.1.0"
+- [X] T001 Create Python package structure `devex_metrics/` per plan.md project layout
+- [X] T002 Initialize pyproject.toml with Python 3.11+ and dependencies (typer, pandas, requests, jinja2, plotly, pyyaml, pytest)
+- [X] T003 [P] Create README.md with installation and quick start instructions
+- [X] T004 [P] Configure pytest with conftest.py in tests/ directory
+- [X] T005 [P] Setup .gitignore for Python (venv/, __pycache__/, *.pyc, .pytest_cache/)
+- [X] T006 Create devex_metrics/__init__.py and devex_metrics/__main__.py entry points
+- [X] T007 Create devex_metrics/version.py with version string "0.1.0"
 
 ---
 
@@ -40,14 +40,14 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T008 Implement GitHub CLI authentication in devex_metrics/auth/gh_cli.py with `gh auth token` integration
-- [ ] T009 Create base data models in devex_metrics/models/ (AnalysisResult, RepositoryMetrics, DimensionScores per data-model.md)
-- [ ] T010 [P] Implement GitHub API rate limiter in devex_metrics/utils/rate_limiter.py tracking 5000 req/hr limit
-- [ ] T011 [P] Create base collector class in devex_metrics/collectors/base.py with rate limit handling and retry logic
-- [ ] T012 [P] Implement YAML parser utility in devex_metrics/utils/yaml_parser.py for workflow file parsing
-- [ ] T013 [P] Create progress bar utilities in devex_metrics/utils/progress.py using rich or tqdm
-- [ ] T014 Implement State of DevOps 2026 benchmarks in devex_metrics/scorers/benchmarks.py (HIGH=10-14, MID=5-9, LOW=0-4)
-- [ ] T015 Create pytest fixtures in tests/conftest.py for mock GitHub API responses using responses library
+- [X] T008 Implement GitHub CLI authentication in devex_metrics/auth/gh_cli.py with `gh auth token` integration
+- [X] T009 Create base data models in devex_metrics/models/ (AnalysisResult, RepositoryMetrics, DimensionScores per data-model.md)
+- [X] T010 [P] Implement GitHub API rate limiter in devex_metrics/utils/rate_limiter.py tracking 5000 req/hr limit
+- [X] T011 [P] Create base collector class in devex_metrics/collectors/base.py with rate limit handling and retry logic
+- [X] T012 [P] Implement YAML parser utility in devex_metrics/utils/yaml_parser.py for workflow file parsing
+- [X] T013 [P] Create progress bar utilities in devex_metrics/utils/progress.py using rich or tqdm
+- [X] T014 Implement State of DevOps 2026 benchmarks in devex_metrics/scorers/benchmarks.py (HIGH=10-14, MID=5-9, LOW=0-4)
+- [X] T015 Create pytest fixtures in tests/conftest.py for mock GitHub API responses using responses library
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -63,38 +63,38 @@
 
 #### Data Collection (T016-T022)
 
-- [ ] T016 [P] [US1] Implement repository collector in devex_metrics/collectors/repositories.py fetching all org repos via `/orgs/{org}/repos` 
-- [ ] T017 [P] [US1] Implement workflow collector in devex_metrics/collectors/workflows.py fetching workflow files and runs via `/repos/{owner}/{repo}/actions/workflows`
-- [ ] T018 [P] [US1] Implement branch protection collector in devex_metrics/collectors/branch_protection.py fetching default branch protection rules
-- [ ] T019 [P] [US1] Implement security collector in devex_metrics/collectors/security.py fetching code scanning, secret scanning, Dependabot alerts
-- [ ] T020 [US1] Implement repository activity detection in devex_metrics/collectors/repositories.py identifying inactive repos (no commits in 90 days per FR-006a)
-- [ ] T021 [US1] Add pagination handling in devex_metrics/collectors/base.py for organizations with 100+ repositories per FR-006
-- [ ] T022 [US1] Implement workflow environment keyword detection in devex_metrics/collectors/workflows.py parsing YAML for `environment:` keyword per A-003
+- [X] T016 [P] [US1] Implement repository collector in devex_metrics/collectors/repositories.py fetching all org repos via `/orgs/{org}/repos` 
+- [X] T017 [P] [US1] Implement workflow collector in devex_metrics/collectors/workflows.py fetching workflow files and runs via `/repos/{owner}/{repo}/actions/workflows`
+- [X] T018 [P] [US1] Implement branch protection collector in devex_metrics/collectors/branch_protection.py fetching default branch protection rules
+- [X] T019 [P] [US1] Implement security collector in devex_metrics/collectors/security.py fetching code scanning, secret scanning, Dependabot alerts
+- [X] T020 [US1] Implement repository activity detection in devex_metrics/collectors/repositories.py identifying inactive repos (no commits in 90 days per FR-006a)
+- [X] T021 [US1] Add pagination handling in devex_metrics/collectors/base.py for organizations with 100+ repositories per FR-006
+- [X] T022 [US1] Implement workflow environment keyword detection in devex_metrics/collectors/workflows.py parsing YAML for `environment:` keyword per A-003
 
 #### Metrics Calculation (T023-T027)
 
-- [ ] T023 [P] [US1] Implement deployment automation analyzer in devex_metrics/analyzers/deployment_automation.py calculating % repos with deploy workflows per FR-007
-- [ ] T024 [P] [US1] Implement branch protection analyzer in devex_metrics/analyzers/branch_protection.py scoring required reviews, status checks, CODEOWNERS per FR-010
-- [ ] T025 [P] [US1] Implement security posture analyzer in devex_metrics/analyzers/security_posture.py aggregating code scanning, secrets, Dependabot per FR-011
-- [ ] T026 [P] [US1] Implement DORA metrics analyzer in devex_metrics/analyzers/dora_metrics.py calculating Deployment Frequency, Lead Time, CFR, MTTR per FR-008
-- [ ] T027 [US1] Implement maturity scorer in devex_metrics/scorers/maturity_scorer.py classifying org into High/Mid/Low tiers per FR-014 and FR-015
+- [X] T023 [P] [US1] Implement deployment automation analyzer in devex_metrics/analyzers/deployment_automation.py calculating % repos with deploy workflows per FR-007
+- [X] T024 [P] [US1] Implement branch protection analyzer in devex_metrics/analyzers/branch_protection.py scoring required reviews, status checks, CODEOWNERS per FR-010
+- [X] T025 [P] [US1] Implement security posture analyzer in devex_metrics/analyzers/security_posture.py aggregating code scanning, secrets, Dependabot per FR-011
+- [X] T026 [P] [US1] Implement DORA metrics analyzer in devex_metrics/analyzers/dora_metrics.py calculating Deployment Frequency, Lead Time, CFR, MTTR per FR-008
+- [X] T027 [US1] Implement maturity scorer in devex_metrics/scorers/maturity_scorer.py classifying org into High/Mid/Low tiers per FR-014 and FR-015
 
 #### CLI Interface (T028-T033)
 
-- [ ] T028 [US1] Implement CLI command structure in devex_metrics/cli.py using typer with `analyze` command per contracts/cli-schema.md
-- [ ] T029 [US1] Add organization argument and format/output/verbose options to `analyze` command per CLI contract
-- [ ] T030 [US1] Implement authentication check in `analyze` command calling gh_cli.py to verify GitHub CLI auth per FR-002
-- [ ] T031 [US1] Add progress indicators for data collection phases (repos, workflows, metrics) using progress.py utilities
-- [ ] T032 [US1] Implement exit codes (0=success, 1=auth error, 2=API error, 3=validation, 4=I/O) per CLI contract
-- [ ] T033 [US1] Add console output summary showing maturity tier, repo count, inactive repos per CLI contract stdout format
+- [X] T028 [US1] Implement CLI command structure in devex_metrics/cli.py using typer with `analyze` command per contracts/cli-schema.md
+- [X] T029 [US1] Add organization argument and format/output/verbose options to `analyze` command per CLI contract
+- [X] T030 [US1] Implement authentication check in `analyze` command calling gh_cli.py to verify GitHub CLI auth per FR-002
+- [X] T031 [US1] Add progress indicators for data collection phases (repos, workflows, metrics) using progress.py utilities
+- [X] T032 [US1] Implement exit codes (0=success, 1=auth error, 2=API error, 3=validation, 4=I/O) per CLI contract
+- [X] T033 [US1] Add console output summary showing maturity tier, repo count, inactive repos per CLI contract stdout format
 
 #### Results Presentation - Basic (T034-T038)
 
-- [ ] T034 [US1] Create base HTML template in devex_metrics/reporters/templates/report.html with maturity tier summary section
-- [ ] T035 [US1] Implement HTML reporter in devex_metrics/reporters/html_reporter.py using Jinja2 per FR-021
-- [ ] T036 [US1] Add dimension scores table to HTML template showing 7 dimensions with 0-2 scores per FR-018
-- [ ] T037 [US1] Add metrics summary section to HTML template showing deployment automation %, branch protection %, security status per FR-018
-- [ ] T038 [US1] Generate self-contained HTML with embedded CSS (no external dependencies for offline viewing)
+- [X] T034 [US1] Create base HTML template in devex_metrics/reporters/templates/report.html with maturity tier summary section
+- [X] T035 [US1] Implement HTML reporter in devex_metrics/reporters/html_reporter.py using Jinja2 per FR-021
+- [X] T036 [US1] Add dimension scores table to HTML template showing 7 dimensions with 0-2 scores per FR-018
+- [X] T037 [US1] Add metrics summary section to HTML template showing deployment automation %, branch protection %, security status per FR-018
+- [X] T038 [US1] Generate self-contained HTML with embedded CSS (no external dependencies for offline viewing)
 
 **Checkpoint**: User Story 1 MVP complete - can analyze org, calculate maturity tier, generate basic HTML report
 
@@ -108,14 +108,14 @@
 
 ### Implementation for User Story 2
 
-- [ ] T039 [P] [US2] Implement benchmark comparison engine in devex_metrics/scorers/benchmarks.py loading thresholds from docs/state-of-devops-2026/metrics-reference.md per FR-016
-- [ ] T040 [P] [US2] Create BenchmarkComparison model in devex_metrics/models/metrics.py with current_value, threshold, gap, status per data-model.md
-- [ ] T041 [P] [US2] Implement gap calculator in devex_metrics/scorers/maturity_scorer.py identifying delta to next tier per FR-017
-- [ ] T042 [US2] Add benchmark comparison section to HTML template showing metrics vs thresholds in table format per FR-019
-- [ ] T043 [US2] Implement color-coding in HTML template (green=above, yellow=at, red=below benchmark) per US2 acceptance criteria
-- [ ] T044 [US2] Add "Recommendations" section to HTML template showing top 3 gaps with specific improvement targets per FR-020 and SC-004
-- [ ] T045 [US2] Calculate exact improvement needed (e.g., "7 more repos need deploy workflows") in maturity_scorer.py per SC-005
-- [ ] T046 [US2] Add strengths/weaknesses summary section identifying best and worst performing dimensions per FR-020
+- [X] T039 [P] [US2] Implement benchmark comparison engine in devex_metrics/scorers/benchmarks.py loading thresholds from docs/state-of-devops-2026/metrics-reference.md per FR-016
+- [X] T040 [P] [US2] Create BenchmarkComparison model in devex_metrics/models/metrics.py with current_value, threshold, gap, status per data-model.md
+- [X] T041 [P] [US2] Implement gap calculator in devex_metrics/scorers/maturity_scorer.py identifying delta to next tier per FR-017
+- [X] T042 [US2] Add benchmark comparison section to HTML template showing metrics vs thresholds in table format per FR-019
+- [X] T043 [US2] Implement color-coding in HTML template (green=above, yellow=at, red=below benchmark) per US2 acceptance criteria
+- [X] T044 [US2] Add "Recommendations" section to HTML template showing top 3 gaps with specific improvement targets per FR-020 and SC-004
+- [X] T045 [US2] Calculate exact improvement needed (e.g., "7 more repos need deploy workflows") in maturity_scorer.py per SC-005
+- [X] T046 [US2] Add strengths/weaknesses summary section identifying best and worst performing dimensions per FR-020
 
 **Checkpoint**: User Stories 1 AND 2 complete - full analysis with benchmarking and actionable recommendations
 
@@ -129,11 +129,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T047 [US3] Add user account detection in devex_metrics/collectors/repositories.py determining if input is org or user via `/users/{user}` vs `/orgs/{org}` endpoints
-- [ ] T048 [US3] Implement user repository collector in devex_metrics/collectors/repositories.py fetching repos via `/users/{user}/repos` per FR-001
-- [ ] T049 [US3] Apply same metrics calculation logic from US1 to user repositories with appropriate scoping per US3 acceptance criteria
-- [ ] T050 [US3] Update CLI `analyze` command to handle both org and username inputs per FR-001
-- [ ] T051 [US3] Update HTML template to display "User: {username}" vs "Organization: {org}" in report header
+- [X] T047 [US3] Add user account detection in devex_metrics/collectors/repositories.py determining if input is org or user via `/users/{user}` vs `/orgs/{org}` endpoints
+- [X] T048 [US3] Implement user repository collector in devex_metrics/collectors/repositories.py fetching repos via `/users/{user}/repos` per FR-001
+- [X] T049 [US3] Apply same metrics calculation logic from US1 to user repositories with appropriate scoping per US3 acceptance criteria
+- [X] T050 [US3] Update CLI `analyze` command to handle both org and username inputs per FR-001
+- [X] T051 [US3] Update HTML template to display "User: {username}" vs "Organization: {org}" in report header
 
 **Checkpoint**: User Stories 1, 2, AND 3 complete - supports both organizations and individual users
 
