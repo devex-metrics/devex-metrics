@@ -9,7 +9,7 @@ export async function collectIssueCounts(
   owner: string,
   repo: string
 ): Promise<IssueCounts> {
-  const octokit = getOctokit();
+  const octokit = await getOctokit();
 
   // Use the search API to get counts efficiently
   const [openResult, closedResult] = await Promise.all([

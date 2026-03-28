@@ -8,7 +8,7 @@ export async function collectRepos(
   owner: string,
   ownerType: "org" | "user"
 ): Promise<{ name: string; fullName: string }[]> {
-  const octokit = getOctokit();
+  const octokit = await getOctokit();
   const repos: { name: string; fullName: string }[] = [];
 
   if (ownerType === "org") {
