@@ -1,0 +1,32 @@
+{
+  "name": "devex-metrics",
+  "version": "1.0.0",
+  "description": "DevEx reporting and dashboarding for GitHub repos and organizations",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devex-metrics/devex-metrics.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/devex-metrics/devex-metrics/issues"
+  },
+  "homepage": "https://github.com/devex-metrics/devex-metrics#readme",
+  "dependencies": {
+    "@octokit/rest": "^22.0.1",
+    "typescript": "^6.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "vitest": "^4.1.2"
+  }
+}
