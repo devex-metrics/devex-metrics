@@ -9,9 +9,8 @@ let _octokit: Octokit | undefined;
  * Authentication is resolved in the following order:
  *
  * 1. **GitHub App** – if both `APP_ID` (repo variable) and `APP_PRIVATE_KEY`
- *    (repo secret) are set, an installation token is minted on the fly.
- *    When `APP_INSTALLATION_ID` is also provided it is used directly;
- *    otherwise the first accessible installation is looked up automatically.
+ *    (repo secret) are set, the first accessible installation is looked up
+ *    and an installation token is minted on the fly.
  *
  * 2. **Personal / OAuth token** – falls back to the `GITHUB_TOKEN`
  *    environment variable.
@@ -43,25 +42,12 @@ export async function getOctokit(): Promise<Octokit> {
 
 /**
  * Create an Octokit instance authenticated as a GitHub App installation.
+ * The installation ID is retrieved automatically at runtime.
  */
 async function createAppOctokit(
   appId: string,
   privateKey: string
 ): Promise<Octokit> {
-  const installationId = process.env.APP_INSTALLATION_ID;
-
-  if (installationId) {
-    return new Octokit({
-      authStrategy: createAppAuth,
-      auth: {
-        appId,
-        privateKey,
-        installationId: Number(installationId),
-      },
-    });
-  }
-
-  // Look up the first installation automatically.
   const appOctokit = new Octokit({
     authStrategy: createAppAuth,
     auth: { appId, privateKey },
@@ -73,8 +59,7 @@ async function createAppOctokit(
   if (installations.length === 0) {
     throw new Error(
       "No installations found for the GitHub App. " +
-        "Install the app on a repository or organisation first, " +
-        "or set APP_INSTALLATION_ID explicitly."
+        "Install the app on a repository or organisation first."
     );
   }
 

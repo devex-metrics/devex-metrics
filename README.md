@@ -55,7 +55,8 @@ Using a GitHub App provides fine-grained permissions and higher rate limits.
 2. Install the app on the target organisation or repositories.
 3. Add the **App ID** as a repository variable named `APP_ID`.
 4. Add the **App private key** (PEM) as a repository secret named `APP_PRIVATE_KEY`.
-5. Optionally add the **Installation ID** as a repository variable named `APP_INSTALLATION_ID`. If omitted, the first installation is used automatically.
+
+The installation ID is retrieved automatically at runtime.
 
 ### Deploying
 
