@@ -15,7 +15,13 @@ on:
         default: "org"
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   collect:
@@ -32,6 +38,16 @@ jobs:
 
       - run: npm run build
 
+      # Restore cached data from previous runs
+      - name: Restore data cache
+        id: cache-data
+        uses: actions/cache@v4
+        with:
+          path: data
+          key: metrics-data-${{ github.repository_owner }}
+          restore-keys: |
+            metrics-data-
+
       - name: Collect metrics
         env:
           GITHUB_TOKEN: ${{ secrets.METRICS_GITHUB_TOKEN }}
@@ -40,10 +56,28 @@ jobs:
           TYPE="${{ github.event.inputs.owner_type || 'org' }}"
           node dist/index.js "$OWNER" "$TYPE"
 
-      - name: Commit cached data
+      # Cache is automatically saved after the job completes
+      # (actions/cache saves on cache miss or key change)
+
+      # Build the GitHub Pages site from the report
+      - name: Build pages site
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/
-          git diff --cached --quiet || git commit -m "chore: update metrics data [skip ci]"
-          git push
+          OWNER="${{ github.event.inputs.owner || github.repository_owner }}"
+          mkdir -p _site
+          node dist/build-pages.js "$OWNER"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: collect
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

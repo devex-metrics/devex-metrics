@@ -41,14 +41,22 @@ A workflow is included at `.github/workflows/collect-metrics.yml`.
 
 1. Create a **GitHub OAuth App** or **Personal Access Token** with `repo` and `read:org` scopes.
 2. Add it as a repository secret named `METRICS_GITHUB_TOKEN`.
-3. The workflow runs daily at 06:00 UTC and commits updated data back to the repo.
-4. You can also trigger it manually via *Actions → Collect DevEx Metrics → Run workflow*.
+3. Enable **GitHub Pages** in your repo settings (set source to *GitHub Actions*).
+4. The workflow runs daily at 06:00 UTC. It:
+   - Restores the previous day's cached data from `actions/cache`
+   - Collects only new / changed metrics (skips if cached data is still fresh)
+   - Saves the updated cache for the next run
+   - Builds an HTML dashboard and deploys it to GitHub Pages
+5. You can also trigger it manually via *Actions → Collect DevEx Metrics → Run workflow*.
+
+No data is committed to the main branch — the cache lives in GitHub Actions and the report is published via GitHub Pages.
 
 ## Project structure
 
 ```
 src/
   index.ts              # CLI entry point & orchestrator
+  build-pages.ts        # Generates HTML site for GitHub Pages
   types.ts              # TypeScript interfaces
   github-client.ts      # Octokit singleton wrapper
   cache.ts              # JSON file-based daily cache
@@ -59,7 +67,8 @@ src/
     pull-requests.ts    # PR counts & detailed PR metrics
     contributors.ts     # Committer & reviewer counts
     dependents.ts       # Dependent repo count
-data/                   # Cached JSON & generated reports
+data/                   # Local cache (gitignored; persisted via actions/cache in CI)
+_site/                  # Generated GitHub Pages site (gitignored)
 .github/workflows/
   collect-metrics.yml   # Scheduled GitHub Actions workflow
 ```
