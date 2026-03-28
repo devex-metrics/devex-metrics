@@ -1,0 +1,11 @@
+node_modules/
+dist/
+_site/
+*.js.map
+.env
+*.tgz
+coverage/
+.nyc_output/
+data/*.json
+data/*.md
+!data/.gitkeep
