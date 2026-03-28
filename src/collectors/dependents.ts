@@ -23,7 +23,7 @@ export async function collectDependentCount(
     // GitHub doesn't expose dependent count directly via REST API.
     // We use the GraphQL API to get the dependency graph if available.
     // As a fallback, return the network_count (forks) as a proxy, or 0.
-    return (community as Record<string, unknown>).network_count as number ?? 0;
+    return ((community as Record<string, unknown>).network_count ?? 0) as number;
   } catch {
     return 0;
   }
