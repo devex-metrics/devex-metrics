@@ -74,4 +74,46 @@ describe("build-pages", () => {
     const md = fs.readFileSync(mdPath, "utf-8");
     expect(md).toContain("# DevEx Metrics");
   });
+
+  it("should include branch and workflow run link in footer when env vars are set", () => {
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+        GITHUB_REF_NAME: "main",
+        GITHUB_SERVER_URL: "https://github.com",
+        GITHUB_REPOSITORY: "test-org/test-repo",
+        GITHUB_RUN_ID: "12345",
+      },
+    });
+    const html = fs.readFileSync(
+      path.join(siteDir, "index.html"),
+      "utf-8"
+    );
+    expect(html).toContain("Deployed from branch");
+    expect(html).toContain("main");
+    expect(html).toContain(
+      "https://github.com/test-org/test-repo/actions/runs/12345"
+    );
+    expect(html).toContain("workflow run");
+  });
+
+  it("should not include deployment info in footer when env vars are absent", () => {
+    const env = { ...process.env };
+    delete env.GITHUB_REF_NAME;
+    delete env.GITHUB_SERVER_URL;
+    delete env.GITHUB_REPOSITORY;
+    delete env.GITHUB_RUN_ID;
+
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+      env,
+    });
+    const html = fs.readFileSync(
+      path.join(siteDir, "index.html"),
+      "utf-8"
+    );
+    expect(html).not.toContain("Deployed from branch");
+    expect(html).not.toContain("workflow run");
+  });
 });

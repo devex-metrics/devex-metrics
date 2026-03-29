@@ -44,7 +44,9 @@ function main(): void {
   );
 
   // Build a self-contained HTML page
-  const html = buildHtml(envelope.data.owner, markdown, envelope.date);
+  const branch = process.env.GITHUB_REF_NAME;
+  const runUrl = buildRunUrl();
+  const html = buildHtml(envelope.data.owner, markdown, envelope.date, branch, runUrl);
   fs.writeFileSync(path.join(siteDir, "index.html"), html);
 
   console.log(`GitHub Pages site built in ${siteDir}/`);
@@ -117,8 +119,34 @@ function markdownToHtml(md: string): string {
   return out.join("\n");
 }
 
-function buildHtml(owner: string, markdown: string, date: string): string {
+function buildRunUrl(): string | undefined {
+  const server = process.env.GITHUB_SERVER_URL;
+  const repo = process.env.GITHUB_REPOSITORY;
+  const runId = process.env.GITHUB_RUN_ID;
+  if (server && repo && runId) {
+    return `${server}/${repo}/actions/runs/${runId}`;
+  }
+  return undefined;
+}
+
+function buildHtml(
+  owner: string,
+  markdown: string,
+  date: string,
+  branch?: string,
+  runUrl?: string
+): string {
   const body = markdownToHtml(markdown);
+
+  let deployedFrom = "";
+  if (branch) {
+    deployedFrom = ` Deployed from branch <strong>${escapeHtml(branch)}</strong>`;
+    if (runUrl) {
+      deployedFrom += ` (<a href="${escapeHtml(runUrl)}">workflow run</a>)`;
+    }
+    deployedFrom += ".";
+  }
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -146,7 +174,7 @@ function buildHtml(owner: string, markdown: string, date: string): string {
 </head>
 <body>
 ${body}
-<footer>Data cached on ${escapeHtml(date)}. Served via GitHub Pages. <a href="data.json">Raw JSON</a> · <a href="report.md">Markdown</a></footer>
+<footer>Data cached on ${escapeHtml(date)}.${deployedFrom} Served via GitHub Pages. <a href="data.json">Raw JSON</a> · <a href="report.md">Markdown</a></footer>
 </body>
 </html>`;
 }
