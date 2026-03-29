@@ -1,8 +1,13 @@
 import { getOctokit } from "../github-client.js";
+import { getCountFromLinkHeader } from "../link-header.js";
 import type { PullRequestCounts, PullRequestDetail } from "../types.js";
 
 /**
  * Count open, closed and merged pull requests for a repository.
+ *
+ * Uses the list-pull-requests endpoint.  Open PRs are counted via the
+ * Link header; closed PRs are paginated so we can separate merged from
+ * unmerged.
  */
 export async function collectPullRequestCounts(
   owner: string,
@@ -10,26 +15,30 @@ export async function collectPullRequestCounts(
 ): Promise<PullRequestCounts> {
   const octokit = await getOctokit();
 
-  const [openResult, closedResult, mergedResult] = await Promise.all([
-    octokit.rest.search.issuesAndPullRequests({
-      q: `repo:${owner}/${repo} is:pr is:open`,
-      per_page: 1,
-    }),
-    octokit.rest.search.issuesAndPullRequests({
-      q: `repo:${owner}/${repo} is:pr is:closed is:unmerged`,
-      per_page: 1,
-    }),
-    octokit.rest.search.issuesAndPullRequests({
-      q: `repo:${owner}/${repo} is:pr is:merged`,
-      per_page: 1,
-    }),
-  ]);
+  // Open count via Link header (single request)
+  const openRes = await octokit.rest.pulls.list({
+    owner,
+    repo,
+    state: "open",
+    per_page: 1,
+  });
+  const open = getCountFromLinkHeader(openRes);
 
-  return {
-    open: openResult.data.total_count,
-    closed: closedResult.data.total_count,
-    merged: mergedResult.data.total_count,
-  };
+  // Paginate closed PRs to distinguish merged from unmerged
+  const closedPrs = await octokit.paginate(octokit.rest.pulls.list, {
+    owner,
+    repo,
+    state: "closed",
+    per_page: 100,
+  });
+  let merged = 0;
+  let closed = 0;
+  for (const pr of closedPrs) {
+    if (pr.merged_at) merged++;
+    else closed++;
+  }
+
+  return { open, closed, merged };
 }
 
 /**
