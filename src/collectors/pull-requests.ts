@@ -15,30 +15,37 @@ export async function collectPullRequestCounts(
 ): Promise<PullRequestCounts> {
   const octokit = await getOctokit();
 
-  // Open count via Link header (single request)
-  const openRes = await octokit.rest.pulls.list({
-    owner,
-    repo,
-    state: "open",
-    per_page: 1,
-  });
-  const open = getCountFromLinkHeader(openRes);
+  try {
+    // Open count via Link header (single request)
+    const openRes = await octokit.rest.pulls.list({
+      owner,
+      repo,
+      state: "open",
+      per_page: 1,
+    });
+    const open = getCountFromLinkHeader(openRes);
 
-  // Paginate closed PRs to distinguish merged from unmerged
-  const closedPrs = await octokit.paginate(octokit.rest.pulls.list, {
-    owner,
-    repo,
-    state: "closed",
-    per_page: 100,
-  });
-  let merged = 0;
-  let closed = 0;
-  for (const pr of closedPrs) {
-    if (pr.merged_at) merged++;
-    else closed++;
+    // Paginate closed PRs to distinguish merged from unmerged
+    const closedPrs = await octokit.paginate(octokit.rest.pulls.list, {
+      owner,
+      repo,
+      state: "closed",
+      per_page: 100,
+    });
+    let merged = 0;
+    let closed = 0;
+    for (const pr of closedPrs) {
+      if (pr.merged_at) merged++;
+      else closed++;
+    }
+
+    return { open, closed, merged };
+  } catch (err: unknown) {
+    if ((err as { status?: number }).status === 404) {
+      return { open: 0, closed: 0, merged: 0 };
+    }
+    throw err;
   }
-
-  return { open, closed, merged };
 }
 
 /**

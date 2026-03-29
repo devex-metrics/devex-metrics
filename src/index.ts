@@ -33,20 +33,30 @@ export async function collect(
 
   const repos: RepoMetrics[] = [];
 
-  for (const { name, fullName } of repoList) {
+  for (const { fullName } of repoList) {
     console.log(`  → ${fullName}`);
+
+    // fullName is "repoOwner/repoName" – repos may belong to a different org/user
+    // than the top-level owner (e.g. org repos returned for a user query).
+    const slashIndex = fullName.indexOf("/");
+    if (slashIndex <= 0 || slashIndex === fullName.length - 1) {
+      console.warn(`  ⚠ Skipping repo with unexpected fullName format: ${fullName}`);
+      continue;
+    }
+    const repoOwner = fullName.slice(0, slashIndex);
+    const repoName = fullName.slice(slashIndex + 1);
 
     const [issues, prCounts, prDetails, contributors, dependentCount] =
       await Promise.all([
-        collectIssueCounts(owner, name),
-        collectPullRequestCounts(owner, name),
-        collectPullRequestDetails(owner, name),
-        collectContributors(owner, name),
-        collectDependentCount(owner, name),
+        collectIssueCounts(repoOwner, repoName),
+        collectPullRequestCounts(repoOwner, repoName),
+        collectPullRequestDetails(repoOwner, repoName),
+        collectContributors(repoOwner, repoName),
+        collectDependentCount(repoOwner, repoName),
       ]);
 
     repos.push({
-      name,
+      name: repoName,
       fullName,
       issues,
       pullRequests: prCounts,
