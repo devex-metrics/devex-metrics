@@ -29,8 +29,11 @@ npm install
 # Build
 npm run build
 
-# Run (replace <owner> with a GitHub org or username)
+# Run with a personal access token (replace <owner> with a GitHub org or username)
 GITHUB_TOKEN=ghp_xxx node dist/index.js <owner> [org|user]
+
+# Or run with a GitHub App
+APP_ID=12345 APP_PRIVATE_KEY="$(cat private-key.pem)" node dist/index.js <owner> [org|user]
 ```
 
 The report is written to `data/<owner>-report.md`.
@@ -39,8 +42,24 @@ The report is written to `data/<owner>-report.md`.
 
 A workflow is included at `.github/workflows/collect-metrics.yml`.
 
+### Option A – Personal Access Token
+
 1. Create a **GitHub OAuth App** or **Personal Access Token** with `repo` and `read:org` scopes.
 2. Add it as a repository secret named `METRICS_GITHUB_TOKEN`.
+
+### Option B – GitHub App (recommended)
+
+Using a GitHub App provides fine-grained permissions and higher rate limits.
+
+1. [Create a GitHub App](https://docs.github.com/en/apps/creating-github-apps) with the required repository permissions (e.g. `Issues: read`, `Pull requests: read`, `Contents: read`).
+2. Install the app on the target organisation or repositories.
+3. Add the **App ID** as a repository variable named `APP_ID`.
+4. Add the **App private key** (PEM) as a repository secret named `APP_PRIVATE_KEY`.
+
+The installation ID is retrieved automatically at runtime.
+
+### Deploying
+
 3. Enable **GitHub Pages** in your repo settings (set source to *GitHub Actions*).
 4. The workflow runs daily at 06:00 UTC. It:
    - Restores the previous day's cached data from `actions/cache`

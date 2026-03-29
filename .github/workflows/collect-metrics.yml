@@ -51,6 +51,8 @@ jobs:
       - name: Collect metrics
         env:
           GITHUB_TOKEN: ${{ secrets.METRICS_GITHUB_TOKEN }}
+          APP_ID: ${{ vars.APP_ID }}
+          APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
         run: |
           OWNER="${{ github.event.inputs.owner || github.repository_owner }}"
           TYPE="${{ github.event.inputs.owner_type || 'org' }}"

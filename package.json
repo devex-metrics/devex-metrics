@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/devex-metrics/devex-metrics#readme",
   "dependencies": {
+    "@octokit/auth-app": "^8.2.0",
     "@octokit/rest": "^22.0.1",
     "typescript": "^6.0.2"
   },

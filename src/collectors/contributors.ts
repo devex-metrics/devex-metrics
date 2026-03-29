@@ -8,7 +8,7 @@ export async function collectContributors(
   owner: string,
   repo: string
 ): Promise<{ committerCount: number; reviewerCount: number }> {
-  const octokit = getOctokit();
+  const octokit = await getOctokit();
   const since = new Date(
     Date.now() - 90 * 24 * 60 * 60 * 1000
   ).toISOString();

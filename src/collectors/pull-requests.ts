@@ -8,7 +8,7 @@ export async function collectPullRequestCounts(
   owner: string,
   repo: string
 ): Promise<PullRequestCounts> {
-  const octokit = getOctokit();
+  const octokit = await getOctokit();
 
   const [openResult, closedResult, mergedResult] = await Promise.all([
     octokit.rest.search.issuesAndPullRequests({
@@ -40,7 +40,7 @@ export async function collectPullRequestDetails(
   repo: string,
   limit = 10
 ): Promise<PullRequestDetail[]> {
-  const octokit = getOctokit();
+  const octokit = await getOctokit();
 
   // Get recent merged PRs
   const { data: prs } = await octokit.rest.pulls.list({

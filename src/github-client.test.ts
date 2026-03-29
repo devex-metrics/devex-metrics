@@ -6,29 +6,40 @@ describe("github-client", () => {
   afterEach(() => {
     resetOctokit();
     delete process.env.GITHUB_TOKEN;
+    delete process.env.APP_ID;
+    delete process.env.APP_PRIVATE_KEY;
   });
 
-  it("should throw when GITHUB_TOKEN is not set", () => {
+  it("should throw when no auth env vars are set", async () => {
     delete process.env.GITHUB_TOKEN;
-    expect(() => getOctokit()).toThrow("GITHUB_TOKEN");
+    await expect(getOctokit()).rejects.toThrow("Authentication required");
   });
 
-  it("should return an Octokit instance when token is set", () => {
+  it("should return an Octokit instance when GITHUB_TOKEN is set", async () => {
     process.env.GITHUB_TOKEN = "ghp_test123";
-    const octokit = getOctokit();
+    const octokit = await getOctokit();
     expect(octokit).toBeInstanceOf(Octokit);
   });
 
-  it("should return the same instance on subsequent calls", () => {
+  it("should return the same instance on subsequent calls", async () => {
     process.env.GITHUB_TOKEN = "ghp_test123";
-    const a = getOctokit();
-    const b = getOctokit();
+    const a = await getOctokit();
+    const b = await getOctokit();
     expect(a).toBe(b);
   });
 
-  it("should allow injecting a mock via setOctokit", () => {
+  it("should allow injecting a mock via setOctokit", async () => {
     const mock = new Octokit();
     setOctokit(mock);
-    expect(getOctokit()).toBe(mock);
+    expect(await getOctokit()).toBe(mock);
+  });
+
+  it("should prefer GitHub App auth over GITHUB_TOKEN when APP_ID and APP_PRIVATE_KEY are set", async () => {
+    process.env.GITHUB_TOKEN = "ghp_test123";
+    process.env.APP_ID = "12345";
+    process.env.APP_PRIVATE_KEY = "fake-private-key";
+    // App auth path is taken; listInstallations will fail with a fake key
+    // but the Octokit is created with the app auth strategy, confirming preference
+    await expect(getOctokit()).rejects.toThrow();
   });
 });

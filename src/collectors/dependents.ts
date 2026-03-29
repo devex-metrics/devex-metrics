@@ -11,7 +11,7 @@ export async function collectDependentCount(
   owner: string,
   repo: string
 ): Promise<number> {
-  const octokit = getOctokit();
+  const octokit = await getOctokit();
 
   try {
     // The community metrics endpoint sometimes includes dependents info
