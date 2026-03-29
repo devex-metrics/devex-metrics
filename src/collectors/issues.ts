@@ -16,15 +16,22 @@ export async function collectIssueCounts(
 ): Promise<IssueCounts> {
   const octokit = await getOctokit();
 
-  const [openAll, closedAll, openPrs, closedPrs] = await Promise.all([
-    octokit.rest.issues.listForRepo({ owner, repo, state: "open", per_page: 1 }),
-    octokit.rest.issues.listForRepo({ owner, repo, state: "closed", per_page: 1 }),
-    octokit.rest.pulls.list({ owner, repo, state: "open", per_page: 1 }),
-    octokit.rest.pulls.list({ owner, repo, state: "closed", per_page: 1 }),
-  ]);
+  try {
+    const [openAll, closedAll, openPrs, closedPrs] = await Promise.all([
+      octokit.rest.issues.listForRepo({ owner, repo, state: "open", per_page: 1 }),
+      octokit.rest.issues.listForRepo({ owner, repo, state: "closed", per_page: 1 }),
+      octokit.rest.pulls.list({ owner, repo, state: "open", per_page: 1 }),
+      octokit.rest.pulls.list({ owner, repo, state: "closed", per_page: 1 }),
+    ]);
 
-  return {
-    open: getCountFromLinkHeader(openAll) - getCountFromLinkHeader(openPrs),
-    closed: getCountFromLinkHeader(closedAll) - getCountFromLinkHeader(closedPrs),
-  };
+    return {
+      open: getCountFromLinkHeader(openAll) - getCountFromLinkHeader(openPrs),
+      closed: getCountFromLinkHeader(closedAll) - getCountFromLinkHeader(closedPrs),
+    };
+  } catch (err: unknown) {
+    if ((err as { status?: number }).status === 404) {
+      return { open: 0, closed: 0 };
+    }
+    throw err;
+  }
 }

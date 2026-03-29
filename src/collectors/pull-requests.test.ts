@@ -83,4 +83,33 @@ describe("collectPullRequestCounts", () => {
     const counts = await collectPullRequestCounts("owner", "repo");
     expect(counts).toEqual({ open: 0, closed: 0, merged: 2 });
   });
+
+  it("should return zero counts when repo is not found (404)", async () => {
+    const mockOctokit = {
+      rest: {
+        pulls: {
+          list: () => Promise.reject(Object.assign(new Error("Not Found"), { status: 404 })),
+        },
+      },
+      paginate: () => Promise.reject(Object.assign(new Error("Not Found"), { status: 404 })),
+    } as unknown as Octokit;
+    setOctokit(mockOctokit);
+
+    const counts = await collectPullRequestCounts("owner", "missing-repo");
+    expect(counts).toEqual({ open: 0, closed: 0, merged: 0 });
+  });
+
+  it("should rethrow errors that are not 404", async () => {
+    const mockOctokit = {
+      rest: {
+        pulls: {
+          list: () => Promise.reject(Object.assign(new Error("Server Error"), { status: 500 })),
+        },
+      },
+      paginate: () => Promise.reject(Object.assign(new Error("Server Error"), { status: 500 })),
+    } as unknown as Octokit;
+    setOctokit(mockOctokit);
+
+    await expect(collectPullRequestCounts("owner", "repo")).rejects.toMatchObject({ status: 500 });
+  });
 });
