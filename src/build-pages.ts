@@ -163,7 +163,7 @@ function buildDashboardHtml(
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DevEx Metrics \u2013 ${escapeHtml(data.owner)}</title>
+  <title>DevEx Metrics &ndash; ${escapeHtml(data.owner)}</title>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <style>${getCSS()}</style>
 </head>
@@ -177,24 +177,24 @@ function buildDashboardHtml(
 <main>
   <section class="kpis" aria-label="Key metrics">
     <div class="kpi">
-      <div class="kpi-icon" aria-hidden="true">\u{1F4E6}</div>
+      <div class="kpi-icon" aria-hidden="true">&#x1F4E6;</div>
       <div class="kpi-val">${data.repoCount}</div>
       <div class="kpi-lbl">Repositories</div>
     </div>
     <div class="kpi">
-      <div class="kpi-icon" aria-hidden="true">\u{26A0}\u{FE0F}</div>
+      <div class="kpi-icon" aria-hidden="true">&#x26A0;&#xFE0F;</div>
       <div class="kpi-val">${totals.openIssues}</div>
       <div class="kpi-lbl">Open Issues</div>
       <div class="kpi-sub">${totals.closedIssues} closed</div>
     </div>
     <div class="kpi">
-      <div class="kpi-icon" aria-hidden="true">\u{1F500}</div>
+      <div class="kpi-icon" aria-hidden="true">&#x1F500;</div>
       <div class="kpi-val">${totals.mergedPRs}</div>
       <div class="kpi-lbl">Merged PRs</div>
       <div class="kpi-sub">${totals.openPRs} open &middot; ${totals.closedPRs} closed</div>
     </div>
     <div class="kpi">
-      <div class="kpi-icon" aria-hidden="true">\u{1F465}</div>
+      <div class="kpi-icon" aria-hidden="true">&#x1F465;</div>
       <div class="kpi-val">${totals.committers}</div>
       <div class="kpi-lbl">Committers</div>
       <div class="kpi-sub">${totals.reviewers} reviewers (90&nbsp;d)</div>
@@ -211,7 +211,7 @@ function buildDashboardHtml(
     <div class="repos-toolbar">
       <h2>Repositories</h2>
       <div class="toolbar-ctrls">
-        <input type="search" id="repoFilter" placeholder="Filter\u2026" aria-label="Filter repositories" />
+        <input type="search" id="repoFilter" placeholder="Filter&hellip;" aria-label="Filter repositories" />
         <select id="repoSort" aria-label="Sort repositories">
           <option value="name">Name</option>
           <option value="issues">Issues</option>
@@ -264,8 +264,8 @@ function buildRepoCard(repo: RepoMetrics): string {
   const totalContrib = repo.committerCount + repo.reviewerCount;
 
   return `<div class="repo-card" data-name="${escapeHtml(repo.fullName.toLowerCase())}" data-issues="${totalIssues}" data-prs="${totalPRs}" data-contributors="${totalContrib}">
-  <button class="repo-hdr" aria-expanded="false" onclick="toggleRepo(this)">
-    <span class="repo-title"><span class="chev" aria-hidden="true">\u203A</span><span class="rname">${escapeHtml(repo.fullName)}</span></span>
+  <button class="repo-hdr" aria-expanded="false" aria-label="Toggle details for ${escapeHtml(repo.fullName)}" onclick="toggleRepo(this)">
+    <span class="repo-title"><span class="chev" aria-hidden="true">&rsaquo;</span><span class="rname">${escapeHtml(repo.fullName)}</span></span>
     <span class="repo-badges">
       <span class="bdg bdg-issue">${repo.issues.open} open</span>
       <span class="bdg bdg-pr">${repo.pullRequests.merged} merged</span>
@@ -322,7 +322,7 @@ a{color:var(--accent)}
 .card{background:var(--card);border-radius:var(--r);padding:1.25rem;box-shadow:var(--sh)}
 .card h2{font-size:1rem;font-weight:600;margin-bottom:.75rem}
 .card-wide{grid-column:1/-1}
-canvas{width:100%!important;max-height:260px}
+.card canvas{display:block;width:100%;max-height:260px}
 .card-wide canvas{max-height:340px}
 .repos-section{margin-bottom:2rem}
 .repos-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem;margin-bottom:1rem}
@@ -383,23 +383,23 @@ document.addEventListener("DOMContentLoaded",function(){
   setupControls();
 });
 function renderCharts(){
-  var s=getComputedStyle(document.documentElement);
-  var c=function(v){return s.getPropertyValue(v).trim();};
-  Chart.defaults.color=c("--muted");
+  var computedStyle=getComputedStyle(document.documentElement);
+  var cssVar=function(v){return computedStyle.getPropertyValue(v).trim();};
+  Chart.defaults.color=cssVar("--muted");
   Chart.defaults.plugins.legend.labels.usePointStyle=true;
   Chart.defaults.plugins.legend.labels.padding=16;
   var dOpts={cutout:"62%",plugins:{legend:{position:"bottom"}},responsive:true,maintainAspectRatio:true};
   new Chart(document.getElementById("chartIssues"),{type:"doughnut",
     data:{labels:["Open","Closed"],datasets:[{data:[CHART_DATA.issues.open,CHART_DATA.issues.closed],
-      backgroundColor:[c("--warn"),c("--ok")],borderWidth:0,hoverOffset:6}]},options:dOpts});
+      backgroundColor:[cssVar("--warn"),cssVar("--ok")],borderWidth:0,hoverOffset:6}]},options:dOpts});
   new Chart(document.getElementById("chartPRs"),{type:"doughnut",
     data:{labels:["Open","Merged","Closed"],datasets:[{data:[CHART_DATA.prs.open,CHART_DATA.prs.merged,CHART_DATA.prs.closed],
-      backgroundColor:[c("--accent"),c("--ok"),c("--muted")],borderWidth:0,hoverOffset:6}]},options:dOpts});
+      backgroundColor:[cssVar("--accent"),cssVar("--ok"),cssVar("--muted")],borderWidth:0,hoverOffset:6}]},options:dOpts});
   if(CHART_DATA.topRepos.length>0){
     new Chart(document.getElementById("chartRepos"),{type:"bar",
       data:{labels:CHART_DATA.topRepos.map(function(r){return r.name;}),
-        datasets:[{label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),backgroundColor:c("--warn"),borderRadius:3},
-          {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),backgroundColor:c("--accent"),borderRadius:3}]},
+        datasets:[{label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),backgroundColor:cssVar("--warn"),borderRadius:3},
+          {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),backgroundColor:cssVar("--accent"),borderRadius:3}]},
       options:{indexAxis:"y",responsive:true,
         scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{display:false}}},
         plugins:{legend:{position:"top",align:"end"}}}});
@@ -411,7 +411,7 @@ function setupControls(){
   var list=document.getElementById("repoList");
   var sh=document.getElementById("shown");
   if(!f||!list)return;
-  function upd(){
+  function filterAndSort(){
     var q=f.value.toLowerCase();var by=st.value;
     var cards=Array.from(list.querySelectorAll(".repo-card"));
     cards.sort(function(a,b){
@@ -427,8 +427,8 @@ function setupControls(){
     }
     if(sh)sh.textContent=String(n);
   }
-  f.addEventListener("input",upd);
-  st.addEventListener("change",upd);
+  f.addEventListener("input",filterAndSort);
+  st.addEventListener("change",filterAndSort);
 }
 function toggleRepo(btn){
   var card=btn.closest(".repo-card");
