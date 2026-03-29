@@ -23,10 +23,10 @@ function throttleOptions(retries = DEFAULT_RETRIES) {
       _octokit: unknown,
       retryCount: number,
     ) => {
-      const method = options["method"] ?? "UNKNOWN";
-      const url = options["url"] ?? "UNKNOWN";
+      const method = (options.method ?? "UNKNOWN") as string;
+      const url = (options.url ?? "UNKNOWN") as string;
       console.warn(
-        `Rate limit hit for ${method as string} ${url as string}. ` +
+        `Rate limit hit for ${method} ${url}. ` +
           `Retrying after ${retryAfter}s (attempt ${retryCount + 1}/${retries})…`,
       );
       return retryCount < retries;
@@ -37,10 +37,10 @@ function throttleOptions(retries = DEFAULT_RETRIES) {
       _octokit: unknown,
       retryCount: number,
     ) => {
-      const method = options["method"] ?? "UNKNOWN";
-      const url = options["url"] ?? "UNKNOWN";
+      const method = (options.method ?? "UNKNOWN") as string;
+      const url = (options.url ?? "UNKNOWN") as string;
       console.warn(
-        `Secondary rate limit hit for ${method as string} ${url as string}. ` +
+        `Secondary rate limit hit for ${method} ${url}. ` +
           `Retrying after ${retryAfter}s (attempt ${retryCount + 1}/${retries})…`,
       );
       return retryCount < retries;
