@@ -42,4 +42,13 @@ describe("github-client", () => {
     // but the Octokit is created with the app auth strategy, confirming preference
     await expect(getOctokit()).rejects.toThrow();
   });
+
+  it("should create an Octokit instance with rate-limit throttling enabled", async () => {
+    process.env.GITHUB_TOKEN = "ghp_test123";
+    const octokit = await getOctokit();
+    // The throttling plugin is registered on the constructor.
+    const ctor = octokit.constructor as typeof Octokit & { plugins?: Array<{ name?: string }> };
+    const pluginNames = ctor.plugins?.map((p) => p.name) ?? [];
+    expect(pluginNames).toContain("throttling");
+  });
 });

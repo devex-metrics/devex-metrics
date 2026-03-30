@@ -1,5 +1,52 @@
 import { Octokit } from "@octokit/rest";
 import { createAppAuth } from "@octokit/auth-app";
+import { throttling } from "@octokit/plugin-throttling";
+
+const ThrottledOctokit = Octokit.plugin(throttling);
+
+/** Default number of retries for rate-limit and abuse responses. */
+const DEFAULT_RETRIES = 3;
+
+/**
+ * Build the `throttle` options shared by every Octokit instance.
+ *
+ * When the primary rate limit is hit (403 with `x-ratelimit-remaining: 0`),
+ * or a secondary / abuse limit is triggered (429 / "Retry-After"), the
+ * plugin automatically waits for the reset window and retries the request
+ * up to `retries` times.
+ */
+function throttleOptions(retries = DEFAULT_RETRIES) {
+  return {
+    onRateLimit: (
+      retryAfter: number,
+      options: Record<string, unknown>,
+      _octokit: unknown,
+      retryCount: number,
+    ) => {
+      const method = (options.method ?? "UNKNOWN") as string;
+      const url = (options.url ?? "UNKNOWN") as string;
+      console.warn(
+        `Rate limit hit for ${method} ${url}. ` +
+          `Retrying after ${retryAfter}s (attempt ${retryCount + 1}/${retries})…`,
+      );
+      return retryCount < retries;
+    },
+    onSecondaryRateLimit: (
+      retryAfter: number,
+      options: Record<string, unknown>,
+      _octokit: unknown,
+      retryCount: number,
+    ) => {
+      const method = (options.method ?? "UNKNOWN") as string;
+      const url = (options.url ?? "UNKNOWN") as string;
+      console.warn(
+        `Secondary rate limit hit for ${method} ${url}. ` +
+          `Retrying after ${retryAfter}s (attempt ${retryCount + 1}/${retries})…`,
+      );
+      return retryCount < retries;
+    },
+  };
+}
 
 let _octokit: Octokit | undefined;
 
@@ -14,6 +61,10 @@ let _octokit: Octokit | undefined;
  *
  * 2. **Personal / OAuth token** – falls back to the `GITHUB_TOKEN`
  *    environment variable.
+ *
+ * Rate limiting is handled automatically via `@octokit/plugin-throttling`.
+ * When GitHub returns a 403 (primary rate limit) or 429 (secondary / abuse
+ * limit), the client waits for the reset window and retries up to 3 times.
  */
 export async function getOctokit(): Promise<Octokit> {
   if (_octokit) {
@@ -36,7 +87,10 @@ export async function getOctokit(): Promise<Octokit> {
         "to a personal access token."
     );
   }
-  _octokit = new Octokit({ auth: token });
+  _octokit = new ThrottledOctokit({
+    auth: token,
+    throttle: throttleOptions(),
+  });
   return _octokit;
 }
 
@@ -48,9 +102,10 @@ async function createAppOctokit(
   appId: string,
   privateKey: string
 ): Promise<Octokit> {
-  const appOctokit = new Octokit({
+  const appOctokit = new ThrottledOctokit({
     authStrategy: createAppAuth,
     auth: { appId, privateKey },
+    throttle: throttleOptions(),
   });
 
   const { data: installations } =
@@ -63,13 +118,14 @@ async function createAppOctokit(
     );
   }
 
-  return new Octokit({
+  return new ThrottledOctokit({
     authStrategy: createAppAuth,
     auth: {
       appId,
       privateKey,
       installationId: installations[0].id,
     },
+    throttle: throttleOptions(),
   });
 }
 
