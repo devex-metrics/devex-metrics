@@ -11,11 +11,12 @@ on:
     inputs:
       owner:
         description: "GitHub org or user to collect metrics for"
-        required: true
+        required: false
+        default: "rajbos"
       owner_type:
         description: "org or user"
         required: false
-        default: "org"
+        default: "user"
 
 permissions:
   contents: read
@@ -57,8 +58,8 @@ jobs:
           APP_ID: ${{ vars.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
         run: |
-          OWNER="${{ github.event.inputs.owner || github.repository_owner }}"
-          TYPE="${{ github.event.inputs.owner_type || 'org' }}"
+          OWNER="${{ github.event.inputs.owner || 'rajbos' }}"
+          TYPE="${{ github.event.inputs.owner_type || 'user' }}"
           node dist/index.js "$OWNER" "$TYPE"
 
       # Cache is automatically saved after the job completes
@@ -67,7 +68,7 @@ jobs:
       # Build the GitHub Pages site from the report
       - name: Build pages site
         run: |
-          OWNER="${{ github.event.inputs.owner || github.repository_owner }}"
+          OWNER="${{ github.event.inputs.owner || 'rajbos' }}"
           mkdir -p _site
           node dist/build-pages.js "$OWNER"
 
