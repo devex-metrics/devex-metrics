@@ -172,6 +172,7 @@ function buildDashboardHtml(
 <header class="hero">
   <h1>DevEx Metrics</h1>
   <p class="subtitle">${escapeHtml(data.owner)} &middot; ${escapeHtml(data.ownerType)} &middot; collected ${escapeHtml(data.collectedAt)}</p>
+  <a class="contribute-btn" href="https://github.com/devex-metrics/devex-metrics">&#x2605; Contribute</a>
 </header>
 
 <main>
@@ -310,6 +311,10 @@ a{color:var(--accent)}
 @media(prefers-color-scheme:dark){.hero{background:linear-gradient(135deg,#1158a7 0%,#6639ba 100%)}}
 .hero h1{font-size:1.8rem;font-weight:700;margin-bottom:.35rem}
 .subtitle{opacity:.88;font-size:.95rem}
+.contribute-btn{display:inline-block;margin-top:1rem;padding:.4rem 1rem;border-radius:999px;
+  background:rgba(255,255,255,.15);color:#fff;text-decoration:none;font-size:.85rem;font-weight:600;
+  border:1px solid rgba(255,255,255,.4);transition:background .2s,transform .2s}
+.contribute-btn:hover{background:rgba(255,255,255,.28);transform:translateY(-1px);color:#fff}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem}
 .kpi{background:var(--card);border-radius:var(--r);padding:1.25rem 1rem;text-align:center;
   box-shadow:var(--sh);transition:transform .2s,box-shadow .2s}
