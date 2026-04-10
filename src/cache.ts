@@ -23,10 +23,13 @@ export function loadCache(owner: string): OrgMetrics | null {
   try {
     const raw = fs.readFileSync(filePath, "utf-8");
     const envelope: CacheEnvelope = JSON.parse(raw);
-    if (envelope.date === todayDateString()) {
+    if (
+      envelope.date === todayDateString() &&
+      envelope.data.weeklyTrends !== undefined
+    ) {
       return envelope.data;
     }
-    return null; // stale cache
+    return null; // stale cache or missing weeklyTrends
   } catch {
     return null;
   }

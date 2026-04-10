@@ -6,3 +6,4 @@ export {
 } from "./pull-requests.js";
 export { collectContributors } from "./contributors.js";
 export { collectDependentCount } from "./dependents.js";
+export { collectWeeklyTrends } from "./trends.js";

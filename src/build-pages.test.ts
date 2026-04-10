@@ -116,4 +116,58 @@ describe("build-pages", () => {
     expect(html).not.toContain("Deployed from branch");
     expect(html).not.toContain("workflow run");
   });
+
+  it("should render trend chart canvases when weeklyTrends data is present", () => {
+    // Re-write the cache file with weeklyTrends data
+    const envelopeWithTrends: CacheEnvelope = {
+      date: "2026-03-28",
+      data: {
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-03-28T12:00:00Z",
+        repoCount: 1,
+        repos: [
+          {
+            name: "repo-a",
+            fullName: "test-pages-owner/repo-a",
+            issues: { open: 2, closed: 5 },
+            pullRequests: { open: 1, closed: 0, merged: 3 },
+            pullRequestDetails: [],
+            committerCount: 2,
+            reviewerCount: 1,
+            dependentCount: 0,
+          },
+        ],
+        weeklyTrends: [
+          { week: "2026-W10", prsOpened: 3, prsMerged: 2, issuesOpened: 5, issuesClosed: 4 },
+          { week: "2026-W11", prsOpened: 1, prsMerged: 1, issuesOpened: 2, issuesClosed: 1 },
+        ],
+      },
+    };
+    fs.writeFileSync(cacheFile, JSON.stringify(envelopeWithTrends));
+
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    expect(html).toContain('id="chartPRTrends"');
+    expect(html).toContain('id="chartIssueTrends"');
+    expect(html).toContain("PR Trends");
+    expect(html).toContain("Issue Trends");
+  });
+
+  it("should build successfully without trend charts when weeklyTrends is absent", () => {
+    // The beforeEach fixture has no weeklyTrends — build-pages must not crash.
+    expect(() =>
+      execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+        cwd: process.cwd(),
+      })
+    ).not.toThrow();
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    expect(html).toContain("<!DOCTYPE html>");
+    // Trend canvases are still in the HTML (always rendered); Chart.js guards
+    // the actual rendering in JS when weeklyTrends is empty.
+    expect(html).toContain('id="chartPRTrends"');
+    expect(html).toContain('id="chartIssueTrends"');
+  });
 });

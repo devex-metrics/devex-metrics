@@ -6,6 +6,7 @@ import {
   collectPullRequestDetails,
   collectContributors,
   collectDependentCount,
+  collectWeeklyTrends,
 } from "./collectors/index.js";
 import { generateReport } from "./report.js";
 import type { OrgMetrics, RepoMetrics } from "./types.js";
@@ -67,12 +68,20 @@ export async function collect(
     });
   }
 
+  console.log("Collecting weekly trends…");
+  const trendRepos = repos.map((r) => {
+    const slash = r.fullName.indexOf("/");
+    return { owner: r.fullName.slice(0, slash), name: r.name };
+  });
+  const weeklyTrends = await collectWeeklyTrends(trendRepos);
+
   const metrics: OrgMetrics = {
     owner,
     ownerType,
     collectedAt: new Date().toISOString(),
     repoCount: repos.length,
     repos,
+    weeklyTrends,
   };
 
   saveCache(owner, metrics);

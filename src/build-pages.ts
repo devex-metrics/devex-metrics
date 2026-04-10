@@ -156,6 +156,7 @@ function buildDashboardHtml(
       closed: totals.closedPRs,
     },
     topRepos,
+    weeklyTrends: data.weeklyTrends ?? [],
   });
 
   return `<!DOCTYPE html>
@@ -205,6 +206,11 @@ function buildDashboardHtml(
     <div class="card card-chart"><h2>Issues</h2><canvas id="chartIssues"></canvas></div>
     <div class="card card-chart"><h2>Pull Requests</h2><canvas id="chartPRs"></canvas></div>
     <div class="card card-chart card-wide"><h2>Top Repositories</h2><canvas id="chartRepos"></canvas></div>
+  </section>
+
+  <section class="charts" aria-label="Trend charts">
+    <div class="card card-chart card-wide"><h2>PR Trends (per week)</h2><canvas id="chartPRTrends"></canvas></div>
+    <div class="card card-chart card-wide"><h2>Issue Trends (per week)</h2><canvas id="chartIssueTrends"></canvas></div>
   </section>
 
   <section class="repos-section" aria-label="Repositories">
@@ -324,6 +330,7 @@ a{color:var(--accent)}
 .card-wide{grid-column:1/-1}
 .card canvas{display:block;width:100%;max-height:260px}
 .card-wide canvas{max-height:340px}
+.card-trend canvas{max-height:240px}
 .repos-section{margin-bottom:2rem}
 .repos-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem;margin-bottom:1rem}
 .repos-toolbar h2{font-size:1.2rem;flex:1}
@@ -403,6 +410,26 @@ function renderCharts(){
       options:{indexAxis:"y",responsive:true,
         scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{display:false}}},
         plugins:{legend:{position:"top",align:"end"}}}});
+  }
+  if(CHART_DATA.weeklyTrends&&CHART_DATA.weeklyTrends.length>0){
+    var tLabels=CHART_DATA.weeklyTrends.map(function(t){return t.week;});
+    var lineOpts={responsive:true,maintainAspectRatio:true,
+      scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cssVar("--border")}}},
+      plugins:{legend:{position:"top",align:"end"}}};
+    new Chart(document.getElementById("chartPRTrends"),{type:"line",
+      data:{labels:tLabels,datasets:[
+        {label:"Opened",data:CHART_DATA.weeklyTrends.map(function(t){return t.prsOpened;}),
+          borderColor:cssVar("--accent"),backgroundColor:cssVar("--accent-s"),tension:0.3,fill:true,pointRadius:3},
+        {label:"Merged",data:CHART_DATA.weeklyTrends.map(function(t){return t.prsMerged;}),
+          borderColor:cssVar("--ok"),backgroundColor:cssVar("--ok-s"),tension:0.3,fill:true,pointRadius:3}]},
+      options:lineOpts});
+    new Chart(document.getElementById("chartIssueTrends"),{type:"line",
+      data:{labels:tLabels,datasets:[
+        {label:"Opened",data:CHART_DATA.weeklyTrends.map(function(t){return t.issuesOpened;}),
+          borderColor:cssVar("--warn"),backgroundColor:cssVar("--warn-s"),tension:0.3,fill:true,pointRadius:3},
+        {label:"Closed",data:CHART_DATA.weeklyTrends.map(function(t){return t.issuesClosed;}),
+          borderColor:cssVar("--ok"),backgroundColor:cssVar("--ok-s"),tension:0.3,fill:true,pointRadius:3}]},
+      options:lineOpts});
   }
 }
 function setupControls(){
