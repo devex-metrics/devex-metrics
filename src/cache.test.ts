@@ -23,6 +23,7 @@ function makeSampleMetrics(): OrgMetrics {
         dependentCount: 0,
       },
     ],
+    weeklyTrends: [],
   };
 }
 

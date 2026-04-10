@@ -14,6 +14,8 @@ export interface OrgMetrics {
   repoCount: number;
   /** Per-repo metrics. */
   repos: RepoMetrics[];
+  /** Weekly activity trends aggregated across all repos (last ~12 weeks). */
+  weeklyTrends?: WeeklyTrendPoint[];
 }
 
 /** Aggregated metrics for a single repository. */
@@ -56,6 +58,16 @@ export interface PullRequestDetail {
   commitCount: number;
   /** Total GitHub Actions minutes consumed by check-suites on this PR (0 if unavailable). */
   actionsMinutes: number;
+}
+
+/** One data point in a weekly activity trend series. */
+export interface WeeklyTrendPoint {
+  /** ISO week label, e.g. "2024-W03". */
+  week: string;
+  prsOpened: number;
+  prsMerged: number;
+  issuesOpened: number;
+  issuesClosed: number;
 }
 
 /** Shape of the on-disk cache file. */
