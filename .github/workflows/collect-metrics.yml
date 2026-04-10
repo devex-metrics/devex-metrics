@@ -44,7 +44,7 @@ jobs:
       # Restore cached data from previous runs
       - name: Restore data cache
         id: cache-data
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: data
           key: metrics-data-${{ github.repository_owner }}
