@@ -12,6 +12,7 @@ vi.mock("./collectors/index.js", () => ({
   collectIssueCounts: vi.fn(),
   collectPullRequestCounts: vi.fn(),
   collectPullRequestDetails: vi.fn(),
+  collectMergedPRDates: vi.fn(),
   collectContributors: vi.fn(),
   collectDependentCount: vi.fn(),
   collectWeeklyTrends: vi.fn(),
@@ -24,6 +25,7 @@ import {
   collectIssueCounts,
   collectPullRequestCounts,
   collectPullRequestDetails,
+  collectMergedPRDates,
   collectContributors,
   collectDependentCount,
   collectWeeklyTrends,
@@ -39,6 +41,7 @@ function setupDefaultMocks() {
   vi.mocked(collectIssueCounts).mockResolvedValue({ open: 0, closed: 0 });
   vi.mocked(collectPullRequestCounts).mockResolvedValue({ open: 0, closed: 0, merged: 0 });
   vi.mocked(collectPullRequestDetails).mockResolvedValue([]);
+  vi.mocked(collectMergedPRDates).mockResolvedValue([]);
   vi.mocked(collectContributors).mockResolvedValue({ committerCount: 0, reviewerCount: 0 });
   vi.mocked(collectDependentCount).mockResolvedValue(0);
   vi.mocked(collectWeeklyTrends).mockResolvedValue([]);
