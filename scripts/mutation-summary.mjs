@@ -65,7 +65,7 @@ if (survivedList.length > 0) {
   lines.push("| ---- | ---- | ------- | ----------- |");
   for (const { file, line, mutator, replacement } of survivedList) {
     const shortFile = file.replace(/^.*[/\\]src[/\\]/, "src/");
-    const safeReplacement = String(replacement ?? "").replace(/\|/g, "\\|");
+    const safeReplacement = String(replacement ?? "").replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
     lines.push(`| \`${shortFile}\` | ${line} | ${mutator} | \`${safeReplacement}\` |`);
   }
   lines.push("");
