@@ -130,6 +130,27 @@ function buildDashboardHtml(
 ): string {
   const totals = aggregate(data.repos);
 
+  // Compute data date range from merged PR details
+  let oldestDataDate = '';
+  let newestDataDate = '';
+  for (const repo of data.repos) {
+    for (const pr of repo.pullRequestDetails) {
+      if (pr.mergedAt) {
+        const d = pr.mergedAt.slice(0, 10);
+        if (!oldestDataDate || d < oldestDataDate) oldestDataDate = d;
+        if (!newestDataDate || d > newestDataDate) newestDataDate = d;
+      }
+    }
+  }
+  // Fall back to weekly trends if no PR details have dates
+  if (!oldestDataDate && data.weeklyTrends && data.weeklyTrends.length > 0) {
+    oldestDataDate = data.weeklyTrends[0].week;
+    newestDataDate = data.weeklyTrends[data.weeklyTrends.length - 1].week;
+  }
+  const dataRangeHtml = oldestDataDate
+    ? ` &middot; <span class="data-range">&#x1F4C5; ${escapeHtml(oldestDataDate)} &rarr; ${escapeHtml(newestDataDate || data.collectedAt.slice(0, 10))}</span>`
+    : '';
+
   let deployedFrom = "";
   if (branch) {
     deployedFrom = ` Deployed from branch <strong>${escapeHtml(branch)}</strong>`;
@@ -151,6 +172,12 @@ function buildDashboardHtml(
 
   const repoCards = data.repos.map((repo) => buildRepoCard(repo)).join("\n");
 
+  const allPRDetails = data.repos.flatMap((r) =>
+    r.pullRequestDetails
+      .filter((pr) => !!pr.mergedAt)
+      .map((pr) => ({ repo: r.name, mergedAt: pr.mergedAt! }))
+  );
+
   const chartPayload = JSON.stringify({
     issues: { open: totals.openIssues, closed: totals.closedIssues },
     prs: {
@@ -164,6 +191,8 @@ function buildDashboardHtml(
       linesAdded: t.linesAdded ?? 0,
       linesDeleted: t.linesDeleted ?? 0,
     })),
+    allPRDetails,
+    collectedAt: data.collectedAt,
   });
 
   return `<!DOCTYPE html>
@@ -182,10 +211,20 @@ function buildDashboardHtml(
     <a href="https://github.com/rajbos" class="hero-nav-link">Made with &#x2764;&#xFE0F; by rajbos</a>
   </nav>
   <h1>DevEx Metrics</h1>
-  <p class="subtitle">${escapeHtml(data.owner)} &middot; ${escapeHtml(data.ownerType)} &middot; collected ${escapeHtml(data.collectedAt)}</p>
+  <p class="subtitle">${escapeHtml(data.owner)} &middot; ${escapeHtml(data.ownerType)} &middot; collected ${escapeHtml(data.collectedAt)}${dataRangeHtml}</p>
 </header>
 
 <main>
+  <div class="filter-bar" role="toolbar" aria-label="Time period filter">
+    <span class="filter-label">Period:</span>
+    <div class="filter-btns">
+      <button class="filter-btn active" data-period="all">All Time</button>
+      <button class="filter-btn" data-period="year">This Year</button>
+      <button class="filter-btn" data-period="90days">Last 90 Days</button>
+      <button class="filter-btn" data-period="30days">Last 30 Days</button>
+    </div>
+  </div>
+
   <section class="kpis" aria-label="Key metrics">
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x1F4E6;</div>
@@ -215,7 +254,7 @@ function buildDashboardHtml(
   <section class="charts" aria-label="Charts">
     <div class="card card-chart"><h2>Issues</h2><canvas id="chartIssues"></canvas></div>
     <div class="card card-chart"><h2>Pull Requests</h2><canvas id="chartPRs"></canvas></div>
-    <div class="card card-chart card-wide"><h2>Top Repositories</h2><canvas id="chartRepos"></canvas></div>
+    <div class="card card-chart card-wide"><h2 id="chartReposTitle">Top Repositories</h2><canvas id="chartRepos"></canvas></div>
   </section>
 
   <section class="charts" aria-label="Trend charts">
@@ -411,6 +450,15 @@ dl{display:flex;flex-direction:column;gap:.15rem}
 .pr-tbl th{color:var(--muted);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.03em}
 .add{color:var(--ok);font-weight:600}.del{color:var(--err);font-weight:600}
 .repo-count{text-align:center;font-size:.8rem;color:var(--muted);margin-top:.75rem}
+.filter-bar{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;flex-wrap:wrap;
+  background:var(--card);border-radius:var(--r);padding:.75rem 1rem;box-shadow:var(--sh)}
+.filter-label{font-size:.85rem;color:var(--muted);font-weight:500;white-space:nowrap}
+.filter-btns{display:flex;gap:.4rem;flex-wrap:wrap}
+.filter-btn{font:inherit;font-size:.8rem;padding:.3rem .8rem;border:1px solid var(--border);
+  border-radius:999px;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
+.filter-btn:hover{border-color:var(--accent);color:var(--accent)}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.data-range{opacity:.82;font-size:.88rem}
 .repo-group{margin-bottom:.75rem}
 .repo-group-hdr{display:flex;align-items:center;gap:.5rem;padding:.65rem 1rem;cursor:pointer;
   background:var(--card);border-radius:var(--rs);font-size:.9rem;font-weight:600;
@@ -441,29 +489,35 @@ footer{max-width:1120px;margin:0 auto;padding:1rem;text-align:center;font-size:.
 
 function getJS(): string {
   return `
+var charts={};
+var cssColors={};
 document.addEventListener("DOMContentLoaded",function(){
+  var cs=getComputedStyle(document.documentElement);
+  var cv=function(v){return cs.getPropertyValue(v).trim();};
+  cssColors={warn:cv("--warn"),ok:cv("--ok"),accent:cv("--accent"),
+    accentS:cv("--accent-s"),okS:cv("--ok-s"),warnS:cv("--warn-s"),
+    err:cv("--err"),errS:cv("--err-s"),muted:cv("--muted"),border:cv("--border")};
   if(typeof Chart!=="undefined"){renderCharts();}
   setupGroups();
   setupControls();
+  setupFilter();
 });
 function renderCharts(){
-  var computedStyle=getComputedStyle(document.documentElement);
-  var cssVar=function(v){return computedStyle.getPropertyValue(v).trim();};
-  Chart.defaults.color=cssVar("--muted");
+  Chart.defaults.color=cssColors.muted;
   Chart.defaults.plugins.legend.labels.usePointStyle=true;
   Chart.defaults.plugins.legend.labels.padding=16;
   var dOpts={cutout:"62%",plugins:{legend:{position:"bottom"}},responsive:true,maintainAspectRatio:true};
-  new Chart(document.getElementById("chartIssues"),{type:"doughnut",
+  charts.issues=new Chart(document.getElementById("chartIssues"),{type:"doughnut",
     data:{labels:["Open","Closed"],datasets:[{data:[CHART_DATA.issues.open,CHART_DATA.issues.closed],
-      backgroundColor:[cssVar("--warn"),cssVar("--ok")],borderWidth:0,hoverOffset:6}]},options:dOpts});
-  new Chart(document.getElementById("chartPRs"),{type:"doughnut",
+      backgroundColor:[cssColors.warn,cssColors.ok],borderWidth:0,hoverOffset:6}]},options:dOpts});
+  charts.prs=new Chart(document.getElementById("chartPRs"),{type:"doughnut",
     data:{labels:["Open","Merged","Closed"],datasets:[{data:[CHART_DATA.prs.open,CHART_DATA.prs.merged,CHART_DATA.prs.closed],
-      backgroundColor:[cssVar("--accent"),cssVar("--ok"),cssVar("--muted")],borderWidth:0,hoverOffset:6}]},options:dOpts});
+      backgroundColor:[cssColors.accent,cssColors.ok,cssColors.muted],borderWidth:0,hoverOffset:6}]},options:dOpts});
   if(CHART_DATA.topRepos.length>0){
-    new Chart(document.getElementById("chartRepos"),{type:"bar",
+    charts.repos=new Chart(document.getElementById("chartRepos"),{type:"bar",
       data:{labels:CHART_DATA.topRepos.map(function(r){return r.name;}),
-        datasets:[{label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),backgroundColor:cssVar("--warn"),borderRadius:3},
-          {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),backgroundColor:cssVar("--accent"),borderRadius:3}]},
+        datasets:[{label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),backgroundColor:cssColors.warn,borderRadius:3},
+          {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),backgroundColor:cssColors.accent,borderRadius:3}]},
       options:{indexAxis:"y",responsive:true,
         scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{display:false}}},
         plugins:{legend:{position:"top",align:"end"}}}});
@@ -471,29 +525,102 @@ function renderCharts(){
   if(CHART_DATA.weeklyTrends&&CHART_DATA.weeklyTrends.length>0){
     var tLabels=CHART_DATA.weeklyTrends.map(function(t){return t.week;});
     var lineOpts={responsive:true,maintainAspectRatio:true,
-      scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cssVar("--border")}}},
+      scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cssColors.border}}},
       plugins:{legend:{position:"top",align:"end"}}};
-    new Chart(document.getElementById("chartPRTrends"),{type:"line",
+    charts.prTrends=new Chart(document.getElementById("chartPRTrends"),{type:"line",
       data:{labels:tLabels,datasets:[
         {label:"Opened",data:CHART_DATA.weeklyTrends.map(function(t){return t.prsOpened;}),
-          borderColor:cssVar("--accent"),backgroundColor:cssVar("--accent-s"),tension:0.3,fill:true,pointRadius:3},
+          borderColor:cssColors.accent,backgroundColor:cssColors.accentS,tension:0.3,fill:true,pointRadius:3},
         {label:"Merged",data:CHART_DATA.weeklyTrends.map(function(t){return t.prsMerged;}),
-          borderColor:cssVar("--ok"),backgroundColor:cssVar("--ok-s"),tension:0.3,fill:true,pointRadius:3}]},
+          borderColor:cssColors.ok,backgroundColor:cssColors.okS,tension:0.3,fill:true,pointRadius:3}]},
       options:lineOpts});
-    new Chart(document.getElementById("chartIssueTrends"),{type:"line",
+    charts.issueTrends=new Chart(document.getElementById("chartIssueTrends"),{type:"line",
       data:{labels:tLabels,datasets:[
         {label:"Opened",data:CHART_DATA.weeklyTrends.map(function(t){return t.issuesOpened;}),
-          borderColor:cssVar("--warn"),backgroundColor:cssVar("--warn-s"),tension:0.3,fill:true,pointRadius:3},
+          borderColor:cssColors.warn,backgroundColor:cssColors.warnS,tension:0.3,fill:true,pointRadius:3},
         {label:"Closed",data:CHART_DATA.weeklyTrends.map(function(t){return t.issuesClosed;}),
-          borderColor:cssVar("--ok"),backgroundColor:cssVar("--ok-s"),tension:0.3,fill:true,pointRadius:3}]},
+          borderColor:cssColors.ok,backgroundColor:cssColors.okS,tension:0.3,fill:true,pointRadius:3}]},
       options:lineOpts});
-    new Chart(document.getElementById("chartPRSizeTrends"),{type:"line",
+    charts.prSizeTrends=new Chart(document.getElementById("chartPRSizeTrends"),{type:"line",
       data:{labels:tLabels,datasets:[
         {label:"Lines Added",data:CHART_DATA.weeklyTrends.map(function(t){return t.linesAdded;}),
-          borderColor:cssVar("--ok"),backgroundColor:cssVar("--ok-s"),tension:0.3,fill:true,pointRadius:3},
+          borderColor:cssColors.ok,backgroundColor:cssColors.okS,tension:0.3,fill:true,pointRadius:3},
         {label:"Lines Removed",data:CHART_DATA.weeklyTrends.map(function(t){return t.linesDeleted;}),
-          borderColor:cssVar("--err"),backgroundColor:cssVar("--err-s"),tension:0.3,fill:true,pointRadius:3}]},
+          borderColor:cssColors.err,backgroundColor:cssColors.errS,tension:0.3,fill:true,pointRadius:3}]},
       options:lineOpts});
+  }
+}
+function setupFilter(){
+  document.querySelectorAll(".filter-btn").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      document.querySelectorAll(".filter-btn").forEach(function(b){b.classList.remove("active");});
+      btn.classList.add("active");
+      applyFilter(btn.dataset.period);
+    });
+  });
+}
+function getCutoffDate(period){
+  var collected=new Date(CHART_DATA.collectedAt);
+  var d;
+  if(period==="year")return new Date(Date.UTC(collected.getUTCFullYear(),0,1));
+  d=new Date(collected);
+  if(period==="90days"){d.setUTCDate(d.getUTCDate()-90);return d;}
+  if(period==="30days"){d.setUTCDate(d.getUTCDate()-30);return d;}
+  return null;
+}
+function weekToDate(weekStr){
+  var parts=weekStr.split("-W");
+  var year=parseInt(parts[0],10);var week=parseInt(parts[1],10);
+  var jan4=new Date(Date.UTC(year,0,4));
+  var dow=jan4.getUTCDay()||7;
+  var mon=new Date(jan4);
+  mon.setUTCDate(jan4.getUTCDate()-dow+1+(week-1)*7);
+  return mon;
+}
+function applyFilter(period){
+  var cutoff=getCutoffDate(period);
+  var trends=CHART_DATA.weeklyTrends||[];
+  if(cutoff)trends=trends.filter(function(t){return weekToDate(t.week)>=cutoff;});
+  var tLabels=trends.map(function(t){return t.week;});
+  if(charts.prTrends){
+    charts.prTrends.data.labels=tLabels;
+    charts.prTrends.data.datasets[0].data=trends.map(function(t){return t.prsOpened;});
+    charts.prTrends.data.datasets[1].data=trends.map(function(t){return t.prsMerged;});
+    charts.prTrends.update();
+  }
+  if(charts.issueTrends){
+    charts.issueTrends.data.labels=tLabels;
+    charts.issueTrends.data.datasets[0].data=trends.map(function(t){return t.issuesOpened;});
+    charts.issueTrends.data.datasets[1].data=trends.map(function(t){return t.issuesClosed;});
+    charts.issueTrends.update();
+  }
+  if(charts.prSizeTrends){
+    charts.prSizeTrends.data.labels=tLabels;
+    charts.prSizeTrends.data.datasets[0].data=trends.map(function(t){return t.linesAdded;});
+    charts.prSizeTrends.data.datasets[1].data=trends.map(function(t){return t.linesDeleted;});
+    charts.prSizeTrends.update();
+  }
+  if(charts.repos){
+    var titleEl=document.getElementById("chartReposTitle");
+    if(period==="all"){
+      charts.repos.data.labels=CHART_DATA.topRepos.map(function(r){return r.name;});
+      charts.repos.data.datasets=[
+        {label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),backgroundColor:cssColors.warn,borderRadius:3},
+        {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),backgroundColor:cssColors.accent,borderRadius:3}];
+      if(titleEl)titleEl.textContent="Top Repositories";
+    }else{
+      var filteredPRs=(CHART_DATA.allPRDetails||[]).filter(function(p){return cutoff?new Date(p.mergedAt)>=cutoff:true;});
+      var counts={};
+      filteredPRs.forEach(function(p){counts[p.repo]=(counts[p.repo]||0)+1;});
+      var topFiltered=Object.keys(counts).map(function(n){return{name:n,prs:counts[n]};})
+        .sort(function(a,b){return b.prs-a.prs;}).slice(0,15);
+      charts.repos.data.labels=topFiltered.map(function(r){return r.name;});
+      charts.repos.data.datasets=[
+        {label:"Merged PRs",data:topFiltered.map(function(r){return r.prs;}),backgroundColor:cssColors.accent,borderRadius:3}];
+      var periodLabel=period==="year"?"This Year":period==="90days"?"Last 90 Days":"Last 30 Days";
+      if(titleEl)titleEl.textContent="Top Repositories \u2014 "+periodLabel;
+    }
+    charts.repos.update();
   }
 }
 function setupControls(){
