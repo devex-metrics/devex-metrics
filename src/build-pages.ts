@@ -218,10 +218,10 @@ function buildDashboardHtml(
   <div class="filter-bar" role="toolbar" aria-label="Time period filter">
     <span class="filter-label">Period:</span>
     <div class="filter-btns">
-      <button class="filter-btn active" data-period="all">All Time</button>
+      <button class="filter-btn" data-period="all">All Time</button>
       <button class="filter-btn" data-period="year">This Year</button>
       <button class="filter-btn" data-period="90days">Last 90 Days</button>
-      <button class="filter-btn" data-period="30days">Last 30 Days</button>
+      <button class="filter-btn active" data-period="30days">Last 30 Days</button>
     </div>
   </div>
 
@@ -233,15 +233,15 @@ function buildDashboardHtml(
     </div>
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x26A0;&#xFE0F;</div>
-      <div class="kpi-val">${totals.openIssues}</div>
-      <div class="kpi-lbl">Open Issues</div>
-      <div class="kpi-sub">${totals.closedIssues} closed</div>
+      <div class="kpi-val" id="kpiIssueVal">${totals.openIssues}</div>
+      <div class="kpi-lbl" id="kpiIssueLbl">Open Issues</div>
+      <div class="kpi-sub" id="kpiIssueSub">${totals.closedIssues} closed</div>
     </div>
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x1F500;</div>
-      <div class="kpi-val">${totals.mergedPRs}</div>
-      <div class="kpi-lbl">Merged PRs</div>
-      <div class="kpi-sub">${totals.openPRs} open &middot; ${totals.closedPRs} closed</div>
+      <div class="kpi-val" id="kpiPRVal">${totals.mergedPRs}</div>
+      <div class="kpi-lbl" id="kpiPRLbl">Merged PRs</div>
+      <div class="kpi-sub" id="kpiPRSub">${totals.openPRs} open &middot; ${totals.closedPRs} closed</div>
     </div>
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x1F465;</div>
@@ -501,6 +501,7 @@ document.addEventListener("DOMContentLoaded",function(){
   setupGroups();
   setupControls();
   setupFilter();
+  applyFilter("30days");
 });
 function renderCharts(){
   Chart.defaults.color=cssColors.muted;
@@ -621,6 +622,59 @@ function applyFilter(period){
       if(titleEl)titleEl.textContent="Top Repositories \u2014 "+periodLabel;
     }
     charts.repos.update();
+  }
+  // Compute period sums from filtered trends
+  var issuesOpened=0,issuesClosed=0,prsOpened=0;
+  trends.forEach(function(t){
+    issuesOpened+=(t.issuesOpened||0);
+    issuesClosed+=(t.issuesClosed||0);
+    prsOpened+=(t.prsOpened||0);
+  });
+  var prsMerged=(CHART_DATA.allPRDetails||[]).filter(function(p){return cutoff?new Date(p.mergedAt)>=cutoff:true;}).length;
+  // Update doughnut charts
+  if(charts.issues){
+    if(period==="all"){
+      charts.issues.data.labels=["Open","Closed"];
+      charts.issues.data.datasets[0].data=[CHART_DATA.issues.open,CHART_DATA.issues.closed];
+    }else{
+      charts.issues.data.labels=["Opened","Closed"];
+      charts.issues.data.datasets[0].data=[issuesOpened,issuesClosed];
+    }
+    charts.issues.update();
+  }
+  if(charts.prs){
+    if(period==="all"){
+      charts.prs.data.labels=["Open","Merged","Closed"];
+      charts.prs.data.datasets[0].data=[CHART_DATA.prs.open,CHART_DATA.prs.merged,CHART_DATA.prs.closed];
+      charts.prs.data.datasets[0].backgroundColor=[cssColors.accent,cssColors.ok,cssColors.muted];
+    }else{
+      charts.prs.data.labels=["Opened","Merged"];
+      charts.prs.data.datasets[0].data=[prsOpened,prsMerged];
+      charts.prs.data.datasets[0].backgroundColor=[cssColors.accent,cssColors.ok];
+    }
+    charts.prs.update();
+  }
+  // Update KPI numbers and labels
+  var issueVal=document.getElementById("kpiIssueVal");
+  var issueLbl=document.getElementById("kpiIssueLbl");
+  var issueSub=document.getElementById("kpiIssueSub");
+  var prVal=document.getElementById("kpiPRVal");
+  var prLbl=document.getElementById("kpiPRLbl");
+  var prSub=document.getElementById("kpiPRSub");
+  if(period==="all"){
+    if(issueVal)issueVal.textContent=String(CHART_DATA.issues.open);
+    if(issueLbl)issueLbl.textContent="Open Issues";
+    if(issueSub)issueSub.textContent=CHART_DATA.issues.closed+" closed";
+    if(prVal)prVal.textContent=String(CHART_DATA.prs.merged);
+    if(prLbl)prLbl.textContent="Merged PRs";
+    if(prSub)prSub.textContent=CHART_DATA.prs.open+" open \u00B7 "+CHART_DATA.prs.closed+" closed";
+  }else{
+    if(issueVal)issueVal.textContent=String(issuesOpened);
+    if(issueLbl)issueLbl.textContent="Issues Opened";
+    if(issueSub)issueSub.textContent=issuesClosed+" closed";
+    if(prVal)prVal.textContent=String(prsMerged);
+    if(prLbl)prLbl.textContent="Merged PRs";
+    if(prSub)prSub.textContent=prsOpened+" opened";
   }
 }
 function setupControls(){
