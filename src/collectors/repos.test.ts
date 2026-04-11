@@ -5,9 +5,10 @@ import { collectRepos } from "./repos.js";
 
 type RepoPage = Array<{ name: string; full_name: string; pushed_at: string | null }>;
 
-function buildMockOctokit(pages: RepoPage[]) {
+function buildMockOctokit(pages: RepoPage[], authenticatedLogin?: string | null) {
   const listForOrg = Symbol("listForOrg");
   const listForUser = Symbol("listForUser");
+  const listForAuthenticatedUser = Symbol("listForAuthenticatedUser");
   const captured: { method?: unknown; params?: unknown } = {};
 
   async function* fakeIterator(method: unknown, params: unknown) {
@@ -18,14 +19,22 @@ function buildMockOctokit(pages: RepoPage[]) {
     }
   }
 
+  const getAuthenticated =
+    authenticatedLogin === null
+      ? vi.fn().mockRejectedValue(Object.assign(new Error("Unauthorized"), { status: 401 }))
+      : authenticatedLogin === undefined
+        ? vi.fn().mockRejectedValue(Object.assign(new Error("Unauthorized"), { status: 401 }))
+        : vi.fn().mockResolvedValue({ data: { login: authenticatedLogin } });
+
   const mock = {
     rest: {
-      repos: { listForOrg, listForUser },
+      repos: { listForOrg, listForUser, listForAuthenticatedUser },
+      users: { getAuthenticated },
     },
     paginate: Object.assign(vi.fn(), { iterator: fakeIterator }),
   } as unknown as Octokit;
 
-  return { mock, captured, listForOrg, listForUser };
+  return { mock, captured, listForOrg, listForUser, listForAuthenticatedUser, getAuthenticated };
 }
 
 describe("collectRepos", () => {
@@ -49,18 +58,67 @@ describe("collectRepos", () => {
     expect(captured.params).toMatchObject({ org: "myorg" });
   });
 
-  it("fetches repos for a user using listForUser with username param", async () => {
-    const { mock, captured, listForUser } = buildMockOctokit([
+  it("org mode never calls getAuthenticated", async () => {
+    const { mock, getAuthenticated } = buildMockOctokit([
+      [{ name: "repo-a", full_name: "myorg/repo-a", pushed_at: "" }],
+    ], "myorg");
+    setOctokit(mock);
+
+    await collectRepos("myorg", "org");
+
+    expect(getAuthenticated).not.toHaveBeenCalled();
+  });
+
+  it("uses listForAuthenticatedUser when owner matches the authenticated user", async () => {
+    const { mock, captured, listForAuthenticatedUser } = buildMockOctokit([
       [{ name: "repo-b", full_name: "myuser/repo-b", pushed_at: "2026-02-01T00:00:00Z" }],
-    ]);
+    ], "myuser");
     setOctokit(mock);
 
     const repos = await collectRepos("myuser", "user");
 
     expect(repos).toHaveLength(1);
     expect(repos[0]).toMatchObject({ name: "repo-b", fullName: "myuser/repo-b" });
+    expect(captured.method).toBe(listForAuthenticatedUser);
+    expect(captured.params).toMatchObject({ type: "all" });
+  });
+
+  it("uses listForAuthenticatedUser with case-insensitive owner match", async () => {
+    const { mock, captured, listForAuthenticatedUser } = buildMockOctokit([
+      [{ name: "repo-c", full_name: "MyUser/repo-c", pushed_at: "" }],
+    ], "MyUser");
+    setOctokit(mock);
+
+    const repos = await collectRepos("myuser", "user");
+
+    expect(captured.method).toBe(listForAuthenticatedUser);
+    expect(repos).toHaveLength(1);
+  });
+
+  it("falls back to listForUser when owner does not match the authenticated user", async () => {
+    const { mock, captured, listForUser } = buildMockOctokit([
+      [{ name: "repo-b", full_name: "otheruser/repo-b", pushed_at: "2026-02-01T00:00:00Z" }],
+    ], "someoneelse");
+    setOctokit(mock);
+
+    const repos = await collectRepos("otheruser", "user");
+
+    expect(repos).toHaveLength(1);
+    expect(repos[0]).toMatchObject({ name: "repo-b", fullName: "otheruser/repo-b" });
     expect(captured.method).toBe(listForUser);
-    expect(captured.params).toMatchObject({ username: "myuser" });
+    expect(captured.params).toMatchObject({ username: "otheruser" });
+  });
+
+  it("falls back to listForUser when getAuthenticated throws (e.g. GitHub App token)", async () => {
+    const { mock, captured, listForUser } = buildMockOctokit([
+      [{ name: "repo-b", full_name: "myuser/repo-b", pushed_at: "" }],
+    ], null);
+    setOctokit(mock);
+
+    const repos = await collectRepos("myuser", "user");
+
+    expect(captured.method).toBe(listForUser);
+    expect(repos).toHaveLength(1);
   });
 
   it("falls back to empty string when pushed_at is null", async () => {
