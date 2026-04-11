@@ -136,3 +136,41 @@ export async function collectPullRequestDetails(
   }
   return details;
 }
+
+/**
+ * Collect merged_at timestamps for merged PRs going back up to ~13 months.
+ * Paginates through closed PRs (up to maxPages×100 entries) using only the
+ * cheap pulls.list call — no per-PR detail fetches. This gives the chart
+ * filter enough history to distinguish 30-day, 90-day, and year views even
+ * for repos with hundreds of merged PRs per month.
+ */
+export async function collectMergedPRDates(
+  owner: string,
+  repo: string,
+  maxPages = 10
+): Promise<string[]> {
+  const octokit = await getOctokit();
+  const dates: string[] = [];
+  for (let page = 1; page <= maxPages; page++) {
+    try {
+      const res = await octokit.rest.pulls.list({
+        owner,
+        repo,
+        state: "closed",
+        sort: "updated",
+        direction: "desc",
+        per_page: 100,
+        page,
+      });
+      for (const pr of res.data) {
+        if (pr.merged_at) dates.push(pr.merged_at);
+      }
+      if (res.data.length < 100) break; // reached the last page
+    } catch (err: unknown) {
+      const status = (err as { status?: number }).status;
+      if (status === 403 || status === 404) break;
+      throw err;
+    }
+  }
+  return dates.sort((a, b) => (b > a ? 1 : -1));
+}
