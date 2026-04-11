@@ -280,6 +280,7 @@ function buildDashboardHtml(
         </select>
       </div>
     </div>
+    <p class="repos-period-note" id="reposPeriodNote">&#9432; The <strong>merged PR</strong> count reflects the selected period. Expand a row for all-time details.</p>
     <div class="table-wrap">
       <table class="repo-table" aria-label="Repositories">
         <thead><tr>
@@ -364,6 +365,7 @@ function buildRepoRow(repo: RepoMetrics): string {
   const dataRow =
     `<tr class="repo-row" ` +
     `data-name="${escapeHtml(repo.fullName.toLowerCase())}" ` +
+    `data-repo-name="${escapeHtml(repo.name.toLowerCase())}" ` +
     `data-open-issues="${repo.issues.open}" ` +
     `data-merged-prs="${repo.pullRequests.merged}" ` +
     `data-open-prs="${repo.pullRequests.open}" ` +
@@ -379,7 +381,7 @@ function buildRepoRow(repo: RepoMetrics): string {
     `<span class="bdg bdg-age"></span>` +
     `</div></td>` +
     `<td>${repo.issues.open}<span class="col-muted"> / ${repo.issues.closed}</span></td>` +
-    `<td>${repo.pullRequests.merged}</td>` +
+    `<td class="td-merged-prs">${repo.pullRequests.merged}</td>` +
     `<td>${repo.pullRequests.open}</td>` +
     `<td title="${repo.committerCount} committers, ${repo.reviewerCount} reviewers">${totalContrib}</td>` +
     `<td>${repo.dependentCount}</td>` +
@@ -512,6 +514,8 @@ dl{display:flex;flex-direction:column;gap:.15rem}
   background:var(--card);border-radius:var(--r);padding:.75rem 1rem;box-shadow:var(--sh)}
 .filter-label{font-size:.85rem;color:var(--muted);font-weight:500;white-space:nowrap}
 .filter-btns{display:flex;gap:.4rem;flex-wrap:wrap}
+.repos-period-note{font-size:.78rem;color:var(--muted);margin:.25rem 0 .6rem;padding:.3rem .5rem;background:var(--accent-s);border-left:3px solid var(--accent);border-radius:0 var(--rs) var(--rs) 0}
+.repos-period-note{font-size:.78rem;color:var(--muted);margin:.25rem 0 .6rem;padding:.3rem .5rem;background:var(--accent-s);border-left:3px solid var(--accent);border-radius:0 var(--rs) var(--rs) 0}
 .filter-btn{font:inherit;font-size:.8rem;padding:.3rem .8rem;border:1px solid var(--border);
   border-radius:999px;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
 .filter-btn:hover{border-color:var(--accent);color:var(--accent)}
@@ -722,6 +726,17 @@ function applyFilter(period){
     if(prLbl)prLbl.textContent="Merged PRs";
     if(prSub)prSub.textContent=prsOpened+" opened";
   }
+  // Update the merged-PR column cells to reflect the selected period
+  var repoCounts={};
+  (CHART_DATA.allPRDetails||[]).forEach(function(p){
+    if(!cutoff||new Date(p.mergedAt)>=cutoff){repoCounts[p.repo]=(repoCounts[p.repo]||0)+1;}
+  });
+  document.querySelectorAll(".repo-row[data-repo-name]").forEach(function(row){
+    var cell=row.querySelector(".td-merged-prs");
+    if(cell)cell.textContent=String(repoCounts[row.dataset.repoName]||0);
+  });
+  var note=document.getElementById("reposPeriodNote");
+  if(note)note.style.display=period==="all"?"none":"";
 }
 function compareRows(a,b,by){
   if(by==="name")return a.dataset.name.localeCompare(b.dataset.name);
