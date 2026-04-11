@@ -759,15 +759,27 @@ function applyFilter(period){
     if(prLbl)prLbl.textContent="Merged PRs";
     if(prSub)prSub.textContent=prsOpened+" opened";
   }
-  // Update the merged-PR column cells to reflect the selected period
-  var repoCounts={};
-  (CHART_DATA.allPRDetails||[]).forEach(function(p){
-    if(!cutoff||new Date(p.mergedAt)>=cutoff){repoCounts[p.repo]=(repoCounts[p.repo]||0)+1;}
-  });
-  document.querySelectorAll(".repo-row[data-repo-name]").forEach(function(row){
-    var cell=row.querySelector(".td-merged-prs");
-    if(cell)cell.textContent=String(repoCounts[row.dataset.repoName]||0);
-  });
+  // Update the merged-PR column cells to reflect the selected period.
+  // For "all time" restore from the data attribute (true API total).
+  // For time-bounded periods count from allPRDetails; key is lowercased to
+  // match data-repo-name which is always stored lowercase.
+  if(period==="all"){
+    document.querySelectorAll(".repo-row[data-repo-name]").forEach(function(row){
+      var cell=row.querySelector(".td-merged-prs");
+      if(cell)cell.textContent=String(row.dataset.mergedPrs||0);
+    });
+  }else{
+    var repoCounts={};
+    (CHART_DATA.allPRDetails||[]).forEach(function(p){
+      if(cutoff&&new Date(p.mergedAt)<cutoff)return;
+      var key=p.repo.toLowerCase();
+      repoCounts[key]=(repoCounts[key]||0)+1;
+    });
+    document.querySelectorAll(".repo-row[data-repo-name]").forEach(function(row){
+      var cell=row.querySelector(".td-merged-prs");
+      if(cell)cell.textContent=String(repoCounts[row.dataset.repoName]||0);
+    });
+  }
   var note=document.getElementById("reposPeriodNote");
   if(note)note.style.display=period==="all"?"none":"";
 }
