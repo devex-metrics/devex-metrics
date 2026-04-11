@@ -7,6 +7,24 @@ const ThrottledOctokit = Octokit.plugin(throttling);
 /** Default number of retries for rate-limit and abuse responses. */
 const DEFAULT_RETRIES = 3;
 
+/** Convert a duration in seconds to a human-readable string (e.g. "45 minutes 57 seconds"). */
+export function formatDuration(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  const parts: string[] = [];
+  if (h > 0) parts.push(`${h} hour${h !== 1 ? "s" : ""}`);
+  if (m > 0) parts.push(`${m} minute${m !== 1 ? "s" : ""}`);
+  if (s > 0 || parts.length === 0) parts.push(`${s} second${s !== 1 ? "s" : ""}`);
+  return parts.join(" ");
+}
+
+/** Return the UTC timestamp at which a retry will resume (now + retryAfter seconds). */
+export function formatResumeTime(retryAfter: number): string {
+  const resumeAt = new Date(Date.now() + retryAfter * 1000);
+  return resumeAt.toISOString().replace("T", " ").replace(/\.\d{3}Z$/, " UTC");
+}
+
 /**
  * Build the `throttle` options shared by every Octokit instance.
  *
@@ -27,7 +45,8 @@ function throttleOptions(retries = DEFAULT_RETRIES) {
       const url = (options.url ?? "UNKNOWN") as string;
       console.warn(
         `Rate limit hit for ${method} ${url}. ` +
-          `Retrying after ${retryAfter}s (attempt ${retryCount + 1}/${retries})…`,
+          `Retrying after ${formatDuration(retryAfter)} (attempt ${retryCount + 1}/${retries})…\n` +
+          `Will continue at ${formatResumeTime(retryAfter)} (UTC)`,
       );
       return retryCount < retries;
     },
@@ -41,7 +60,8 @@ function throttleOptions(retries = DEFAULT_RETRIES) {
       const url = (options.url ?? "UNKNOWN") as string;
       console.warn(
         `Secondary rate limit hit for ${method} ${url}. ` +
-          `Retrying after ${retryAfter}s (attempt ${retryCount + 1}/${retries})…`,
+          `Retrying after ${formatDuration(retryAfter)} (attempt ${retryCount + 1}/${retries})…\n` +
+          `Will continue at ${formatResumeTime(retryAfter)} (UTC)`,
       );
       return retryCount < retries;
     },
