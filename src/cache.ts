@@ -48,6 +48,35 @@ export function saveFixture(owner: string, data: OrgMetrics): void {
 }
 
 /**
+ * Return true if `timestamp` is defined and was within the last `hours` hours.
+ */
+export function isWithinHours(timestamp: string | undefined, hours: number): boolean {
+  if (!timestamp) return false;
+  return Date.now() - new Date(timestamp).getTime() < hours * 60 * 60 * 1000;
+}
+
+/**
+ * Load the raw cached data for `owner` regardless of date, for use in
+ * per-repo freshness checks. Returns null if no file exists or is unreadable.
+ * Fixture files take precedence over the daily cache.
+ */
+export function loadRawCache(owner: string): OrgMetrics | null {
+  // Fixture first (already date-independent)
+  const fixture = loadFixture(owner);
+  if (fixture) return fixture;
+
+  const filePath = cacheFilePath(owner);
+  if (!fs.existsSync(filePath)) return null;
+  try {
+    const raw = fs.readFileSync(filePath, "utf-8");
+    const envelope: CacheEnvelope = JSON.parse(raw);
+    return envelope.data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Return cached data if it was collected today, otherwise null.
  * Fixture files (committed to the repo) take precedence and have no
  * date restriction — they are intended for local development.
