@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { setOctokit, resetOctokit } from "../github-client.js";
 import { Octokit } from "@octokit/rest";
 import { collectIssueCounts } from "./issues.js";
@@ -109,5 +109,25 @@ describe("collectIssueCounts", () => {
     setOctokit(mockOctokit);
 
     await expect(collectIssueCounts("owner", "repo")).rejects.toMatchObject({ status: 500 });
+  });
+
+  it("should return zero counts on 403 and emit a console.warn", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const mockOctokit = {
+      rest: {
+        issues: {
+          listForRepo: () => Promise.reject(Object.assign(new Error("Forbidden"), { status: 403 })),
+        },
+        pulls: {
+          list: () => Promise.reject(Object.assign(new Error("Forbidden"), { status: 403 })),
+        },
+      },
+    } as unknown as Octokit;
+    setOctokit(mockOctokit);
+
+    const counts = await collectIssueCounts("owner", "repo");
+    expect(counts).toEqual({ open: 0, closed: 0 });
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("403"));
+    warnSpy.mockRestore();
   });
 });
