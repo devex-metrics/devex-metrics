@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "mutation": "stryker run",
-    "mutation:ci": "stryker run --reporters json,clear-text"
+    "mutation:ci": "stryker run --reporters json,clear-text",
+    "preview-dashboard": "node scripts/preview-dashboard.js"
   },
   "repository": {
     "type": "git",
