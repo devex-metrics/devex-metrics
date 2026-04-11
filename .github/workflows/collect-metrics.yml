@@ -76,7 +76,7 @@ jobs:
 
       - name: Create PR for updated fixture data
         id: create-pr
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: update ${{ github.event.inputs.owner || 'rajbos' }} fixture data"
@@ -102,7 +102,7 @@ jobs:
           node dist/build-pages.js "$OWNER"
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: _site
 
