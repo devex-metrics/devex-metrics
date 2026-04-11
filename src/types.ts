@@ -38,9 +38,9 @@ export interface RepoMetrics {
   /** Detailed PR metrics (sampled from recently closed PRs). */
   pullRequestDetails: PullRequestDetail[];
   /**
-   * ISO-8601 merged_at timestamps for the last ~100 merged PRs.
+   * ISO-8601 merged_at timestamps for the last ~1 000 merged PRs (up to 10 pages × 100).
    * Used by the chart filter to show accurate per-period breakdowns.
-   * Collected with a single cheap API call (no per-PR detail fetches).
+   * Collected via paginated pulls.list calls (no per-PR detail fetches).
    */
   mergedPRDates?: string[];
   /** Unique committers in the default branch (last 90 days). */
