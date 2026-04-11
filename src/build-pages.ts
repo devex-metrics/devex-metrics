@@ -148,8 +148,10 @@ function buildDashboardHtml(
     newestDataDate = data.weeklyTrends[data.weeklyTrends.length - 1].week;
   }
   const dataRangeHtml = oldestDataDate
-    ? ` &middot; <span class="data-range">&#x1F4C5; ${escapeHtml(oldestDataDate)} &rarr; ${escapeHtml(newestDataDate || data.collectedAt.slice(0, 10))}</span>`
+    ? `<span class="data-range">&#x1F4C5; ${escapeHtml(oldestDataDate)} &rarr; ${escapeHtml(newestDataDate || data.collectedAt.slice(0, 10))}</span>`
     : '';
+  const ownerLine = `${escapeHtml(data.owner)} &middot; ${escapeHtml(data.ownerType)}`;
+  const collectedLine = `collected ${escapeHtml(data.collectedAt)}`;
 
   let deployedFrom = "";
   if (branch) {
@@ -216,7 +218,11 @@ function buildDashboardHtml(
     <a href="https://github.com/rajbos" class="hero-nav-link">Made with &#x2764;&#xFE0F; by rajbos</a>
   </nav>
   <h1>DevEx Metrics</h1>
-  <p class="subtitle">${escapeHtml(data.owner)} &middot; ${escapeHtml(data.ownerType)} &middot; collected ${escapeHtml(data.collectedAt)}${dataRangeHtml}</p>
+  <div class="subtitle">
+    <div class="subtitle-top">${ownerLine}</div>
+    <div class="subtitle-mid">${collectedLine}</div>
+    ${dataRangeHtml ? `<div class="subtitle-bottom">${dataRangeHtml}</div>` : ''}
+  </div>
 </header>
 
 <main>
@@ -435,9 +441,9 @@ a{color:var(--accent)}
   padding:2.5rem 2rem;text-align:center;margin-bottom:2rem}
 @media(prefers-color-scheme:dark){.hero{background:linear-gradient(135deg,#1158a7 0%,#6639ba 100%)}}
 .hero h1{font-size:1.8rem;font-weight:700;margin-bottom:.35rem}
-.subtitle{opacity:.88;font-size:.95rem}
+.subtitle{opacity:.88;font-size:.95rem;display:block;max-width:1400px;margin:0 auto .5rem;text-align:left}
 .hero-nav{display:flex;justify-content:flex-end;gap:1rem;margin-bottom:1rem;padding-right:90px}
-.hero-nav-link{color:#fff;opacity:.85;font-size:.85rem;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:.1rem;transition:opacity .15s}
+.hero-nav-link{color:#fff;opacity:.85;font-size:1rem;font-weight:600;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:.1px;transition:opacity .15s}
 .hero-nav-link:hover{opacity:1;border-bottom-color:#fff}
 .hero-nav-link{display:inline-flex;align-items:center;gap:.35rem}
 .github-corner svg{position:fixed;top:0;right:0;border:0;z-index:999;fill:#24292f;color:#fff}
