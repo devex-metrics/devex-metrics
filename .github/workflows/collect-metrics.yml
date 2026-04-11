@@ -21,7 +21,7 @@ on:
         default: "user"
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -65,7 +65,16 @@ jobs:
         run: |
           OWNER="${{ github.event.inputs.owner || 'rajbos' }}"
           TYPE="${{ github.event.inputs.owner_type || 'user' }}"
-          node dist/index.js "$OWNER" "$TYPE"
+          node dist/save-fixture.js "$OWNER" "$TYPE"
+
+      - name: Commit updated fixture data
+        run: |
+          OWNER="${{ github.event.inputs.owner || 'rajbos' }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/${OWNER}.fixture.json
+          git diff --cached --quiet || git commit -m "chore: update ${OWNER} fixture data"
+          git push
 
       # actions/cache@v5 automatically saves the data/ folder at job end.
 
