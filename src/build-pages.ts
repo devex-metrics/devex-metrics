@@ -150,7 +150,8 @@ function buildDashboardHtml(
   const dataRangeHtml = oldestDataDate
     ? `<span class="data-range">&#x1F4C5; ${escapeHtml(oldestDataDate)} &rarr; ${escapeHtml(newestDataDate || data.collectedAt.slice(0, 10))}</span>`
     : '';
-  const ownerLine = `${escapeHtml(data.owner)} &middot; ${escapeHtml(data.ownerType)}`;
+  const ownerLink = `<a href="https://github.com/${escapeHtml(data.owner)}" class="hero-owner-link" target="_blank" rel="noopener noreferrer">${escapeHtml(data.owner)}</a>`;
+  const ownerLine = `${ownerLink} &middot; ${escapeHtml(data.ownerType)}`;
   const collectedLine = `collected ${escapeHtml(data.collectedAt)}`;
 
   let deployedFrom = "";
@@ -214,15 +215,17 @@ function buildDashboardHtml(
 <body>
 
 <header class="hero">
-  <nav class="hero-nav">
-    <a href="https://github.com/rajbos" class="hero-nav-link">Made with &#x2764;&#xFE0F; by rajbos</a>
-  </nav>
-  <h1>DevEx Metrics</h1>
-  <div class="subtitle">
-    <div class="subtitle-top">${ownerLine}</div>
-    <div class="subtitle-mid">${collectedLine}</div>
-    ${dataRangeHtml ? `<div class="subtitle-bottom">${dataRangeHtml}</div>` : ''}
+  <div class="hero-meta-bar">
+    <div class="subtitle">
+      <div class="subtitle-top">${ownerLine}</div>
+      <div class="subtitle-mid">${collectedLine}</div>
+      ${dataRangeHtml ? `<div class="subtitle-bottom">${dataRangeHtml}</div>` : ''}
+    </div>
+    <nav class="hero-nav">
+      <a href="https://github.com/rajbos" class="hero-nav-link">Made with &#x2764;&#xFE0F; by rajbos</a>
+    </nav>
   </div>
+  <h1>DevEx Metrics</h1>
 </header>
 
 <main>
@@ -441,11 +444,15 @@ a{color:var(--accent)}
   padding:2.5rem 2rem;text-align:center;margin-bottom:2rem}
 @media(prefers-color-scheme:dark){.hero{background:linear-gradient(135deg,#1158a7 0%,#6639ba 100%)}}
 .hero h1{font-size:1.8rem;font-weight:700;margin-bottom:.35rem}
-.subtitle{opacity:.88;font-size:.95rem;display:block;max-width:1400px;margin:0 auto .5rem;text-align:left}
-.hero-nav{display:flex;justify-content:flex-end;gap:1rem;margin-bottom:1rem;padding-right:90px}
+.subtitle{font-size:1rem;font-weight:600;opacity:.85;text-align:left}
+.subtitle-mid,.subtitle-bottom{font-size:.85rem;font-weight:400;opacity:.82;margin-top:.2rem}
+.hero-meta-bar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;padding-right:90px}
+.hero-nav{display:flex;gap:1rem}
 .hero-nav-link{color:#fff;opacity:.85;font-size:1rem;font-weight:600;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:.1px;transition:opacity .15s}
 .hero-nav-link:hover{opacity:1;border-bottom-color:#fff}
 .hero-nav-link{display:inline-flex;align-items:center;gap:.35rem}
+.hero-owner-link{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:.1rem;transition:opacity .15s}
+.hero-owner-link:hover{opacity:1;border-bottom-color:#fff}
 .github-corner svg{position:fixed;top:0;right:0;border:0;z-index:999;fill:#24292f;color:#fff}
 .github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}
 @keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}
