@@ -3,10 +3,9 @@ import { execSync } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 
-const owner = process.argv[2];
-if (!owner) {
-  console.error('Usage: npm run preview-dashboard -- <owner>');
-  process.exit(1);
+const owner = process.argv[2] || 'devops-actions';
+if (!process.argv[2]) {
+  console.log(`No owner provided; defaulting to '${owner}'. To specify a different owner run: npm run preview-dashboard -- <owner> [org|user]`);
 }
 
 try {
