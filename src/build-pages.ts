@@ -429,7 +429,7 @@ function getCSS(): string {
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
   color:var(--fg);background:var(--bg);line-height:1.55;min-height:100vh}
-main{max-width:1120px;margin:0 auto;padding:0 1rem 2rem}
+main{max-width:1400px;margin:0 auto;padding:0 1rem 2rem}
 a{color:var(--accent)}
 .hero{background:linear-gradient(135deg,#0969da 0%,#8250df 100%);color:#fff;
   padding:2.5rem 2rem;text-align:center;margin-bottom:2rem}
@@ -526,7 +526,7 @@ dl{display:flex;flex-direction:column;gap:.15rem}
 .filter-btn:hover{border-color:var(--accent);color:var(--accent)}
 .filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 .data-range{opacity:.82;font-size:.88rem}
-footer{max-width:1120px;margin:0 auto;padding:1rem;text-align:center;font-size:.8rem;
+footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.8rem;
   color:var(--muted);border-top:1px solid var(--border)}
 @media(max-width:640px){
   .charts{grid-template-columns:1fr}
