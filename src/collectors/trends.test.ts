@@ -15,7 +15,7 @@ function daysAgo(n: number): string {
 /** Build a mock Octokit for the trends collector. */
 function buildMockOctokit(opts: {
   issues?: Array<{ created_at: string; state: string; closed_at?: string | null; pull_request?: object }>;
-  prs?: Array<{ created_at: string; updated_at: string; merged_at: string | null }>;
+  prs?: Array<{ number?: number; created_at: string; updated_at: string; merged_at: string | null; additions?: number; deletions?: number }>;
   issueError?: { status: number };
   prError?: { status: number };
 }) {
@@ -49,7 +49,13 @@ function buildMockOctokit(opts: {
   return {
     rest: {
       issues: { listForRepo: {} },
-      pulls: { list: {} },
+      pulls: {
+        list: {},
+        get: async ({ pull_number }: { owner: string; repo: string; pull_number: number }) => {
+          const pr = prsData.find((p) => p.number === pull_number);
+          return { data: { additions: pr?.additions ?? 0, deletions: pr?.deletions ?? 0 } };
+        },
+      },
     },
     paginate: paginateFn,
   } as unknown as Octokit;
@@ -86,6 +92,8 @@ describe("collectWeeklyTrends", () => {
       expect(t.prsMerged).toBe(0);
       expect(t.issuesOpened).toBe(0);
       expect(t.issuesClosed).toBe(0);
+      expect(t.linesAdded).toBe(0);
+      expect(t.linesDeleted).toBe(0);
     }
   });
 
@@ -215,5 +223,111 @@ describe("collectWeeklyTrends", () => {
     for (let i = 1; i < trends.length; i++) {
       expect(trends[i].week >= trends[i - 1].week).toBe(true);
     }
+  });
+
+  it("accumulates lines added and deleted for merged PRs", async () => {
+    setOctokit(
+      buildMockOctokit({
+        issues: [],
+        prs: [
+          {
+            number: 1,
+            created_at: daysAgo(2),
+            updated_at: daysAgo(1),
+            merged_at: daysAgo(1),
+            additions: 120,
+            deletions: 30,
+          },
+        ],
+      })
+    );
+    const trends = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
+    const totalAdded = trends.reduce((s, t) => s + t.linesAdded, 0);
+    const totalDeleted = trends.reduce((s, t) => s + t.linesDeleted, 0);
+    expect(totalAdded).toBe(120);
+    expect(totalDeleted).toBe(30);
+  });
+
+  it("does not fetch PR details for unmerged PRs", async () => {
+    let getCallCount = 0;
+
+    async function* paginateIterator(): AsyncGenerator<{
+      data: Array<{ number: number; created_at: string; updated_at: string; merged_at: null }>;
+    }> {
+      yield {
+        data: [
+          { number: 1, created_at: daysAgo(1), updated_at: daysAgo(1), merged_at: null },
+          { number: 2, created_at: daysAgo(2), updated_at: daysAgo(2), merged_at: null },
+        ],
+      };
+    }
+
+    const paginateFn = Object.assign(
+      (_method: unknown, _params: unknown) => Promise.resolve([]),
+      { iterator: paginateIterator }
+    );
+
+    setOctokit({
+      rest: {
+        issues: { listForRepo: {} },
+        pulls: {
+          list: {},
+          get: async () => {
+            getCallCount++;
+            return { data: { additions: 0, deletions: 0 } };
+          },
+        },
+      },
+      paginate: paginateFn,
+    } as unknown as Octokit);
+
+    await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
+    expect(getCallCount).toBe(0);
+  });
+
+  it("respects the maxDetailFetches budget across repos", async () => {
+    let getCallCount = 0;
+
+    async function* paginateIterator(): AsyncGenerator<{
+      data: Array<{ number: number; created_at: string; updated_at: string; merged_at: string }>;
+    }> {
+      yield {
+        data: [
+          { number: 1, created_at: daysAgo(1), updated_at: daysAgo(1), merged_at: daysAgo(1) },
+          { number: 2, created_at: daysAgo(2), updated_at: daysAgo(2), merged_at: daysAgo(2) },
+          { number: 3, created_at: daysAgo(3), updated_at: daysAgo(3), merged_at: daysAgo(3) },
+        ],
+      };
+    }
+
+    const paginateFn = Object.assign(
+      (_method: unknown, _params: unknown) => Promise.resolve([]),
+      { iterator: paginateIterator }
+    );
+
+    setOctokit({
+      rest: {
+        issues: { listForRepo: {} },
+        pulls: {
+          list: {},
+          get: async () => {
+            getCallCount++;
+            return { data: { additions: 10, deletions: 5 } };
+          },
+        },
+      },
+      paginate: paginateFn,
+    } as unknown as Octokit);
+
+    // Two repos with 3 merged PRs each = 6 total, but budget is 4
+    await collectWeeklyTrends(
+      [
+        { owner: "o", name: "r1" },
+        { owner: "o", name: "r2" },
+      ],
+      4,
+      4
+    );
+    expect(getCallCount).toBe(4);
   });
 });

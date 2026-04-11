@@ -156,7 +156,11 @@ function buildDashboardHtml(
       closed: totals.closedPRs,
     },
     topRepos,
-    weeklyTrends: data.weeklyTrends ?? [],
+    weeklyTrends: (data.weeklyTrends ?? []).map((t) => ({
+      ...t,
+      linesAdded: t.linesAdded ?? 0,
+      linesDeleted: t.linesDeleted ?? 0,
+    })),
   });
 
   return `<!DOCTYPE html>
@@ -211,6 +215,7 @@ function buildDashboardHtml(
   <section class="charts" aria-label="Trend charts">
     <div class="card card-chart card-wide"><h2>PR Trends (per week)</h2><canvas id="chartPRTrends"></canvas></div>
     <div class="card card-chart card-wide"><h2>Issue Trends (per week)</h2><canvas id="chartIssueTrends"></canvas></div>
+    <div class="card card-chart card-wide"><h2>PR Size Trends (lines/week)</h2><canvas id="chartPRSizeTrends"></canvas></div>
   </section>
 
   <section class="repos-section" aria-label="Repositories">
@@ -429,6 +434,13 @@ function renderCharts(){
           borderColor:cssVar("--warn"),backgroundColor:cssVar("--warn-s"),tension:0.3,fill:true,pointRadius:3},
         {label:"Closed",data:CHART_DATA.weeklyTrends.map(function(t){return t.issuesClosed;}),
           borderColor:cssVar("--ok"),backgroundColor:cssVar("--ok-s"),tension:0.3,fill:true,pointRadius:3}]},
+      options:lineOpts});
+    new Chart(document.getElementById("chartPRSizeTrends"),{type:"line",
+      data:{labels:tLabels,datasets:[
+        {label:"Lines Added",data:CHART_DATA.weeklyTrends.map(function(t){return t.linesAdded;}),
+          borderColor:cssVar("--ok"),backgroundColor:cssVar("--ok-s"),tension:0.3,fill:true,pointRadius:3},
+        {label:"Lines Removed",data:CHART_DATA.weeklyTrends.map(function(t){return t.linesDeleted;}),
+          borderColor:cssVar("--err"),backgroundColor:cssVar("--err-s"),tension:0.3,fill:true,pointRadius:3}]},
       options:lineOpts});
   }
 }

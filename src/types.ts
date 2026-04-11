@@ -68,6 +68,10 @@ export interface WeeklyTrendPoint {
   prsMerged: number;
   issuesOpened: number;
   issuesClosed: number;
+  /** Total lines added across all merged PRs in this week. */
+  linesAdded: number;
+  /** Total lines deleted across all merged PRs in this week. */
+  linesDeleted: number;
 }
 
 /** Shape of the on-disk cache file. */

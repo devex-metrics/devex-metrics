@@ -41,10 +41,16 @@ function isoWeekMonday(date: Date): Date {
  * Collect weekly PR and issue activity trends aggregated across a list of
  * repos for the last `weeksBack` ISO weeks (including the current partial
  * week).
+ *
+ * For merged PRs, fetches individual PR details to accumulate lines
+ * added/deleted per week. The total number of detail fetches is capped at
+ * `maxDetailFetches` across all repos to avoid rate-limit exhaustion on
+ * large organisations.
  */
 export async function collectWeeklyTrends(
   repos: { owner: string; name: string }[],
-  weeksBack = 12
+  weeksBack = 12,
+  maxDetailFetches = 200
 ): Promise<WeeklyTrendPoint[]> {
   const octokit = await getOctokit();
 
@@ -63,6 +69,8 @@ export async function collectWeeklyTrends(
       prsMerged: 0,
       issuesOpened: 0,
       issuesClosed: 0,
+      linesAdded: 0,
+      linesDeleted: 0,
     });
     cursor.setUTCDate(cursor.getUTCDate() + 7);
   }
@@ -70,6 +78,9 @@ export async function collectWeeklyTrends(
   // cutoff = start of the oldest bucket (inclusive).
   const cutoff = startMonday;
   const cutoffIso = cutoff.toISOString();
+
+  // Budget for individual pulls.get() detail calls (to limit API fan-out).
+  let detailFetchBudget = maxDetailFetches;
 
   for (const { owner, name } of repos) {
     try {
@@ -138,7 +149,23 @@ export async function collectWeeklyTrends(
             if (mergedAt >= cutoff) {
               const wk = toIsoWeekLabel(mergedAt);
               const bucket = weeks.get(wk);
-              if (bucket) bucket.prsMerged++;
+              if (bucket) {
+                bucket.prsMerged++;
+                if (detailFetchBudget > 0) {
+                  detailFetchBudget--;
+                  try {
+                    const { data: detail } = await octokit.rest.pulls.get({
+                      owner,
+                      repo: name,
+                      pull_number: pr.number,
+                    });
+                    bucket.linesAdded += detail.additions;
+                    bucket.linesDeleted += detail.deletions;
+                  } catch {
+                    // Skip line counts if detail fetch fails
+                  }
+                }
+              }
             }
           }
         }
