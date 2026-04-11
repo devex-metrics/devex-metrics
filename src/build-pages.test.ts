@@ -117,6 +117,112 @@ describe("build-pages", () => {
     expect(html).not.toContain("workflow run");
   });
 
+  it("should embed setupGroups and computeAge in the JS", () => {
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    expect(html).toContain("setupGroups");
+    expect(html).toContain("computeAge");
+    expect(html).toContain("utcDaysSince");
+    expect(html).toContain("grp-month");
+    expect(html).toContain("grp-older");
+  });
+
+  it("should include data-pushed attribute on repo cards", () => {
+    const envelope: CacheEnvelope = {
+      date: "2026-03-28",
+      data: {
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-03-28T12:00:00Z",
+        repoCount: 1,
+        repos: [
+          {
+            name: "repo-a",
+            fullName: "test-pages-owner/repo-a",
+            pushedAt: "2025-01-15T10:00:00Z",
+            issues: { open: 2, closed: 5 },
+            pullRequests: { open: 1, closed: 0, merged: 3 },
+            pullRequestDetails: [],
+            committerCount: 2,
+            reviewerCount: 1,
+            dependentCount: 0,
+          },
+        ],
+      },
+    };
+    fs.writeFileSync(cacheFile, JSON.stringify(envelope));
+
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    expect(html).toContain('data-pushed="2025-01-15T10:00:00Z"');
+    expect(html).toContain("bdg-age");
+  });
+
+  it("should include Merged column in PR table and sort PRs descending by mergedAt", () => {
+    const envelope: CacheEnvelope = {
+      date: "2026-03-28",
+      data: {
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-03-28T12:00:00Z",
+        repoCount: 1,
+        repos: [
+          {
+            name: "repo-a",
+            fullName: "test-pages-owner/repo-a",
+            pushedAt: "2026-03-20T10:00:00Z",
+            issues: { open: 2, closed: 5 },
+            pullRequests: { open: 1, closed: 0, merged: 3 },
+            pullRequestDetails: [
+              {
+                number: 10,
+                title: "Older PR",
+                state: "merged",
+                mergedAt: "2026-01-01T00:00:00Z",
+                linesAdded: 10,
+                linesDeleted: 5,
+                commentCount: 1,
+                commitCount: 1,
+                actionsMinutes: 1,
+              },
+              {
+                number: 20,
+                title: "Newer PR",
+                state: "merged",
+                mergedAt: "2026-03-01T00:00:00Z",
+                linesAdded: 20,
+                linesDeleted: 2,
+                commentCount: 2,
+                commitCount: 2,
+                actionsMinutes: 2,
+              },
+            ],
+            committerCount: 2,
+            reviewerCount: 1,
+            dependentCount: 0,
+          },
+        ],
+      },
+    };
+    fs.writeFileSync(cacheFile, JSON.stringify(envelope));
+
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    expect(html).toContain("<th>Merged</th>");
+    expect(html).toContain("2026-03-01");
+    expect(html).toContain("2026-01-01");
+    // Newer PR (#20) should appear before older PR (#10) in the HTML
+    const pos20 = html.indexOf("#20 Newer PR");
+    const pos10 = html.indexOf("#10 Older PR");
+    expect(pos20).toBeLessThan(pos10);
+  });
+
   it("should render trend chart canvases when weeklyTrends data is present", () => {
     // Re-write the cache file with weeklyTrends data
     const envelopeWithTrends: CacheEnvelope = {

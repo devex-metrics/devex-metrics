@@ -68,7 +68,9 @@ export async function collectPullRequestDetails(
     per_page: limit,
   });
 
-  const mergedPrs = prs.filter((pr) => pr.merged_at !== null);
+  const mergedPrs = prs
+    .filter((pr) => pr.merged_at !== null)
+    .sort((a, b) => (b.merged_at! > a.merged_at! ? 1 : -1));
 
   const details: PullRequestDetail[] = [];
   for (const pr of mergedPrs) {
@@ -109,6 +111,7 @@ export async function collectPullRequestDetails(
         commentCount: detail.comments + detail.review_comments,
         commitCount: detail.commits,
         actionsMinutes: Math.round(actionsMinutes * 100) / 100,
+        mergedAt: pr.merged_at ?? undefined,
       });
     } catch {
       // Skip PRs we cannot fetch details for

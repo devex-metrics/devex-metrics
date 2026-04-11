@@ -22,6 +22,8 @@ export interface OrgMetrics {
 export interface RepoMetrics {
   name: string;
   fullName: string;
+  /** ISO-8601 date when the repository was last pushed to. */
+  pushedAt?: string;
   /** Issue counts by state. */
   issues: IssueCounts;
   /** Pull request counts by state. */
@@ -58,6 +60,8 @@ export interface PullRequestDetail {
   commitCount: number;
   /** Total GitHub Actions minutes consumed by check-suites on this PR (0 if unavailable). */
   actionsMinutes: number;
+  /** ISO-8601 date when the PR was merged. */
+  mergedAt?: string;
 }
 
 /** One data point in a weekly activity trend series. */

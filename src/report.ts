@@ -37,6 +37,9 @@ export function generateReport(metrics: OrgMetrics): string {
   for (const repo of metrics.repos) {
     lines.push(`### ${repo.fullName}`);
     lines.push("");
+    if (repo.pushedAt) {
+      lines.push(`Last pushed: ${repo.pushedAt.slice(0, 10)}`);
+    }
     lines.push(
       `Issues: ${repo.issues.open} open / ${repo.issues.closed} closed`
     );
@@ -50,15 +53,22 @@ export function generateReport(metrics: OrgMetrics): string {
     lines.push("");
 
     if (repo.pullRequestDetails.length > 0) {
+      const sortedPRs = [...repo.pullRequestDetails].sort((a, b) => {
+        if (!a.mergedAt && !b.mergedAt) return 0;
+        if (!a.mergedAt) return 1;
+        if (!b.mergedAt) return -1;
+        return b.mergedAt.localeCompare(a.mergedAt);
+      });
       lines.push(
-        "| PR | Lines +/- | Comments | Commits | Actions min |"
+        "| PR | Merged | Lines +/- | Comments | Commits | Actions min |"
       );
       lines.push(
-        "| -- | --------- | -------- | ------- | ----------- |"
+        "| -- | ------ | --------- | -------- | ------- | ----------- |"
       );
-      for (const pr of repo.pullRequestDetails) {
+      for (const pr of sortedPRs) {
+        const mergedDate = pr.mergedAt ? pr.mergedAt.slice(0, 10) : "";
         lines.push(
-          `| #${pr.number} ${pr.title} | +${pr.linesAdded}/-${pr.linesDeleted} | ${pr.commentCount} | ${pr.commitCount} | ${pr.actionsMinutes} |`
+          `| #${pr.number} ${pr.title} | ${mergedDate} | +${pr.linesAdded}/-${pr.linesDeleted} | ${pr.commentCount} | ${pr.commitCount} | ${pr.actionsMinutes} |`
         );
       }
       lines.push("");
