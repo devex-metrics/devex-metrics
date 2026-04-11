@@ -29,6 +29,7 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  pull-requests: write
 
 concurrency:
   group: pages
@@ -73,14 +74,23 @@ jobs:
           TYPE="${{ github.event.inputs.owner_type || 'user' }}"
           node dist/save-fixture.js "$OWNER" "$TYPE"
 
-      - name: Commit updated fixture data
-        run: |
-          OWNER="${{ github.event.inputs.owner || 'rajbos' }}"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/${OWNER}.fixture.json
-          git diff --cached --quiet || git commit -m "chore: update ${OWNER} fixture data"
-          git push
+      - name: Create PR for updated fixture data
+        id: create-pr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update ${{ github.event.inputs.owner || 'rajbos' }} fixture data"
+          branch: "chore/update-fixture-${{ github.event.inputs.owner || 'rajbos' }}"
+          title: "chore: update ${{ github.event.inputs.owner || 'rajbos' }} fixture data"
+          body: "Automated fixture data update from the collect-metrics workflow."
+          add-paths: "data/*.fixture.json"
+          delete-branch: true
+
+      - name: Enable auto-merge on fixture data PR
+        if: steps.create-pr.outputs.pull-request-operation == 'created' || steps.create-pr.outputs.pull-request-operation == 'updated'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge --auto --squash "${{ steps.create-pr.outputs.pull-request-url }}"
 
       # actions/cache@v5 automatically saves the data/ folder at job end.
 
