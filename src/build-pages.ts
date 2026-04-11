@@ -554,6 +554,17 @@ document.addEventListener("DOMContentLoaded",function(){
   applyFilter("30days");
 });
 function renderCharts(){
+  Chart.register({id:"repoBarGrad",beforeUpdate:function(chart){
+    if(chart.canvas.id!=="chartRepos")return;
+    var ctx=chart.ctx,ca=chart.chartArea;
+    if(!ca)return;
+    chart.data.datasets.forEach(function(ds){
+      var base=ds._gradBase;if(!base)return;
+      var g=ctx.createLinearGradient(ca.left,0,ca.right,0);
+      g.addColorStop(0,base);g.addColorStop(1,base+"55");
+      ds.backgroundColor=g;
+    });
+  }});
   Chart.defaults.color=cssColors.muted;
   Chart.defaults.plugins.legend.labels.usePointStyle=true;
   Chart.defaults.plugins.legend.labels.padding=16;
@@ -567,8 +578,8 @@ function renderCharts(){
   if(CHART_DATA.topRepos.length>0){
     charts.repos=new Chart(document.getElementById("chartRepos"),{type:"bar",
       data:{labels:CHART_DATA.topRepos.map(function(r){return r.name;}),
-        datasets:[{label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),backgroundColor:cssColors.warn,borderRadius:3},
-          {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),backgroundColor:cssColors.accent,borderRadius:3}]},
+        datasets:[{label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
+          {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}]},
       options:{indexAxis:"y",responsive:true,
         scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{display:false}}},
         plugins:{legend:{position:"top",align:"end"}}}});
@@ -656,8 +667,8 @@ function applyFilter(period){
     if(period==="all"){
       charts.repos.data.labels=CHART_DATA.topRepos.map(function(r){return r.name;});
       charts.repos.data.datasets=[
-        {label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),backgroundColor:cssColors.warn,borderRadius:3},
-        {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),backgroundColor:cssColors.accent,borderRadius:3}];
+        {label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
+        {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}];
       if(titleEl)titleEl.textContent="Top Repositories";
     }else{
       var filteredPRs=(CHART_DATA.allPRDetails||[]).filter(function(p){return cutoff?new Date(p.mergedAt)>=cutoff:true;});
@@ -667,7 +678,7 @@ function applyFilter(period){
         .sort(function(a,b){return b.prs-a.prs;}).slice(0,15);
       charts.repos.data.labels=topFiltered.map(function(r){return r.name;});
       charts.repos.data.datasets=[
-        {label:"Merged PRs",data:topFiltered.map(function(r){return r.prs;}),backgroundColor:cssColors.accent,borderRadius:3}];
+        {label:"Merged PRs",data:topFiltered.map(function(r){return r.prs;}),_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}];
       var periodLabel=period==="year"?"This Year":period==="90days"?"Last 90 Days":"Last 30 Days";
       if(titleEl)titleEl.textContent="Top Repositories \u2014 "+periodLabel;
     }
