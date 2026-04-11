@@ -1,0 +1,5980 @@
+{
+  "owner": "rajbos",
+  "ownerType": "user",
+  "collectedAt": "2026-04-11T14:17:52.544Z",
+  "repoCount": 147,
+  "repos": [
+    {
+      "name": "docker-action-demo",
+      "fullName": "devops-actions/docker-action-demo",
+      "pushedAt": "2023-07-20T15:55:13Z",
+      "issues": {
+        "open": 0,
+        "closed": -2
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 3
+      },
+      "pullRequestDetails": [
+        {
+          "number": 3,
+          "title": "Update README.md",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 1,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-07-20T15:54:53Z"
+        },
+        {
+          "number": 2,
+          "title": "testing",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 0,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-07-20T15:31:38Z"
+        },
+        {
+          "number": 1,
+          "title": "Fix labels",
+          "state": "merged",
+          "linesAdded": 7,
+          "linesDeleted": 4,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-07-20T15:29:09Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "issue-comment-tag",
+      "fullName": "devops-actions/issue-comment-tag",
+      "pushedAt": "2026-04-11T10:28:39Z",
+      "issues": {
+        "open": 0,
+        "closed": -468
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 54,
+        "merged": 415
+      },
+      "pullRequestDetails": [
+        {
+          "number": 482,
+          "title": "chore: add actions-example-checker workflow",
+          "state": "merged",
+          "linesAdded": 12,
+          "linesDeleted": 0,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 5.52,
+          "mergedAt": "2026-04-11T10:28:37Z"
+        },
+        {
+          "number": 478,
+          "title": "Bump github/codeql-action from 4.32.4 to 4.35.1",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 4.93,
+          "mergedAt": "2026-04-01T01:42:56Z"
+        },
+        {
+          "number": 480,
+          "title": "Bump devops-actions/action-get-tag from dcee564e07262b28daaf72136d7ef2b4db1b22d4 to ab3dc4cc86db74ebccd6561b39eaff344af81e04",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 4.75,
+          "mergedAt": "2026-04-01T01:40:43Z"
+        },
+        {
+          "number": 479,
+          "title": "Bump actions/setup-node from 6.2.0 to 6.3.0",
+          "state": "merged",
+          "linesAdded": 5,
+          "linesDeleted": 5,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 4.75,
+          "mergedAt": "2026-04-01T01:38:37Z"
+        },
+        {
+          "number": 477,
+          "title": "Bump actions/dependency-review-action from 4.8.3 to 4.9.0",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 5.05,
+          "mergedAt": "2026-04-01T01:36:31Z"
+        },
+        {
+          "number": 476,
+          "title": "Bump jessehouwing/actions-semver-checker from 2.0.6 to 2.0.7",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 5,
+          "mergedAt": "2026-04-01T01:34:20Z"
+        },
+        {
+          "number": 475,
+          "title": "chore: add missing dependency-review workflow",
+          "state": "merged",
+          "linesAdded": 21,
+          "linesDeleted": 0,
+          "commentCount": 2,
+          "commitCount": 2,
+          "actionsMinutes": 4.88,
+          "mergedAt": "2026-03-31T19:04:09Z"
+        },
+        {
+          "number": 474,
+          "title": "Bump handlebars from 4.7.8 to 4.7.9",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 5.18,
+          "mergedAt": "2026-03-27T00:34:49Z"
+        },
+        {
+          "number": 473,
+          "title": "Bump yaml from 2.8.2 to 2.8.3",
+          "state": "merged",
+          "linesAdded": 5,
+          "linesDeleted": 5,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 4.82,
+          "mergedAt": "2026-03-26T01:48:53Z"
+        },
+        {
+          "number": 472,
+          "title": "Bump picomatch",
+          "state": "merged",
+          "linesAdded": 15,
+          "linesDeleted": 15,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 4.97,
+          "mergedAt": "2026-03-26T01:44:32Z"
+        }
+      ],
+      "committerCount": 3,
+      "reviewerCount": 2,
+      "dependentCount": 8
+    },
+    {
+      "name": "load-available-actions",
+      "fullName": "devops-actions/load-available-actions",
+      "pushedAt": "2026-04-11T10:28:45Z",
+      "issues": {
+        "open": -2,
+        "closed": -619
+      },
+      "pullRequests": {
+        "open": 3,
+        "closed": 66,
+        "merged": 554
+      },
+      "pullRequestDetails": [
+        {
+          "number": 663,
+          "title": "chore: add actions-example-checker workflow",
+          "state": "merged",
+          "linesAdded": 12,
+          "linesDeleted": 0,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 19.87,
+          "mergedAt": "2026-04-11T10:28:43Z"
+        },
+        {
+          "number": 662,
+          "title": "Bump typescript from 5.9.3 to 6.0.2",
+          "state": "merged",
+          "linesAdded": 100,
+          "linesDeleted": 444,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 10.32,
+          "mergedAt": "2026-04-01T21:55:46Z"
+        },
+        {
+          "number": 661,
+          "title": "Bump the development-dependencies group with 6 updates",
+          "state": "merged",
+          "linesAdded": 552,
+          "linesDeleted": 541,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 10.2,
+          "mergedAt": "2026-04-01T21:51:14Z"
+        },
+        {
+          "number": 660,
+          "title": "Bump the all-in-one group with 4 updates",
+          "state": "merged",
+          "linesAdded": 14,
+          "linesDeleted": 14,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 10.45,
+          "mergedAt": "2026-04-01T21:50:19Z"
+        },
+        {
+          "number": 655,
+          "title": "Bump picomatch",
+          "state": "merged",
+          "linesAdded": 9,
+          "linesDeleted": 9,
+          "commentCount": 2,
+          "commitCount": 2,
+          "actionsMinutes": 21.32,
+          "mergedAt": "2026-04-01T06:58:34Z"
+        },
+        {
+          "number": 658,
+          "title": "chore: add missing dependency-review workflow",
+          "state": "merged",
+          "linesAdded": 21,
+          "linesDeleted": 0,
+          "commentCount": 2,
+          "commitCount": 2,
+          "actionsMinutes": 53.88,
+          "mergedAt": "2026-04-01T06:54:03Z"
+        },
+        {
+          "number": 657,
+          "title": "Bump yaml from 2.8.2 to 2.8.3",
+          "state": "merged",
+          "linesAdded": 5,
+          "linesDeleted": 5,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 13.42,
+          "mergedAt": "2026-03-27T00:42:43Z"
+        },
+        {
+          "number": 656,
+          "title": "Bump handlebars from 4.7.8 to 4.7.9",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 12.93,
+          "mergedAt": "2026-03-27T00:37:04Z"
+        },
+        {
+          "number": 654,
+          "title": "Bump flatted from 3.3.3 to 3.4.2",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 10.77,
+          "mergedAt": "2026-03-21T10:43:19Z"
+        },
+        {
+          "number": 653,
+          "title": "Bump undici from 6.23.0 to 6.24.0",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 11.53,
+          "mergedAt": "2026-03-14T07:45:00Z"
+        }
+      ],
+      "committerCount": 4,
+      "reviewerCount": 3,
+      "dependentCount": 16
+    },
+    {
+      "name": "load-used-actions",
+      "fullName": "devops-actions/load-used-actions",
+      "pushedAt": "2026-04-11T10:28:50Z",
+      "issues": {
+        "open": 1,
+        "closed": -241
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 46,
+        "merged": 196
+      },
+      "pullRequestDetails": [
+        {
+          "number": 257,
+          "title": "chore: add actions-example-checker workflow",
+          "state": "merged",
+          "linesAdded": 12,
+          "linesDeleted": 0,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 5.15,
+          "mergedAt": "2026-04-11T10:28:48Z"
+        },
+        {
+          "number": 254,
+          "title": "Bump github/codeql-action from 3.35.1 to 4.35.1",
+          "state": "merged",
+          "linesAdded": 4,
+          "linesDeleted": 4,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 3.67,
+          "mergedAt": "2026-04-08T10:44:56Z"
+        },
+        {
+          "number": 249,
+          "title": "Bump ossf/scorecard-action from 2.4.0 to 2.4.3 in /.github/workflows",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 3.55,
+          "mergedAt": "2026-04-08T10:44:35Z"
+        },
+        {
+          "number": 250,
+          "title": "Bump step-security/harden-runner from 2.16.0 to 2.16.1",
+          "state": "merged",
+          "linesAdded": 10,
+          "linesDeleted": 10,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 3.17,
+          "mergedAt": "2026-04-08T10:44:14Z"
+        },
+        {
+          "number": 251,
+          "title": "Bump step-security/harden-runner from 2.16.0 to 2.16.1 in /.github/workflows",
+          "state": "merged",
+          "linesAdded": 10,
+          "linesDeleted": 10,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 3.28,
+          "mergedAt": "2026-04-08T10:43:48Z"
+        },
+        {
+          "number": 256,
+          "title": "Bump vite from 8.0.3 to 8.0.5 in the npm_and_yarn group across 1 directory",
+          "state": "merged",
+          "linesAdded": 4,
+          "linesDeleted": 4,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 5,
+          "mergedAt": "2026-04-06T18:41:26Z"
+        },
+        {
+          "number": 255,
+          "title": "Bump @types/node from 25.5.0 to 25.5.2",
+          "state": "merged",
+          "linesAdded": 5,
+          "linesDeleted": 5,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 5,
+          "mergedAt": "2026-04-06T07:29:33Z"
+        },
+        {
+          "number": 252,
+          "title": "Bump actions/setup-node from 4.4.0 to 6.3.0",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 4.42,
+          "mergedAt": "2026-04-02T20:42:20Z"
+        },
+        {
+          "number": 247,
+          "title": "Bump devops-actions/action-get-tag from dcee564e07262b28daaf72136d7ef2b4db1b22d4 to ab3dc4cc86db74ebccd6561b39eaff344af81e04 in /.github/workflows",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 5.37,
+          "mergedAt": "2026-04-02T20:40:03Z"
+        }
+      ],
+      "committerCount": 5,
+      "reviewerCount": 3,
+      "dependentCount": 8
+    },
+    {
+      "name": "partner-actions",
+      "fullName": "github-technology-partners/partner-actions",
+      "pushedAt": "2024-06-24T17:45:02Z",
+      "issues": {
+        "open": 0,
+        "closed": -17
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 2,
+        "merged": 16
+      },
+      "pullRequestDetails": [
+        {
+          "number": 18,
+          "title": "expands list of HashiCorp-provided Actions",
+          "state": "merged",
+          "linesAdded": 4,
+          "linesDeleted": 0,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2024-06-24T17:45:02Z"
+        },
+        {
+          "number": 17,
+          "title": "Add Octopus Deploy actions",
+          "state": "merged",
+          "linesAdded": 4,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2024-01-31T16:56:44Z"
+        },
+        {
+          "number": 16,
+          "title": "Add Integrate Shipyard by Shipyard",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-12-07T21:37:56Z"
+        },
+        {
+          "number": 11,
+          "title": "Add Veracode Actions",
+          "state": "merged",
+          "linesAdded": 4,
+          "linesDeleted": 0,
+          "commentCount": 5,
+          "commitCount": 5,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-11-23T18:05:44Z"
+        },
+        {
+          "number": 14,
+          "title": "Add link to blog in the main readme",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-11-23T06:30:44Z"
+        },
+        {
+          "number": 15,
+          "title": "Add `setup-terraform` by HashiCorp",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 1,
+          "commentCount": 2,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-11-22T17:04:33Z"
+        },
+        {
+          "number": 13,
+          "title": "Add Login, CLI, PowerShell Actions by Azure",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 0,
+          "commentCount": 2,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-11-17T17:28:06Z"
+        },
+        {
+          "number": 12,
+          "title": "Add AppMap Analysis action",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-11-17T01:12:24Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 4,
+      "dependentCount": 5
+    },
+    {
+      "name": "azure-devops-extension-action",
+      "fullName": "jessehouwing/azure-devops-extension-action",
+      "pushedAt": "2020-12-09T18:50:18Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "octogotchi",
+      "fullName": "marcduiker/octogotchi",
+      "pushedAt": "2021-04-09T20:43:11Z",
+      "issues": {
+        "open": 1,
+        "closed": -1
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 2
+      },
+      "pullRequestDetails": [
+        {
+          "number": 2,
+          "title": "Use action from specific branch ",
+          "state": "merged",
+          "linesAdded": 4,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-04-09T19:49:42Z"
+        },
+        {
+          "number": 1,
+          "title": "Adding first workflow setup",
+          "state": "merged",
+          "linesAdded": 12,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-04-09T12:37:26Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "octogotchi-backend",
+      "fullName": "marcduiker/octogotchi-backend",
+      "pushedAt": "2021-04-29T21:52:12Z",
+      "issues": {
+        "open": 1,
+        "closed": -1
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 2
+      },
+      "pullRequestDetails": [
+        {
+          "number": 7,
+          "title": "Create an issue with today's date in the title and setup a way to add images to the comments",
+          "state": "merged",
+          "linesAdded": 262,
+          "linesDeleted": 10,
+          "commentCount": 0,
+          "commitCount": 17,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-04-11T18:44:47Z"
+        },
+        {
+          "number": 5,
+          "title": "Action start with echoing the calling repository slug",
+          "state": "merged",
+          "linesAdded": 39,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 4,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-04-09T20:08:18Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "MondrianMuse",
+      "fullName": "MatthijsvdVeer/MondrianMuse",
+      "pushedAt": "2026-04-07T07:58:06Z",
+      "issues": {
+        "open": -11,
+        "closed": -74
+      },
+      "pullRequests": {
+        "open": 12,
+        "closed": 11,
+        "merged": 64
+      },
+      "pullRequestDetails": [
+        {
+          "number": 198,
+          "title": "docs: rewrite README with workflow diagram and folder structure",
+          "state": "merged",
+          "linesAdded": 55,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-28T00:07:12Z"
+        },
+        {
+          "number": 197,
+          "title": "🔧 Add workshop: Building Intelligent Agents: From Concept to Coding Assistant",
+          "state": "merged",
+          "linesAdded": 32,
+          "linesDeleted": 53,
+          "commentCount": 7,
+          "commitCount": 7,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-20T10:33:39Z"
+        },
+        {
+          "number": 195,
+          "title": "⚰️ Cleaning up old expirements",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 968,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-19T09:15:04Z"
+        },
+        {
+          "number": 191,
+          "title": "✨ Workshop abstract flow",
+          "state": "merged",
+          "linesAdded": 947,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-19T08:50:37Z"
+        },
+        {
+          "number": 190,
+          "title": "✨ Add missing demo notebook",
+          "state": "merged",
+          "linesAdded": 184,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-13T09:58:11Z"
+        },
+        {
+          "number": 183,
+          "title": "Add nickycorrelje to allowed users",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-01-12T14:39:54Z"
+        },
+        {
+          "number": 178,
+          "title": "✏️ Add abstract: Write Drunk, Edit Sober: Creating Responsible Generative Content",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 0,
+          "commentCount": 6,
+          "commitCount": 3,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-11-10T07:28:51Z"
+        },
+        {
+          "number": 176,
+          "title": "📌 Pin Python version",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-11-10T07:22:06Z"
+        },
+        {
+          "number": 174,
+          "title": "⬆️ Update Spacy",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-11-10T07:16:52Z"
+        },
+        {
+          "number": 172,
+          "title": "⬆️ Updating Python packages",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-11-10T07:12:27Z"
+        }
+      ],
+      "committerCount": 3,
+      "reviewerCount": 1,
+      "dependentCount": 6
+    },
+    {
+      "name": "mcp-security-scans",
+      "fullName": "mcp-research/mcp-security-scans",
+      "pushedAt": "2026-04-01T19:21:48Z",
+      "issues": {
+        "open": -3,
+        "closed": -107
+      },
+      "pullRequests": {
+        "open": 4,
+        "closed": 13,
+        "merged": 95
+      },
+      "pullRequestDetails": [
+        {
+          "number": 195,
+          "title": "Bump requests from 2.32.5 to 2.33.0 in the pip group across 1 directory",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 3.72,
+          "mergedAt": "2026-03-26T20:46:48Z"
+        },
+        {
+          "number": 194,
+          "title": "Fix JSON preprocessing corruption of comma-containing env var values",
+          "state": "merged",
+          "linesAdded": 52,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-10T21:35:03Z"
+        },
+        {
+          "number": 192,
+          "title": "Fix JSON parsing failure for unquoted shell variable references in MCP composition configs",
+          "state": "merged",
+          "linesAdded": 69,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-08T10:41:19Z"
+        },
+        {
+          "number": 191,
+          "title": "Fix JSON parsing failure for spread-style placeholders at start of mcpServers object",
+          "state": "merged",
+          "linesAdded": 65,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-08T10:17:34Z"
+        },
+        {
+          "number": 188,
+          "title": "Fix Windows path backslash escaping when hash comment follows path in args array",
+          "state": "merged",
+          "linesAdded": 98,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 11.18,
+          "mergedAt": "2026-03-07T20:30:00Z"
+        },
+        {
+          "number": 187,
+          "title": "Fix Scorecard PinnedDependencies alert: remove unpinned `pip install -e .`",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 12.02,
+          "mergedAt": "2026-03-07T20:01:29Z"
+        },
+        {
+          "number": 180,
+          "title": "Fix bracket counting to skip `{`/`}` inside JSON string values",
+          "state": "merged",
+          "linesAdded": 77,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 10.92,
+          "mergedAt": "2026-03-07T20:00:50Z"
+        },
+        {
+          "number": 186,
+          "title": "Fix pip --require-hashes failure: add pinned exceptiongroup to lock files",
+          "state": "merged",
+          "linesAdded": 130,
+          "linesDeleted": 116,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 9.07,
+          "mergedAt": "2026-03-07T19:50:14Z"
+        },
+        {
+          "number": 183,
+          "title": "Fix JSON parsing failure for hash comments at array start with consecutive backslash-escaped strings",
+          "state": "merged",
+          "linesAdded": 62,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 6.92,
+          "mergedAt": "2026-03-07T19:47:52Z"
+        },
+        {
+          "number": 184,
+          "title": "Fix inline `//` comments before closing braces destroying JSON structure",
+          "state": "merged",
+          "linesAdded": 63,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 11.83,
+          "mergedAt": "2026-03-07T19:28:10Z"
+        }
+      ],
+      "committerCount": 4,
+      "reviewerCount": 3,
+      "dependentCount": 2
+    },
+    {
+      "name": "copilot-custom-extension",
+      "fullName": "molson504x/copilot-custom-extension",
+      "pushedAt": "2025-11-16T05:21:22Z",
+      "issues": {
+        "open": -1,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 2,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "lfs-warning",
+      "fullName": "ppremk/lfs-warning",
+      "pushedAt": "2024-09-07T09:39:08Z",
+      "issues": {
+        "open": -4,
+        "closed": -55
+      },
+      "pullRequests": {
+        "open": 5,
+        "closed": 4,
+        "merged": 52
+      },
+      "pullRequestDetails": [
+        {
+          "number": 171,
+          "title": "Bump undici from 5.28.2 to 5.28.4",
+          "state": "merged",
+          "linesAdded": 265,
+          "linesDeleted": 47,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2024-04-04T20:35:17Z"
+        },
+        {
+          "number": 167,
+          "title": "Fix emoji",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-12-12T12:11:27Z"
+        },
+        {
+          "number": 165,
+          "title": "Validate PR changes to make sure there are no changes missing",
+          "state": "merged",
+          "linesAdded": 38,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 9,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-12-12T11:55:16Z"
+        },
+        {
+          "number": 166,
+          "title": "Fix text setup for the issue comment",
+          "state": "merged",
+          "linesAdded": 29,
+          "linesDeleted": 20,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-12-12T11:53:02Z"
+        },
+        {
+          "number": 163,
+          "title": "Update-node",
+          "state": "merged",
+          "linesAdded": 35256,
+          "linesDeleted": 15174,
+          "commentCount": 3,
+          "commitCount": 4,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-12-12T11:04:14Z"
+        },
+        {
+          "number": 164,
+          "title": "Support pull_request_target",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-12-12T10:38:32Z"
+        },
+        {
+          "number": 162,
+          "title": "Exclude files without blob_url when getting PR blobs",
+          "state": "merged",
+          "linesAdded": 4,
+          "linesDeleted": 4,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-12-12T10:26:23Z"
+        },
+        {
+          "number": 155,
+          "title": "Bump got and gts",
+          "state": "merged",
+          "linesAdded": 0,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-12-10T14:46:33Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 7,
+      "dependentCount": 21
+    },
+    {
+      "name": "ActionsFundamentals",
+      "fullName": "ps-actions-sandbox/ActionsFundamentals",
+      "pushedAt": "2025-08-13T09:24:28Z",
+      "issues": {
+        "open": -15,
+        "closed": -46
+      },
+      "pullRequests": {
+        "open": 16,
+        "closed": 32,
+        "merged": 15
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 1,
+      "dependentCount": 209
+    },
+    {
+      "name": ".github",
+      "fullName": "rajbos/.github",
+      "pushedAt": "2024-04-27T10:59:56Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "acp-editor-demo",
+      "fullName": "rajbos/acp-editor-demo",
+      "pushedAt": "2026-01-26T08:46:03Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 1,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "actions-load-test",
+      "fullName": "rajbos/actions-load-test",
+      "pushedAt": "2022-09-09T21:31:11Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 1
+      },
+      "pullRequestDetails": [
+        {
+          "number": 1,
+          "title": "Update workflow name and workspace",
+          "state": "merged",
+          "linesAdded": 4,
+          "linesDeleted": 3,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2022-09-09T21:31:11Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "actions-marketplace",
+      "fullName": "rajbos/actions-marketplace",
+      "pushedAt": "2026-04-01T17:33:28Z",
+      "issues": {
+        "open": -5,
+        "closed": -73
+      },
+      "pullRequests": {
+        "open": 6,
+        "closed": 12,
+        "merged": 62
+      },
+      "pullRequestDetails": [
+        {
+          "number": 108,
+          "title": "Bump ubuntu from `d1e2e92` to `0d39fcc`",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.23,
+          "mergedAt": "2026-03-19T14:20:26Z"
+        },
+        {
+          "number": 106,
+          "title": "Bump actions/upload-artifact from 4.6.2 to 7.0.0",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.23,
+          "mergedAt": "2026-03-01T18:14:44Z"
+        },
+        {
+          "number": 103,
+          "title": "Bump devops-actions/load-available-actions from 2.2.0 to 2.2.1",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.2,
+          "mergedAt": "2026-03-01T18:14:36Z"
+        },
+        {
+          "number": 102,
+          "title": "Bump ossf/scorecard-action from 2.4.0 to 2.4.3",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.23,
+          "mergedAt": "2026-03-01T18:14:28Z"
+        },
+        {
+          "number": 105,
+          "title": "Bump actions/checkout from 4.3.1 to 6.0.2",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.18,
+          "mergedAt": "2026-03-01T18:14:19Z"
+        },
+        {
+          "number": 104,
+          "title": "Bump github/codeql-action from 3.32.4 to 4.32.4",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.22,
+          "mergedAt": "2026-03-01T18:14:10Z"
+        },
+        {
+          "number": 107,
+          "title": "Bump ubuntu from 20.04 to 24.04",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.22,
+          "mergedAt": "2026-03-01T18:14:00Z"
+        },
+        {
+          "number": 101,
+          "title": "Fix stale data: true browser caching with deployment-time cache busting",
+          "state": "merged",
+          "linesAdded": 24,
+          "linesDeleted": 0,
+          "commentCount": 1,
+          "commitCount": 3,
+          "actionsMinutes": 1.05,
+          "mergedAt": "2026-03-01T18:13:19Z"
+        },
+        {
+          "number": 100,
+          "title": "[StepSecurity] Apply security best practices",
+          "state": "merged",
+          "linesAdded": 171,
+          "linesDeleted": 16,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-01T17:33:52Z"
+        }
+      ],
+      "committerCount": 3,
+      "reviewerCount": 1,
+      "dependentCount": 23
+    },
+    {
+      "name": "actions-marketplace-checks",
+      "fullName": "rajbos/actions-marketplace-checks",
+      "pushedAt": "2026-04-09T20:59:39Z",
+      "issues": {
+        "open": 0,
+        "closed": -203
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 8,
+        "merged": 196
+      },
+      "pullRequestDetails": [
+        {
+          "number": 227,
+          "title": "Add GitHub API usage monitoring to workflows using PAT tokens",
+          "state": "merged",
+          "linesAdded": 11,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 20.98,
+          "mergedAt": "2026-04-04T17:49:02Z"
+        },
+        {
+          "number": 224,
+          "title": "Fix retry-mirrors.yml: wrong secret/variable references causing nightly failures",
+          "state": "merged",
+          "linesAdded": 10,
+          "linesDeleted": 13,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 81.15,
+          "mergedAt": "2026-03-22T15:16:23Z"
+        },
+        {
+          "number": 223,
+          "title": "Fix 403/404 errors crashing repoInfo job after rate-limit retries",
+          "state": "merged",
+          "linesAdded": 241,
+          "linesDeleted": 5,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 98.68,
+          "mergedAt": "2026-03-22T14:53:47Z"
+        },
+        {
+          "number": 220,
+          "title": "Bump actions/download-artifact from 7 to 8",
+          "state": "merged",
+          "linesAdded": 32,
+          "linesDeleted": 9,
+          "commentCount": 2,
+          "commitCount": 5,
+          "actionsMinutes": 69.62,
+          "mergedAt": "2026-03-07T18:05:22Z"
+        },
+        {
+          "number": 219,
+          "title": "Bump devops-actions/load-available-actions from 2.2.0 to 2.2.1",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 105.3,
+          "mergedAt": "2026-03-07T17:44:03Z"
+        },
+        {
+          "number": 218,
+          "title": "Bump actions/upload-artifact from 6 to 7",
+          "state": "merged",
+          "linesAdded": 16,
+          "linesDeleted": 16,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 1.9,
+          "mergedAt": "2026-03-07T16:27:54Z"
+        },
+        {
+          "number": 221,
+          "title": "Fix pester-test required check not firing on non-PS1 PRs",
+          "state": "merged",
+          "linesAdded": 24,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 21.45,
+          "mergedAt": "2026-03-07T16:27:00Z"
+        },
+        {
+          "number": 222,
+          "title": "Soft-abort instead of waiting when rate limit wait would exceed 1-hour job runtime",
+          "state": "merged",
+          "linesAdded": 284,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 59.87,
+          "mergedAt": "2026-03-07T16:06:37Z"
+        },
+        {
+          "number": 216,
+          "title": "Lower the amount of repos to check",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 38.87,
+          "mergedAt": "2026-02-22T20:46:57Z"
+        },
+        {
+          "number": 217,
+          "title": "Add retry with exponential backoff for Install-Module in workflows",
+          "state": "merged",
+          "linesAdded": 162,
+          "linesDeleted": 5,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 2.13,
+          "mergedAt": "2026-02-22T20:44:57Z"
+        }
+      ],
+      "committerCount": 4,
+      "reviewerCount": 2,
+      "dependentCount": 5
+    },
+    {
+      "name": "actions-permissions",
+      "fullName": "rajbos/actions-permissions",
+      "pushedAt": "2023-07-24T15:08:46Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 27
+    },
+    {
+      "name": "actions-testing",
+      "fullName": "rajbos/actions-testing",
+      "pushedAt": "2021-01-27T19:00:39Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "actions-testing-grounds",
+      "fullName": "rajbos/actions-testing-grounds",
+      "pushedAt": "2021-09-12T14:17:37Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "actions-usage",
+      "fullName": "rajbos/actions-usage",
+      "pushedAt": "2023-07-30T10:42:05Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 13
+    },
+    {
+      "name": "arm.chocolateyserver",
+      "fullName": "rajbos/arm.chocolateyserver",
+      "pushedAt": "2018-07-24T10:01:38Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "azure-openai-service-proxy",
+      "fullName": "rajbos/azure-openai-service-proxy",
+      "pushedAt": "2025-12-08T16:22:02Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 36
+    },
+    {
+      "name": "Azure-scripts",
+      "fullName": "rajbos/Azure-scripts",
+      "pushedAt": "2018-11-08T10:06:52Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "centralPackageVersioningSample",
+      "fullName": "rajbos/centralPackageVersioningSample",
+      "pushedAt": "2022-06-26T10:07:52Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "check-dependabot",
+      "fullName": "rajbos/check-dependabot",
+      "pushedAt": "2023-02-05T20:17:41Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 3
+    },
+    {
+      "name": "CleanupCopilotLicenses",
+      "fullName": "rajbos/CleanupCopilotLicenses",
+      "pushedAt": "2024-04-16T01:28:42Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 4
+    },
+    {
+      "name": "cli",
+      "fullName": "rajbos/cli",
+      "pushedAt": "2023-02-05T20:15:52Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 8236
+    },
+    {
+      "name": "codespaces-models",
+      "fullName": "rajbos/codespaces-models",
+      "pushedAt": "2024-09-22T21:31:55Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 100
+    },
+    {
+      "name": "CodeToCloud-Student",
+      "fullName": "rajbos/CodeToCloud-Student",
+      "pushedAt": "2022-03-31T12:57:57Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 26
+    },
+    {
+      "name": "container-scan",
+      "fullName": "rajbos/container-scan",
+      "pushedAt": "2025-01-05T17:19:59Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "continuous-compliance-action",
+      "fullName": "rajbos/continuous-compliance-action",
+      "pushedAt": "2023-03-21T13:27:07Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 5
+    },
+    {
+      "name": "copilot-custom-agents",
+      "fullName": "rajbos/copilot-custom-agents",
+      "pushedAt": "2025-11-23T21:34:41Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "copilot-usage-advanced-dashboard",
+      "fullName": "rajbos/copilot-usage-advanced-dashboard",
+      "pushedAt": "2026-02-04T15:52:29Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 2,
+      "reviewerCount": 0,
+      "dependentCount": 39
+    },
+    {
+      "name": "create-github-app-from-manifest",
+      "fullName": "rajbos/create-github-app-from-manifest",
+      "pushedAt": "2026-03-31T19:05:53Z",
+      "issues": {
+        "open": 0,
+        "closed": -20
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 6,
+        "merged": 15
+      },
+      "pullRequestDetails": [
+        {
+          "number": 21,
+          "title": "Bump path-to-regexp from 0.1.12 to 0.1.13 in /nodejs in the npm_and_yarn group across 1 directory",
+          "state": "merged",
+          "linesAdded": 6,
+          "linesDeleted": 6,
+          "commentCount": 4,
+          "commitCount": 2,
+          "actionsMinutes": 1.82,
+          "mergedAt": "2026-03-31T19:05:51Z"
+        },
+        {
+          "number": 20,
+          "title": "Bump the npm_and_yarn group across 1 directory with 1 update",
+          "state": "merged",
+          "linesAdded": 12,
+          "linesDeleted": 12,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-31T07:49:35Z"
+        },
+        {
+          "number": 19,
+          "title": "Bump the npm_and_yarn group across 1 directory with 1 update",
+          "state": "merged",
+          "linesAdded": 12,
+          "linesDeleted": 12,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-02-25T12:20:28Z"
+        },
+        {
+          "number": 18,
+          "title": "Bump qs from 6.14.1 to 6.14.2 in /nodejs in the npm_and_yarn group across 1 directory",
+          "state": "merged",
+          "linesAdded": 6,
+          "linesDeleted": 6,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.02,
+          "mergedAt": "2026-02-14T20:49:21Z"
+        },
+        {
+          "number": 17,
+          "title": "Bump qs from 6.14.0 to 6.14.1 in /nodejs in the npm_and_yarn group across 1 directory",
+          "state": "merged",
+          "linesAdded": 6,
+          "linesDeleted": 6,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.02,
+          "mergedAt": "2026-01-01T22:25:47Z"
+        },
+        {
+          "number": 16,
+          "title": "Potential fix for code scanning alert no. 2: DOM text reinterpreted as HTML",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-12-16T10:54:34Z"
+        },
+        {
+          "number": 9,
+          "title": "Bump brace-expansion in /nodejs",
+          "state": "merged",
+          "linesAdded": 12,
+          "linesDeleted": 12,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-12-16T10:27:50Z"
+        },
+        {
+          "number": 14,
+          "title": "Bump express from 4.19.2 to 4.22.0 in /nodejs",
+          "state": "merged",
+          "linesAdded": 426,
+          "linesDeleted": 326,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-12-16T10:27:37Z"
+        }
+      ],
+      "committerCount": 1,
+      "reviewerCount": 2,
+      "dependentCount": 1
+    },
+    {
+      "name": "demo",
+      "fullName": "rajbos/demo",
+      "pushedAt": "2023-02-15T15:47:32Z",
+      "issues": {
+        "open": 1,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "demo-actions",
+      "fullName": "rajbos/demo-actions",
+      "pushedAt": "2026-04-08T14:45:37Z",
+      "issues": {
+        "open": -5,
+        "closed": -133
+      },
+      "pullRequests": {
+        "open": 6,
+        "closed": 46,
+        "merged": 88
+      },
+      "pullRequestDetails": [
+        {
+          "number": 206,
+          "title": "Fix",
+          "state": "merged",
+          "linesAdded": 34,
+          "linesDeleted": 1,
+          "commentCount": 3,
+          "commitCount": 12,
+          "actionsMinutes": 0,
+          "mergedAt": "2024-03-01T13:29:22Z"
+        }
+      ],
+      "committerCount": 1,
+      "reviewerCount": 1,
+      "dependentCount": 5
+    },
+    {
+      "name": "demo-javascript-action",
+      "fullName": "rajbos/demo-javascript-action",
+      "pushedAt": "2024-06-17T06:44:23Z",
+      "issues": {
+        "open": -2,
+        "closed": -8
+      },
+      "pullRequests": {
+        "open": 3,
+        "closed": 7,
+        "merged": 2
+      },
+      "pullRequestDetails": [
+        {
+          "number": 2,
+          "title": "Bump actions/setup-node from 3 to 4",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2024-03-20T08:04:46Z"
+        },
+        {
+          "number": 3,
+          "title": "Bump actions/checkout from 3 to 4",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2024-03-20T08:02:35Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "Demo-Pages",
+      "fullName": "rajbos/Demo-Pages",
+      "pushedAt": "2021-10-25T18:51:45Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "demo-repo",
+      "fullName": "rajbos/demo-repo",
+      "pushedAt": "2025-05-08T12:03:02Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "demo-repo-monday",
+      "fullName": "rajbos/demo-repo-monday",
+      "pushedAt": "2023-03-27T08:28:13Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "demo-training",
+      "fullName": "rajbos/demo-training",
+      "pushedAt": "2022-03-07T10:23:23Z",
+      "issues": {
+        "open": 1,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "demo-webgoat",
+      "fullName": "rajbos/demo-webgoat",
+      "pushedAt": "2024-10-18T08:00:35Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 1,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "demo-wiki",
+      "fullName": "rajbos/demo-wiki",
+      "pushedAt": "2023-01-16T10:15:38Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "dependency-review-action",
+      "fullName": "rajbos/dependency-review-action",
+      "pushedAt": "2023-10-16T15:00:40Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 169
+    },
+    {
+      "name": "dependency-updates",
+      "fullName": "rajbos/dependency-updates",
+      "pushedAt": "2022-05-24T21:18:27Z",
+      "issues": {
+        "open": 1,
+        "closed": -10
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 11
+      },
+      "pullRequestDetails": [
+        {
+          "number": 15,
+          "title": "Upgrade node version in dockerfile",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 3,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-07-09T09:09:59Z"
+        },
+        {
+          "number": 10,
+          "title": "Added setting to remove the source branch on GitLab when creating a new Merge Request",
+          "state": "merged",
+          "linesAdded": 17,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 12,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-01-25T08:10:39Z"
+        },
+        {
+          "number": 9,
+          "title": "Cleaning up docker login information after we are done using it",
+          "state": "merged",
+          "linesAdded": 13,
+          "linesDeleted": 93,
+          "commentCount": 0,
+          "commitCount": 5,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-01-20T18:03:43Z"
+        },
+        {
+          "number": 8,
+          "title": "Fixing param name",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-01-20T14:01:03Z"
+        },
+        {
+          "number": 7,
+          "title": "fix docker push for main",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-01-20T12:39:28Z"
+        },
+        {
+          "number": 6,
+          "title": "Added additional logging to check for empty GitLab merge request titles",
+          "state": "merged",
+          "linesAdded": 17,
+          "linesDeleted": 9,
+          "commentCount": 0,
+          "commitCount": 16,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-01-20T12:36:37Z"
+        },
+        {
+          "number": 5,
+          "title": "Using correct merge request title depending on the update type",
+          "state": "merged",
+          "linesAdded": 24,
+          "linesDeleted": 4,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-01-19T07:40:30Z"
+        },
+        {
+          "number": 4,
+          "title": "Adding contributing.md",
+          "state": "merged",
+          "linesAdded": 0,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-01-15T17:39:46Z"
+        },
+        {
+          "number": 3,
+          "title": "Updated readme and added contributing guide",
+          "state": "merged",
+          "linesAdded": 84,
+          "linesDeleted": 61,
+          "commentCount": 0,
+          "commitCount": 4,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-01-15T17:31:19Z"
+        },
+        {
+          "number": 2,
+          "title": "Adding in options to run yarn updates",
+          "state": "merged",
+          "linesAdded": 18,
+          "linesDeleted": 75,
+          "commentCount": 0,
+          "commitCount": 4,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-01-15T16:53:25Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "DevTrainingDemo",
+      "fullName": "rajbos/DevTrainingDemo",
+      "pushedAt": "2022-06-08T09:11:40Z",
+      "issues": {
+        "open": 1,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "dind-rootless-runner",
+      "fullName": "rajbos/dind-rootless-runner",
+      "pushedAt": "2021-10-12T08:03:09Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "dind-secure",
+      "fullName": "rajbos/dind-secure",
+      "pushedAt": "2021-06-09T14:36:08Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "docker-test",
+      "fullName": "rajbos/docker-test",
+      "pushedAt": "2023-03-30T12:58:01Z",
+      "issues": {
+        "open": -1,
+        "closed": -16
+      },
+      "pullRequests": {
+        "open": 2,
+        "closed": 11,
+        "merged": 6
+      },
+      "pullRequestDetails": [
+        {
+          "number": 11,
+          "title": "Bump amd64/alpine from 3.15.0 to 3.16.0",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2022-05-24T21:13:29Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "doom-sharp",
+      "fullName": "rajbos/doom-sharp",
+      "pushedAt": "2023-09-21T17:29:40Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 10
+    },
+    {
+      "name": "dotnetcore-angular",
+      "fullName": "rajbos/dotnetcore-angular",
+      "pushedAt": "2019-10-26T19:29:04Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "dotnetcore-webapp",
+      "fullName": "rajbos/dotnetcore-webapp",
+      "pushedAt": "2024-07-07T15:29:19Z",
+      "issues": {
+        "open": -4,
+        "closed": -130
+      },
+      "pullRequests": {
+        "open": 5,
+        "closed": 39,
+        "merged": 92
+      },
+      "pullRequestDetails": [
+        {
+          "number": 122,
+          "title": "Bump Microsoft.Extensions.Configuration from 6.0.1 to 7.0.0",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-06-07T16:21:56Z"
+        },
+        {
+          "number": 125,
+          "title": "Bump Microsoft.NET.Test.Sdk from 17.5.0 to 17.6.1",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-06-07T16:21:45Z"
+        },
+        {
+          "number": 120,
+          "title": "Bump Microsoft.Extensions.Configuration.Binder from 7.0.1 to 7.0.4",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-06-06T07:53:26Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 157
+    },
+    {
+      "name": "dvrtos",
+      "fullName": "rajbos/dvrtos",
+      "pushedAt": "2023-06-14T09:33:47Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "eco-ci-activity-checker",
+      "fullName": "rajbos/eco-ci-activity-checker",
+      "pushedAt": "2023-04-09T00:04:04Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "eco-ci-energy-estimation",
+      "fullName": "rajbos/eco-ci-energy-estimation",
+      "pushedAt": "2023-06-08T21:22:02Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 30
+    },
+    {
+      "name": "find-action-used",
+      "fullName": "rajbos/find-action-used",
+      "pushedAt": "2024-11-08T07:43:21Z",
+      "issues": {
+        "open": -1,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 2,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "game-center",
+      "fullName": "rajbos/game-center",
+      "pushedAt": "2026-04-08T06:55:27Z",
+      "issues": {
+        "open": -1,
+        "closed": -20
+      },
+      "pullRequests": {
+        "open": 2,
+        "closed": 0,
+        "merged": 21
+      },
+      "pullRequestDetails": [
+        {
+          "number": 21,
+          "title": "Bump actions/configure-pages from 4 to 5",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.2,
+          "mergedAt": "2025-12-25T11:23:51Z"
+        },
+        {
+          "number": 20,
+          "title": "Bump actions/setup-node from 4 to 6",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.32,
+          "mergedAt": "2025-12-25T11:23:31Z"
+        },
+        {
+          "number": 19,
+          "title": "Bump actions/checkout from 4 to 6",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.28,
+          "mergedAt": "2025-12-25T11:23:14Z"
+        },
+        {
+          "number": 22,
+          "title": "Bump actions/upload-pages-artifact from 3 to 4",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.22,
+          "mergedAt": "2025-12-25T11:21:25Z"
+        },
+        {
+          "number": 18,
+          "title": "Configure Dependabot for npm and GitHub Actions",
+          "state": "merged",
+          "linesAdded": 16,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.2,
+          "mergedAt": "2025-12-25T11:10:59Z"
+        },
+        {
+          "number": 17,
+          "title": "Added deps from ci checks",
+          "state": "merged",
+          "linesAdded": 36,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.25,
+          "mergedAt": "2025-12-25T11:09:13Z"
+        },
+        {
+          "number": 16,
+          "title": "Enhance PR tracking workflow with multi-line body",
+          "state": "merged",
+          "linesAdded": 17,
+          "linesDeleted": 11,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.27,
+          "mergedAt": "2025-12-24T10:37:57Z"
+        },
+        {
+          "number": 15,
+          "title": "Fix workflow to use PRs instead of direct push to main",
+          "state": "merged",
+          "linesAdded": 35,
+          "linesDeleted": 5,
+          "commentCount": 0,
+          "commitCount": 4,
+          "actionsMinutes": 0.1,
+          "mergedAt": "2025-12-24T10:28:02Z"
+        },
+        {
+          "number": 13,
+          "title": "added first draft of Head Ball with Mathijs",
+          "state": "merged",
+          "linesAdded": 436,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.3,
+          "mergedAt": "2025-12-23T13:33:20Z"
+        },
+        {
+          "number": 12,
+          "title": "update",
+          "state": "merged",
+          "linesAdded": 210,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0.18,
+          "mergedAt": "2025-12-23T12:39:55Z"
+        }
+      ],
+      "committerCount": 1,
+      "reviewerCount": 2,
+      "dependentCount": 0
+    },
+    {
+      "name": "get-organization-repositories-fork",
+      "fullName": "rajbos/get-organization-repositories-fork",
+      "pushedAt": "2023-02-05T20:20:43Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 4
+    },
+    {
+      "name": "gh-developer-games",
+      "fullName": "rajbos/gh-developer-games",
+      "pushedAt": "2023-01-17T10:29:15Z",
+      "issues": {
+        "open": -1,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 2,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 8
+    },
+    {
+      "name": "ghas-bootcamp",
+      "fullName": "rajbos/ghas-bootcamp",
+      "pushedAt": "2025-05-03T22:35:38Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 205
+    },
+    {
+      "name": "ghas-mcp-server",
+      "fullName": "rajbos/ghas-mcp-server",
+      "pushedAt": "2025-05-21T15:43:10Z",
+      "issues": {
+        "open": 0,
+        "closed": -7
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 0,
+        "merged": 8
+      },
+      "pullRequestDetails": [
+        {
+          "number": 12,
+          "title": "Fix the links so that they also render on npmjs.org",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.8,
+          "mergedAt": "2025-04-04T15:13:43Z"
+        },
+        {
+          "number": 11,
+          "title": "Releasing v0.0.4",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 1.12,
+          "mergedAt": "2025-04-04T14:51:41Z"
+        },
+        {
+          "number": 10,
+          "title": "Moar buttons",
+          "state": "merged",
+          "linesAdded": 92,
+          "linesDeleted": 8,
+          "commentCount": 0,
+          "commitCount": 4,
+          "actionsMinutes": 0.77,
+          "mergedAt": "2025-04-04T14:49:47Z"
+        },
+        {
+          "number": 9,
+          "title": "update link without inputS plural to prevent issues",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 4,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.73,
+          "mergedAt": "2025-04-04T14:25:28Z"
+        },
+        {
+          "number": 8,
+          "title": "Adding more docs",
+          "state": "merged",
+          "linesAdded": 5,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.78,
+          "mergedAt": "2025-04-04T14:15:35Z"
+        },
+        {
+          "number": 7,
+          "title": "buttons",
+          "state": "merged",
+          "linesAdded": 31,
+          "linesDeleted": 9,
+          "commentCount": 0,
+          "commitCount": 4,
+          "actionsMinutes": 0.72,
+          "mergedAt": "2025-04-04T14:10:14Z"
+        },
+        {
+          "number": 6,
+          "title": "fix names",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.7,
+          "mergedAt": "2025-04-04T13:46:14Z"
+        },
+        {
+          "number": 5,
+          "title": "fix typo in the server name",
+          "state": "merged",
+          "linesAdded": 5,
+          "linesDeleted": 5,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 1.52,
+          "mergedAt": "2025-03-28T18:20:05Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 1,
+      "dependentCount": 4
+    },
+    {
+      "name": "GHAzDo-widget",
+      "fullName": "rajbos/GHAzDo-widget",
+      "pushedAt": "2026-04-10T21:21:15Z",
+      "issues": {
+        "open": 1,
+        "closed": -142
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 26,
+        "merged": 117
+      },
+      "pullRequestDetails": [
+        {
+          "number": 166,
+          "title": "Increase test coverage and fix run() setResult bug (closes #150)",
+          "state": "merged",
+          "linesAdded": 408,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.88,
+          "mergedAt": "2026-04-10T21:21:13Z"
+        },
+        {
+          "number": 165,
+          "title": "fix: unpin tfx-cli so Dependabot can update it",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 3.67,
+          "mergedAt": "2026-04-10T20:57:02Z"
+        },
+        {
+          "number": 164,
+          "title": "Bump vite from 8.0.1 to 8.0.8 in /dependencyReviewTask in the npm_and_yarn group across 1 directory",
+          "state": "merged",
+          "linesAdded": 0,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 3.65,
+          "mergedAt": "2026-04-10T16:39:50Z"
+        },
+        {
+          "number": 162,
+          "title": "Bump vite from 8.0.1 to 8.0.5 in /widgets in the npm_and_yarn group across 1 directory",
+          "state": "merged",
+          "linesAdded": 92,
+          "linesDeleted": 93,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.63,
+          "mergedAt": "2026-04-10T15:27:24Z"
+        },
+        {
+          "number": 163,
+          "title": "Bump lodash from 4.17.23 to 4.18.1 in the npm_and_yarn group across 1 directory",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.07,
+          "mergedAt": "2026-04-10T15:24:52Z"
+        },
+        {
+          "number": 161,
+          "title": "Bump actions/checkout from 4.3.1 to 6.0.2",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.07,
+          "mergedAt": "2026-04-10T15:24:47Z"
+        },
+        {
+          "number": 160,
+          "title": "Bump github/codeql-action from 3.34.1 to 4.35.1",
+          "state": "merged",
+          "linesAdded": 4,
+          "linesDeleted": 4,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.18,
+          "mergedAt": "2026-04-10T15:24:43Z"
+        },
+        {
+          "number": 159,
+          "title": "Bump vitest from 4.1.0 to 4.1.2 in /widgets",
+          "state": "merged",
+          "linesAdded": 137,
+          "linesDeleted": 132,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.02,
+          "mergedAt": "2026-04-10T15:24:39Z"
+        },
+        {
+          "number": 158,
+          "title": "Bump the all-in-one group with 3 updates",
+          "state": "merged",
+          "linesAdded": 11,
+          "linesDeleted": 11,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.28,
+          "mergedAt": "2026-04-10T15:24:35Z"
+        },
+        {
+          "number": 157,
+          "title": "Bump @types/node from 25.3.3 to 25.5.0 in /widgets",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.43,
+          "mergedAt": "2026-04-10T15:24:32Z"
+        }
+      ],
+      "committerCount": 4,
+      "reviewerCount": 1,
+      "dependentCount": 6
+    },
+    {
+      "name": "giphy-action",
+      "fullName": "rajbos/giphy-action",
+      "pushedAt": "2023-05-13T22:02:46Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 2
+    },
+    {
+      "name": "github-action-composite-message",
+      "fullName": "rajbos/github-action-composite-message",
+      "pushedAt": "2021-09-12T14:23:58Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "github-actions-requests",
+      "fullName": "rajbos/github-actions-requests",
+      "pushedAt": "2024-09-03T21:00:19Z",
+      "issues": {
+        "open": 0,
+        "closed": -14
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 0,
+        "merged": 15
+      },
+      "pullRequestDetails": [
+        {
+          "number": 41,
+          "title": "Correct Type on Readme",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2022-01-10T16:44:45Z"
+        },
+        {
+          "number": 40,
+          "title": "Create LICENSE.md",
+          "state": "merged",
+          "linesAdded": 21,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-12-04T16:36:32Z"
+        },
+        {
+          "number": 39,
+          "title": "Add final clone",
+          "state": "merged",
+          "linesAdded": 5,
+          "linesDeleted": 14,
+          "commentCount": 0,
+          "commitCount": 31,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-12-03T20:01:57Z"
+        },
+        {
+          "number": 38,
+          "title": "Add final clone",
+          "state": "merged",
+          "linesAdded": 195,
+          "linesDeleted": 42,
+          "commentCount": 0,
+          "commitCount": 29,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-12-03T19:58:59Z"
+        },
+        {
+          "number": 34,
+          "title": "Linguist integration to save CodeQL cycles on languages we don't have",
+          "state": "merged",
+          "linesAdded": 119,
+          "linesDeleted": 11,
+          "commentCount": 0,
+          "commitCount": 41,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-11-28T14:18:26Z"
+        },
+        {
+          "number": 24,
+          "title": "Extract shell scripts from workflow files",
+          "state": "merged",
+          "linesAdded": 295,
+          "linesDeleted": 147,
+          "commentCount": 3,
+          "commitCount": 48,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-11-26T15:31:58Z"
+        },
+        {
+          "number": 27,
+          "title": "Feature/6 dependabot alerts",
+          "state": "merged",
+          "linesAdded": 198,
+          "linesDeleted": 40,
+          "commentCount": 0,
+          "commitCount": 42,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-11-22T10:20:48Z"
+        },
+        {
+          "number": 25,
+          "title": "Inject codeql job",
+          "state": "merged",
+          "linesAdded": 120,
+          "linesDeleted": 10,
+          "commentCount": 0,
+          "commitCount": 23,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-11-05T21:20:37Z"
+        },
+        {
+          "number": 23,
+          "title": "Separate js file",
+          "state": "merged",
+          "linesAdded": 237,
+          "linesDeleted": 215,
+          "commentCount": 0,
+          "commitCount": 9,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-11-05T15:20:20Z"
+        },
+        {
+          "number": 21,
+          "title": "Codeql alerts",
+          "state": "merged",
+          "linesAdded": 95,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 28,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-11-04T15:15:07Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 2,
+      "dependentCount": 14
+    },
+    {
+      "name": "github-azure-devops-marketplace-extension-news",
+      "fullName": "rajbos/github-azure-devops-marketplace-extension-news",
+      "pushedAt": "2026-04-01T09:39:38Z",
+      "issues": {
+        "open": -4,
+        "closed": -327
+      },
+      "pullRequests": {
+        "open": 5,
+        "closed": 68,
+        "merged": 260
+      },
+      "pullRequestDetails": [
+        {
+          "number": 338,
+          "title": "Improve blog post formatting: empty line before used-by, action summary heading, and What's Changed section with commit fallback",
+          "state": "merged",
+          "linesAdded": 45,
+          "linesDeleted": 4,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 3109.28,
+          "mergedAt": "2026-03-28T20:49:53Z"
+        },
+        {
+          "number": 336,
+          "title": "chore: upgrade dependencies",
+          "state": "merged",
+          "linesAdded": 75,
+          "linesDeleted": 81,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 14.48,
+          "mergedAt": "2026-03-25T16:51:36Z"
+        },
+        {
+          "number": 334,
+          "title": "Bump actions/download-artifact from 7.0.0 to 8.0.0",
+          "state": "merged",
+          "linesAdded": 4,
+          "linesDeleted": 4,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 302.98,
+          "mergedAt": "2026-03-01T17:42:03Z"
+        },
+        {
+          "number": 333,
+          "title": "Bump actions/upload-artifact from 6.0.0 to 7.0.0",
+          "state": "merged",
+          "linesAdded": 6,
+          "linesDeleted": 6,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 1053.17,
+          "mergedAt": "2026-03-01T17:27:13Z"
+        },
+        {
+          "number": 335,
+          "title": "Bump the all-in-one group with 10 updates",
+          "state": "merged",
+          "linesAdded": 274,
+          "linesDeleted": 274,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 827.87,
+          "mergedAt": "2026-03-01T17:11:04Z"
+        },
+        {
+          "number": 332,
+          "title": "Bump the all-in-one group with 4 updates",
+          "state": "merged",
+          "linesAdded": 14,
+          "linesDeleted": 14,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 244.13,
+          "mergedAt": "2026-03-01T08:44:08Z"
+        },
+        {
+          "number": 331,
+          "title": "Include git output in PowerShell exception messages",
+          "state": "merged",
+          "linesAdded": 6,
+          "linesDeleted": 6,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 2966.98,
+          "mergedAt": "2026-02-20T20:05:41Z"
+        },
+        {
+          "number": 330,
+          "title": "Fail PostNews job on git operation failures",
+          "state": "merged",
+          "linesAdded": 18,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 254.3,
+          "mergedAt": "2026-02-16T21:59:13Z"
+        },
+        {
+          "number": 329,
+          "title": "Fix PostNews authentication failure in deploy.yml workflow",
+          "state": "merged",
+          "linesAdded": 29,
+          "linesDeleted": 9,
+          "commentCount": 0,
+          "commitCount": 6,
+          "actionsMinutes": 3450.23,
+          "mergedAt": "2026-02-11T16:15:37Z"
+        },
+        {
+          "number": 328,
+          "title": "Replace browser clicking with raw URL fetching for action file discovery",
+          "state": "merged",
+          "linesAdded": 35,
+          "linesDeleted": 27,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 12.3,
+          "mergedAt": "2026-02-08T19:59:43Z"
+        }
+      ],
+      "committerCount": 5,
+      "reviewerCount": 3,
+      "dependentCount": 3
+    },
+    {
+      "name": "github-composite-action-goodbye",
+      "fullName": "rajbos/github-composite-action-goodbye",
+      "pushedAt": "2021-09-12T14:25:11Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "github-config-as-code",
+      "fullName": "rajbos/github-config-as-code",
+      "pushedAt": "2023-06-07T15:24:41Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "github-copilot-game-dev",
+      "fullName": "rajbos/github-copilot-game-dev",
+      "pushedAt": "2026-04-01T09:55:18Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 1,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "github-copilot-model-notifier",
+      "fullName": "rajbos/github-copilot-model-notifier",
+      "pushedAt": "2026-04-02T08:23:31Z",
+      "issues": {
+        "open": 0,
+        "closed": -8
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 9
+      },
+      "pullRequestDetails": [
+        {
+          "number": 9,
+          "title": "Bump actions/checkout from 4.2.2 to 6.0.2",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.33,
+          "mergedAt": "2026-03-10T18:48:47Z"
+        },
+        {
+          "number": 8,
+          "title": "Add dark mode support via prefers-color-scheme",
+          "state": "merged",
+          "linesAdded": 36,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0.32,
+          "mergedAt": "2026-03-03T21:30:28Z"
+        },
+        {
+          "number": 7,
+          "title": "Enrich models with release status and multiplier data from rendered HTML",
+          "state": "merged",
+          "linesAdded": 77,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0.32,
+          "mergedAt": "2026-03-03T21:20:10Z"
+        },
+        {
+          "number": 6,
+          "title": "Fix SyntaxError in check-models workflow and ensure job fails on errors",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0.35,
+          "mergedAt": "2026-03-03T12:48:48Z"
+        },
+        {
+          "number": 5,
+          "title": "Fix model scraper: replace Playwright with GitHub Docs markdown API",
+          "state": "merged",
+          "linesAdded": 165,
+          "linesDeleted": 117,
+          "commentCount": 2,
+          "commitCount": 7,
+          "actionsMinutes": 0.33,
+          "mergedAt": "2026-03-03T12:09:11Z"
+        },
+        {
+          "number": 4,
+          "title": "Update setup-python action to version 6.2.0",
+          "state": "merged",
+          "linesAdded": 5,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 1.13,
+          "mergedAt": "2026-03-03T11:11:19Z"
+        },
+        {
+          "number": 3,
+          "title": "Bump actions/checkout from 4.2.2 to 6.0.2",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0.12,
+          "mergedAt": "2026-03-03T11:02:37Z"
+        },
+        {
+          "number": 2,
+          "title": "Add lint workflow (Ruff + Mypy) for use in PR rulesets",
+          "state": "merged",
+          "linesAdded": 46,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 0.07,
+          "mergedAt": "2026-03-03T11:02:24Z"
+        },
+        {
+          "number": 1,
+          "title": "Add GitHub Copilot model change notifier with GitHub Pages and RSS feed",
+          "state": "merged",
+          "linesAdded": 647,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-03T10:49:57Z"
+        }
+      ],
+      "committerCount": 4,
+      "reviewerCount": 1,
+      "dependentCount": 0
+    },
+    {
+      "name": "github-copilot-premium-reqs-usage-fork",
+      "fullName": "rajbos/github-copilot-premium-reqs-usage-fork",
+      "pushedAt": "2025-09-26T18:55:14Z",
+      "issues": {
+        "open": 1,
+        "closed": -17
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 2,
+        "merged": 16
+      },
+      "pullRequestDetails": [
+        {
+          "number": 38,
+          "title": "Add user search and analysis feature with enhanced dropdown and comprehensive panel filtering",
+          "state": "merged",
+          "linesAdded": 706,
+          "linesDeleted": 13,
+          "commentCount": 6,
+          "commitCount": 4,
+          "actionsMinutes": 43205.23,
+          "mergedAt": "2025-09-26T18:55:12Z"
+        },
+        {
+          "number": 34,
+          "title": "Remove underline styling from all clickable elements in Usage Statistics panel for cleaner interface",
+          "state": "merged",
+          "linesAdded": 16,
+          "linesDeleted": 16,
+          "commentCount": 5,
+          "commitCount": 4,
+          "actionsMinutes": 43205.43,
+          "mergedAt": "2025-08-27T14:33:42Z"
+        },
+        {
+          "number": 32,
+          "title": "Add user extrapolation feature with two-column potential cost breakdown dialog and comprehensive projected cost analysis",
+          "state": "merged",
+          "linesAdded": 564,
+          "linesDeleted": 47,
+          "commentCount": 23,
+          "commitCount": 13,
+          "actionsMinutes": 43201.7,
+          "mergedAt": "2025-08-27T12:05:14Z"
+        },
+        {
+          "number": 31,
+          "title": "Add GitHub Copilot custom instructions for the Copilot Premium Requests Usage Analyzer",
+          "state": "merged",
+          "linesAdded": 172,
+          "linesDeleted": 0,
+          "commentCount": 3,
+          "commitCount": 4,
+          "actionsMinutes": 43200.6,
+          "mergedAt": "2025-08-25T14:36:01Z"
+        },
+        {
+          "number": 28,
+          "title": "Add interactive potential cost breakdown for premium requests with corrected quota calculations",
+          "state": "merged",
+          "linesAdded": 449,
+          "linesDeleted": 1,
+          "commentCount": 10,
+          "commitCount": 6,
+          "actionsMinutes": 43205.1,
+          "mergedAt": "2025-08-25T14:33:30Z"
+        },
+        {
+          "number": 26,
+          "title": "Add plan-aware user quota tracking to top bar statistics",
+          "state": "merged",
+          "linesAdded": 242,
+          "linesDeleted": 2,
+          "commentCount": 3,
+          "commitCount": 4,
+          "actionsMinutes": 43201.78,
+          "mergedAt": "2025-08-22T11:00:58Z"
+        },
+        {
+          "number": 24,
+          "title": "Add model breakdown visualization to Power User Requests chart",
+          "state": "merged",
+          "linesAdded": 109,
+          "linesDeleted": 10,
+          "commentCount": 3,
+          "commitCount": 3,
+          "actionsMinutes": 43202.02,
+          "mergedAt": "2025-08-22T09:49:27Z"
+        },
+        {
+          "number": 22,
+          "title": "Add total row to Requests per Model table",
+          "state": "merged",
+          "linesAdded": 158,
+          "linesDeleted": 1,
+          "commentCount": 1,
+          "commitCount": 2,
+          "actionsMinutes": 43201.63,
+          "mergedAt": "2025-08-21T07:38:01Z"
+        },
+        {
+          "number": 20,
+          "title": "Remove Models List section from main page",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 22,
+          "commentCount": 1,
+          "commitCount": 2,
+          "actionsMinutes": 2.32,
+          "mergedAt": "2025-08-14T21:09:58Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 4
+    },
+    {
+      "name": "github-copilot-token-usage",
+      "fullName": "rajbos/github-copilot-token-usage",
+      "pushedAt": "2026-04-11T13:35:28Z",
+      "issues": {
+        "open": -2,
+        "closed": -484
+      },
+      "pullRequests": {
+        "open": 3,
+        "closed": 39,
+        "merged": 446
+      },
+      "pullRequestDetails": [
+        {
+          "number": 581,
+          "title": "Add marketplace and npm download badges to README",
+          "state": "merged",
+          "linesAdded": 5,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 17.5,
+          "mergedAt": "2026-04-11T13:35:26Z"
+        },
+        {
+          "number": 579,
+          "title": "Potential fix for code scanning alert no. 53: Client-side cross-site scripting",
+          "state": "merged",
+          "linesAdded": 59,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 17.07,
+          "mergedAt": "2026-04-10T21:34:34Z"
+        },
+        {
+          "number": 578,
+          "title": "chore: bump VS Code extension version to 0.1.1",
+          "state": "merged",
+          "linesAdded": 32,
+          "linesDeleted": 14,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 16.85,
+          "mergedAt": "2026-04-10T21:19:52Z"
+        },
+        {
+          "number": 577,
+          "title": "chore(deps): bump basic-ftp from 5.2.1 to 5.2.2 in /.github/scripts in the npm_and_yarn group across 1 directory",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 16.53,
+          "mergedAt": "2026-04-10T20:51:42Z"
+        },
+        {
+          "number": 182,
+          "title": "Add GitHub authentication support to extension",
+          "state": "merged",
+          "linesAdded": 766,
+          "linesDeleted": 0,
+          "commentCount": 9,
+          "commitCount": 22,
+          "actionsMinutes": 16.7,
+          "mergedAt": "2026-04-10T20:42:12Z"
+        },
+        {
+          "number": 572,
+          "title": "feat: Add Claude Desktop Cowork session support",
+          "state": "merged",
+          "linesAdded": 584,
+          "linesDeleted": 4,
+          "commentCount": 0,
+          "commitCount": 7,
+          "actionsMinutes": 22.55,
+          "mergedAt": "2026-04-10T18:05:19Z"
+        },
+        {
+          "number": 576,
+          "title": "Show git branch in status bar when running in debug mode",
+          "state": "merged",
+          "linesAdded": 22,
+          "linesDeleted": 5,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 17.48,
+          "mergedAt": "2026-04-10T17:50:28Z"
+        },
+        {
+          "number": 575,
+          "title": "Fix Copilot CLI session titles showing empty",
+          "state": "merged",
+          "linesAdded": 147,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 17.47,
+          "mergedAt": "2026-04-10T17:40:50Z"
+        },
+        {
+          "number": 573,
+          "title": "fix: track token usage from sub-agent calls in Copilot agent mode (#567)",
+          "state": "merged",
+          "linesAdded": 443,
+          "linesDeleted": 30,
+          "commentCount": 0,
+          "commitCount": 4,
+          "actionsMinutes": 21.78,
+          "mergedAt": "2026-04-10T17:00:23Z"
+        },
+        {
+          "number": 574,
+          "title": "Fix: wrap long MCP tool names in session viewer",
+          "state": "merged",
+          "linesAdded": 6,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 17.97,
+          "mergedAt": "2026-04-10T16:26:50Z"
+        }
+      ],
+      "committerCount": 16,
+      "reviewerCount": 3,
+      "dependentCount": 15
+    },
+    {
+      "name": "github-fork-updater",
+      "fullName": "rajbos/github-fork-updater",
+      "pushedAt": "2026-04-01T00:06:32Z",
+      "issues": {
+        "open": -4,
+        "closed": -54
+      },
+      "pullRequests": {
+        "open": 5,
+        "closed": 6,
+        "merged": 49
+      },
+      "pullRequestDetails": [
+        {
+          "number": 182,
+          "title": "Skip actions-dependencies job for dependabot actor",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-22T17:00:03Z"
+        },
+        {
+          "number": 177,
+          "title": "Bump github/codeql-action from 4.32.0 to 4.32.4",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.58,
+          "mergedAt": "2026-03-07T21:28:33Z"
+        },
+        {
+          "number": 178,
+          "title": "Bump step-security/harden-runner from 2.14.1 to 2.15.0",
+          "state": "merged",
+          "linesAdded": 7,
+          "linesDeleted": 7,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.5,
+          "mergedAt": "2026-03-07T21:28:22Z"
+        },
+        {
+          "number": 179,
+          "title": "Bump actions/dependency-review-action from 4.8.2 to 4.8.3",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.55,
+          "mergedAt": "2026-03-07T21:28:04Z"
+        },
+        {
+          "number": 180,
+          "title": "Bump jessehouwing/actions-dependency-submission from 1.0.8 to 1.0.10",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.52,
+          "mergedAt": "2026-03-07T21:27:52Z"
+        },
+        {
+          "number": 181,
+          "title": "Bump actions/upload-artifact from 6.0.0 to 7.0.0",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.55,
+          "mergedAt": "2026-03-07T21:27:40Z"
+        },
+        {
+          "number": 172,
+          "title": "Bump actions/checkout from 6.0.1 to 6.0.2",
+          "state": "merged",
+          "linesAdded": 7,
+          "linesDeleted": 7,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.5,
+          "mergedAt": "2026-02-01T16:08:35Z"
+        },
+        {
+          "number": 175,
+          "title": "Bump devops-actions/issue-comment-tag from 0.1.8 to 0.1.9",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.57,
+          "mergedAt": "2026-02-01T10:11:01Z"
+        },
+        {
+          "number": 173,
+          "title": "Bump step-security/harden-runner from 2.14.0 to 2.14.1",
+          "state": "merged",
+          "linesAdded": 7,
+          "linesDeleted": 7,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.55,
+          "mergedAt": "2026-02-01T10:10:13Z"
+        },
+        {
+          "number": 174,
+          "title": "Bump github/codeql-action from 4.31.9 to 4.32.0",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.55,
+          "mergedAt": "2026-02-01T10:09:51Z"
+        }
+      ],
+      "committerCount": 3,
+      "reviewerCount": 1,
+      "dependentCount": 35
+    },
+    {
+      "name": "github-graphql-examples",
+      "fullName": "rajbos/github-graphql-examples",
+      "pushedAt": "2022-11-28T22:28:51Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "github-mcp-server",
+      "fullName": "rajbos/github-mcp-server",
+      "pushedAt": "2025-05-13T18:59:47Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 3944
+    },
+    {
+      "name": "github-models-example",
+      "fullName": "rajbos/github-models-example",
+      "pushedAt": "2024-10-13T15:22:28Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "github-org-information",
+      "fullName": "rajbos/github-org-information",
+      "pushedAt": "2023-06-08T20:48:09Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "GitHub-ratelimit-research",
+      "fullName": "rajbos/GitHub-ratelimit-research",
+      "pushedAt": "2026-04-11T13:23:41Z",
+      "issues": {
+        "open": 0,
+        "closed": -15
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 1,
+        "merged": 15
+      },
+      "pullRequestDetails": [
+        {
+          "number": 53,
+          "title": "Bump actions/checkout from 4.3.1 to 6.0.2",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.28,
+          "mergedAt": "2026-03-30T08:23:58Z"
+        },
+        {
+          "number": 52,
+          "title": "Bump ossf/scorecard-action from 2.4.0 to 2.4.3",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.23,
+          "mergedAt": "2026-03-30T08:23:47Z"
+        },
+        {
+          "number": 54,
+          "title": "Bump actions/upload-artifact from 4.6.2 to 7.0.0",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.25,
+          "mergedAt": "2026-03-30T08:23:37Z"
+        },
+        {
+          "number": 51,
+          "title": "Bump github/codeql-action from 3.35.1 to 4.35.1",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.23,
+          "mergedAt": "2026-03-30T08:23:26Z"
+        },
+        {
+          "number": 50,
+          "title": "[StepSecurity] Apply security best practices",
+          "state": "merged",
+          "linesAdded": 120,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.27,
+          "mergedAt": "2026-03-30T08:22:12Z"
+        },
+        {
+          "number": 43,
+          "title": "Handle SSO/SAML org errors gracefully and fix argument list too long",
+          "state": "merged",
+          "linesAdded": 8,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-19T18:27:00Z"
+        },
+        {
+          "number": 35,
+          "title": "Fix jq failures on invalid GitHub API responses in check-ratelimit workflow",
+          "state": "merged",
+          "linesAdded": 21,
+          "linesDeleted": 6,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-10T22:11:57Z"
+        },
+        {
+          "number": 18,
+          "title": "Filter Dependabot and CodeQL automated runs from workflow run counts",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-01T13:50:01Z"
+        },
+        {
+          "number": 10,
+          "title": "Fix \"Argument list too long\" crash in Update repos summary step",
+          "state": "merged",
+          "linesAdded": 9,
+          "linesDeleted": 8,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-02-28T11:32:20Z"
+        }
+      ],
+      "committerCount": 4,
+      "reviewerCount": 1,
+      "dependentCount": 1
+    },
+    {
+      "name": "github-secure-code-game",
+      "fullName": "rajbos/github-secure-code-game",
+      "pushedAt": "2023-07-20T17:58:55Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "github-upload-action",
+      "fullName": "rajbos/github-upload-action",
+      "pushedAt": "2021-11-29T16:22:30Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 12
+    },
+    {
+      "name": "GitHubBootcamp",
+      "fullName": "rajbos/GitHubBootcamp",
+      "pushedAt": "2022-06-17T14:57:02Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 25
+    },
+    {
+      "name": "Goat-test",
+      "fullName": "rajbos/Goat-test",
+      "pushedAt": "2023-10-07T10:11:36Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "greenframe-action",
+      "fullName": "rajbos/greenframe-action",
+      "pushedAt": "2023-04-08T21:12:31Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 2
+    },
+    {
+      "name": "ha-config",
+      "fullName": "rajbos/ha-config",
+      "pushedAt": "2019-01-27T10:48:16Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "hol-demo",
+      "fullName": "rajbos/hol-demo",
+      "pushedAt": "2022-09-06T15:17:57Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 1
+      },
+      "pullRequestDetails": [
+        {
+          "number": 1,
+          "title": "Create my-first-workflow.yml",
+          "state": "merged",
+          "linesAdded": 36,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2022-09-06T15:17:04Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "home-automation",
+      "fullName": "rajbos/home-automation",
+      "pushedAt": "2022-03-25T14:54:30Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "html-timer",
+      "fullName": "rajbos/html-timer",
+      "pushedAt": "2024-12-01T21:42:34Z",
+      "issues": {
+        "open": 1,
+        "closed": -3
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 1,
+        "merged": 3
+      },
+      "pullRequestDetails": [
+        {
+          "number": 7,
+          "title": "Add textbox for additional instructions",
+          "state": "merged",
+          "linesAdded": 25,
+          "linesDeleted": 1,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-12-13T22:34:04Z"
+        },
+        {
+          "number": 6,
+          "title": "Add button for manual timer value",
+          "state": "merged",
+          "linesAdded": 7,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-03-05T14:52:40Z"
+        },
+        {
+          "number": 4,
+          "title": "added contribute",
+          "state": "merged",
+          "linesAdded": 32,
+          "linesDeleted": 1,
+          "commentCount": 5,
+          "commitCount": 4,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-02-07T18:13:13Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 1,
+      "dependentCount": 3
+    },
+    {
+      "name": "issue-labeler",
+      "fullName": "rajbos/issue-labeler",
+      "pushedAt": "2023-06-29T08:42:00Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 51
+    },
+    {
+      "name": "Jarvis",
+      "fullName": "rajbos/Jarvis",
+      "pushedAt": "2026-04-10T19:44:50Z",
+      "issues": {
+        "open": 0,
+        "closed": -51
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 12,
+        "merged": 40
+      },
+      "pullRequestDetails": [
+        {
+          "number": 69,
+          "title": "Debug workflow failure for Repository Quality Improver",
+          "state": "merged",
+          "linesAdded": 6,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 2.45,
+          "mergedAt": "2026-04-10T19:44:49Z"
+        },
+        {
+          "number": 65,
+          "title": "build(deps-dev): bump the dev-dependencies group with 7 updates",
+          "state": "merged",
+          "linesAdded": 348,
+          "linesDeleted": 341,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.87,
+          "mergedAt": "2026-04-10T19:27:21Z"
+        },
+        {
+          "number": 66,
+          "title": "build(deps): bump preact from 10.29.0 to 10.29.1 in the production-dependencies group",
+          "state": "merged",
+          "linesAdded": 5,
+          "linesDeleted": 5,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.62,
+          "mergedAt": "2026-04-10T19:27:10Z"
+        },
+        {
+          "number": 64,
+          "title": "fix: complete JarvisApi IPC contract coverage",
+          "state": "merged",
+          "linesAdded": 83,
+          "linesDeleted": 10,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 2.55,
+          "mergedAt": "2026-04-07T17:41:33Z"
+        },
+        {
+          "number": 63,
+          "title": "build(deps): bump vite from 8.0.3 to 8.0.5",
+          "state": "merged",
+          "linesAdded": 4,
+          "linesDeleted": 4,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 0.82,
+          "mergedAt": "2026-04-07T08:27:16Z"
+        },
+        {
+          "number": 61,
+          "title": "build(deps-dev): bump lodash from 4.17.23 to 4.18.1",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.8,
+          "mergedAt": "2026-04-07T08:20:10Z"
+        },
+        {
+          "number": 51,
+          "title": "build(deps-dev): bump the dev-dependencies group with 5 updates",
+          "state": "merged",
+          "linesAdded": 365,
+          "linesDeleted": 360,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.78,
+          "mergedAt": "2026-04-07T08:20:07Z"
+        },
+        {
+          "number": 54,
+          "title": "feat: support for grouped config — link local and remote repos to named groups",
+          "state": "merged",
+          "linesAdded": 1151,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 2.48,
+          "mergedAt": "2026-04-05T08:46:01Z"
+        },
+        {
+          "number": 52,
+          "title": "build(deps-dev): bump @xmldom/xmldom from 0.8.11 to 0.8.12",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.63,
+          "mergedAt": "2026-04-05T08:31:21Z"
+        }
+      ],
+      "committerCount": 4,
+      "reviewerCount": 2,
+      "dependentCount": 0
+    },
+    {
+      "name": "juice-shop",
+      "fullName": "rajbos/juice-shop",
+      "pushedAt": "2023-02-15T07:27:33Z",
+      "issues": {
+        "open": 1,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 17411
+    },
+    {
+      "name": "kvm",
+      "fullName": "rajbos/kvm",
+      "pushedAt": "2021-03-15T15:16:08Z",
+      "issues": {
+        "open": 0,
+        "closed": -1
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 2,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 9
+    },
+    {
+      "name": "legitify",
+      "fullName": "rajbos/legitify",
+      "pushedAt": "2025-01-05T17:20:31Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 74
+    },
+    {
+      "name": "local-setup",
+      "fullName": "rajbos/local-setup",
+      "pushedAt": "2025-12-20T11:46:04Z",
+      "issues": {
+        "open": 0,
+        "closed": -4
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 5
+      },
+      "pullRequestDetails": [
+        {
+          "number": 2,
+          "title": "Adding ollama convertor",
+          "state": "merged",
+          "linesAdded": 96,
+          "linesDeleted": 0,
+          "commentCount": 13,
+          "commitCount": 11,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-11-16T22:35:28Z"
+        },
+        {
+          "number": 4,
+          "title": "Fix manifest path parsing to handle Ollama's nested registry structure",
+          "state": "merged",
+          "linesAdded": 45,
+          "linesDeleted": 24,
+          "commentCount": 1,
+          "commitCount": 3,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-11-16T22:32:56Z"
+        },
+        {
+          "number": 3,
+          "title": "Add manifests directory existence check in Ollama converter script",
+          "state": "merged",
+          "linesAdded": 6,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-11-16T22:28:30Z"
+        },
+        {
+          "number": 5,
+          "title": "Add ollama command availability check before execution",
+          "state": "merged",
+          "linesAdded": 6,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-11-16T22:27:31Z"
+        },
+        {
+          "number": 1,
+          "title": "Updates",
+          "state": "merged",
+          "linesAdded": 61,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2024-01-13T13:36:01Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 2,
+      "dependentCount": 0
+    },
+    {
+      "name": "mcp-agents-hub",
+      "fullName": "rajbos/mcp-agents-hub",
+      "pushedAt": "2025-05-13T19:00:44Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 15
+    },
+    {
+      "name": "mcp-registry-demo",
+      "fullName": "rajbos/mcp-registry-demo",
+      "pushedAt": "2026-03-28T20:24:33Z",
+      "issues": {
+        "open": -4,
+        "closed": -12
+      },
+      "pullRequests": {
+        "open": 5,
+        "closed": 1,
+        "merged": 12
+      },
+      "pullRequestDetails": [
+        {
+          "number": 12,
+          "title": "Add stdio MCP server example with Playwright",
+          "state": "merged",
+          "linesAdded": 163,
+          "linesDeleted": 47,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 0.45,
+          "mergedAt": "2025-12-20T13:23:20Z"
+        },
+        {
+          "number": 11,
+          "title": "Add bash validation to integration tests with CORS header verification",
+          "state": "merged",
+          "linesAdded": 97,
+          "linesDeleted": 8,
+          "commentCount": 0,
+          "commitCount": 5,
+          "actionsMinutes": 0.67,
+          "mergedAt": "2025-12-16T14:28:03Z"
+        },
+        {
+          "number": 10,
+          "title": "Add MS Learn MCP server to registry",
+          "state": "merged",
+          "linesAdded": 26,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0.75,
+          "mergedAt": "2025-12-11T21:38:38Z"
+        },
+        {
+          "number": 8,
+          "title": "Bump js-yaml from 4.1.0 to 4.1.1",
+          "state": "merged",
+          "linesAdded": 7,
+          "linesDeleted": 5,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-12-11T20:56:10Z"
+        },
+        {
+          "number": 9,
+          "title": "Remove legacy registry.json format support",
+          "state": "merged",
+          "linesAdded": 0,
+          "linesDeleted": 37,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-12-11T20:27:11Z"
+        },
+        {
+          "number": 7,
+          "title": "Add CI workflow for build and test validation on all branches",
+          "state": "merged",
+          "linesAdded": 34,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 4,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-12-11T19:22:46Z"
+        },
+        {
+          "number": 6,
+          "title": "Exclude integration tests from default test run to prevent pre-deployment failures",
+          "state": "merged",
+          "linesAdded": 17,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-12-11T19:12:20Z"
+        },
+        {
+          "number": 5,
+          "title": "Transform static build output to flattened structure and remove legacy registry.json",
+          "state": "merged",
+          "linesAdded": 54,
+          "linesDeleted": 35,
+          "commentCount": 1,
+          "commitCount": 3,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-12-11T18:31:44Z"
+        },
+        {
+          "number": 4,
+          "title": "Validate registry against MCP OpenAPI specification",
+          "state": "merged",
+          "linesAdded": 1404,
+          "linesDeleted": 170,
+          "commentCount": 0,
+          "commitCount": 4,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-12-11T17:53:14Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 1,
+      "dependentCount": 1
+    },
+    {
+      "name": "mcp-servers",
+      "fullName": "rajbos/mcp-servers",
+      "pushedAt": "2025-03-27T13:42:05Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 10330
+    },
+    {
+      "name": "melos-action",
+      "fullName": "rajbos/melos-action",
+      "pushedAt": "2024-04-26T12:36:37Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 9
+    },
+    {
+      "name": "microsoft-learn",
+      "fullName": "rajbos/microsoft-learn",
+      "pushedAt": "2022-10-25T20:25:46Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 9
+    },
+    {
+      "name": "microsoft-todo-mcp-server",
+      "fullName": "rajbos/microsoft-todo-mcp-server",
+      "pushedAt": "2026-04-11T10:55:44Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 23
+    },
+    {
+      "name": "modern-development",
+      "fullName": "rajbos/modern-development",
+      "pushedAt": "2023-04-21T00:45:05Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 1
+      },
+      "pullRequestDetails": [
+        {
+          "number": 1,
+          "title": "Bump spring-security-oauth2 from 2.3.5.RELEASE to 2.3.6.RELEASE in /proxy",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-04-20T21:53:44Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "NuGetDefense.Core",
+      "fullName": "rajbos/NuGetDefense.Core",
+      "pushedAt": "2021-07-27T18:25:03Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 7
+    },
+    {
+      "name": "openssf-scorecard-monitor",
+      "fullName": "rajbos/openssf-scorecard-monitor",
+      "pushedAt": "2026-04-10T03:45:41Z",
+      "issues": {
+        "open": -6,
+        "closed": -2
+      },
+      "pullRequests": {
+        "open": 7,
+        "closed": 2,
+        "merged": 1
+      },
+      "pullRequestDetails": [
+        {
+          "number": 2,
+          "title": "Fix: create parent dirs and bootstrap empty database input",
+          "state": "merged",
+          "linesAdded": 369,
+          "linesDeleted": 20,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 1.75,
+          "mergedAt": "2026-01-31T23:41:09Z"
+        }
+      ],
+      "committerCount": 3,
+      "reviewerCount": 1,
+      "dependentCount": 14
+    },
+    {
+      "name": "pages-test",
+      "fullName": "rajbos/pages-test",
+      "pushedAt": "2022-02-07T20:33:42Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "pipelines",
+      "fullName": "rajbos/pipelines",
+      "pushedAt": "2023-02-20T03:59:19Z",
+      "issues": {
+        "open": -9,
+        "closed": -100
+      },
+      "pullRequests": {
+        "open": 10,
+        "closed": 35,
+        "merged": 66
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "pr-template-test",
+      "fullName": "rajbos/pr-template-test",
+      "pushedAt": "2022-11-30T21:10:28Z",
+      "issues": {
+        "open": -1,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 2,
+        "closed": 0,
+        "merged": 1
+      },
+      "pullRequestDetails": [
+        {
+          "number": 1,
+          "title": "Create harder.txt",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2022-11-30T20:27:12Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "PS-NetworkAnalyzer",
+      "fullName": "rajbos/PS-NetworkAnalyzer",
+      "pushedAt": "2025-12-21T20:57:04Z",
+      "issues": {
+        "open": 0,
+        "closed": -7
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 4,
+        "merged": 4
+      },
+      "pullRequestDetails": [
+        {
+          "number": 3,
+          "title": "Add PowerShell network analyzer for IoT device discovery across multiple subnets",
+          "state": "merged",
+          "linesAdded": 240,
+          "linesDeleted": 14,
+          "commentCount": 3,
+          "commitCount": 6,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-12-11T21:01:24Z"
+        },
+        {
+          "number": 4,
+          "title": "Add implementation agent to complete research → planner → execution workflow",
+          "state": "merged",
+          "linesAdded": 240,
+          "linesDeleted": 14,
+          "commentCount": 2,
+          "commitCount": 4,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-12-11T12:21:40Z"
+        },
+        {
+          "number": 2,
+          "title": "Remove target restriction from custom agents to enable cross-platform availability",
+          "state": "merged",
+          "linesAdded": 17,
+          "linesDeleted": 6,
+          "commentCount": 0,
+          "commitCount": 3,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-12-11T05:23:57Z"
+        },
+        {
+          "number": 1,
+          "title": "Add GitHub Copilot agent mode with research and planning workflow",
+          "state": "merged",
+          "linesAdded": 383,
+          "linesDeleted": 0,
+          "commentCount": 3,
+          "commitCount": 5,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-12-10T23:13:28Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 1,
+      "dependentCount": 0
+    },
+    {
+      "name": "PublicGitHubActionsTest",
+      "fullName": "rajbos/PublicGitHubActionsTest",
+      "pushedAt": "2022-02-18T14:54:25Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "rajbos",
+      "fullName": "rajbos/rajbos",
+      "pushedAt": "2026-04-09T07:28:26Z",
+      "issues": {
+        "open": -2,
+        "closed": -81
+      },
+      "pullRequests": {
+        "open": 3,
+        "closed": 1,
+        "merged": 81
+      },
+      "pullRequestDetails": [
+        {
+          "number": 110,
+          "title": "chore(deps): bump github/codeql-action from 4.34.1 to 4.35.1",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.22,
+          "mergedAt": "2026-03-30T17:18:53Z"
+        },
+        {
+          "number": 111,
+          "title": "chore(deps): bump axios from 1.13.6 to 1.14.0",
+          "state": "merged",
+          "linesAdded": 13,
+          "linesDeleted": 10,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.25,
+          "mergedAt": "2026-03-30T17:18:13Z"
+        },
+        {
+          "number": 109,
+          "title": "Skip pr-analysis job for dependabot-authored commits",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-23T22:20:18Z"
+        },
+        {
+          "number": 105,
+          "title": "chore(deps): bump step-security/harden-runner from 2.15.1 to 2.16.0",
+          "state": "merged",
+          "linesAdded": 4,
+          "linesDeleted": 4,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.42,
+          "mergedAt": "2026-03-23T22:10:46Z"
+        },
+        {
+          "number": 106,
+          "title": "chore(deps): bump github/codeql-action from 4.32.6 to 4.34.1",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.2,
+          "mergedAt": "2026-03-23T22:10:33Z"
+        },
+        {
+          "number": 107,
+          "title": "chore(deps): bump actions/cache from 5.0.3 to 5.0.4",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.22,
+          "mergedAt": "2026-03-23T22:10:17Z"
+        },
+        {
+          "number": 108,
+          "title": "chore(deps-dev): bump eslint from 10.0.3 to 10.1.0",
+          "state": "merged",
+          "linesAdded": 7,
+          "linesDeleted": 7,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.22,
+          "mergedAt": "2026-03-23T22:09:38Z"
+        },
+        {
+          "number": 104,
+          "title": "chore(deps-dev): bump @babel/preset-env from 7.29.0 to 7.29.2",
+          "state": "merged",
+          "linesAdded": 5,
+          "linesDeleted": 5,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.25,
+          "mergedAt": "2026-03-19T14:20:44Z"
+        },
+        {
+          "number": 103,
+          "title": "chore(deps): bump devops-actions/github-copilot-pr-analysis from 0.0.4 to 0.0.5",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.07,
+          "mergedAt": "2026-03-14T21:26:30Z"
+        },
+        {
+          "number": 98,
+          "title": "chore(deps): bump actions/dependency-review-action from 4.8.3 to 4.9.0",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.23,
+          "mergedAt": "2026-03-14T21:19:47Z"
+        }
+      ],
+      "committerCount": 5,
+      "reviewerCount": 2,
+      "dependentCount": 2
+    },
+    {
+      "name": "rajbos.github.io",
+      "fullName": "rajbos/rajbos.github.io",
+      "pushedAt": "2026-04-08T10:42:19Z",
+      "issues": {
+        "open": 0,
+        "closed": -48
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 6,
+        "merged": 43
+      },
+      "pullRequestDetails": [
+        {
+          "number": 84,
+          "title": "Bump nokogiri from 1.18.10 to 1.19.1",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-04-08T10:42:18Z"
+        },
+        {
+          "number": 83,
+          "title": "Bump addressable from 2.8.1 to 2.9.0",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-04-08T10:40:17Z"
+        },
+        {
+          "number": 82,
+          "title": "Bump actions/checkout from 4 to 6",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-04-01T20:29:10Z"
+        },
+        {
+          "number": 81,
+          "title": "Bump activesupport from 7.0.7.2 to 7.2.3.1",
+          "state": "merged",
+          "linesAdded": 21,
+          "linesDeleted": 7,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-24T05:40:20Z"
+        },
+        {
+          "number": 79,
+          "title": "Seo optimalizations",
+          "state": "merged",
+          "linesAdded": 1656,
+          "linesDeleted": 58,
+          "commentCount": 0,
+          "commitCount": 7,
+          "actionsMinutes": 0.23,
+          "mergedAt": "2026-03-10T20:27:09Z"
+        },
+        {
+          "number": 68,
+          "title": "Add GitHub Copilot section to magic files blog post",
+          "state": "merged",
+          "linesAdded": 23,
+          "linesDeleted": 1,
+          "commentCount": 5,
+          "commitCount": 6,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-03-07T20:17:21Z"
+        },
+        {
+          "number": 76,
+          "title": "Remove broken link",
+          "state": "merged",
+          "linesAdded": 0,
+          "linesDeleted": 4,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-02-22T21:26:00Z"
+        },
+        {
+          "number": 77,
+          "title": "Bump nokogiri from 1.18.9 to 1.19.1",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-02-21T17:33:50Z"
+        },
+        {
+          "number": 73,
+          "title": "Bump actions/checkout from 5 to 6",
+          "state": "merged",
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.23,
+          "mergedAt": "2025-12-01T17:32:13Z"
+        }
+      ],
+      "committerCount": 4,
+      "reviewerCount": 2,
+      "dependentCount": 6
+    },
+    {
+      "name": "runner-tests",
+      "fullName": "rajbos/runner-tests",
+      "pushedAt": "2023-07-08T15:04:33Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 1,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "sample-app-aoai-chatGPT",
+      "fullName": "rajbos/sample-app-aoai-chatGPT",
+      "pushedAt": "2024-09-27T13:39:08Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 3104
+    },
+    {
+      "name": "scorecard-action",
+      "fullName": "rajbos/scorecard-action",
+      "pushedAt": "2023-11-17T07:04:21Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 84
+    },
+    {
+      "name": "scorecard-ghes",
+      "fullName": "rajbos/scorecard-ghes",
+      "pushedAt": "2023-05-26T19:41:22Z",
+      "issues": {
+        "open": -5,
+        "closed": -1
+      },
+      "pullRequests": {
+        "open": 6,
+        "closed": 2,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 623
+    },
+    {
+      "name": "scorecard-webapp",
+      "fullName": "rajbos/scorecard-webapp",
+      "pushedAt": "2023-07-11T08:40:16Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 30
+    },
+    {
+      "name": "secret-scanning-custom-patterns",
+      "fullName": "rajbos/secret-scanning-custom-patterns",
+      "pushedAt": "2023-07-17T13:23:57Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 28
+    },
+    {
+      "name": "security-demo",
+      "fullName": "rajbos/security-demo",
+      "pushedAt": "2022-03-05T09:36:07Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "SonarQube-AzureAppService",
+      "fullName": "rajbos/SonarQube-AzureAppService",
+      "pushedAt": "2024-10-14T14:25:11Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 174
+    },
+    {
+      "name": "Stryker.MultipleProjectRunner",
+      "fullName": "rajbos/Stryker.MultipleProjectRunner",
+      "pushedAt": "2023-12-20T13:29:35Z",
+      "issues": {
+        "open": 0,
+        "closed": -1
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 0,
+        "merged": 2
+      },
+      "pullRequestDetails": [
+        {
+          "number": 6,
+          "title": "Updated JoinStykerJsonFile function.",
+          "state": "merged",
+          "linesAdded": 24,
+          "linesDeleted": 21,
+          "commentCount": 2,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2022-05-16T07:14:06Z"
+        },
+        {
+          "number": 2,
+          "title": "Fixed testPath-property example",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-02-23T07:57:17Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 1,
+      "dependentCount": 4
+    },
+    {
+      "name": "tag-npm-version",
+      "fullName": "rajbos/tag-npm-version",
+      "pushedAt": "2025-12-08T12:22:32Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "TailwindTraders",
+      "fullName": "rajbos/TailwindTraders",
+      "pushedAt": "2021-05-20T17:44:45Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 346
+    },
+    {
+      "name": "teams-automation",
+      "fullName": "rajbos/teams-automation",
+      "pushedAt": "2025-09-06T08:30:58Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 0,
+        "merged": 1
+      },
+      "pullRequestDetails": [
+        {
+          "number": 1,
+          "title": "Initial implementation of sharing a teams channel with a list of emails ",
+          "state": "merged",
+          "linesAdded": 522,
+          "linesDeleted": 44,
+          "commentCount": 1,
+          "commitCount": 10,
+          "actionsMinutes": 0,
+          "mergedAt": "2025-09-06T08:21:08Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "test-repo",
+      "fullName": "rajbos/test-repo",
+      "pushedAt": "2023-01-05T18:13:06Z",
+      "issues": {
+        "open": 0,
+        "closed": -3
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 2,
+        "merged": 2
+      },
+      "pullRequestDetails": [
+        {
+          "number": 2,
+          "title": "Update new-file.md",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-01-20T20:30:04Z"
+        },
+        {
+          "number": 1,
+          "title": "Create new-file.md",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 0,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2021-01-20T20:21:29Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "tfsec-sarif-action",
+      "fullName": "rajbos/tfsec-sarif-action",
+      "pushedAt": "2023-07-17T14:46:28Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 36
+    },
+    {
+      "name": "training-manual",
+      "fullName": "rajbos/training-manual",
+      "pushedAt": "2024-02-05T16:53:38Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 346
+    },
+    {
+      "name": "trivy-action",
+      "fullName": "rajbos/trivy-action",
+      "pushedAt": "2025-02-10T22:13:37Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 331
+    },
+    {
+      "name": "typescript-demo",
+      "fullName": "rajbos/typescript-demo",
+      "pushedAt": "2023-10-19T02:13:23Z",
+      "issues": {
+        "open": -7,
+        "closed": -29
+      },
+      "pullRequests": {
+        "open": 8,
+        "closed": 30,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "vscode-github-ratelimit",
+      "fullName": "rajbos/vscode-github-ratelimit",
+      "pushedAt": "2026-01-03T17:05:44Z",
+      "issues": {
+        "open": 0,
+        "closed": -1
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 1,
+        "merged": 1
+      },
+      "pullRequestDetails": [
+        {
+          "number": 1,
+          "title": "Add rate limit history tracking and visualization",
+          "state": "merged",
+          "linesAdded": 2635,
+          "linesDeleted": 18,
+          "commentCount": 0,
+          "commitCount": 6,
+          "actionsMinutes": 0,
+          "mergedAt": "2026-01-03T17:05:44Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 1
+    },
+    {
+      "name": "VSTSClient",
+      "fullName": "rajbos/VSTSClient",
+      "pushedAt": "2021-04-22T09:27:30Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "webdis-fork",
+      "fullName": "rajbos/webdis-fork",
+      "pushedAt": "2024-02-05T16:52:08Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 311
+    },
+    {
+      "name": "WebGoat.Net-Test",
+      "fullName": "rajbos/WebGoat.Net-Test",
+      "pushedAt": "2023-10-07T10:10:59Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "WebGoat.NETCore",
+      "fullName": "rajbos/WebGoat.NETCore",
+      "pushedAt": "2024-10-09T07:49:26Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 1
+      },
+      "pullRequestDetails": [
+        {
+          "number": 1,
+          "title": "Upgrade to .NET 6.0",
+          "state": "merged",
+          "linesAdded": 21,
+          "linesDeleted": 22,
+          "commentCount": 0,
+          "commitCount": 9,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-10-07T09:33:08Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 19
+    },
+    {
+      "name": "workflow-composition",
+      "fullName": "rajbos/workflow-composition",
+      "pushedAt": "2023-09-13T13:20:26Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "TailWind",
+      "fullName": "renevanosnabrugge/TailWind",
+      "pushedAt": "2022-10-28T12:04:18Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "demo-actions",
+      "fullName": "rob-demo/demo-actions",
+      "pushedAt": "2023-07-07T11:08:52Z",
+      "issues": {
+        "open": 1,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 1,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 5
+    },
+    {
+      "name": "techhub",
+      "fullName": "techhubms/techhub",
+      "pushedAt": "2026-04-11T13:29:40Z",
+      "issues": {
+        "open": -3,
+        "closed": -186
+      },
+      "pullRequests": {
+        "open": 4,
+        "closed": 21,
+        "merged": 166
+      },
+      "pullRequestDetails": [
+        {
+          "number": 328,
+          "title": "Fix structurally failing integration tests by disabling default date filter in test factory",
+          "state": "merged",
+          "linesAdded": 5,
+          "linesDeleted": 0,
+          "commentCount": 1,
+          "commitCount": 3,
+          "actionsMinutes": 43.38,
+          "mergedAt": "2026-04-07T15:28:03Z"
+        },
+        {
+          "number": 326,
+          "title": "🤖 Weekly Roundup: 2026-03-30 to 2026-04-05",
+          "state": "merged",
+          "linesAdded": 520,
+          "linesDeleted": 0,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 5.5,
+          "mergedAt": "2026-04-06T18:14:05Z"
+        },
+        {
+          "number": 324,
+          "title": "Remove duplicate news content file causing API startup crash",
+          "state": "merged",
+          "linesAdded": 0,
+          "linesDeleted": 86,
+          "commentCount": 1,
+          "commitCount": 2,
+          "actionsMinutes": 26.33,
+          "mergedAt": "2026-04-02T07:25:08Z"
+        },
+        {
+          "number": 322,
+          "title": "Bump OpenTelemetry.Extensions.Hosting from 1.15.0 to 1.15.1",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 3,
+          "commitCount": 2,
+          "actionsMinutes": 5.87,
+          "mergedAt": "2026-04-01T14:34:53Z"
+        },
+        {
+          "number": 321,
+          "title": "Bump OpenTelemetry.Exporter.OpenTelemetryProtocol from 1.15.0 to 1.15.1",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 17.67,
+          "mergedAt": "2026-04-01T14:20:39Z"
+        },
+        {
+          "number": 320,
+          "title": "Bump Markdig from 1.1.1 to 1.1.2",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 1,
+          "commitCount": 2,
+          "actionsMinutes": 28.23,
+          "mergedAt": "2026-04-01T14:20:08Z"
+        },
+        {
+          "number": 319,
+          "title": "Bump bunit from 2.6.2 to 2.7.2",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 1,
+          "commitCount": 2,
+          "actionsMinutes": 27.28,
+          "mergedAt": "2026-04-01T13:55:41Z"
+        },
+        {
+          "number": 318,
+          "title": "Bump Aspire.Hosting.AppHost from 13.2.0 to 13.2.1",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 1,
+          "commitCount": 2,
+          "actionsMinutes": 26.03,
+          "mergedAt": "2026-04-01T12:35:51Z"
+        },
+        {
+          "number": 317,
+          "title": "Lower Container Apps, PostgreSQL, and Azure Monitor specs to reduce Azure costs",
+          "state": "merged",
+          "linesAdded": 12,
+          "linesDeleted": 14,
+          "commentCount": 5,
+          "commitCount": 5,
+          "actionsMinutes": 27.12,
+          "mergedAt": "2026-04-01T12:17:22Z"
+        },
+        {
+          "number": 313,
+          "title": "Bump github/codeql-action from 4.34.1 to 4.35.1",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 1,
+          "commitCount": 2,
+          "actionsMinutes": 25.72,
+          "mergedAt": "2026-04-01T11:34:38Z"
+        }
+      ],
+      "committerCount": 6,
+      "reviewerCount": 4,
+      "dependentCount": 1
+    },
+    {
+      "name": "gh-developer-caption-this",
+      "fullName": "UncleBats/gh-developer-caption-this",
+      "pushedAt": "2024-04-05T04:29:17Z",
+      "issues": {
+        "open": 0,
+        "closed": -1
+      },
+      "pullRequests": {
+        "open": 1,
+        "closed": 1,
+        "merged": 1
+      },
+      "pullRequestDetails": [
+        {
+          "number": 2,
+          "title": "📝 Change my caption to be more awesome ",
+          "state": "merged",
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 2,
+          "commitCount": 2,
+          "actionsMinutes": 0,
+          "mergedAt": "2023-01-16T11:32:06Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 2,
+      "dependentCount": 0
+    },
+    {
+      "name": "Anythink-Market-dedwkp0p",
+      "fullName": "Wilcolab/Anythink-Market-dedwkp0p",
+      "pushedAt": "2024-10-30T15:18:38Z",
+      "issues": {
+        "open": 1,
+        "closed": -5
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 1,
+        "merged": 5
+      },
+      "pullRequestDetails": [
+        {
+          "number": 8,
+          "title": "Add tests for power operation in arithmetic module",
+          "state": "merged",
+          "linesAdded": 19,
+          "linesDeleted": 2,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2024-10-30T15:18:38Z"
+        },
+        {
+          "number": 7,
+          "title": "Add support for power operation in calculate function",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 0,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2024-10-30T15:15:09Z"
+        },
+        {
+          "number": 6,
+          "title": "Add power operation to calculator",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 0,
+          "commentCount": 1,
+          "commitCount": 5,
+          "actionsMinutes": 0,
+          "mergedAt": "2024-10-30T15:12:42Z"
+        },
+        {
+          "number": 5,
+          "title": "Add button for power function in calculator",
+          "state": "merged",
+          "linesAdded": 3,
+          "linesDeleted": 1,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2024-10-30T15:07:04Z"
+        },
+        {
+          "number": 4,
+          "title": "Add GET and DELETE endpoints for comments",
+          "state": "merged",
+          "linesAdded": 30,
+          "linesDeleted": 0,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "mergedAt": "2024-10-30T14:56:44Z"
+        }
+      ],
+      "committerCount": 0,
+      "reviewerCount": 1,
+      "dependentCount": 0
+    },
+    {
+      "name": "doepicshit",
+      "fullName": "xebia/doepicshit",
+      "pushedAt": "2026-03-31T21:03:07Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "github-copilot-premium-reqs-usage",
+      "fullName": "xebia/github-copilot-premium-reqs-usage",
+      "pushedAt": "2026-04-10T16:41:22Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "github-copilot-updates",
+      "fullName": "xebia/github-copilot-updates",
+      "pushedAt": "2025-07-14T08:12:06Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "github-governance-references",
+      "fullName": "xebia/github-governance-references",
+      "pushedAt": "2026-04-10T12:45:47Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "octocat",
+      "fullName": "xebia/octocat",
+      "pushedAt": "2025-07-18T16:14:25Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "GDBC2018-Challenges",
+      "fullName": "XpiritBV/GDBC2018-Challenges",
+      "pushedAt": "2018-06-21T02:31:07Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "LeaderboardsGlobalDevopsBootcamp",
+      "fullName": "XpiritBV/LeaderboardsGlobalDevopsBootcamp",
+      "pushedAt": "2022-12-08T00:56:12Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    },
+    {
+      "name": "legitify-scan",
+      "fullName": "XpiritUSA/legitify-scan",
+      "pushedAt": "2023-05-04T12:28:25Z",
+      "issues": {
+        "open": 0,
+        "closed": 0
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 0,
+        "merged": 0
+      },
+      "pullRequestDetails": [],
+      "committerCount": 0,
+      "reviewerCount": 0,
+      "dependentCount": 0
+    }
+  ],
+  "weeklyTrends": [
+    {
+      "week": "2026-W04",
+      "prsOpened": 21,
+      "prsMerged": 23,
+      "issuesOpened": 2,
+      "issuesClosed": 1,
+      "linesAdded": 1092,
+      "linesDeleted": 88
+    },
+    {
+      "week": "2026-W05",
+      "prsOpened": 58,
+      "prsMerged": 42,
+      "issuesOpened": 6,
+      "issuesClosed": 5,
+      "linesAdded": 122,
+      "linesDeleted": 132
+    },
+    {
+      "week": "2026-W06",
+      "prsOpened": 36,
+      "prsMerged": 40,
+      "issuesOpened": 2,
+      "issuesClosed": 2,
+      "linesAdded": 1463,
+      "linesDeleted": 70
+    },
+    {
+      "week": "2026-W07",
+      "prsOpened": 47,
+      "prsMerged": 39,
+      "issuesOpened": 8,
+      "issuesClosed": 5,
+      "linesAdded": 1442,
+      "linesDeleted": 139
+    },
+    {
+      "week": "2026-W08",
+      "prsOpened": 94,
+      "prsMerged": 89,
+      "issuesOpened": 12,
+      "issuesClosed": 27,
+      "linesAdded": 23292,
+      "linesDeleted": 24920
+    },
+    {
+      "week": "2026-W09",
+      "prsOpened": 134,
+      "prsMerged": 110,
+      "issuesOpened": 16,
+      "issuesClosed": 6,
+      "linesAdded": 26750,
+      "linesDeleted": 30835
+    },
+    {
+      "week": "2026-W10",
+      "prsOpened": 62,
+      "prsMerged": 69,
+      "issuesOpened": 26,
+      "issuesClosed": 20,
+      "linesAdded": 1108,
+      "linesDeleted": 175
+    },
+    {
+      "week": "2026-W11",
+      "prsOpened": 78,
+      "prsMerged": 55,
+      "issuesOpened": 14,
+      "issuesClosed": 31,
+      "linesAdded": 18887,
+      "linesDeleted": 18565
+    },
+    {
+      "week": "2026-W12",
+      "prsOpened": 135,
+      "prsMerged": 120,
+      "issuesOpened": 58,
+      "issuesClosed": 74,
+      "linesAdded": 10603,
+      "linesDeleted": 10409
+    },
+    {
+      "week": "2026-W13",
+      "prsOpened": 103,
+      "prsMerged": 88,
+      "issuesOpened": 29,
+      "issuesClosed": 33,
+      "linesAdded": 52129,
+      "linesDeleted": 3937
+    },
+    {
+      "week": "2026-W14",
+      "prsOpened": 110,
+      "prsMerged": 77,
+      "issuesOpened": 17,
+      "issuesClosed": 32,
+      "linesAdded": 922,
+      "linesDeleted": 1202
+    },
+    {
+      "week": "2026-W15",
+      "prsOpened": 55,
+      "prsMerged": 59,
+      "issuesOpened": 16,
+      "issuesClosed": 13,
+      "linesAdded": 3193,
+      "linesDeleted": 2736
+    }
+  ]
+}
