@@ -2,8 +2,10 @@ name: Collect DevEx Metrics
 
 on:
   push:
+    branches: [main]
     paths:
       - ".github/workflows/collect-metrics.yml"
+      - "src/**"
   schedule:
     # Run daily at 06:00 UTC
     - cron: "0 6 * * *"
