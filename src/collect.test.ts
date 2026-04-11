@@ -5,6 +5,7 @@ vi.mock("./cache.js", () => ({
   loadRawCache: vi.fn(),
   isWithinHours: vi.fn(),
   saveCache: vi.fn(),
+  CURRENT_SCHEMA_VERSION: 1,
 }));
 
 vi.mock("./collectors/index.js", () => ({
@@ -106,7 +107,7 @@ describe("collect", () => {
 
     expect(saveCache).toHaveBeenCalledWith(
       "fresh-org",
-      expect.objectContaining({ owner: "fresh-org" })
+      expect.objectContaining({ owner: "fresh-org", schemaVersion: 1 })
     );
   });
 });

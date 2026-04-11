@@ -4,6 +4,11 @@
 
 /** Top-level metrics for an org or user. */
 export interface OrgMetrics {
+  /**
+   * Cache schema version. Compared against `CURRENT_SCHEMA_VERSION` in
+   * `cache.ts` when loading cached data. Absent in pre-versioning fixtures.
+   */
+  schemaVersion?: number;
   /** GitHub org or user login name. */
   owner: string;
   /** Whether target is an organization or user. */

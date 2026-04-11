@@ -1,4 +1,4 @@
-import { loadCache, loadRawCache, isWithinHours, saveCache } from "./cache.js";
+import { loadCache, loadRawCache, isWithinHours, saveCache, CURRENT_SCHEMA_VERSION } from "./cache.js";
 import {
   collectRepos,
   collectIssueCounts,
@@ -122,6 +122,7 @@ export async function collect(
   }
 
   const metrics: OrgMetrics = {
+    schemaVersion: CURRENT_SCHEMA_VERSION,
     owner,
     ownerType,
     collectedAt: new Date().toISOString(),

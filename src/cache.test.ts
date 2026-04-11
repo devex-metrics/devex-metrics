@@ -1,11 +1,12 @@
 import { describe, it, expect, afterEach } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { loadCache, saveCache, loadFixture, saveFixture, loadRawCache, isWithinHours } from "./cache.js";
+import { loadCache, saveCache, loadFixture, saveFixture, loadRawCache, isWithinHours, CURRENT_SCHEMA_VERSION } from "./cache.js";
 import type { OrgMetrics } from "./types.js";
 
 function makeSampleMetrics(): OrgMetrics {
   return {
+    schemaVersion: CURRENT_SCHEMA_VERSION,
     owner: "test-owner",
     ownerType: "user",
     collectedAt: new Date().toISOString(),
@@ -113,6 +114,23 @@ describe("fixture", () => {
     expect(loaded!.owner).toBe("test-owner");
     // Clean up daily cache
     fs.unlinkSync(path.join(dataDir, "test-owner.json"));
+  });
+
+  it("loadFixture returns null when schema version does not match", () => {
+    fs.mkdirSync(dataDir, { recursive: true });
+    const stale = { ...makeSampleMetrics(), schemaVersion: 0 };
+    fs.writeFileSync(testFixtureFile, JSON.stringify(stale));
+    expect(loadFixture("test-owner")).toBeNull();
+  });
+
+  it("loadCache returns null when daily cache schema version does not match", () => {
+    fs.mkdirSync(dataDir, { recursive: true });
+    const testFile = path.join(dataDir, "test-owner.json");
+    const stale = { ...makeSampleMetrics(), schemaVersion: 0 };
+    const envelope = { date: new Date().toISOString().slice(0, 10), data: { ...stale, weeklyTrends: [] } };
+    fs.writeFileSync(testFile, JSON.stringify(envelope));
+    expect(loadCache("test-owner")).toBeNull();
+    fs.unlinkSync(testFile);
   });
 });
 
