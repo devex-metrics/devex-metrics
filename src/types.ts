@@ -24,6 +24,8 @@ export interface RepoMetrics {
   fullName: string;
   /** ISO-8601 date when the repository was last pushed to. */
   pushedAt?: string;
+  /** ISO-8601 timestamp when metrics for this repo were last collected. */
+  collectedAt?: string;
   /** Issue counts by state. */
   issues: IssueCounts;
   /** Pull request counts by state. */

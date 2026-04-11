@@ -41,7 +41,11 @@ export async function collectPullRequestCounts(
 
     return { open, closed, merged };
   } catch (err: unknown) {
-    if ((err as { status?: number }).status === 404) {
+    const status = (err as { status?: number }).status;
+    if (status === 404 || status === 403) {
+      if (status === 403) {
+        console.warn(`  ⚠ pull-requests: skipping ${owner}/${repo}: access denied (403) — token may need SAML SSO authorization`);
+      }
       return { open: 0, closed: 0, merged: 0 };
     }
     throw err;
@@ -59,14 +63,27 @@ export async function collectPullRequestDetails(
   const octokit = await getOctokit();
 
   // Get recent merged PRs
-  const { data: prs } = await octokit.rest.pulls.list({
-    owner,
-    repo,
-    state: "closed",
-    sort: "updated",
-    direction: "desc",
-    per_page: limit,
-  });
+  let prs: Awaited<ReturnType<typeof octokit.rest.pulls.list>>["data"] = [];
+  try {
+    const res = await octokit.rest.pulls.list({
+      owner,
+      repo,
+      state: "closed",
+      sort: "updated",
+      direction: "desc",
+      per_page: limit,
+    });
+    prs = res.data;
+  } catch (err: unknown) {
+    const status = (err as { status?: number }).status;
+    if (status === 403 || status === 404) {
+      if (status === 403) {
+        console.warn(`  ⚠ pr-details: skipping ${owner}/${repo}: access denied (403) — token may need SAML SSO authorization`);
+      }
+      return [];
+    }
+    throw err;
+  }
 
   const mergedPrs = prs
     .filter((pr) => pr.merged_at !== null)

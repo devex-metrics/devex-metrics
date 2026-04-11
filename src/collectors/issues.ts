@@ -29,7 +29,11 @@ export async function collectIssueCounts(
       closed: getCountFromLinkHeader(closedAll) - getCountFromLinkHeader(closedPrs),
     };
   } catch (err: unknown) {
-    if ((err as { status?: number }).status === 404) {
+    const status = (err as { status?: number }).status;
+    if (status === 404 || status === 403) {
+      if (status === 403) {
+        console.warn(`  ⚠ issues: skipping ${owner}/${repo}: access denied (403) — token may need SAML SSO authorization`);
+      }
       return { open: 0, closed: 0 };
     }
     throw err;
