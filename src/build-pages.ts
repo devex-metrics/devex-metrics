@@ -172,11 +172,16 @@ function buildDashboardHtml(
 
   const repoRows = data.repos.map((repo) => buildRepoRow(repo)).join("\n");
 
-  const allPRDetails = data.repos.flatMap((r) =>
-    r.pullRequestDetails
+  const allPRDetails = data.repos.flatMap((r) => {
+    // Prefer mergedPRDates (wider history, 1 cheap API call) over the
+    // 10-entry pullRequestDetails so the chart filter spans real time ranges.
+    if (r.mergedPRDates && r.mergedPRDates.length > 0) {
+      return r.mergedPRDates.map((date) => ({ repo: r.name, mergedAt: date }));
+    }
+    return r.pullRequestDetails
       .filter((pr) => !!pr.mergedAt)
-      .map((pr) => ({ repo: r.name, mergedAt: pr.mergedAt! }))
-  );
+      .map((pr) => ({ repo: r.name, mergedAt: pr.mergedAt! }));
+  });
 
   const chartPayload = JSON.stringify({
     issues: { open: totals.openIssues, closed: totals.closedIssues },

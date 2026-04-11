@@ -136,3 +136,34 @@ export async function collectPullRequestDetails(
   }
   return details;
 }
+
+/**
+ * Collect merged_at timestamps for the most recent merged PRs (up to `limit`).
+ * Uses a single cheap list call — no per-PR detail fetches — so it can afford
+ * a much higher limit than collectPullRequestDetails.
+ */
+export async function collectMergedPRDates(
+  owner: string,
+  repo: string,
+  limit = 100
+): Promise<string[]> {
+  const octokit = await getOctokit();
+  try {
+    const res = await octokit.rest.pulls.list({
+      owner,
+      repo,
+      state: "closed",
+      sort: "updated",
+      direction: "desc",
+      per_page: limit,
+    });
+    return res.data
+      .filter((pr) => pr.merged_at !== null)
+      .map((pr) => pr.merged_at!)
+      .sort((a, b) => (b > a ? 1 : -1));
+  } catch (err: unknown) {
+    const status = (err as { status?: number }).status;
+    if (status === 403 || status === 404) return [];
+    throw err;
+  }
+}

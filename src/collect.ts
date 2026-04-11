@@ -4,6 +4,7 @@ import {
   collectIssueCounts,
   collectPullRequestCounts,
   collectPullRequestDetails,
+  collectMergedPRDates,
   collectContributors,
   collectDependentCount,
   collectWeeklyTrends,
@@ -82,11 +83,12 @@ export async function collect(
     const repoOwner = fullName.slice(0, slashIndex);
     const repoName = fullName.slice(slashIndex + 1);
 
-    const [issues, prCounts, prDetails, contributors, dependentCount] =
+    const [issues, prCounts, prDetails, mergedPRDates, contributors, dependentCount] =
       await Promise.all([
         collectIssueCounts(repoOwner, repoName),
         collectPullRequestCounts(repoOwner, repoName),
         collectPullRequestDetails(repoOwner, repoName),
+        collectMergedPRDates(repoOwner, repoName),
         collectContributors(repoOwner, repoName),
         collectDependentCount(repoOwner, repoName),
       ]);
@@ -99,6 +101,7 @@ export async function collect(
       issues,
       pullRequests: prCounts,
       pullRequestDetails: prDetails,
+      mergedPRDates,
       committerCount: contributors.committerCount,
       reviewerCount: contributors.reviewerCount,
       dependentCount,
