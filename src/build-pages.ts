@@ -778,9 +778,11 @@ function setupControls(){
         // Find next group header to use as insertion point
         var nextHdr=hdrRow.nextElementSibling;
         while(nextHdr&&!nextHdr.classList.contains("grp-hdr-row")){nextHdr=nextHdr.nextElementSibling;}
-        // Remove rows from DOM then re-insert in sorted order before nextHdr
+        // Save detail-row refs before removal — getElementById won't find detached nodes
+        var drMap=new Map();
         dataRows.forEach(function(row){
           var dr=document.getElementById("detail-"+row.dataset.repoId);
+          drMap.set(row,dr);
           if(row.parentNode)row.parentNode.removeChild(row);
           if(dr&&dr.parentNode)dr.parentNode.removeChild(dr);
         });
@@ -790,7 +792,7 @@ function setupControls(){
           row.style.display=(!match||grpHidden)?"none":"";
           if(match&&!grpHidden)n++;
           tbody.insertBefore(row,nextHdr||null);
-          var dr=document.getElementById("detail-"+row.dataset.repoId);
+          var dr=drMap.get(row);
           if(dr){
             if(!match||grpHidden)dr.style.display="none";
             else dr.style.display=dr.hidden?"none":"";
@@ -853,6 +855,11 @@ function setupGroups(){
   var tbody=document.getElementById("repoList");
   if(!tbody)return;
   var dataRows=Array.from(tbody.querySelectorAll("tr.repo-row"));
+  // Build detail-row map before removing from DOM (getElementById won't find detached nodes)
+  var drMap=new Map();
+  dataRows.forEach(function(row){
+    drMap.set(row,document.getElementById("detail-"+row.dataset.repoId));
+  });
   var allRows=Array.from(tbody.querySelectorAll("tr"));
   allRows.forEach(function(r){if(r.parentNode)r.parentNode.removeChild(r);});
   var groups={};
@@ -865,7 +872,7 @@ function setupGroups(){
     var ageBadge=row.querySelector(".bdg-age");
     if(ageBadge){var ageStr=computeAge(days);ageBadge.textContent=ageStr;ageBadge.style.display=ageStr?"":"none";}
     row.dataset.grpId=targetId;
-    var dr=document.getElementById("detail-"+row.dataset.repoId);
+    var dr=drMap.get(row);
     if(dr)dr.dataset.grpId=targetId;
     groups[targetId].push(row);
   });
@@ -881,7 +888,7 @@ function setupGroups(){
     tbody.appendChild(hdrTr);
     grpRows.forEach(function(row){
       tbody.appendChild(row);
-      var dr=document.getElementById("detail-"+row.dataset.repoId);
+      var dr=drMap.get(row);
       if(dr)tbody.appendChild(dr);
     });
     if(!firstOpened){
@@ -890,7 +897,7 @@ function setupGroups(){
     }else{
       grpRows.forEach(function(row){
         row.style.display="none";row.dataset.grpHidden="1";
-        var dr=document.getElementById("detail-"+row.dataset.repoId);
+        var dr=drMap.get(row);
         if(dr){dr.style.display="none";dr.dataset.grpHidden="1";}
       });
     }

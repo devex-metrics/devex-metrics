@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { execFileSync } from "node:child_process";
+import { JSDOM } from "jsdom";
 import type { CacheEnvelope } from "./types.js";
 
 describe("build-pages", () => {
@@ -350,5 +351,84 @@ describe("build-pages", () => {
     // Normalized values should appear as 0 in the chart payload
     expect(html).toContain('"linesAdded":0');
     expect(html).toContain('"linesDeleted":0');
+  });
+
+  it("detail rows survive sort/filter — accordion opens after sorting", () => {
+    // Regression: filterAndSort removed detail rows from the DOM and then called
+    // document.getElementById() to find them — but detached nodes can't be found
+    // that way, so the detail rows were permanently lost after the first sort.
+    const envelope: CacheEnvelope = {
+      date: "2026-03-28",
+      data: {
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-03-28T12:00:00Z",
+        repoCount: 2,
+        repos: [
+          {
+            name: "repo-a",
+            fullName: "test-pages-owner/repo-a",
+            pushedAt: "2026-03-27T10:00:00Z",
+            issues: { open: 5, closed: 3 },
+            pullRequests: { open: 2, closed: 0, merged: 4 },
+            pullRequestDetails: [],
+            committerCount: 3,
+            reviewerCount: 2,
+            dependentCount: 1,
+          },
+          {
+            name: "repo-b",
+            fullName: "test-pages-owner/repo-b",
+            pushedAt: "2026-03-26T10:00:00Z",
+            issues: { open: 1, closed: 8 },
+            pullRequests: { open: 0, closed: 1, merged: 2 },
+            pullRequestDetails: [],
+            committerCount: 1,
+            reviewerCount: 0,
+            dependentCount: 0,
+          },
+        ],
+      },
+    };
+    fs.writeFileSync(cacheFile, JSON.stringify(envelope));
+
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+
+    const dom = new JSDOM(html, { runScripts: "dangerously" });
+    const { window } = dom;
+    const document = window.document;
+
+    // Fire DOMContentLoaded so setupGroups / setupControls run
+    document.dispatchEvent(new window.Event("DOMContentLoaded"));
+
+    // Simulate a sort by changing the select value and dispatching "change"
+    const sortSelect = document.getElementById("repoSort") as HTMLSelectElement;
+    expect(sortSelect).not.toBeNull();
+    sortSelect.value = "openIssues";
+    sortSelect.dispatchEvent(new window.Event("change"));
+
+    // After sort, every detail row should still be in the document
+    const dataRows = Array.from(
+      document.querySelectorAll<HTMLElement>("tr.repo-row")
+    );
+    expect(dataRows.length).toBe(2);
+
+    for (const row of dataRows) {
+      const repoId = row.dataset.repoId!;
+      const detailRow = document.getElementById(`detail-${repoId}`);
+      expect(detailRow).not.toBeNull();
+
+      // Simulate clicking the expand button
+      const btn = row.querySelector<HTMLElement>(".repo-expand-btn");
+      expect(btn).not.toBeNull();
+      btn!.click();
+
+      // Detail row should now be visible (hidden removed, no display:none)
+      expect(detailRow!.hidden).toBe(false);
+      expect(detailRow!.style.display).not.toBe("none");
+    }
   });
 });
