@@ -139,8 +139,8 @@ describe("build-pages", () => {
           },
         ],
         weeklyTrends: [
-          { week: "2026-W10", prsOpened: 3, prsMerged: 2, issuesOpened: 5, issuesClosed: 4 },
-          { week: "2026-W11", prsOpened: 1, prsMerged: 1, issuesOpened: 2, issuesClosed: 1 },
+          { week: "2026-W10", prsOpened: 3, prsMerged: 2, issuesOpened: 5, issuesClosed: 4, linesAdded: 400, linesDeleted: 100 },
+          { week: "2026-W11", prsOpened: 1, prsMerged: 1, issuesOpened: 2, issuesClosed: 1, linesAdded: 200, linesDeleted: 50 },
         ],
       },
     };
@@ -152,8 +152,10 @@ describe("build-pages", () => {
     const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
     expect(html).toContain('id="chartPRTrends"');
     expect(html).toContain('id="chartIssueTrends"');
+    expect(html).toContain('id="chartPRSizeTrends"');
     expect(html).toContain("PR Trends");
     expect(html).toContain("Issue Trends");
+    expect(html).toContain("PR Size Trends");
   });
 
   it("should build successfully without trend charts when weeklyTrends is absent", () => {
@@ -169,5 +171,47 @@ describe("build-pages", () => {
     // the actual rendering in JS when weeklyTrends is empty.
     expect(html).toContain('id="chartPRTrends"');
     expect(html).toContain('id="chartIssueTrends"');
+    expect(html).toContain('id="chartPRSizeTrends"');
+  });
+
+  it("normalizes missing linesAdded/linesDeleted to 0 for old cached data", () => {
+    // Simulate old cached data where weeklyTrends lacks the new fields
+    const oldEnvelope: CacheEnvelope = {
+      date: "2026-03-28",
+      data: {
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-03-28T12:00:00Z",
+        repoCount: 1,
+        repos: [
+          {
+            name: "repo-a",
+            fullName: "test-pages-owner/repo-a",
+            issues: { open: 1, closed: 2 },
+            pullRequests: { open: 0, closed: 0, merged: 1 },
+            pullRequestDetails: [],
+            committerCount: 1,
+            reviewerCount: 0,
+            dependentCount: 0,
+          },
+        ],
+        weeklyTrends: [
+          // Cast as any to simulate old JSON without the new fields
+          { week: "2026-W10", prsOpened: 2, prsMerged: 1, issuesOpened: 3, issuesClosed: 2 } as unknown as import("./types.js").WeeklyTrendPoint,
+        ],
+      },
+    };
+    fs.writeFileSync(cacheFile, JSON.stringify(oldEnvelope));
+
+    expect(() =>
+      execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+        cwd: process.cwd(),
+      })
+    ).not.toThrow();
+
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    // Normalized values should appear as 0 in the chart payload
+    expect(html).toContain('"linesAdded":0');
+    expect(html).toContain('"linesDeleted":0');
   });
 });
