@@ -29,8 +29,7 @@ async function main(): Promise<void> {
 
   saveFixture(owner, metrics);
 
-  console.log(`\n✓ Fixture saved to data/${owner}.fixture.json`);
-  console.log(`  Commit this file to share data across all worktrees:\n`);
+  console.log(`\n  Commit this file to share data across all worktrees:\n`);
   console.log(`  git add data/${owner}.fixture.json`);
   console.log(`  git commit -m "chore: update ${owner} fixture data"`);
 }

@@ -42,7 +42,9 @@ export function loadFixture(owner: string): OrgMetrics | null {
  */
 export function saveFixture(owner: string, data: OrgMetrics): void {
   fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(fixtureFilePath(owner), JSON.stringify(data, null, 2));
+  const filePath = fixtureFilePath(owner);
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  console.log(`Fixture saved to: ${filePath}`);
 }
 
 /**
