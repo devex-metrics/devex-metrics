@@ -531,23 +531,23 @@ function renderCharts(){
     charts.prTrends=new Chart(document.getElementById("chartPRTrends"),{type:"line",
       data:{labels:tLabels,datasets:[
         {label:"Opened",data:CHART_DATA.weeklyTrends.map(function(t){return t.prsOpened;}),
-          borderColor:cssColors.accent,backgroundColor:cssColors.accentS,tension:0.3,fill:true,pointRadius:3},
+          borderColor:cssColors.accent,fill:false,tension:0.3,borderWidth:2.5,pointRadius:4,pointHoverRadius:6},
         {label:"Merged",data:CHART_DATA.weeklyTrends.map(function(t){return t.prsMerged;}),
-          borderColor:cssColors.ok,backgroundColor:cssColors.okS,tension:0.3,fill:true,pointRadius:3}]},
+          borderColor:cssColors.ok,fill:false,tension:0.3,borderWidth:2.5,pointRadius:4,pointHoverRadius:6}]},
       options:lineOpts});
     charts.issueTrends=new Chart(document.getElementById("chartIssueTrends"),{type:"line",
       data:{labels:tLabels,datasets:[
         {label:"Opened",data:CHART_DATA.weeklyTrends.map(function(t){return t.issuesOpened;}),
-          borderColor:cssColors.warn,backgroundColor:cssColors.warnS,tension:0.3,fill:true,pointRadius:3},
+          borderColor:cssColors.warn,fill:false,tension:0.3,borderWidth:2.5,pointRadius:4,pointHoverRadius:6},
         {label:"Closed",data:CHART_DATA.weeklyTrends.map(function(t){return t.issuesClosed;}),
-          borderColor:cssColors.ok,backgroundColor:cssColors.okS,tension:0.3,fill:true,pointRadius:3}]},
+          borderColor:cssColors.ok,fill:false,tension:0.3,borderWidth:2.5,pointRadius:4,pointHoverRadius:6}]},
       options:lineOpts});
     charts.prSizeTrends=new Chart(document.getElementById("chartPRSizeTrends"),{type:"line",
       data:{labels:tLabels,datasets:[
         {label:"Lines Added",data:CHART_DATA.weeklyTrends.map(function(t){return t.linesAdded;}),
-          borderColor:cssColors.ok,backgroundColor:cssColors.okS,tension:0.3,fill:true,pointRadius:3},
+          borderColor:cssColors.ok,fill:false,tension:0.3,borderWidth:2.5,pointRadius:4,pointHoverRadius:6},
         {label:"Lines Removed",data:CHART_DATA.weeklyTrends.map(function(t){return t.linesDeleted;}),
-          borderColor:cssColors.err,backgroundColor:cssColors.errS,tension:0.3,fill:true,pointRadius:3}]},
+          borderColor:cssColors.err,fill:false,tension:0.3,borderWidth:2.5,pointRadius:4,pointHoverRadius:6}]},
       options:lineOpts});
   }
 }
