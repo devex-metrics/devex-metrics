@@ -8,14 +8,55 @@ function cacheFilePath(owner: string): string {
   return path.join(DATA_DIR, `${owner}.json`);
 }
 
+function fixtureFilePath(owner: string): string {
+  return path.join(DATA_DIR, `${owner}.fixture.json`);
+}
+
 function todayDateString(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
 /**
+ * Load committed fixture data for `owner` (no date restriction).
+ * Fixture files are checked-in to the repo for use across worktrees
+ * without needing live API access.
+ */
+export function loadFixture(owner: string): OrgMetrics | null {
+  const filePath = fixtureFilePath(owner);
+  if (!fs.existsSync(filePath)) return null;
+  try {
+    const raw = fs.readFileSync(filePath, "utf-8");
+    const data = JSON.parse(raw) as OrgMetrics;
+    if (!data.owner || !Array.isArray(data.repos) || data.weeklyTrends === undefined) {
+      return null;
+    }
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Persist `data` as a fixture file (no date envelope) that can be
+ * committed to the repo and reused across worktrees without API calls.
+ */
+export function saveFixture(owner: string, data: OrgMetrics): void {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.writeFileSync(fixtureFilePath(owner), JSON.stringify(data, null, 2));
+}
+
+/**
  * Return cached data if it was collected today, otherwise null.
+ * Fixture files (committed to the repo) take precedence and have no
+ * date restriction — they are intended for local development.
  */
 export function loadCache(owner: string): OrgMetrics | null {
+  const fixture = loadFixture(owner);
+  if (fixture) {
+    console.log(`Using fixture data for ${owner} (collected ${fixture.collectedAt})`);
+    return fixture;
+  }
+
   const filePath = cacheFilePath(owner);
   if (!fs.existsSync(filePath)) {
     return null;

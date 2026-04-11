@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
+    "save-fixture": "npm run build && node dist/save-fixture.js",
     "test": "vitest run",
     "test:watch": "vitest"
   },

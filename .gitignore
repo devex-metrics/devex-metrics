@@ -9,3 +9,4 @@ coverage/
 data/*.json
 data/*.md
 !data/.gitkeep
+!data/*.fixture.json
