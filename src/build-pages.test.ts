@@ -264,6 +264,37 @@ describe("build-pages", () => {
     expect(html).toContain("PR Size Trends");
   });
 
+  it("should default the Last 30 Days filter button as active", () => {
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    // Last 30 Days button should be active, All Time should not
+    expect(html).toContain('class="filter-btn active" data-period="30days"');
+    expect(html).not.toContain('class="filter-btn active" data-period="all"');
+  });
+
+  it("should call applyFilter on DOMContentLoaded with 30days default", () => {
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    expect(html).toContain('applyFilter("30days")');
+  });
+
+  it("should include KPI element IDs for dynamic filter updates", () => {
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    expect(html).toContain('id="kpiIssueVal"');
+    expect(html).toContain('id="kpiIssueLbl"');
+    expect(html).toContain('id="kpiIssueSub"');
+    expect(html).toContain('id="kpiPRVal"');
+    expect(html).toContain('id="kpiPRLbl"');
+    expect(html).toContain('id="kpiPRSub"');
+  });
+
   it("should build successfully without trend charts when weeklyTrends is absent", () => {
     // The beforeEach fixture has no weeklyTrends — build-pages must not crash.
     expect(() =>
