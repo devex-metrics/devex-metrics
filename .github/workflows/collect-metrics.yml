@@ -42,15 +42,18 @@ jobs:
 
       - run: npm run build
 
-      # Restore cached data from previous runs
+      - name: Get today's date
+        id: date
+        run: echo "date=$(date -u +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      # Restore cached data from today's run (if any).
+      # Key includes the date so stale data from previous days is never restored.
       - name: Restore data cache
         id: cache-data
         uses: actions/cache@v5
         with:
           path: data
-          key: metrics-data-${{ github.repository_owner }}
-          restore-keys: |
-            metrics-data-
+          key: metrics-data-${{ github.repository_owner }}-${{ steps.date.outputs.date }}
 
       - name: Collect metrics
         env:
@@ -62,8 +65,7 @@ jobs:
           TYPE="${{ github.event.inputs.owner_type || 'user' }}"
           node dist/index.js "$OWNER" "$TYPE"
 
-      # Cache is automatically saved after the job completes
-      # (actions/cache saves on cache miss or key change)
+      # actions/cache@v5 automatically saves the data/ folder at job end.
 
       # Build the GitHub Pages site from the report
       - name: Build pages site
