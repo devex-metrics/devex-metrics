@@ -34,7 +34,7 @@ export async function collect(
 
   const repos: RepoMetrics[] = [];
 
-  for (const { fullName } of repoList) {
+  for (const { fullName, pushedAt } of repoList) {
     console.log(`  → ${fullName}`);
 
     // fullName is "repoOwner/repoName" – repos may belong to a different org/user
@@ -59,6 +59,7 @@ export async function collect(
     repos.push({
       name: repoName,
       fullName,
+      pushedAt,
       issues,
       pullRequests: prCounts,
       pullRequestDetails: prDetails,

@@ -246,19 +246,27 @@ ${getJS()}
 /* ------------------------------------------------------------------ */
 
 function buildRepoCard(repo: RepoMetrics): string {
-  const prRows = repo.pullRequestDetails
+  const sortedPRDetails = [...repo.pullRequestDetails].sort((a, b) => {
+    if (!a.mergedAt && !b.mergedAt) return 0;
+    if (!a.mergedAt) return 1;
+    if (!b.mergedAt) return -1;
+    return b.mergedAt.localeCompare(a.mergedAt);
+  });
+
+  const prRows = sortedPRDetails
     .map(
       (pr) =>
         `<tr><td>#${pr.number} ${escapeHtml(pr.title)}</td>` +
+        `<td>${pr.mergedAt ? pr.mergedAt.slice(0, 10) : ""}</td>` +
         `<td><span class="add">+${pr.linesAdded}</span> <span class="del">-${pr.linesDeleted}</span></td>` +
         `<td>${pr.commentCount}</td><td>${pr.commitCount}</td><td>${pr.actionsMinutes}</td></tr>`,
     )
     .join("");
 
   const prTable =
-    repo.pullRequestDetails.length > 0
+    sortedPRDetails.length > 0
       ? `<div class="pr-wrap"><h4>Recent Pull Requests</h4>
-      <table class="pr-tbl"><thead><tr><th>PR</th><th>Lines</th><th>Comments</th><th>Commits</th><th>CI&nbsp;min</th></tr></thead>
+      <table class="pr-tbl"><thead><tr><th>PR</th><th>Merged</th><th>Lines</th><th>Comments</th><th>Commits</th><th>CI&nbsp;min</th></tr></thead>
       <tbody>${prRows}</tbody></table></div>`
       : "";
 
@@ -269,13 +277,13 @@ function buildRepoCard(repo: RepoMetrics): string {
     repo.pullRequests.closed;
   const totalContrib = repo.committerCount + repo.reviewerCount;
 
-  return `<div class="repo-card" data-name="${escapeHtml(repo.fullName.toLowerCase())}" data-issues="${totalIssues}" data-prs="${totalPRs}" data-contributors="${totalContrib}">
+  return `<div class="repo-card" data-name="${escapeHtml(repo.fullName.toLowerCase())}" data-issues="${totalIssues}" data-prs="${totalPRs}" data-contributors="${totalContrib}" data-pushed="${escapeHtml(repo.pushedAt ?? "")}">
   <button class="repo-hdr" aria-expanded="false" aria-label="Toggle details for ${escapeHtml(repo.fullName)}" onclick="toggleRepo(this)">
     <span class="repo-title"><span class="chev" aria-hidden="true">&rsaquo;</span><span class="rname">${escapeHtml(repo.fullName)}</span></span>
     <span class="repo-badges">
       <span class="bdg bdg-issue">${repo.issues.open} open</span>
       <span class="bdg bdg-pr">${repo.pullRequests.merged} merged</span>
-      <span class="bdg bdg-ctr">${totalContrib} contrib</span>${repo.dependentCount > 0 ? `<span class="bdg bdg-dep">${repo.dependentCount} dep</span>` : ""}
+      <span class="bdg bdg-ctr">${totalContrib} contrib</span>${repo.dependentCount > 0 ? `<span class="bdg bdg-dep">${repo.dependentCount} dep</span>` : ""}<span class="bdg bdg-age"></span>
     </span>
   </button>
   <div class="repo-body" hidden>
@@ -367,6 +375,18 @@ dl{display:flex;flex-direction:column;gap:.15rem}
 .pr-tbl th{color:var(--muted);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.03em}
 .add{color:var(--ok);font-weight:600}.del{color:var(--err);font-weight:600}
 .repo-count{text-align:center;font-size:.8rem;color:var(--muted);margin-top:.75rem}
+.repo-group{margin-bottom:.75rem}
+.repo-group-hdr{display:flex;align-items:center;gap:.5rem;padding:.65rem 1rem;cursor:pointer;
+  background:var(--card);border-radius:var(--rs);font-size:.9rem;font-weight:600;
+  list-style:none;box-shadow:var(--sh);user-select:none}
+.repo-group-hdr::-webkit-details-marker{display:none}
+.repo-group-hdr::marker{display:none}
+.repo-group-hdr:hover{background:var(--accent-s)}
+.grp-chevron{font-size:.75rem;transition:transform .2s;color:var(--muted);display:inline-block}
+details[open] .grp-chevron{transform:rotate(90deg)}
+.grp-label{flex:1}.grp-count{color:var(--muted);font-size:.8rem;font-weight:400}
+.grp-body{padding-top:.5rem}
+.bdg-age{background:var(--border);color:var(--muted)}
 footer{max-width:1120px;margin:0 auto;padding:1rem;text-align:center;font-size:.8rem;
   color:var(--muted);border-top:1px solid var(--border)}
 @media(max-width:640px){
@@ -387,6 +407,7 @@ function getJS(): string {
   return `
 document.addEventListener("DOMContentLoaded",function(){
   if(typeof Chart!=="undefined"){renderCharts();}
+  setupGroups();
   setupControls();
 });
 function renderCharts(){
@@ -440,22 +461,110 @@ function setupControls(){
   if(!f||!list)return;
   function filterAndSort(){
     var q=f.value.toLowerCase();var by=st.value;
-    var cards=Array.from(list.querySelectorAll(".repo-card"));
-    cards.sort(function(a,b){
-      if(by==="name")return a.dataset.name.localeCompare(b.dataset.name);
-      return Number(b.dataset[by])-Number(a.dataset[by]);
-    });
     var n=0;
-    for(var i=0;i<cards.length;i++){
-      var match=cards[i].dataset.name.indexOf(q)!==-1;
-      cards[i].style.display=match?"":"none";
-      if(match)n++;
-      list.appendChild(cards[i]);
+    var grpBodies=Array.from(list.querySelectorAll(".grp-body"));
+    if(grpBodies.length>0){
+      grpBodies.forEach(function(grpBody){
+        var groupCards=Array.from(grpBody.querySelectorAll(".repo-card"));
+        groupCards.sort(function(a,b){
+          if(by==="name")return a.dataset.name.localeCompare(b.dataset.name);
+          return Number(b.dataset[by])-Number(a.dataset[by]);
+        });
+        groupCards.forEach(function(card){
+          var match=card.dataset.name.indexOf(q)!==-1;
+          card.style.display=match?"":"none";
+          if(match)n++;
+          grpBody.appendChild(card);
+        });
+      });
+      Array.from(list.querySelectorAll(".repo-group")).forEach(function(grpEl){
+        if(grpEl.dataset.emptyGroup)return;
+        var visible=Array.from(grpEl.querySelectorAll(".repo-card")).filter(function(c){return c.style.display!=="none";}).length;
+        grpEl.style.display=visible>0?"":"none";
+      });
+    }else{
+      var allCards=Array.from(list.querySelectorAll(".repo-card"));
+      allCards.sort(function(a,b){
+        if(by==="name")return a.dataset.name.localeCompare(b.dataset.name);
+        return Number(b.dataset[by])-Number(a.dataset[by]);
+      });
+      allCards.forEach(function(card){
+        var match=card.dataset.name.indexOf(q)!==-1;
+        card.style.display=match?"":"none";
+        if(match)n++;
+        list.appendChild(card);
+      });
     }
     if(sh)sh.textContent=String(n);
   }
   f.addEventListener("input",filterAndSort);
   st.addEventListener("change",filterAndSort);
+}
+function setupGroups(){
+  var now=Date.now();
+  var groupDefs=[
+    {id:"grp-month",label:"Last Month",maxDays:30},
+    {id:"grp-quarter",label:"Last Quarter",maxDays:90},
+    {id:"grp-halfyear",label:"Last Half Year",maxDays:180},
+    {id:"grp-older",label:"Older",maxDays:Infinity}
+  ];
+  var list=document.getElementById("repoList");
+  if(!list)return;
+  var cards=Array.from(list.querySelectorAll(".repo-card"));
+  cards.forEach(function(c){c.parentNode.removeChild(c);});
+  groupDefs.forEach(function(g){
+    var el=document.createElement("div");
+    el.id=g.id;
+    el.className="repo-group";
+    el.innerHTML="<details><summary class=\"repo-group-hdr\"><span class=\"grp-chevron\">&#9654;</span><span class=\"grp-label\">"+g.label+"</span><span class=\"grp-count\"></span></summary><div class=\"grp-body\"></div></details>";
+    list.appendChild(el);
+  });
+  cards.forEach(function(card){
+    var pushed=card.dataset.pushed;
+    var days=pushed&&pushed.length>0?utcDaysSince(pushed,now):Infinity;
+    var targetId=groupDefs[groupDefs.length-1].id;
+    for(var i=0;i<groupDefs.length;i++){
+      if(days<=groupDefs[i].maxDays){targetId=groupDefs[i].id;break;}
+    }
+    var ageBadge=card.querySelector(".bdg-age");
+    if(ageBadge){
+      var ageStr=computeAge(days);
+      ageBadge.textContent=ageStr;
+      if(!ageStr)ageBadge.style.display="none";
+    }
+    document.getElementById(targetId).querySelector(".grp-body").appendChild(card);
+  });
+  var firstOpened=false;
+  groupDefs.forEach(function(g){
+    var grpEl=document.getElementById(g.id);
+    var count=grpEl.querySelectorAll(".repo-card").length;
+    grpEl.querySelector(".grp-count").textContent=count?" ("+count+")":"";
+    if(count===0){
+      grpEl.style.display="none";
+      grpEl.dataset.emptyGroup="1";
+    }else if(!firstOpened){
+      grpEl.querySelector("details").open=true;
+      firstOpened=true;
+    }
+  });
+}
+function utcDaysSince(isoDate,nowMs){
+  var d=new Date(isoDate);
+  var pushedMs=Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());
+  var nowDate=new Date(nowMs);
+  var todayMs=Date.UTC(nowDate.getUTCFullYear(),nowDate.getUTCMonth(),nowDate.getUTCDate());
+  return Math.max(0,(todayMs-pushedMs)/86400000);
+}
+function computeAge(days){
+  if(!isFinite(days))return "";
+  if(days<1)return "today";
+  days=Math.floor(days);
+  if(days<7)return days+"d";
+  var w=Math.floor(days/7);
+  if(w<5)return w+"w";
+  var m=Math.floor(days/30);
+  if(m<12)return m+"mo";
+  return Math.floor(days/365)+"y";
 }
 function toggleRepo(btn){
   var card=btn.closest(".repo-card");
