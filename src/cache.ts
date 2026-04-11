@@ -4,6 +4,16 @@ import type { CacheEnvelope, OrgMetrics } from "./types.js";
 
 const DATA_DIR = path.resolve(process.cwd(), "data");
 
+/**
+ * Current cache schema version. Bump this whenever `OrgMetrics` gains a new
+ * required field so that cached/fixture data missing the field is automatically
+ * invalidated and re-collected.
+ *
+ * Version history:
+ *   1 — initial versioning; adds mergedPRDates per repo
+ */
+export const CURRENT_SCHEMA_VERSION = 1;
+
 function cacheFilePath(owner: string): string {
   return path.join(DATA_DIR, `${owner}.json`);
 }
@@ -28,6 +38,13 @@ export function loadFixture(owner: string): OrgMetrics | null {
     const raw = fs.readFileSync(filePath, "utf-8");
     const data = JSON.parse(raw) as OrgMetrics;
     if (!data.owner || !Array.isArray(data.repos) || data.weeklyTrends === undefined) {
+      return null;
+    }
+    if (data.schemaVersion !== CURRENT_SCHEMA_VERSION) {
+      console.log(
+        `Fixture for ${owner} has schema version ${data.schemaVersion ?? "none"} ` +
+        `(current: ${CURRENT_SCHEMA_VERSION}). Ignoring stale fixture.`
+      );
       return null;
     }
     return data;
@@ -70,7 +87,9 @@ export function loadRawCache(owner: string): OrgMetrics | null {
   try {
     const raw = fs.readFileSync(filePath, "utf-8");
     const envelope: CacheEnvelope = JSON.parse(raw);
-    return envelope.data ?? null;
+    const data = envelope.data ?? null;
+    if (data?.schemaVersion !== CURRENT_SCHEMA_VERSION) return null;
+    return data;
   } catch {
     return null;
   }
@@ -97,11 +116,12 @@ export function loadCache(owner: string): OrgMetrics | null {
     const envelope: CacheEnvelope = JSON.parse(raw);
     if (
       envelope.date === todayDateString() &&
-      envelope.data.weeklyTrends !== undefined
+      envelope.data.weeklyTrends !== undefined &&
+      envelope.data.schemaVersion === CURRENT_SCHEMA_VERSION
     ) {
       return envelope.data;
     }
-    return null; // stale cache or missing weeklyTrends
+    return null; // stale cache, missing weeklyTrends, or schema version mismatch
   } catch {
     return null;
   }

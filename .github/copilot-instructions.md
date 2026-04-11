@@ -58,7 +58,16 @@ _site/                  # Generated GitHub Pages output (gitignored)
 3. Re-export from `src/collectors/index.ts`.
 4. Add the new metric fields to the relevant interface in `src/types.ts`.
 5. Wire up the collector in `src/collect.ts`, surface the data in `src/report.ts` and `src/build-pages.ts`.
-6. Write tests using vitest (see Testing section below for patterns).
+6. **If the new field is required for correct behaviour** (e.g. the chart filter depends on it), bump `CURRENT_SCHEMA_VERSION` in `src/cache.ts` and add a line to the version history comment there. This invalidates all cached/fixture data that pre-dates the change and forces a fresh collection on the next run.
+7. Write tests using vitest (see Testing section below for patterns).
+
+## Cache schema versioning
+
+`CURRENT_SCHEMA_VERSION` is exported from `src/cache.ts`. It is stored in every `OrgMetrics` object produced by `collect.ts`. When data is loaded from disk (`loadCache`, `loadRawCache`, `loadFixture`), the stored version is compared to the constant; a mismatch causes the loader to return `null` so the caller falls back to a fresh API collection.
+
+**When to bump the version:** any time a new field is added to `OrgMetrics` (or a nested type) that the dashboard or report rely on and that would be absent in data collected with an older build. Increment by 1, update the version-history comment in `cache.ts`, and update `makeSampleMetrics()` in `cache.test.ts` if needed.
+
+**Do not** bump the version for purely additive optional fields where the absence can be handled gracefully with a fallback.
 
 ## Testing
 

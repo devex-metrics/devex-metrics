@@ -63,7 +63,12 @@ jobs:
           path: data
           key: metrics-data-${{ github.repository_owner }}-${{ steps.date.outputs.date }}
 
+      # Collection is only needed for scheduled runs and manual dispatches.
+      # Push-triggered runs rebuild the pages from existing fixture/cache data so
+      # that a same-day fixture (collected with older code) is never used to skip
+      # a fresh collection that would include new fields like mergedPRDates.
       - name: Collect metrics
+        if: github.event_name != 'push'
         env:
           GITHUB_TOKEN: ${{ secrets.METRICS_GITHUB_TOKEN }}
           APP_ID: ${{ vars.APP_ID }}
@@ -76,6 +81,7 @@ jobs:
 
       - name: Create PR for updated fixture data
         id: create-pr
+        if: github.event_name != 'push'
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -87,7 +93,7 @@ jobs:
           delete-branch: true
 
       - name: Enable auto-merge on fixture data PR
-        if: steps.create-pr.outputs.pull-request-operation == 'created' || steps.create-pr.outputs.pull-request-operation == 'updated'
+        if: github.event_name != 'push' && (steps.create-pr.outputs.pull-request-operation == 'created' || steps.create-pr.outputs.pull-request-operation == 'updated')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh pr merge --auto --squash "${{ steps.create-pr.outputs.pull-request-url }}"
