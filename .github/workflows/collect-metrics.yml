@@ -19,6 +19,11 @@ on:
         description: "org or user"
         required: false
         default: "user"
+      force_refresh:
+        description: "Force fresh data collection even if today's fixture already exists"
+        required: false
+        default: "false"
+        type: boolean
 
 permissions:
   contents: write
@@ -62,6 +67,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.METRICS_GITHUB_TOKEN }}
           APP_ID: ${{ vars.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+          FORCE_REFRESH: ${{ github.event.inputs.force_refresh || 'false' }}
         run: |
           OWNER="${{ github.event.inputs.owner || 'rajbos' }}"
           TYPE="${{ github.event.inputs.owner_type || 'user' }}"

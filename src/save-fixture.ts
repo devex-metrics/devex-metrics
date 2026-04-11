@@ -1,15 +1,14 @@
 import { collect } from "./collect.js";
-import { saveFixture } from "./cache.js";
+import { loadFixture, saveFixture } from "./cache.js";
 
 /**
- * Fetch fresh metrics from GitHub (bypassing any local cache) and save
- * the result as a fixture file that can be committed to the repo.
+ * Collect metrics and save as a fixture file for local development.
  *
- * All worktrees that have this file will automatically use it for local
- * development without needing API access.
+ * By default, skips collection if the fixture was already collected today.
+ * Set FORCE_REFRESH=true or pass --force to always fetch fresh data.
  *
  * Usage:
- *   GITHUB_TOKEN=ghp_xxx node dist/save-fixture.js <owner> [org|user]
+ *   GITHUB_TOKEN=ghp_xxx node dist/save-fixture.js <owner> [org|user] [--force]
  *
  * After running:
  *   git add data/<owner>.fixture.json
@@ -20,11 +19,31 @@ async function main(): Promise<void> {
   const ownerType = (process.argv[3] ?? "org") as "org" | "user";
 
   if (!owner) {
-    console.error("Usage: save-fixture <owner> [org|user]");
+    console.error("Usage: save-fixture <owner> [org|user] [--force]");
     process.exit(1);
   }
 
-  console.log(`Fetching fresh metrics for ${owner} (bypassing cache)…`);
+  const forceRefresh =
+    process.env.FORCE_REFRESH === "true" ||
+    process.argv.includes("--force");
+
+  if (!forceRefresh) {
+    const existing = loadFixture(owner);
+    const todayStr = new Date().toISOString().slice(0, 10);
+    if (existing?.collectedAt?.slice(0, 10) === todayStr) {
+      console.log(
+        `Fixture for ${owner} is already from today (${existing.collectedAt}). Skipping refresh.\n` +
+        `Use --force or set FORCE_REFRESH=true to collect anyway.`
+      );
+      return;
+    }
+  }
+
+  console.log(
+    forceRefresh
+      ? `Fetching fresh metrics for ${owner} (forced)…`
+      : `Fetching fresh metrics for ${owner} (no fixture for today yet)…`
+  );
   const metrics = await collect(owner, ownerType, { skipCache: true });
 
   saveFixture(owner, metrics);
