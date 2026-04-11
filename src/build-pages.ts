@@ -179,7 +179,6 @@ function buildDashboardHtml(
 
 <header class="hero">
   <nav class="hero-nav">
-    <a href="https://github.com/devex-metrics/devex-metrics" class="hero-nav-link" target="_blank" rel="noopener noreferrer">${GITHUB_MARK_SVG} Contribute</a>
     <a href="https://github.com/rajbos" class="hero-nav-link">Made with &#x2764;&#xFE0F; by rajbos</a>
   </nav>
   <h1>DevEx Metrics</h1>
@@ -348,7 +347,7 @@ a{color:var(--accent)}
 @media(prefers-color-scheme:dark){.hero{background:linear-gradient(135deg,#1158a7 0%,#6639ba 100%)}}
 .hero h1{font-size:1.8rem;font-weight:700;margin-bottom:.35rem}
 .subtitle{opacity:.88;font-size:.95rem}
-.hero-nav{display:flex;justify-content:flex-end;gap:1rem;margin-bottom:1rem}
+.hero-nav{display:flex;justify-content:flex-end;gap:1rem;margin-bottom:1rem;padding-right:90px}
 .hero-nav-link{color:#fff;opacity:.85;font-size:.85rem;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:.1rem;transition:opacity .15s}
 .hero-nav-link:hover{opacity:1;border-bottom-color:#fff}
 .hero-nav-link{display:inline-flex;align-items:center;gap:.35rem}
