@@ -109,9 +109,20 @@ import { collect } from "./collect.js";
 - **Edge cases**: empty repos, pagination (multiple pages accumulate), deduplication, null fields with defined fallbacks.
 - Avoid testing implementation details or mocking things that don't need it. Don't aim for 100% coverage — focus on behaviours that could regress.
 
+## Mutation testing
+
+Mutation testing is provided by [Stryker](https://stryker-mutator.io/) with the vitest runner.
+
+- **Config**: `stryker.config.mjs` (ESM). Mutates all `src/**/*.ts` except test files, `types.ts`, `index.ts`, `save-fixture.ts`, and `build-pages.ts` (the last is excluded because its tests run via subprocess and Stryker cannot track coverage that way).
+- **Run locally** (before creating a PR): `npm run mutation` — produces an HTML report at `reports/mutation/index.html` and a text summary in the terminal.
+- **Run in CI mode**: `npm run mutation:ci` — outputs JSON + text (no HTML). The `mutation` job in `ci.yml` reads `reports/mutation/mutation.json` and posts a Markdown summary to the GitHub Actions step summary via `node scripts/mutation-summary.mjs >> $GITHUB_STEP_SUMMARY`.
+- **Thresholds**: `high: 80`, `low: 60` for colour-coding only; `break: null` so the CI job never fails purely on score. Tighten `break` once you have a stable baseline.
+- **Interpreting results**: a survived mutant means a code change was not caught by any test — it may indicate a test gap worth addressing. NoCoverage mutants mean no test exercises that line at all.
+- **reports/** is gitignored — never commit Stryker output.
+
 ## GitHub Actions
 
-- **ci.yml**: runs `npm ci`, `npm run build`, `npm test` on every push/PR to `main`. Keep this fast (< 2 min).
+- **ci.yml**: runs `npm ci`, `npm run build`, `npm test` on every push/PR to `main`. A second `mutation` job (depends on `test`) runs Stryker and posts a step summary; it runs on every PR but does not block merging on score.
 - **collect-metrics.yml**: scheduled daily; restores cache, collects metrics, builds Pages, deploys. Does **not** commit to `main`.
 - Always pin action versions to a full SHA or major-version tag.
 

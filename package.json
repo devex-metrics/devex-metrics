@@ -8,7 +8,9 @@
     "start": "node dist/index.js",
     "save-fixture": "npm run build && node dist/save-fixture.js",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "mutation": "stryker run",
+    "mutation:ci": "stryker run --reporters json,clear-text"
   },
   "repository": {
     "type": "git",
@@ -29,6 +31,8 @@
     "typescript": "^6.0.2"
   },
   "devDependencies": {
+    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/vitest-runner": "^9.6.1",
     "@types/jsdom": "^28.0.1",
     "@types/node": "^25.6.0",
     "jsdom": "^29.0.2",

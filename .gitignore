@@ -6,6 +6,7 @@ _site/
 *.tgz
 coverage/
 .nyc_output/
+reports/
 data/*.json
 data/*.md
 !data/.gitkeep
