@@ -175,6 +175,10 @@ function buildDashboardHtml(
 <body>
 
 <header class="hero">
+  <nav class="hero-nav">
+    <a href="https://github.com/devex-metrics/devex-metrics" class="hero-nav-link">Contribute</a>
+    <a href="https://github.com/rajbos" class="hero-nav-link">Made with &#x2764;&#xFE0F; by rajbos</a>
+  </nav>
   <h1>DevEx Metrics</h1>
   <p class="subtitle">${escapeHtml(data.owner)} &middot; ${escapeHtml(data.ownerType)} &middot; collected ${escapeHtml(data.collectedAt)}</p>
 </header>
@@ -329,6 +333,9 @@ a{color:var(--accent)}
 @media(prefers-color-scheme:dark){.hero{background:linear-gradient(135deg,#1158a7 0%,#6639ba 100%)}}
 .hero h1{font-size:1.8rem;font-weight:700;margin-bottom:.35rem}
 .subtitle{opacity:.88;font-size:.95rem}
+.hero-nav{display:flex;justify-content:flex-end;gap:1rem;margin-bottom:1rem}
+.hero-nav-link{color:#fff;opacity:.85;font-size:.85rem;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:.1rem;transition:opacity .15s}
+.hero-nav-link:hover{opacity:1;border-bottom-color:#fff}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem}
 .kpi{background:var(--card);border-radius:var(--r);padding:1.25rem 1rem;text-align:center;
   box-shadow:var(--sh);transition:transform .2s,box-shadow .2s}
