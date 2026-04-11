@@ -19,10 +19,13 @@
 src/
   index.ts              # CLI entry point & orchestrator
   build-pages.ts        # Generates static HTML for GitHub Pages
+  collect.ts            # Core collection orchestrator (cache-aware, calls all collectors)
   types.ts              # All shared TypeScript interfaces (source of truth)
   github-client.ts      # Octokit singleton (token or GitHub App auth)
+  link-header.ts        # GitHub Link header pagination helper
   cache.ts              # JSON file-based daily cache in data/
   report.ts             # Markdown report generator
+  save-fixture.ts       # CLI utility: save current API response as a test fixture
   collectors/
     index.ts            # Re-exports all collectors
     repos.ts            # List repositories
@@ -30,6 +33,7 @@ src/
     pull-requests.ts    # PR counts + detailed PR metrics
     contributors.ts     # Committer & reviewer counts (last 90 days)
     dependents.ts       # Dependent repository count
+    trends.ts           # Weekly activity trend aggregation
 data/                   # Local cache (gitignored)
 _site/                  # Generated GitHub Pages output (gitignored)
 .github/workflows/
@@ -53,15 +57,57 @@ _site/                  # Generated GitHub Pages output (gitignored)
 2. Export a single async function that accepts an Octokit instance plus whatever parameters it needs and returns a typed value.
 3. Re-export from `src/collectors/index.ts`.
 4. Add the new metric fields to the relevant interface in `src/types.ts`.
-5. Wire up the collector in `src/index.ts` and surface the data in `src/report.ts` and `src/build-pages.ts`.
-6. Write tests using vitest; prefer fixture-driven tests (see `src/save-fixture.ts`).
+5. Wire up the collector in `src/collect.ts`, surface the data in `src/report.ts` and `src/build-pages.ts`.
+6. Write tests using vitest (see Testing section below for patterns).
 
 ## Testing
 
 - All test files live alongside the source file they test: `src/foo.test.ts` tests `src/foo.ts`.
 - Run tests with `npm test` (vitest, single run) or `npm run test:watch` (watch mode).
-- Tests use vitest globals (`describe`, `it`, `expect`) — no imports needed for those.
-- Use real fixture JSON files under `data/` for integration-style tests; use `vi.fn()` / `vi.spyOn()` to mock Octokit calls for unit tests.
+- Tests use vitest globals (`describe`, `it`, `expect`, `vi`) — no imports needed for those, though explicit imports are fine for clarity.
+- **CI runs `npm test` on every PR and push to `main`** — all tests must pass before merging.
+
+### Mock patterns
+
+**API collectors** (`collectors/*.ts`) — inject a fake Octokit via `setOctokit` / `resetOctokit`:
+
+```ts
+import { setOctokit, resetOctokit } from "../github-client.js";
+
+afterEach(() => resetOctokit());
+
+it("counts correctly", async () => {
+  setOctokit({ rest: { ... }, paginate: { ... } } as unknown as Octokit);
+  const result = await collectFoo("owner", "repo");
+  expect(result).toEqual(...);
+});
+```
+
+For collectors that use `paginate.iterator`, create an async generator and attach it:
+
+```ts
+async function* fakeIterator() { yield { data: [...] }; }
+const paginateFn = Object.assign(vi.fn(), { iterator: fakeIterator });
+```
+
+**Orchestrators** (`collect.ts`) — use `vi.mock` to replace the cache and collector modules:
+
+```ts
+vi.mock("./cache.js", () => ({ loadCache: vi.fn(), saveCache: vi.fn(), ... }));
+vi.mock("./collectors/index.js", () => ({ collectRepos: vi.fn(), ... }));
+// imports below receive the mocked versions
+import { collect } from "./collect.js";
+```
+
+**Pure functions** (`report.ts`, `link-header.ts`) — call directly; no mocking needed.
+
+### What to test
+
+- **Happy path**: verify the correct shape and values of the result.
+- **Error paths**: 404 returns a zero/empty default; 403 returns a zero/empty default *and* calls `console.warn`; non-404/403 errors are re-thrown.
+- **Partial failures**: in collectors with independent `try/catch` blocks (e.g. `contributors.ts`), verify that one path failing does not zero out the other.
+- **Edge cases**: empty repos, pagination (multiple pages accumulate), deduplication, null fields with defined fallbacks.
+- Avoid testing implementation details or mocking things that don't need it. Don't aim for 100% coverage — focus on behaviours that could regress.
 
 ## GitHub Actions
 
