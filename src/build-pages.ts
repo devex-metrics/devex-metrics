@@ -23,16 +23,20 @@ function main(): void {
 
   const dataDir = path.resolve(process.cwd(), "data");
   const cacheFile = path.join(dataDir, `${owner}.json`);
+  const fixtureFile = path.join(dataDir, `${owner}.fixture.json`);
   const siteDir = path.resolve(process.cwd(), "_site");
 
-  if (!fs.existsSync(cacheFile)) {
-    console.error(`No cached data found at ${cacheFile}`);
+  let envelope: CacheEnvelope;
+  if (fs.existsSync(cacheFile)) {
+    envelope = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as CacheEnvelope;
+  } else if (fs.existsSync(fixtureFile)) {
+    console.log(`No daily cache found; falling back to fixture at ${fixtureFile}`);
+    const data = JSON.parse(fs.readFileSync(fixtureFile, "utf-8")) as OrgMetrics;
+    envelope = { date: data.collectedAt.slice(0, 10), data };
+  } else {
+    console.error(`No data found at ${cacheFile} or ${fixtureFile}`);
     process.exit(1);
   }
-
-  const envelope: CacheEnvelope = JSON.parse(
-    fs.readFileSync(cacheFile, "utf-8")
-  );
   const markdown = generateReport(envelope.data);
 
   fs.mkdirSync(siteDir, { recursive: true });

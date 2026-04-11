@@ -431,4 +431,41 @@ describe("build-pages", () => {
       expect(detailRow!.style.display).not.toBe("none");
     }
   });
+
+  it("should fall back to fixture file when no daily cache is present", () => {
+    const fixtureFile = path.join(dataDir, "test-pages-owner.fixture.json");
+    // Remove the daily cache so only the fixture is available
+    if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
+    try {
+      const fixtureData = {
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-03-28T08:00:00Z",
+        repoCount: 1,
+        repos: [
+          {
+            name: "fixture-repo",
+            fullName: "test-pages-owner/fixture-repo",
+            issues: { open: 1, closed: 2 },
+            pullRequests: { open: 0, closed: 0, merged: 1 },
+            pullRequestDetails: [],
+            committerCount: 1,
+            reviewerCount: 0,
+            dependentCount: 0,
+          },
+        ],
+      };
+      fs.writeFileSync(fixtureFile, JSON.stringify(fixtureData));
+
+      execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+        cwd: process.cwd(),
+      });
+
+      const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+      expect(html).toContain("test-pages-owner");
+      expect(html).toContain("fixture-repo");
+    } finally {
+      if (fs.existsSync(fixtureFile)) fs.unlinkSync(fixtureFile);
+    }
+  });
 });
