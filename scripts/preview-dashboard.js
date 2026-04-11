@@ -17,6 +17,24 @@ try {
   console.log('Building TypeScript (npm run build)...');
   execSync('npm run build', { stdio: 'inherit' });
 
+  // If cache is missing, attempt to collect metrics first (requires GITHUB_TOKEN or App creds)
+  const ownerType = process.argv[3] || 'org';
+  const cacheFile = path.resolve(process.cwd(), 'data', `${owner}.json`);
+  if (!fs.existsSync(cacheFile)) {
+    console.log(`No cached data found at ${cacheFile}. Attempting to collect metrics for ${owner} (${ownerType})...`);
+    if (process.env.GITHUB_TOKEN || (process.env.APP_ID && process.env.APP_PRIVATE_KEY)) {
+      try {
+        execSync(`node dist/index.js ${owner} ${ownerType}`, { stdio: 'inherit' });
+      } catch (err) {
+        console.error('Data collection failed:', err.message || err);
+        process.exit(1);
+      }
+    } else {
+      console.error('No GITHUB_TOKEN or App credentials found in the environment. Set GITHUB_TOKEN (or APP_ID and APP_PRIVATE_KEY) and re-run.');
+      process.exit(1);
+    }
+  }
+
   console.log(`Generating site for ${owner}...`);
   execSync(`node dist/build-pages.js ${owner}`, { stdio: 'inherit' });
 
