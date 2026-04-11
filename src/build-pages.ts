@@ -170,7 +170,7 @@ function buildDashboardHtml(
     .sort((a, b) => b.issues + b.prs - (a.issues + a.prs))
     .slice(0, 15);
 
-  const repoCards = data.repos.map((repo) => buildRepoCard(repo)).join("\n");
+  const repoRows = data.repos.map((repo) => buildRepoRow(repo)).join("\n");
 
   const allPRDetails = data.repos.flatMap((r) =>
     r.pullRequestDetails
@@ -270,13 +270,31 @@ function buildDashboardHtml(
         <input type="search" id="repoFilter" placeholder="Filter&hellip;" aria-label="Filter repositories" />
         <select id="repoSort" aria-label="Sort repositories">
           <option value="name">Name</option>
-          <option value="issues">Issues</option>
-          <option value="prs">PRs</option>
+          <option value="openIssues">Open Issues</option>
+          <option value="mergedPrs">Merged PRs</option>
+          <option value="openPrs">Open PRs</option>
           <option value="contributors">Contributors</option>
+          <option value="dependents">Dependents</option>
+          <option value="pushed">Last Updated</option>
+          <option value="linesAdded">Lines Added</option>
         </select>
       </div>
     </div>
-    <div id="repoList" class="repo-list">${repoCards}</div>
+    <div class="table-wrap">
+      <table class="repo-table" aria-label="Repositories">
+        <thead><tr>
+          <th class="col-repo th-sortable" data-sort="name">Repository <span class="sort-ind" aria-hidden="true"></span></th>
+          <th class="col-num th-sortable" data-sort="openIssues">Issues <span class="sort-ind" aria-hidden="true"></span></th>
+          <th class="col-num th-sortable" data-sort="mergedPrs">Merged PRs <span class="sort-ind" aria-hidden="true"></span></th>
+          <th class="col-num th-sortable" data-sort="openPrs">Open PRs <span class="sort-ind" aria-hidden="true"></span></th>
+          <th class="col-num th-sortable" data-sort="contributors">Contributors <span class="sort-ind" aria-hidden="true"></span></th>
+          <th class="col-num th-sortable" data-sort="dependents">Dependents <span class="sort-ind" aria-hidden="true"></span></th>
+          <th class="col-date th-sortable" data-sort="pushed">Last Updated <span class="sort-ind" aria-hidden="true"></span></th>
+          <th class="col-lines th-sortable" data-sort="linesAdded">Lines +/- <span class="sort-ind" aria-hidden="true"></span></th>
+        </tr></thead>
+        <tbody id="repoList">${repoRows}</tbody>
+      </table>
+    </div>
     <p class="repo-count"><span id="shown">${data.repos.length}</span> of ${data.repos.length} repositories</p>
   </section>
 </main>
@@ -300,10 +318,10 @@ ${getJS()}
 }
 
 /* ------------------------------------------------------------------ */
-/*  Repo card builder                                                 */
+/*  Repo row builder (table layout)                                  */
 /* ------------------------------------------------------------------ */
 
-function buildRepoCard(repo: RepoMetrics): string {
+function buildRepoRow(repo: RepoMetrics): string {
   const sortedPRDetails = [...repo.pullRequestDetails].sort((a, b) => {
     if (!a.mergedAt && !b.mergedAt) return 0;
     if (!a.mergedAt) return 1;
@@ -328,36 +346,61 @@ function buildRepoCard(repo: RepoMetrics): string {
       <tbody>${prRows}</tbody></table></div>`
       : "";
 
-  const totalIssues = repo.issues.open + repo.issues.closed;
-  const totalPRs =
-    repo.pullRequests.open +
-    repo.pullRequests.merged +
-    repo.pullRequests.closed;
   const totalContrib = repo.committerCount + repo.reviewerCount;
-
+  const linesAdded = repo.pullRequestDetails.reduce(
+    (s, pr) => s + pr.linesAdded,
+    0,
+  );
+  const linesDeleted = repo.pullRequestDetails.reduce(
+    (s, pr) => s + pr.linesDeleted,
+    0,
+  );
+  const pushedDate = repo.pushedAt ? repo.pushedAt.slice(0, 10) : "";
   const repoUrl = `https://github.com/${escapeHtml(repo.fullName)}`;
-  return `<div class="repo-card" data-name="${escapeHtml(repo.fullName.toLowerCase())}" data-issues="${totalIssues}" data-prs="${totalPRs}" data-contributors="${totalContrib}" data-pushed="${escapeHtml(repo.pushedAt ?? "")}">
-  <div class="repo-hdr-row">
-  <button class="repo-hdr" aria-expanded="false" aria-label="Toggle details for ${escapeHtml(repo.fullName)}" onclick="toggleRepo(this)">
-    <span class="repo-title"><span class="chev" aria-hidden="true">&rsaquo;</span><span class="rname">${escapeHtml(repo.fullName)}</span></span>
-    <span class="repo-badges">
-      <span class="bdg bdg-issue">${repo.issues.open} open</span>
-      <span class="bdg bdg-pr">${repo.pullRequests.merged} merged</span>
-      <span class="bdg bdg-ctr">${totalContrib} contrib</span>${repo.dependentCount > 0 ? `<span class="bdg bdg-dep">${repo.dependentCount} dep</span>` : ""}<span class="bdg bdg-age"></span>
-    </span>
-  </button>
-  <a class="repo-gh-link" href="${repoUrl}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(repo.fullName)} on GitHub" title="Open on GitHub" onclick="event.stopPropagation()">${GITHUB_MARK_SVG}</a>
-  </div>
-  <div class="repo-body" hidden>
-    <div class="stats-grid">
-      <div class="sg"><h4>Issues</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.issues.open}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.issues.closed}</dd></div></dl></div>
-      <div class="sg"><h4>Pull Requests</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.pullRequests.open}</dd></div><div class="dr"><dt>Merged</dt><dd>${repo.pullRequests.merged}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.pullRequests.closed}</dd></div></dl></div>
-      <div class="sg"><h4>People (90 d)</h4><dl><div class="dr"><dt>Committers</dt><dd>${repo.committerCount}</dd></div><div class="dr"><dt>Reviewers</dt><dd>${repo.reviewerCount}</dd></div></dl></div>
-      <div class="sg"><h4>Dependents</h4><dl><div class="dr"><dt>Repos</dt><dd>${repo.dependentCount}</dd></div></dl></div>
-    </div>
-    ${prTable}
-  </div>
-</div>`;
+  const repoId = repo.fullName
+    .replace(/[^a-zA-Z0-9]/g, "-")
+    .replace(/-+/g, "-");
+
+  const dataRow =
+    `<tr class="repo-row" ` +
+    `data-name="${escapeHtml(repo.fullName.toLowerCase())}" ` +
+    `data-open-issues="${repo.issues.open}" ` +
+    `data-merged-prs="${repo.pullRequests.merged}" ` +
+    `data-open-prs="${repo.pullRequests.open}" ` +
+    `data-contributors="${totalContrib}" ` +
+    `data-dependents="${repo.dependentCount}" ` +
+    `data-pushed="${escapeHtml(repo.pushedAt ?? "")}" ` +
+    `data-lines-added="${linesAdded}" ` +
+    `data-lines-deleted="${linesDeleted}" ` +
+    `data-repo-id="${repoId}">` +
+    `<td><div class="repo-name-cell">` +
+    `<button class="repo-expand-btn" onclick="toggleRepo(this)" aria-expanded="false" aria-label="Toggle details for ${escapeHtml(repo.fullName)}"><span class="chev" aria-hidden="true">&rsaquo;</span></button>` +
+    `<a class="rname" href="${repoUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(repo.fullName)}</a>` +
+    `<span class="bdg bdg-age"></span>` +
+    `</div></td>` +
+    `<td>${repo.issues.open}<span class="col-muted"> / ${repo.issues.closed}</span></td>` +
+    `<td>${repo.pullRequests.merged}</td>` +
+    `<td>${repo.pullRequests.open}</td>` +
+    `<td title="${repo.committerCount} committers, ${repo.reviewerCount} reviewers">${totalContrib}</td>` +
+    `<td>${repo.dependentCount}</td>` +
+    `<td>${pushedDate}</td>` +
+    `<td><span class="add">+${linesAdded}</span> <span class="del">-${linesDeleted}</span></td>` +
+    `</tr>`;
+
+  const detailRow =
+    `<tr class="repo-detail-row" id="detail-${repoId}" hidden>` +
+    `<td colspan="8" class="repo-detail-cell">` +
+    `<div class="stats-grid">` +
+    `<div class="sg"><h4>Issues</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.issues.open}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.issues.closed}</dd></div></dl></div>` +
+    `<div class="sg"><h4>Pull Requests</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.pullRequests.open}</dd></div><div class="dr"><dt>Merged</dt><dd>${repo.pullRequests.merged}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.pullRequests.closed}</dd></div></dl></div>` +
+    `<div class="sg"><h4>People (90 d)</h4><dl><div class="dr"><dt>Committers</dt><dd>${repo.committerCount}</dd></div><div class="dr"><dt>Reviewers</dt><dd>${repo.reviewerCount}</dd></div></dl></div>` +
+    `<div class="sg"><h4>Dependents</h4><dl><div class="dr"><dt>Repos</dt><dd>${repo.dependentCount}</dd></div></dl></div>` +
+    `</div>` +
+    prTable +
+    `</td>` +
+    `</tr>`;
+
+  return dataRow + "\n" + detailRow;
 }
 
 /* ------------------------------------------------------------------ */
@@ -418,27 +461,42 @@ a{color:var(--accent)}
   border:1px solid var(--border);border-radius:var(--rs);background:var(--card);color:var(--fg)}
 #repoFilter{width:220px}
 #repoFilter:focus,#repoSort:focus{outline:2px solid var(--accent);outline-offset:-1px}
-.repo-card{background:var(--card);border-radius:var(--rs);margin-bottom:.5rem;
-  box-shadow:var(--sh);overflow:hidden}
-.repo-hdr-row{display:flex;align-items:center}
-.repo-hdr{display:flex;flex:1;align-items:center;gap:.5rem;padding:.7rem 1rem;
-  border:none;background:none;color:inherit;font:inherit;cursor:pointer;text-align:left;transition:background .15s;min-width:0}
-.repo-hdr:hover{background:var(--accent-s)}
-.repo-gh-link{display:flex;align-items:center;justify-content:center;padding:.7rem .85rem;
-  font-size:1rem;color:var(--muted);text-decoration:none;transition:color .15s,background .15s;flex-shrink:0}
-.repo-gh-link:hover{color:var(--accent);background:var(--accent-s)}
-.repo-title{display:flex;align-items:center;gap:.4rem;flex:1;min-width:0}
-.chev{display:inline-block;font-size:1.1rem;font-weight:700;transition:transform .2s;
-  color:var(--muted);width:1rem;text-align:center}
-.repo-card.expanded .chev{transform:rotate(90deg)}
-.rname{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.repo-badges{display:flex;flex-wrap:wrap;gap:.35rem}
+.table-wrap{overflow-x:auto;border-radius:var(--r);box-shadow:var(--sh)}
+.repo-table{width:100%;border-collapse:collapse;background:var(--card);font-size:.85rem}
+.repo-table thead tr{border-bottom:2px solid var(--border)}
+.repo-table th{padding:.55rem .8rem;text-align:left;font-size:.75rem;text-transform:uppercase;
+  letter-spacing:.04em;color:var(--muted);font-weight:600;white-space:nowrap;background:var(--card);position:sticky;top:0;z-index:1}
+.repo-table td{padding:.5rem .8rem;border-bottom:1px solid var(--border);vertical-align:middle}
+.repo-row:hover>td{background:var(--accent-s)}
+.repo-row.expanded>td{background:var(--accent-s)}
+.repo-detail-cell{background:var(--bg);padding:1rem 1.25rem}
+.th-sortable{cursor:pointer;user-select:none}
+.th-sortable:hover{color:var(--accent)}
+.th-sortable.sort-active{color:var(--accent)}
+.sort-ind{margin-left:.3rem;font-size:.8rem;display:inline-block;min-width:.7rem}
+.repo-name-cell{display:flex;align-items:center;gap:.4rem;min-width:180px}
+.repo-expand-btn{display:inline-flex;align-items:center;justify-content:center;
+  width:1.4rem;height:1.4rem;border:none;background:none;color:var(--muted);
+  cursor:pointer;padding:0;flex-shrink:0;font-size:1.1rem;line-height:1}
+.repo-expand-btn:hover{color:var(--accent)}
+.chev{display:inline-block;transition:transform .2s}
+.repo-row.expanded .chev{transform:rotate(90deg)}
+.rname{font-weight:600;color:var(--accent);text-decoration:none;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.85rem}
+.rname:hover{text-decoration:underline}
+.col-muted{color:var(--muted);font-size:.8rem}
+.col-num{text-align:right}
+.col-date,.col-lines{white-space:nowrap}
+.grp-hdr-row{cursor:pointer;user-select:none}
+.grp-hdr-cell{padding:.5rem .8rem;font-size:.82rem;font-weight:600;
+  background:var(--bg);color:var(--muted);border-bottom:1px solid var(--border)}
+.grp-hdr-row:hover .grp-hdr-cell{color:var(--fg);background:var(--border)}
+.grp-chevron{display:inline-block;font-size:.75rem;transition:transform .2s;
+  color:var(--muted);margin-right:.4rem}
+.grp-hdr-row.expanded .grp-chevron{transform:rotate(90deg)}
+.grp-count{color:var(--muted);font-size:.8rem;font-weight:400}
 .bdg{font-size:.7rem;padding:.15rem .5rem;border-radius:999px;font-weight:500;white-space:nowrap}
-.bdg-issue{background:var(--warn-s);color:var(--warn)}
-.bdg-pr{background:var(--ok-s);color:var(--ok)}
-.bdg-ctr{background:var(--accent-s);color:var(--accent)}
-.bdg-dep{background:var(--err-s);color:var(--err)}
-.repo-body{padding:1rem;border-top:1px solid var(--border)}
+.bdg-age{background:var(--border);color:var(--muted)}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin-bottom:1rem}
 .sg h4{font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:.4rem}
 dl{display:flex;flex-direction:column;gap:.15rem}
@@ -459,27 +517,14 @@ dl{display:flex;flex-direction:column;gap:.15rem}
 .filter-btn:hover{border-color:var(--accent);color:var(--accent)}
 .filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
 .data-range{opacity:.82;font-size:.88rem}
-.repo-group{margin-bottom:.75rem}
-.repo-group-hdr{display:flex;align-items:center;gap:.5rem;padding:.65rem 1rem;cursor:pointer;
-  background:var(--card);border-radius:var(--rs);font-size:.9rem;font-weight:600;
-  list-style:none;box-shadow:var(--sh);user-select:none}
-.repo-group-hdr::-webkit-details-marker{display:none}
-.repo-group-hdr::marker{display:none}
-.repo-group-hdr:hover{background:var(--accent-s)}
-.grp-chevron{font-size:.75rem;transition:transform .2s;color:var(--muted);display:inline-block}
-details[open] .grp-chevron{transform:rotate(90deg)}
-.grp-label{flex:1}.grp-count{color:var(--muted);font-size:.8rem;font-weight:400}
-.grp-body{padding-top:.5rem}
-.bdg-age{background:var(--border);color:var(--muted)}
 footer{max-width:1120px;margin:0 auto;padding:1rem;text-align:center;font-size:.8rem;
   color:var(--muted);border-top:1px solid var(--border)}
 @media(max-width:640px){
   .charts{grid-template-columns:1fr}
   .hero{padding:1.5rem 1rem}.hero h1{font-size:1.4rem}
-  .repo-hdr{flex-direction:column;align-items:flex-start}
-  .repo-badges{margin-top:.3rem}
   .toolbar-ctrls{flex-direction:column;width:100%}
   #repoFilter{width:100%}
+  .col-date,.col-lines{display:none}
 }`;
 }
 
@@ -500,6 +545,7 @@ document.addEventListener("DOMContentLoaded",function(){
   if(typeof Chart!=="undefined"){renderCharts();}
   setupGroups();
   setupControls();
+  setupSortHeaders();
   setupFilter();
   applyFilter("30days");
 });
@@ -677,6 +723,11 @@ function applyFilter(period){
     if(prSub)prSub.textContent=prsOpened+" opened";
   }
 }
+function compareRows(a,b,by){
+  if(by==="name")return a.dataset.name.localeCompare(b.dataset.name);
+  if(by==="pushed"){var pa=a.dataset.pushed||"";var pb=b.dataset.pushed||"";return pb.localeCompare(pa);}
+  return Number(b.dataset[by]||0)-Number(a.dataset[by]||0);
+}
 function setupControls(){
   var f=document.getElementById("repoFilter");
   var st=document.getElementById("repoSort");
@@ -684,45 +735,81 @@ function setupControls(){
   var sh=document.getElementById("shown");
   if(!f||!list)return;
   function filterAndSort(){
-    var q=f.value.toLowerCase();var by=st.value;
+    var q=f.value.toLowerCase();var by=st?st.value:"name";
     var n=0;
-    var grpBodies=Array.from(list.querySelectorAll(".grp-body"));
-    if(grpBodies.length>0){
-      grpBodies.forEach(function(grpBody){
-        var groupCards=Array.from(grpBody.querySelectorAll(".repo-card"));
-        groupCards.sort(function(a,b){
-          if(by==="name")return a.dataset.name.localeCompare(b.dataset.name);
-          return Number(b.dataset[by])-Number(a.dataset[by]);
+    var tbody=list;
+    var grpHdrRows=Array.from(tbody.querySelectorAll("tr.grp-hdr-row"));
+    if(grpHdrRows.length>0){
+      grpHdrRows.forEach(function(hdrRow){
+        var grpId=hdrRow.dataset.grpId;
+        var dataRows=Array.from(tbody.querySelectorAll("tr.repo-row[data-grp-id='"+grpId+"']"));
+        dataRows.sort(function(a,b){return compareRows(a,b,by);});
+        // Find next group header to use as insertion point
+        var nextHdr=hdrRow.nextElementSibling;
+        while(nextHdr&&!nextHdr.classList.contains("grp-hdr-row")){nextHdr=nextHdr.nextElementSibling;}
+        // Remove rows from DOM then re-insert in sorted order before nextHdr
+        dataRows.forEach(function(row){
+          var dr=document.getElementById("detail-"+row.dataset.repoId);
+          if(row.parentNode)row.parentNode.removeChild(row);
+          if(dr&&dr.parentNode)dr.parentNode.removeChild(dr);
         });
-        groupCards.forEach(function(card){
-          var match=card.dataset.name.indexOf(q)!==-1;
-          card.style.display=match?"":"none";
-          if(match)n++;
-          grpBody.appendChild(card);
+        dataRows.forEach(function(row){
+          var match=row.dataset.name.indexOf(q)!==-1;
+          var grpHidden=!!row.dataset.grpHidden;
+          row.style.display=(!match||grpHidden)?"none":"";
+          if(match&&!grpHidden)n++;
+          tbody.insertBefore(row,nextHdr||null);
+          var dr=document.getElementById("detail-"+row.dataset.repoId);
+          if(dr){
+            if(!match||grpHidden)dr.style.display="none";
+            else dr.style.display=dr.hidden?"none":"";
+            tbody.insertBefore(dr,nextHdr||null);
+          }
         });
       });
-      Array.from(list.querySelectorAll(".repo-group")).forEach(function(grpEl){
-        if(grpEl.dataset.emptyGroup)return;
-        var visible=Array.from(grpEl.querySelectorAll(".repo-card")).filter(function(c){return c.style.display!=="none";}).length;
-        grpEl.style.display=visible>0?"":"none";
+      // Hide group headers whose rows are all filtered out
+      grpHdrRows.forEach(function(hdrRow){
+        var grpId=hdrRow.dataset.grpId;
+        var visible=Array.from(tbody.querySelectorAll("tr.repo-row[data-grp-id='"+grpId+"']"))
+          .filter(function(r){return r.style.display!=="none";}).length;
+        hdrRow.style.display=visible>0?"":"none";
       });
     }else{
-      var allCards=Array.from(list.querySelectorAll(".repo-card"));
-      allCards.sort(function(a,b){
-        if(by==="name")return a.dataset.name.localeCompare(b.dataset.name);
-        return Number(b.dataset[by])-Number(a.dataset[by]);
-      });
-      allCards.forEach(function(card){
-        var match=card.dataset.name.indexOf(q)!==-1;
-        card.style.display=match?"":"none";
+      var allDataRows=Array.from(tbody.querySelectorAll("tr.repo-row"));
+      allDataRows.sort(function(a,b){return compareRows(a,b,by);});
+      allDataRows.forEach(function(row){
+        var match=row.dataset.name.indexOf(q)!==-1;
+        row.style.display=match?"":"none";
         if(match)n++;
-        list.appendChild(card);
+        tbody.appendChild(row);
+        var dr=document.getElementById("detail-"+row.dataset.repoId);
+        if(dr){
+          if(!match)dr.style.display="none";
+          else dr.style.display=dr.hidden?"none":"";
+          tbody.appendChild(dr);
+        }
       });
     }
     if(sh)sh.textContent=String(n);
   }
   f.addEventListener("input",filterAndSort);
-  st.addEventListener("change",filterAndSort);
+  if(st)st.addEventListener("change",filterAndSort);
+}
+function setupSortHeaders(){
+  var st=document.getElementById("repoSort");
+  document.querySelectorAll(".th-sortable").forEach(function(th){
+    th.addEventListener("click",function(){
+      var sortKey=th.dataset.sort;
+      document.querySelectorAll(".th-sortable").forEach(function(h){
+        h.classList.remove("sort-active");
+        var ind=h.querySelector(".sort-ind");if(ind)ind.textContent="";
+      });
+      th.classList.add("sort-active");
+      var ind=th.querySelector(".sort-ind");
+      if(ind)ind.textContent=(sortKey==="name"||sortKey==="pushed")?"↑":"↓";
+      if(st){st.value=sortKey;st.dispatchEvent(new Event("change"));}
+    });
+  });
 }
 function setupGroups(){
   var now=Date.now();
@@ -732,43 +819,67 @@ function setupGroups(){
     {id:"grp-halfyear",label:"Last Half Year",maxDays:180},
     {id:"grp-older",label:"Older",maxDays:Infinity}
   ];
-  var list=document.getElementById("repoList");
-  if(!list)return;
-  var cards=Array.from(list.querySelectorAll(".repo-card"));
-  cards.forEach(function(c){c.parentNode.removeChild(c);});
-  groupDefs.forEach(function(g){
-    var el=document.createElement("div");
-    el.id=g.id;
-    el.className="repo-group";
-    el.innerHTML='<details><summary class="repo-group-hdr"><span class="grp-chevron">&#9654;</span><span class="grp-label">'+g.label+'</span><span class="grp-count"></span></summary><div class="grp-body"></div></details>';
-    list.appendChild(el);
-  });
-  cards.forEach(function(card){
-    var pushed=card.dataset.pushed;
+  var tbody=document.getElementById("repoList");
+  if(!tbody)return;
+  var dataRows=Array.from(tbody.querySelectorAll("tr.repo-row"));
+  var allRows=Array.from(tbody.querySelectorAll("tr"));
+  allRows.forEach(function(r){if(r.parentNode)r.parentNode.removeChild(r);});
+  var groups={};
+  groupDefs.forEach(function(g){groups[g.id]=[];});
+  dataRows.forEach(function(row){
+    var pushed=row.dataset.pushed;
     var days=pushed&&pushed.length>0?utcDaysSince(pushed,now):Infinity;
     var targetId=groupDefs[groupDefs.length-1].id;
-    for(var i=0;i<groupDefs.length;i++){
-      if(days<=groupDefs[i].maxDays){targetId=groupDefs[i].id;break;}
-    }
-    var ageBadge=card.querySelector(".bdg-age");
-    if(ageBadge){
-      var ageStr=computeAge(days);
-      ageBadge.textContent=ageStr;
-      if(!ageStr)ageBadge.style.display="none";
-    }
-    document.getElementById(targetId).querySelector(".grp-body").appendChild(card);
+    for(var i=0;i<groupDefs.length;i++){if(days<=groupDefs[i].maxDays){targetId=groupDefs[i].id;break;}}
+    var ageBadge=row.querySelector(".bdg-age");
+    if(ageBadge){var ageStr=computeAge(days);ageBadge.textContent=ageStr;ageBadge.style.display=ageStr?"":"none";}
+    row.dataset.grpId=targetId;
+    var dr=document.getElementById("detail-"+row.dataset.repoId);
+    if(dr)dr.dataset.grpId=targetId;
+    groups[targetId].push(row);
   });
   var firstOpened=false;
   groupDefs.forEach(function(g){
-    var grpEl=document.getElementById(g.id);
-    var count=grpEl.querySelectorAll(".repo-card").length;
-    grpEl.querySelector(".grp-count").textContent=count?" ("+count+")":"";
-    if(count===0){
-      grpEl.style.display="none";
-      grpEl.dataset.emptyGroup="1";
-    }else if(!firstOpened){
-      grpEl.querySelector("details").open=true;
+    var grpRows=groups[g.id];
+    if(grpRows.length===0)return;
+    var hdrTr=document.createElement("tr");
+    hdrTr.className="grp-hdr-row";
+    hdrTr.dataset.grpId=g.id;
+    hdrTr.innerHTML='<td colspan="8" class="grp-hdr-cell"><span class="grp-chevron">&#9654;</span><span class="grp-label">'+g.label+'</span><span class="grp-count"> ('+grpRows.length+')</span></td>';
+    hdrTr.addEventListener("click",function(){toggleGroup(g.id);});
+    tbody.appendChild(hdrTr);
+    grpRows.forEach(function(row){
+      tbody.appendChild(row);
+      var dr=document.getElementById("detail-"+row.dataset.repoId);
+      if(dr)tbody.appendChild(dr);
+    });
+    if(!firstOpened){
       firstOpened=true;
+      hdrTr.classList.add("expanded");
+    }else{
+      grpRows.forEach(function(row){
+        row.style.display="none";row.dataset.grpHidden="1";
+        var dr=document.getElementById("detail-"+row.dataset.repoId);
+        if(dr){dr.style.display="none";dr.dataset.grpHidden="1";}
+      });
+    }
+  });
+}
+function toggleGroup(grpId){
+  var hdrRow=document.querySelector(".grp-hdr-row[data-grp-id='"+grpId+"']");
+  if(!hdrRow)return;
+  var expanded=hdrRow.classList.toggle("expanded");
+  var tbody=document.getElementById("repoList");
+  var dataRows=Array.from(tbody.querySelectorAll("tr.repo-row[data-grp-id='"+grpId+"']"));
+  dataRows.forEach(function(row){
+    if(expanded){
+      delete row.dataset.grpHidden;
+      row.style.display="";
+    }else{
+      row.dataset.grpHidden="1";
+      row.style.display="none";
+      var dr=document.getElementById("detail-"+row.dataset.repoId);
+      if(dr){dr.style.display="none";dr.dataset.grpHidden="1";}
     }
   });
 }
@@ -791,13 +902,14 @@ function computeAge(days){
   return Math.floor(days/365)+"y";
 }
 function toggleRepo(btn){
-  var card=btn.closest(".repo-card");
-  var body=card.querySelector(".repo-body");
+  var row=btn.closest("tr.repo-row");
+  if(!row)return;
+  var repoId=row.dataset.repoId;
+  var dr=document.getElementById("detail-"+repoId);
   var exp=btn.getAttribute("aria-expanded")==="true";
   btn.setAttribute("aria-expanded",String(!exp));
-  body.hidden=exp;
-  card.classList.toggle("expanded");
+  if(dr){dr.hidden=exp;dr.style.display=exp?"none":"";}
+  row.classList.toggle("expanded");
 }`;
 }
-
 main();
