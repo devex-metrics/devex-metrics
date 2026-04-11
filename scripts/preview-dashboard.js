@@ -10,6 +10,10 @@ if (!owner) {
 }
 
 try {
+  console.log('Installing dependencies (npm ci)...');
+  // npm ci is idempotent and ensures local devDependencies like tsc are available
+  execSync('npm ci', { stdio: 'inherit' });
+
   console.log('Building TypeScript (npm run build)...');
   execSync('npm run build', { stdio: 'inherit' });
 
