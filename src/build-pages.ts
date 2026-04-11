@@ -560,7 +560,7 @@ function setupGroups(){
     var el=document.createElement("div");
     el.id=g.id;
     el.className="repo-group";
-    el.innerHTML="<details><summary class=\"repo-group-hdr\"><span class=\"grp-chevron\">&#9654;</span><span class=\"grp-label\">"+g.label+"</span><span class=\"grp-count\"></span></summary><div class=\"grp-body\"></div></details>";
+    el.innerHTML='<details><summary class="repo-group-hdr"><span class="grp-chevron">&#9654;</span><span class="grp-label">'+g.label+'</span><span class="grp-count"></span></summary><div class="grp-body"></div></details>';
     list.appendChild(el);
   });
   cards.forEach(function(card){
