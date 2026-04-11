@@ -414,6 +414,7 @@ function renderCharts(){
   if(CHART_DATA.weeklyTrends&&CHART_DATA.weeklyTrends.length>0){
     var tLabels=CHART_DATA.weeklyTrends.map(function(t){return t.week;});
     var lineOpts={responsive:true,maintainAspectRatio:true,
+      interaction:{mode:"index",intersect:false},
       scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cssVar("--border")}}},
       plugins:{legend:{position:"top",align:"end"}}};
     new Chart(document.getElementById("chartPRTrends"),{type:"line",
@@ -421,14 +422,14 @@ function renderCharts(){
         {label:"Opened",data:CHART_DATA.weeklyTrends.map(function(t){return t.prsOpened;}),
           borderColor:cssVar("--accent"),backgroundColor:cssVar("--accent-s"),tension:0.3,fill:true,pointRadius:3},
         {label:"Merged",data:CHART_DATA.weeklyTrends.map(function(t){return t.prsMerged;}),
-          borderColor:cssVar("--ok"),backgroundColor:cssVar("--ok-s"),tension:0.3,fill:true,pointRadius:3}]},
+          borderColor:cssVar("--ok"),backgroundColor:cssVar("--ok-s"),tension:0.3,fill:true,pointRadius:3,borderDash:[5,4]}]},
       options:lineOpts});
     new Chart(document.getElementById("chartIssueTrends"),{type:"line",
       data:{labels:tLabels,datasets:[
         {label:"Opened",data:CHART_DATA.weeklyTrends.map(function(t){return t.issuesOpened;}),
           borderColor:cssVar("--warn"),backgroundColor:cssVar("--warn-s"),tension:0.3,fill:true,pointRadius:3},
         {label:"Closed",data:CHART_DATA.weeklyTrends.map(function(t){return t.issuesClosed;}),
-          borderColor:cssVar("--ok"),backgroundColor:cssVar("--ok-s"),tension:0.3,fill:true,pointRadius:3}]},
+          borderColor:cssVar("--ok"),backgroundColor:cssVar("--ok-s"),tension:0.3,fill:true,pointRadius:3,borderDash:[5,4]}]},
       options:lineOpts});
   }
 }
