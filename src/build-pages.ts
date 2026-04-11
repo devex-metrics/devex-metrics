@@ -586,7 +586,7 @@ function renderCharts(){
         datasets:[{label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
           {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}]},
       options:{indexAxis:"y",responsive:true,
-        scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{display:false}}},
+        scales:{x:{stacked:true,grid:{display:false}},y:{grid:{display:false}}},
         plugins:{legend:{position:"top",align:"end"}}}});
   }
   if(CHART_DATA.weeklyTrends&&CHART_DATA.weeklyTrends.length>0){
@@ -597,23 +597,23 @@ function renderCharts(){
     charts.prTrends=new Chart(document.getElementById("chartPRTrends"),{type:"line",
       data:{labels:tLabels,datasets:[
         {label:"Opened",data:CHART_DATA.weeklyTrends.map(function(t){return t.prsOpened;}),
-          borderColor:cssColors.accent,backgroundColor:cssColors.accentS,tension:0.3,fill:true,pointRadius:3},
+          borderColor:cssColors.accent,backgroundColor:'transparent',tension:0.3,fill:false,pointRadius:3},
         {label:"Merged",data:CHART_DATA.weeklyTrends.map(function(t){return t.prsMerged;}),
-          borderColor:cssColors.ok,backgroundColor:cssColors.okS,tension:0.3,fill:true,pointRadius:3}]},
+          borderColor:cssColors.ok,backgroundColor:'transparent',tension:0.3,fill:false,pointRadius:3}]},
       options:lineOpts});
     charts.issueTrends=new Chart(document.getElementById("chartIssueTrends"),{type:"line",
       data:{labels:tLabels,datasets:[
         {label:"Opened",data:CHART_DATA.weeklyTrends.map(function(t){return t.issuesOpened;}),
-          borderColor:cssColors.warn,backgroundColor:cssColors.warnS,tension:0.3,fill:true,pointRadius:3},
+          borderColor:cssColors.warn,backgroundColor:'transparent',tension:0.3,fill:false,pointRadius:3},
         {label:"Closed",data:CHART_DATA.weeklyTrends.map(function(t){return t.issuesClosed;}),
-          borderColor:cssColors.ok,backgroundColor:cssColors.okS,tension:0.3,fill:true,pointRadius:3}]},
+          borderColor:cssColors.ok,backgroundColor:'transparent',tension:0.3,fill:false,pointRadius:3}]},
       options:lineOpts});
     charts.prSizeTrends=new Chart(document.getElementById("chartPRSizeTrends"),{type:"line",
       data:{labels:tLabels,datasets:[
         {label:"Lines Added",data:CHART_DATA.weeklyTrends.map(function(t){return t.linesAdded;}),
-          borderColor:cssColors.ok,backgroundColor:cssColors.okS,tension:0.3,fill:true,pointRadius:3},
+          borderColor:cssColors.ok,backgroundColor:'transparent',tension:0.3,fill:false,pointRadius:3},
         {label:"Lines Removed",data:CHART_DATA.weeklyTrends.map(function(t){return t.linesDeleted;}),
-          borderColor:cssColors.err,backgroundColor:cssColors.errS,tension:0.3,fill:true,pointRadius:3}]},
+          borderColor:cssColors.err,backgroundColor:'transparent',tension:0.3,fill:false,pointRadius:3}]},
       options:lineOpts});
   }
 }
