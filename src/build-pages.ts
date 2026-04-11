@@ -286,7 +286,9 @@ function buildRepoCard(repo: RepoMetrics): string {
     repo.pullRequests.closed;
   const totalContrib = repo.committerCount + repo.reviewerCount;
 
+  const repoUrl = `https://github.com/${escapeHtml(repo.fullName)}`;
   return `<div class="repo-card" data-name="${escapeHtml(repo.fullName.toLowerCase())}" data-issues="${totalIssues}" data-prs="${totalPRs}" data-contributors="${totalContrib}" data-pushed="${escapeHtml(repo.pushedAt ?? "")}">
+  <div class="repo-hdr-row">
   <button class="repo-hdr" aria-expanded="false" aria-label="Toggle details for ${escapeHtml(repo.fullName)}" onclick="toggleRepo(this)">
     <span class="repo-title"><span class="chev" aria-hidden="true">&rsaquo;</span><span class="rname">${escapeHtml(repo.fullName)}</span></span>
     <span class="repo-badges">
@@ -295,6 +297,8 @@ function buildRepoCard(repo: RepoMetrics): string {
       <span class="bdg bdg-ctr">${totalContrib} contrib</span>${repo.dependentCount > 0 ? `<span class="bdg bdg-dep">${repo.dependentCount} dep</span>` : ""}<span class="bdg bdg-age"></span>
     </span>
   </button>
+  <a class="repo-gh-link" href="${repoUrl}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(repo.fullName)} on GitHub" title="Open on GitHub" onclick="event.stopPropagation()">&#x2197;</a>
+  </div>
   <div class="repo-body" hidden>
     <div class="stats-grid">
       <div class="sg"><h4>Issues</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.issues.open}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.issues.closed}</dd></div></dl></div>
@@ -361,9 +365,13 @@ a{color:var(--accent)}
 #repoFilter:focus,#repoSort:focus{outline:2px solid var(--accent);outline-offset:-1px}
 .repo-card{background:var(--card);border-radius:var(--rs);margin-bottom:.5rem;
   box-shadow:var(--sh);overflow:hidden}
-.repo-hdr{display:flex;width:100%;align-items:center;gap:.5rem;padding:.7rem 1rem;
-  border:none;background:none;color:inherit;font:inherit;cursor:pointer;text-align:left;transition:background .15s}
+.repo-hdr-row{display:flex;align-items:center}
+.repo-hdr{display:flex;flex:1;align-items:center;gap:.5rem;padding:.7rem 1rem;
+  border:none;background:none;color:inherit;font:inherit;cursor:pointer;text-align:left;transition:background .15s;min-width:0}
 .repo-hdr:hover{background:var(--accent-s)}
+.repo-gh-link{display:flex;align-items:center;justify-content:center;padding:.7rem .85rem;
+  font-size:1rem;color:var(--muted);text-decoration:none;transition:color .15s,background .15s;flex-shrink:0}
+.repo-gh-link:hover{color:var(--accent);background:var(--accent-s)}
 .repo-title{display:flex;align-items:center;gap:.4rem;flex:1;min-width:0}
 .chev{display:inline-block;font-size:1.1rem;font-weight:700;transition:transform .2s;
   color:var(--muted);width:1rem;text-align:center}
