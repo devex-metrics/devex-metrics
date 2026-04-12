@@ -3,12 +3,10 @@ import { setOctokit, resetOctokit } from "../github-client.js";
 import { Octokit } from "@octokit/rest";
 import { collectIssueCounts } from "./issues.js";
 
-/** Build a fake Octokit whose list endpoints return controlled Link headers. */
+/** Build a fake Octokit whose issues list endpoint returns controlled Link headers. */
 function buildMockOctokit(opts: {
   openIssuesTotal: number;
   closedIssuesTotal: number;
-  openPrsTotal: number;
-  closedPrsTotal: number;
 }) {
   function fakeResponse(total: number) {
     const data = total > 0 ? [{ id: 1 }] : [];
@@ -25,10 +23,6 @@ function buildMockOctokit(opts: {
         listForRepo: ({ state }: { state: string }) =>
           fakeResponse(state === "open" ? opts.openIssuesTotal : opts.closedIssuesTotal),
       },
-      pulls: {
-        list: ({ state }: { state: string }) =>
-          fakeResponse(state === "open" ? opts.openPrsTotal : opts.closedPrsTotal),
-      },
     },
   } as unknown as Octokit;
 }
@@ -36,13 +30,11 @@ function buildMockOctokit(opts: {
 describe("collectIssueCounts", () => {
   afterEach(() => resetOctokit());
 
-  it("should return correct counts when issues and PRs exist", async () => {
+  it("should return issue counts directly from the issues API", async () => {
     setOctokit(
       buildMockOctokit({
-        openIssuesTotal: 10,  // includes PRs
-        closedIssuesTotal: 20,
-        openPrsTotal: 3,
-        closedPrsTotal: 5,
+        openIssuesTotal: 7,
+        closedIssuesTotal: 15,
       })
     );
 
@@ -55,22 +47,6 @@ describe("collectIssueCounts", () => {
       buildMockOctokit({
         openIssuesTotal: 0,
         closedIssuesTotal: 0,
-        openPrsTotal: 0,
-        closedPrsTotal: 0,
-      })
-    );
-
-    const counts = await collectIssueCounts("owner", "repo");
-    expect(counts).toEqual({ open: 0, closed: 0 });
-  });
-
-  it("should return zero issues when all items are PRs", async () => {
-    setOctokit(
-      buildMockOctokit({
-        openIssuesTotal: 5,
-        closedIssuesTotal: 3,
-        openPrsTotal: 5,
-        closedPrsTotal: 3,
       })
     );
 
@@ -83,9 +59,6 @@ describe("collectIssueCounts", () => {
       rest: {
         issues: {
           listForRepo: () => Promise.reject(Object.assign(new Error("Not Found"), { status: 404 })),
-        },
-        pulls: {
-          list: () => Promise.reject(Object.assign(new Error("Not Found"), { status: 404 })),
         },
       },
     } as unknown as Octokit;
@@ -101,9 +74,6 @@ describe("collectIssueCounts", () => {
         issues: {
           listForRepo: () => Promise.reject(Object.assign(new Error("Server Error"), { status: 500 })),
         },
-        pulls: {
-          list: () => Promise.reject(Object.assign(new Error("Server Error"), { status: 500 })),
-        },
       },
     } as unknown as Octokit;
     setOctokit(mockOctokit);
@@ -117,9 +87,6 @@ describe("collectIssueCounts", () => {
       rest: {
         issues: {
           listForRepo: () => Promise.reject(Object.assign(new Error("Forbidden"), { status: 403 })),
-        },
-        pulls: {
-          list: () => Promise.reject(Object.assign(new Error("Forbidden"), { status: 403 })),
         },
       },
     } as unknown as Octokit;
