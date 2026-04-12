@@ -103,8 +103,8 @@ function aggregate(repos: RepoMetrics[]): Totals {
     committers = 0,
     reviewers = 0;
   for (const r of repos) {
-    openIssues += r.issues.open;
-    closedIssues += r.issues.closed;
+    openIssues += Math.max(0, r.issues.open);
+    closedIssues += Math.max(0, r.issues.closed);
     openPRs += r.pullRequests.open;
     mergedPRs += r.pullRequests.merged;
     closedPRs += r.pullRequests.closed;
@@ -170,7 +170,7 @@ function buildDashboardHtml(
   const topRepos = [...data.repos]
     .map((r) => ({
       name: r.name,
-      issues: r.issues.open + r.issues.closed,
+      issues: Math.max(0, r.issues.open) + Math.max(0, r.issues.closed),
       prs:
         r.pullRequests.open + r.pullRequests.merged + r.pullRequests.closed,
     }))
