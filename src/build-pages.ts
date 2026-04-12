@@ -584,7 +584,7 @@ function renderCharts(){
     chart.data.datasets.forEach(function(ds){
       var base=ds._gradBase;if(!base)return;
       var g=ctx.createLinearGradient(ca.left,0,ca.right,0);
-      g.addColorStop(0,base);g.addColorStop(1,base+"55");
+      g.addColorStop(0,base+"55");g.addColorStop(1,base);
       ds.backgroundColor=g;
     });
   }});
@@ -604,7 +604,7 @@ function renderCharts(){
         datasets:[{label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
           {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}]},
       options:{indexAxis:"y",responsive:true,
-        scales:{x:{stacked:false,grid:{display:false}},y:{stacked:false,grid:{display:false}}},
+        scales:{x:{stacked:true,grid:{display:false}},y:{stacked:false,grid:{display:false}}},
         plugins:{legend:{position:"top",align:"end",onClick:function(e,item,legend){
           reposVisibility[item.datasetIndex]=!reposVisibility[item.datasetIndex];
           legend.chart.setDatasetVisibility(item.datasetIndex,reposVisibility[item.datasetIndex]);
