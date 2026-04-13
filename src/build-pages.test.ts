@@ -3,6 +3,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { execFileSync } from "node:child_process";
 import { JSDOM } from "jsdom";
+import { CURRENT_SCHEMA_VERSION } from "./cache.js";
 import type { CacheEnvelope } from "./types.js";
 
 describe("build-pages", () => {
@@ -15,6 +16,7 @@ describe("build-pages", () => {
     const envelope: CacheEnvelope = {
       date: "2026-03-28",
       data: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         owner: "test-pages-owner",
         ownerType: "org",
         collectedAt: "2026-03-28T12:00:00Z",
@@ -134,6 +136,7 @@ describe("build-pages", () => {
     const envelope: CacheEnvelope = {
       date: "2026-03-28",
       data: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         owner: "test-pages-owner",
         ownerType: "org",
         collectedAt: "2026-03-28T12:00:00Z",
@@ -167,6 +170,7 @@ describe("build-pages", () => {
     const envelope: CacheEnvelope = {
       date: "2026-03-28",
       data: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         owner: "test-pages-owner",
         ownerType: "org",
         collectedAt: "2026-03-28T12:00:00Z",
@@ -229,6 +233,7 @@ describe("build-pages", () => {
     const envelopeWithTrends: CacheEnvelope = {
       date: "2026-03-28",
       data: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         owner: "test-pages-owner",
         ownerType: "org",
         collectedAt: "2026-03-28T12:00:00Z",
@@ -317,6 +322,7 @@ describe("build-pages", () => {
     const oldEnvelope: CacheEnvelope = {
       date: "2026-03-28",
       data: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         owner: "test-pages-owner",
         ownerType: "org",
         collectedAt: "2026-03-28T12:00:00Z",
@@ -360,6 +366,7 @@ describe("build-pages", () => {
     const envelope: CacheEnvelope = {
       date: "2026-03-28",
       data: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         owner: "test-pages-owner",
         ownerType: "org",
         collectedAt: "2026-03-28T12:00:00Z",
@@ -438,6 +445,7 @@ describe("build-pages", () => {
     if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
     try {
       const fixtureData = {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
         owner: "test-pages-owner",
         ownerType: "org",
         collectedAt: "2026-03-28T08:00:00Z",
@@ -467,5 +475,50 @@ describe("build-pages", () => {
     } finally {
       if (fs.existsSync(fixtureFile)) fs.unlinkSync(fixtureFile);
     }
+  });
+
+  it("should exit with error when fixture has a stale schema version", () => {
+    const fixtureFile = path.join(dataDir, "test-pages-owner.fixture.json");
+    if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
+    try {
+      const staleFixture = {
+        schemaVersion: 1,
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-03-28T08:00:00Z",
+        repoCount: 1,
+        repos: [],
+      };
+      fs.writeFileSync(fixtureFile, JSON.stringify(staleFixture));
+
+      expect(() =>
+        execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+          cwd: process.cwd(),
+        })
+      ).toThrow();
+    } finally {
+      if (fs.existsSync(fixtureFile)) fs.unlinkSync(fixtureFile);
+    }
+  });
+
+  it("should exit with error when cache file has a stale schema version", () => {
+    const staleEnvelope = {
+      date: "2026-03-28",
+      data: {
+        schemaVersion: 1,
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-03-28T12:00:00Z",
+        repoCount: 0,
+        repos: [],
+      },
+    };
+    fs.writeFileSync(cacheFile, JSON.stringify(staleEnvelope));
+
+    expect(() =>
+      execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+        cwd: process.cwd(),
+      })
+    ).toThrow();
   });
 });

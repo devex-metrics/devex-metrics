@@ -1,6 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { generateReport } from "./report.js";
+import { CURRENT_SCHEMA_VERSION } from "./cache.js";
 import type { CacheEnvelope, OrgMetrics, RepoMetrics } from "./types.js";
 
 /**
@@ -28,10 +29,25 @@ function main(): void {
 
   let envelope: CacheEnvelope;
   if (fs.existsSync(cacheFile)) {
-    envelope = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as CacheEnvelope;
+    const raw = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as CacheEnvelope;
+    if (raw.data?.schemaVersion !== CURRENT_SCHEMA_VERSION) {
+      console.error(
+        `Cache file schema version ${raw.data?.schemaVersion ?? "none"} does not match ` +
+        `current version ${CURRENT_SCHEMA_VERSION}. Please re-run data collection.`
+      );
+      process.exit(1);
+    }
+    envelope = raw;
   } else if (fs.existsSync(fixtureFile)) {
     console.log(`No daily cache found; falling back to fixture at ${fixtureFile}`);
     const data = JSON.parse(fs.readFileSync(fixtureFile, "utf-8")) as OrgMetrics;
+    if (data.schemaVersion !== CURRENT_SCHEMA_VERSION) {
+      console.error(
+        `Fixture schema version ${data.schemaVersion ?? "none"} does not match ` +
+        `current version ${CURRENT_SCHEMA_VERSION}. Fixture is stale — re-run collection to regenerate it.`
+      );
+      process.exit(1);
+    }
     envelope = { date: data.collectedAt.slice(0, 10), data };
   } else {
     console.error(`No data found at ${cacheFile} or ${fixtureFile}`);
