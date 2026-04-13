@@ -295,8 +295,8 @@ function buildDashboardHtml(
   <h1>DevEx Metrics</h1>
 </header>
 
-<main>
-  <div class="filter-bar" role="toolbar" aria-label="Time period filter">
+<div class="filter-bar" role="toolbar" aria-label="Time period filter">
+  <div class="filter-bar-inner">
     <span class="filter-label">Period:</span>
     <div class="filter-btns">
       <button class="filter-btn" data-period="all">All Time</button>
@@ -308,7 +308,9 @@ function buildDashboardHtml(
       <input type="checkbox" id="excludeBots" /> Exclude bots
     </label>
   </div>
+</div>
 
+<main>
   <section class="kpis" aria-label="Key metrics">
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x1F4E6;</div>
@@ -527,7 +529,7 @@ function getCSS(): string {
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
   color:var(--fg);background:var(--bg);line-height:1.55;min-height:100vh}
-main{max-width:1400px;margin:0 auto;padding:0 1rem 2rem}
+main{max-width:1400px;margin:0 auto;padding:1.5rem 1rem 2rem}
 a{color:var(--accent)}
 .hero{background:linear-gradient(135deg,#0969da 0%,#8250df 100%);color:#fff;
   padding:2.5rem 2rem;text-align:center;margin-bottom:2rem}
@@ -617,11 +619,12 @@ dl{display:flex;flex-direction:column;gap:.15rem}
 .pr-tbl th{color:var(--muted);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.03em}
 .add{color:var(--ok);font-weight:600}.del{color:var(--err);font-weight:600}
 .repo-count{text-align:center;font-size:.8rem;color:var(--muted);margin-top:.75rem}
-.filter-bar{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;flex-wrap:wrap;
-  background:var(--card);border-radius:var(--r);padding:.75rem 1rem;box-shadow:var(--sh)}
+.filter-bar{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--border);
+  box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:0}
+.filter-bar-inner{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;
+  max-width:1400px;margin:0 auto;padding:.65rem 1rem}
 .filter-label{font-size:.85rem;color:var(--muted);font-weight:500;white-space:nowrap}
 .filter-btns{display:flex;gap:.4rem;flex-wrap:wrap}
-.repos-period-note{font-size:.78rem;color:var(--muted);margin:.25rem 0 .6rem;padding:.3rem .5rem;background:var(--accent-s);border-left:3px solid var(--accent);border-radius:0 var(--rs) var(--rs) 0}
 .repos-period-note{font-size:.78rem;color:var(--muted);margin:.25rem 0 .6rem;padding:.3rem .5rem;background:var(--accent-s);border-left:3px solid var(--accent);border-radius:0 var(--rs) var(--rs) 0}
 .filter-btn{font:inherit;font-size:.8rem;padding:.3rem .8rem;border:1px solid var(--border);
   border-radius:999px;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
