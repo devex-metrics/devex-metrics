@@ -692,10 +692,10 @@ function renderCharts(){
   if(CHART_DATA.topRepos.length>0){
     charts.repos=new Chart(document.getElementById("chartRepos"),{type:"bar",
       data:{labels:CHART_DATA.topRepos.map(function(r){return r.name;}),
-        datasets:[{label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
-          {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}]},
+        datasets:[{label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),xAxisID:"xIssues",_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
+          {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),xAxisID:"xPRs",_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}]},
       options:{indexAxis:"y",responsive:true,
-        scales:{x:{stacked:true,grid:{display:false}},y:{stacked:false,grid:{display:false}}},
+        scales:{xPRs:{position:"bottom",stacked:false,grid:{display:false},beginAtZero:true},xIssues:{position:"top",stacked:false,grid:{display:false},beginAtZero:true},y:{stacked:false,grid:{display:false}}},
         plugins:{legend:{position:"top",align:"end",onClick:function(e,item,legend){
           reposVisibility[item.datasetIndex]=!reposVisibility[item.datasetIndex];
           legend.chart.setDatasetVisibility(item.datasetIndex,reposVisibility[item.datasetIndex]);
@@ -861,8 +861,8 @@ function applyFilter(period){
     if(period==="all"){
       charts.repos.data.labels=CHART_DATA.topRepos.map(function(r){return r.name;});
       charts.repos.data.datasets=[
-        {label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
-        {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}];
+        {label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),xAxisID:"xIssues",_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
+        {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),xAxisID:"xPRs",_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}];
       if(titleEl)titleEl.textContent="Top Repositories";
     }else{
       var counts={};
@@ -873,8 +873,8 @@ function applyFilter(period){
       }).sort(function(a,b){return b.prs-a.prs;}).slice(0,15);
       charts.repos.data.labels=topFiltered.map(function(r){return r.name;});
       charts.repos.data.datasets=[
-        {label:"Issues",data:topFiltered.map(function(r){return r.issues;}),_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
-        {label:"Pull Requests",data:topFiltered.map(function(r){return r.prs;}),_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}];
+        {label:"Issues",data:topFiltered.map(function(r){return r.issues;}),xAxisID:"xIssues",_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
+        {label:"Pull Requests",data:topFiltered.map(function(r){return r.prs;}),xAxisID:"xPRs",_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}];
       var periodLabel=period==="year"?"This Year":period==="90days"?"Last 90 Days":"Last 30 Days";
       if(titleEl)titleEl.textContent="Top Repositories \u2014 "+periodLabel;
     }
