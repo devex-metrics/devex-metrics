@@ -1,6 +1,36 @@
 import { getOctokit } from "../github-client.js";
 import { getCountFromLinkHeader } from "../link-header.js";
-import type { PullRequestCounts, PullRequestDetail } from "../types.js";
+import type {
+  PullRequestCounts,
+  PullRequestDetail,
+  MergedPRSummary,
+  CopilotAdoption,
+} from "../types.js";
+
+const COPILOT_LOGIN = "copilot[bot]";
+
+/**
+ * Extract issue numbers from a PR body that use closing keywords.
+ * Matches: Fixes #123, closes #45, Resolves #9, etc.
+ */
+export function parseIssueRefs(body: string | null | undefined): number[] {
+  if (!body) return [];
+  const pattern = /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/gi;
+  const nums = new Set<number>();
+  let m: RegExpExecArray | null;
+  while ((m = pattern.exec(body)) !== null) {
+    nums.add(Number(m[1]));
+  }
+  return [...nums];
+}
+
+function isBotLogin(login: string): boolean {
+  return login.endsWith("[bot]");
+}
+
+function hoursBetween(a: string, b: string): number {
+  return Math.max(0, (new Date(b).getTime() - new Date(a).getTime()) / 3_600_000);
+}
 
 /**
  * Count open, closed and merged pull requests for a repository.
@@ -54,6 +84,7 @@ export async function collectPullRequestCounts(
 
 /**
  * Collect detailed metrics for the most recent merged PRs (up to `limit`).
+ * Includes Copilot authorship/review detection.
  */
 export async function collectPullRequestDetails(
   owner: string,
@@ -119,15 +150,41 @@ export async function collectPullRequestDetails(
         // Check runs may not be accessible; leave as 0
       }
 
+      // Detect Copilot review
+      let hasCopilotReview = false;
+      try {
+        const { data: reviews } = await octokit.rest.pulls.listReviews({
+          owner,
+          repo,
+          pull_number: pr.number,
+          per_page: 100,
+        });
+        hasCopilotReview = reviews.some(
+          (r) => r.user?.login?.toLowerCase() === COPILOT_LOGIN,
+        );
+      } catch {
+        // Reviews may not be accessible
+      }
+
+      const authorLogin = pr.user?.login ?? "unknown";
+      const isCopilotAuthored = authorLogin.toLowerCase() === COPILOT_LOGIN;
+
       details.push({
         number: pr.number,
         title: pr.title,
         state: pr.merged_at ? "merged" : "closed",
+        createdAt: pr.created_at,
+        author: authorLogin,
+        isCopilotAuthored,
+        hasCopilotReview,
         linesAdded: detail.additions,
         linesDeleted: detail.deletions,
         commentCount: detail.comments + detail.review_comments,
         commitCount: detail.commits,
         actionsMinutes: Math.round(actionsMinutes * 100) / 100,
+        timeToMergeHours: pr.merged_at
+          ? Math.round(hoursBetween(pr.created_at, pr.merged_at) * 100) / 100
+          : undefined,
         mergedAt: pr.merged_at ?? undefined,
       });
     } catch {
@@ -138,19 +195,21 @@ export async function collectPullRequestDetails(
 }
 
 /**
- * Collect merged_at timestamps for merged PRs going back up to ~13 months.
+ * Collect an enriched timeline of merged PRs going back up to ~13 months.
  * Paginates through closed PRs (up to maxPages×100 entries) using only the
- * cheap pulls.list call — no per-PR detail fetches. This gives the chart
- * filter enough history to distinguish 30-day, 90-day, and year views even
- * for repos with hundreds of merged PRs per month.
+ * cheap pulls.list call — no per-PR detail fetches.
+ *
+ * Each entry includes author, timing, and issue-reference metadata extracted
+ * from the list response, which is enough for cycle-time charts, actor
+ * breakdowns, and Copilot adoption KPIs without extra API calls.
  */
-export async function collectMergedPRDates(
+export async function collectMergedPRTimeline(
   owner: string,
   repo: string,
   maxPages = 10
-): Promise<string[]> {
+): Promise<MergedPRSummary[]> {
   const octokit = await getOctokit();
-  const dates: string[] = [];
+  const timeline: MergedPRSummary[] = [];
   for (let page = 1; page <= maxPages; page++) {
     try {
       const res = await octokit.rest.pulls.list({
@@ -163,7 +222,19 @@ export async function collectMergedPRDates(
         page,
       });
       for (const pr of res.data) {
-        if (pr.merged_at) dates.push(pr.merged_at);
+        if (!pr.merged_at) continue;
+        const authorLogin = pr.user?.login ?? "unknown";
+        timeline.push({
+          number: pr.number,
+          createdAt: pr.created_at,
+          mergedAt: pr.merged_at,
+          author: authorLogin,
+          isBotAuthor: pr.user?.type === "Bot" || isBotLogin(authorLogin),
+          isCopilotAuthored: authorLogin.toLowerCase() === COPILOT_LOGIN,
+          timeToMergeHours:
+            Math.round(hoursBetween(pr.created_at, pr.merged_at) * 100) / 100,
+          closesIssues: parseIssueRefs(pr.body),
+        });
       }
       if (res.data.length < 100) break; // reached the last page
     } catch (err: unknown) {
@@ -172,5 +243,20 @@ export async function collectMergedPRDates(
       throw err;
     }
   }
-  return dates.sort((a, b) => (b > a ? 1 : -1));
+  return timeline.sort((a, b) => (b.mergedAt > a.mergedAt ? 1 : -1));
+}
+
+/**
+ * Compute Copilot adoption metrics from the merged PR timeline and details.
+ */
+export function computeCopilotAdoption(
+  timeline: MergedPRSummary[],
+  details: PullRequestDetail[],
+): CopilotAdoption {
+  return {
+    copilotAuthoredPRs: timeline.filter((p) => p.isCopilotAuthored).length,
+    copilotReviewedPRs: details.filter((p) => p.hasCopilotReview).length,
+    totalMergedPRs: timeline.length,
+    totalDetailedPRs: details.length,
+  };
 }
