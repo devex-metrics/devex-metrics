@@ -19,13 +19,25 @@ function makeSampleMetrics(): OrgMetrics {
             number: 42,
             title: "Add feature X",
             state: "merged",
+            createdAt: "2026-03-01T00:00:00Z",
+            author: "dev1",
+            isCopilotAuthored: false,
+            hasCopilotReview: true,
             linesAdded: 120,
             linesDeleted: 30,
             commentCount: 8,
             commitCount: 3,
             actionsMinutes: 4.5,
+            timeToMergeHours: 48,
+            mergedAt: "2026-03-03T00:00:00Z",
           },
         ],
+        mergedPRTimeline: [
+          { number: 42, createdAt: "2026-03-01T00:00:00Z", mergedAt: "2026-03-03T00:00:00Z", author: "dev1", isBotAuthor: false, isCopilotAuthored: false, timeToMergeHours: 48, closesIssues: [] },
+          { number: 43, createdAt: "2026-03-02T00:00:00Z", mergedAt: "2026-03-04T00:00:00Z", author: "copilot[bot]", isBotAuthor: true, isCopilotAuthored: true, timeToMergeHours: 48, closesIssues: [] },
+        ],
+        copilotAdoption: { copilotAuthoredPRs: 1, copilotReviewedPRs: 1, totalMergedPRs: 2, totalDetailedPRs: 1 },
+        issueLeadTimes: [],
         committerCount: 4,
         reviewerCount: 3,
         dependentCount: 10,
@@ -36,6 +48,9 @@ function makeSampleMetrics(): OrgMetrics {
         issues: { open: 0, closed: 5 },
         pullRequests: { open: 0, closed: 0, merged: 3 },
         pullRequestDetails: [],
+        mergedPRTimeline: [],
+        copilotAdoption: { copilotAuthoredPRs: 0, copilotReviewedPRs: 0, totalMergedPRs: 0, totalDetailedPRs: 0 },
+        issueLeadTimes: [],
         committerCount: 1,
         reviewerCount: 1,
         dependentCount: 0,
@@ -53,6 +68,19 @@ describe("generateReport", () => {
     expect(report).toContain("Open issues | 5");
     expect(report).toContain("Closed issues | 25");
     expect(report).toContain("Merged PRs | 18");
+  });
+
+  it("should include Copilot adoption metrics in the summary", () => {
+    const report = generateReport(makeSampleMetrics());
+
+    expect(report).toContain("Copilot-authored PRs | 1 (50.0%)");
+    expect(report).toContain("Copilot-reviewed PRs | 1 (100.0%)");
+  });
+
+  it("should include median cycle time in the summary", () => {
+    const report = generateReport(makeSampleMetrics());
+
+    expect(report).toContain("Median cycle time");
   });
 
   it("should list per-repo details", () => {

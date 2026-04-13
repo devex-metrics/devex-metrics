@@ -1,4 +1,4 @@
-import type { OrgMetrics, RepoMetrics } from "./types.js";
+import type { OrgMetrics, RepoMetrics, CopilotAdoption } from "./types.js";
 
 /**
  * Produce a human-readable Markdown report from collected metrics.
@@ -29,6 +29,27 @@ export function generateReport(metrics: OrgMetrics): string {
   lines.push(`| Closed (unmerged) PRs | ${totals.closedPRs} |`);
   lines.push(`| Unique committers (90 d) | ${totals.committers} |`);
   lines.push(`| Unique reviewers (90 d) | ${totals.reviewers} |`);
+
+  // Copilot adoption summary
+  const copilotTotals = aggregateCopilot(metrics.repos);
+  if (copilotTotals.totalMergedPRs > 0) {
+    const authoredPct = ((copilotTotals.copilotAuthoredPRs / copilotTotals.totalMergedPRs) * 100).toFixed(1);
+    lines.push(`| Copilot-authored PRs | ${copilotTotals.copilotAuthoredPRs} (${authoredPct}%) |`);
+  }
+  if (copilotTotals.totalDetailedPRs > 0) {
+    const reviewedPct = ((copilotTotals.copilotReviewedPRs / copilotTotals.totalDetailedPRs) * 100).toFixed(1);
+    lines.push(`| Copilot-reviewed PRs | ${copilotTotals.copilotReviewedPRs} (${reviewedPct}%) |`);
+  }
+
+  // Median cycle time
+  const allCycleTimes = metrics.repos.flatMap(
+    (r) => (r.mergedPRTimeline ?? []).map((p) => p.timeToMergeHours),
+  );
+  if (allCycleTimes.length > 0) {
+    const medianHrs = median(allCycleTimes);
+    lines.push(`| Median cycle time | ${formatDuration(medianHrs)} |`);
+  }
+
   lines.push("");
 
   // -- Per-repo --
@@ -107,4 +128,35 @@ function aggregate(repos: RepoMetrics[]) {
     committers,
     reviewers,
   };
+}
+
+function aggregateCopilot(repos: RepoMetrics[]): CopilotAdoption {
+  let copilotAuthoredPRs = 0;
+  let copilotReviewedPRs = 0;
+  let totalMergedPRs = 0;
+  let totalDetailedPRs = 0;
+
+  for (const r of repos) {
+    if (r.copilotAdoption) {
+      copilotAuthoredPRs += r.copilotAdoption.copilotAuthoredPRs;
+      copilotReviewedPRs += r.copilotAdoption.copilotReviewedPRs;
+      totalMergedPRs += r.copilotAdoption.totalMergedPRs;
+      totalDetailedPRs += r.copilotAdoption.totalDetailedPRs;
+    }
+  }
+  return { copilotAuthoredPRs, copilotReviewedPRs, totalMergedPRs, totalDetailedPRs };
+}
+
+function median(values: number[]): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+function formatDuration(hours: number): string {
+  if (hours < 1) return `${Math.round(hours * 60)}m`;
+  if (hours < 24) return `${hours.toFixed(1)}h`;
+  const days = hours / 24;
+  return `${days.toFixed(1)}d`;
 }

@@ -2,9 +2,11 @@ import { loadCache, loadRawCache, isWithinHours, saveCache, CURRENT_SCHEMA_VERSI
 import {
   collectRepos,
   collectIssueCounts,
+  collectIssueLeadTimes,
   collectPullRequestCounts,
   collectPullRequestDetails,
-  collectMergedPRDates,
+  collectMergedPRTimeline,
+  computeCopilotAdoption,
   collectContributors,
   collectDependentCount,
   collectWeeklyTrends,
@@ -83,15 +85,24 @@ export async function collect(
     const repoOwner = fullName.slice(0, slashIndex);
     const repoName = fullName.slice(slashIndex + 1);
 
-    const [issues, prCounts, prDetails, mergedPRDates, contributors, dependentCount] =
+    const [issues, prCounts, prDetails, mergedPRTimeline, contributors, dependentCount] =
       await Promise.all([
         collectIssueCounts(repoOwner, repoName),
         collectPullRequestCounts(repoOwner, repoName),
         collectPullRequestDetails(repoOwner, repoName),
-        collectMergedPRDates(repoOwner, repoName),
+        collectMergedPRTimeline(repoOwner, repoName),
         collectContributors(repoOwner, repoName),
         collectDependentCount(repoOwner, repoName),
       ]);
+
+    // Fetch issue lead times for PRs that reference issues
+    const issueLeadTimes = await collectIssueLeadTimes(
+      repoOwner,
+      repoName,
+      mergedPRTimeline,
+    );
+
+    const copilotAdoption = computeCopilotAdoption(mergedPRTimeline, prDetails);
 
     repos.push({
       name: repoName,
@@ -101,7 +112,9 @@ export async function collect(
       issues,
       pullRequests: prCounts,
       pullRequestDetails: prDetails,
-      mergedPRDates,
+      mergedPRTimeline,
+      copilotAdoption,
+      issueLeadTimes,
       committerCount: contributors.committerCount,
       reviewerCount: contributors.reviewerCount,
       dependentCount,

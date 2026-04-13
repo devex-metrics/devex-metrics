@@ -122,6 +122,20 @@ function aggregate(repos: RepoMetrics[]): Totals {
   };
 }
 
+function computeMedian(values: number[]): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+}
+
+function formatDurationHtml(hours: number): string {
+  if (hours < 1) return `${Math.round(hours * 60)}m`;
+  if (hours < 24) return `${hours.toFixed(1)}h`;
+  const days = hours / 24;
+  return `${days.toFixed(1)}d`;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Dashboard HTML builder                                            */
 /* ------------------------------------------------------------------ */
@@ -179,16 +193,58 @@ function buildDashboardHtml(
 
   const repoRows = data.repos.map((repo) => buildRepoRow(repo)).join("\n");
 
+  // Build enriched PR details for charts — prefer the mergedPRTimeline
+  // (wider history, 1 cheap API call) over the 10-entry pullRequestDetails.
   const allPRDetails = data.repos.flatMap((r) => {
-    // Prefer mergedPRDates (wider history, 1 cheap API call) over the
-    // 10-entry pullRequestDetails so the chart filter spans real time ranges.
-    if (r.mergedPRDates && r.mergedPRDates.length > 0) {
-      return r.mergedPRDates.map((date) => ({ repo: r.name, mergedAt: date }));
+    if (r.mergedPRTimeline && r.mergedPRTimeline.length > 0) {
+      return r.mergedPRTimeline.map((p) => ({
+        repo: r.name,
+        mergedAt: p.mergedAt,
+        createdAt: p.createdAt,
+        author: p.author,
+        isBotAuthor: p.isBotAuthor,
+        isCopilotAuthored: p.isCopilotAuthored,
+        timeToMergeHours: p.timeToMergeHours,
+      }));
     }
     return r.pullRequestDetails
       .filter((pr) => !!pr.mergedAt)
-      .map((pr) => ({ repo: r.name, mergedAt: pr.mergedAt! }));
+      .map((pr) => ({
+        repo: r.name,
+        mergedAt: pr.mergedAt!,
+        createdAt: pr.createdAt,
+        author: pr.author,
+        isBotAuthor: false,
+        isCopilotAuthored: pr.isCopilotAuthored,
+        timeToMergeHours: pr.timeToMergeHours ?? 0,
+      }));
   });
+
+  // Aggregate Copilot adoption
+  let copilotAuthored = 0, copilotReviewed = 0, copilotTotalMerged = 0, copilotTotalDetailed = 0;
+  for (const r of data.repos) {
+    if (r.copilotAdoption) {
+      copilotAuthored += r.copilotAdoption.copilotAuthoredPRs;
+      copilotReviewed += r.copilotAdoption.copilotReviewedPRs;
+      copilotTotalMerged += r.copilotAdoption.totalMergedPRs;
+      copilotTotalDetailed += r.copilotAdoption.totalDetailedPRs;
+    }
+  }
+
+  // Aggregate issue lead times
+  const allIssueLeadTimes = data.repos.flatMap((r) =>
+    (r.issueLeadTimes ?? []).map((lt) => ({
+      issueNumber: lt.issueNumber,
+      prNumber: lt.prNumber,
+      leadTimeHours: lt.leadTimeHours,
+      prMergedAt: lt.prMergedAt,
+      repo: r.name,
+    })),
+  );
+
+  // Median cycle time
+  const cycleTimes = allPRDetails.map((p) => p.timeToMergeHours).filter((h) => h > 0);
+  const medianCycleHrs = computeMedian(cycleTimes);
 
   const chartPayload = JSON.stringify({
     issues: { open: totals.openIssues, closed: totals.closedIssues },
@@ -204,6 +260,13 @@ function buildDashboardHtml(
       linesDeleted: t.linesDeleted ?? 0,
     })),
     allPRDetails,
+    allIssueLeadTimes,
+    copilot: {
+      authored: copilotAuthored,
+      reviewed: copilotReviewed,
+      totalMerged: copilotTotalMerged,
+      totalDetailed: copilotTotalDetailed,
+    },
     collectedAt: data.collectedAt,
   });
 
@@ -241,6 +304,9 @@ function buildDashboardHtml(
       <button class="filter-btn" data-period="90days">Last 90 Days</button>
       <button class="filter-btn active" data-period="30days">Last 30 Days</button>
     </div>
+    <label class="filter-toggle" title="Exclude PRs authored by bots (dependabot, renovate, etc.) from charts and KPIs">
+      <input type="checkbox" id="excludeBots" /> Exclude bots
+    </label>
   </div>
 </div>
 
@@ -269,6 +335,18 @@ function buildDashboardHtml(
       <div class="kpi-lbl">Committers</div>
       <div class="kpi-sub">${totals.reviewers} reviewers (90&nbsp;d)</div>
     </div>
+    <div class="kpi">
+      <div class="kpi-icon" aria-hidden="true">&#x1F916;</div>
+      <div class="kpi-val" id="kpiCopilotVal">${copilotTotalMerged > 0 ? ((copilotAuthored / copilotTotalMerged) * 100).toFixed(1) + '%' : '–'}</div>
+      <div class="kpi-lbl" id="kpiCopilotLbl">Copilot PRs</div>
+      <div class="kpi-sub" id="kpiCopilotSub">${copilotAuthored} authored &middot; ${copilotReviewed} reviewed</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-icon" aria-hidden="true">&#x23F1;&#xFE0F;</div>
+      <div class="kpi-val" id="kpiCycleVal">${medianCycleHrs > 0 ? formatDurationHtml(medianCycleHrs) : '–'}</div>
+      <div class="kpi-lbl" id="kpiCycleLbl">Median Cycle Time</div>
+      <div class="kpi-sub" id="kpiCycleSub">PR created &rarr; merged</div>
+    </div>
   </section>
 
   <section class="charts" aria-label="Charts">
@@ -281,6 +359,13 @@ function buildDashboardHtml(
     <div class="card card-chart card-wide"><h2>PR Trends (per week)</h2><canvas id="chartPRTrends"></canvas></div>
     <div class="card card-chart card-wide"><h2>Issue Trends (per week)</h2><canvas id="chartIssueTrends"></canvas></div>
     <div class="card card-chart card-wide"><h2>PR Size Trends (lines/week)</h2><canvas id="chartPRSizeTrends"></canvas></div>
+  </section>
+
+  <section class="charts" aria-label="Delivery metric charts">
+    <div class="card card-chart card-wide"><h2>PR Cycle Time (weekly median, hours)</h2><canvas id="chartCycleTime"></canvas></div>
+    <div class="card card-chart card-wide"><h2>Actor Breakdown (PRs merged per week)</h2><canvas id="chartActorBreakdown"></canvas></div>
+    <div class="card card-chart"><h2>Copilot Adoption</h2><canvas id="chartCopilotAdoption"></canvas></div>
+    <div class="card card-chart"><h2>Issue &rarr; PR Lead Time</h2><canvas id="chartLeadTime"></canvas></div>
   </section>
 
   <section class="repos-section" aria-label="Repositories">
@@ -545,6 +630,9 @@ dl{display:flex;flex-direction:column;gap:.15rem}
   border-radius:999px;background:transparent;color:var(--muted);cursor:pointer;transition:all .15s}
 .filter-btn:hover{border-color:var(--accent);color:var(--accent)}
 .filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.filter-toggle{display:flex;align-items:center;gap:.35rem;font-size:.82rem;color:var(--muted);
+  cursor:pointer;white-space:nowrap;margin-left:.75rem;padding-left:.75rem;border-left:1px solid var(--border)}
+.filter-toggle input{accent-color:var(--accent);cursor:pointer}
 .data-range{opacity:.82;font-size:.88rem}
 footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.8rem;
   color:var(--muted);border-top:1px solid var(--border)}
@@ -641,6 +729,71 @@ function renderCharts(){
           borderColor:cssColors.err,backgroundColor:'transparent',tension:0.3,fill:false,pointRadius:3}]},
       options:lineOpts});
   }
+  renderDeliveryCharts();
+}
+function getISOWeek(d){var date=new Date(d);date.setUTCDate(date.getUTCDate()+4-(date.getUTCDay()||7));var y=date.getUTCFullYear();var jan1=new Date(Date.UTC(y,0,1));var wn=Math.ceil(((date.getTime()-jan1.getTime())/86400000+1)/7);return y+"-W"+(wn<10?"0":"")+wn;}
+function medianOf(arr){if(!arr.length)return 0;var s=arr.slice().sort(function(a,b){return a-b;});var m=Math.floor(s.length/2);return s.length%2?s[m]:(s[m-1]+s[m])/2;}
+function fmtDur(h){if(h<1)return Math.round(h*60)+"m";if(h<24)return h.toFixed(1)+"h";return(h/24).toFixed(1)+"d";}
+function renderDeliveryCharts(){
+  var lineOpts={responsive:true,maintainAspectRatio:true,
+    scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cssColors.border}}},
+    plugins:{legend:{position:"top",align:"end"}}};
+  // Cycle time chart
+  var prs=CHART_DATA.allPRDetails||[];
+  if(prs.length>0){
+    var weekCycleTimes={};
+    prs.forEach(function(p){if(p.timeToMergeHours>0){var w=getISOWeek(p.mergedAt);if(!weekCycleTimes[w])weekCycleTimes[w]=[];weekCycleTimes[w].push(p.timeToMergeHours);}});
+    var weeks=Object.keys(weekCycleTimes).sort();
+    charts.cycleTime=new Chart(document.getElementById("chartCycleTime"),{type:"line",
+      data:{labels:weeks,datasets:[
+        {label:"Median cycle time (hours)",data:weeks.map(function(w){return Math.round(medianOf(weekCycleTimes[w])*10)/10;}),
+          borderColor:cssColors.accent,backgroundColor:cssColors.accentS,tension:0.3,fill:true,pointRadius:3}]},
+      options:lineOpts});
+  }
+  // Actor breakdown chart
+  if(prs.length>0){
+    var weekActors={};
+    prs.forEach(function(p){
+      var w=getISOWeek(p.mergedAt);
+      if(!weekActors[w])weekActors[w]={human:0,copilot:0,dependabot:0,otherBot:0};
+      if(p.isCopilotAuthored)weekActors[w].copilot++;
+      else if(p.isBotAuthor&&p.author&&p.author.toLowerCase().indexOf("dependabot")!==-1)weekActors[w].dependabot++;
+      else if(p.isBotAuthor)weekActors[w].otherBot++;
+      else weekActors[w].human++;
+    });
+    var aWeeks=Object.keys(weekActors).sort();
+    charts.actorBreakdown=new Chart(document.getElementById("chartActorBreakdown"),{type:"bar",
+      data:{labels:aWeeks,datasets:[
+        {label:"Human",data:aWeeks.map(function(w){return weekActors[w].human;}),backgroundColor:cssColors.accent,borderRadius:2},
+        {label:"Copilot",data:aWeeks.map(function(w){return weekActors[w].copilot;}),backgroundColor:cssColors.purple||"#8250df",borderRadius:2},
+        {label:"Dependabot",data:aWeeks.map(function(w){return weekActors[w].dependabot;}),backgroundColor:cssColors.warn,borderRadius:2},
+        {label:"Other bots",data:aWeeks.map(function(w){return weekActors[w].otherBot;}),backgroundColor:cssColors.muted,borderRadius:2}]},
+      options:{responsive:true,maintainAspectRatio:true,
+        scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:cssColors.border}}},
+        plugins:{legend:{position:"top",align:"end"}}}});
+  }
+  // Copilot adoption doughnut
+  var cop=CHART_DATA.copilot||{};
+  if(cop.totalMerged>0){
+    var dOpts2={cutout:"62%",plugins:{legend:{position:"bottom"}},responsive:true,maintainAspectRatio:true};
+    charts.copilotAdoption=new Chart(document.getElementById("chartCopilotAdoption"),{type:"doughnut",
+      data:{labels:["Copilot-authored","Human-authored"],
+        datasets:[{data:[cop.authored,cop.totalMerged-cop.authored],
+          backgroundColor:[cssColors.purple||"#8250df",cssColors.accent],borderWidth:0,hoverOffset:6}]},
+      options:dOpts2});
+  }
+  // Issue lead time scatter
+  var lts=CHART_DATA.allIssueLeadTimes||[];
+  if(lts.length>0){
+    var ltData=lts.map(function(lt){return{x:lt.prMergedAt.slice(0,10),y:Math.round(lt.leadTimeHours/24*10)/10};}).sort(function(a,b){return a.x<b.x?-1:1;});
+    charts.leadTime=new Chart(document.getElementById("chartLeadTime"),{type:"bar",
+      data:{labels:ltData.map(function(d){return d.x;}),datasets:[
+        {label:"Lead time (days)",data:ltData.map(function(d){return d.y;}),
+          backgroundColor:cssColors.ok,borderRadius:2}]},
+      options:{responsive:true,maintainAspectRatio:true,
+        scales:{x:{grid:{display:false}},y:{beginAtZero:true,title:{display:true,text:"Days"},grid:{color:cssColors.border}}},
+        plugins:{legend:{display:false}}}});
+  }
 }
 function setupFilter(){
   document.querySelectorAll(".filter-btn").forEach(function(btn){
@@ -650,6 +803,11 @@ function setupFilter(){
       applyFilter(btn.dataset.period);
     });
   });
+  var botCb=document.getElementById("excludeBots");
+  if(botCb){botCb.addEventListener("change",function(){
+    var activeBtn=document.querySelector(".filter-btn.active");
+    applyFilter(activeBtn?activeBtn.dataset.period:"30days");
+  });}
 }
 function getCutoffDate(period){
   var collected=new Date(CHART_DATA.collectedAt);
@@ -671,6 +829,7 @@ function weekToDate(weekStr){
 }
 function applyFilter(period){
   var cutoff=getCutoffDate(period);
+  var excludeBots=!!document.getElementById("excludeBots")&&document.getElementById("excludeBots").checked;
   var trends=CHART_DATA.weeklyTrends||[];
   if(cutoff)trends=trends.filter(function(t){return weekToDate(t.week)>=cutoff;});
   var tLabels=trends.map(function(t){return t.week;});
@@ -692,6 +851,11 @@ function applyFilter(period){
     charts.prSizeTrends.data.datasets[1].data=trends.map(function(t){return t.linesDeleted;});
     charts.prSizeTrends.update();
   }
+  // Filter allPRDetails by period and bot exclusion
+  var allPR=(CHART_DATA.allPRDetails||[]);
+  if(excludeBots)allPR=allPR.filter(function(p){return !p.isBotAuthor;});
+  var filteredPR=allPR;
+  if(cutoff)filteredPR=allPR.filter(function(p){return new Date(p.mergedAt)>=cutoff;});
   if(charts.repos){
     var titleEl=document.getElementById("chartReposTitle");
     if(period==="all"){
@@ -701,9 +865,8 @@ function applyFilter(period){
         {label:"Pull Requests",data:CHART_DATA.topRepos.map(function(r){return r.prs;}),_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}];
       if(titleEl)titleEl.textContent="Top Repositories";
     }else{
-      var filteredPRs=(CHART_DATA.allPRDetails||[]).filter(function(p){return cutoff?new Date(p.mergedAt)>=cutoff:true;});
       var counts={};
-      filteredPRs.forEach(function(p){counts[p.repo]=(counts[p.repo]||0)+1;});
+      filteredPR.forEach(function(p){counts[p.repo]=(counts[p.repo]||0)+1;});
       var topFiltered=Object.keys(counts).map(function(n){
         var rd=CHART_DATA.topRepos.find(function(r){return r.name===n;});
         return{name:n,prs:counts[n],issues:rd?rd.issues:0};
@@ -727,7 +890,7 @@ function applyFilter(period){
     issuesClosed+=(t.issuesClosed||0);
     prsOpened+=(t.prsOpened||0);
   });
-  var prsMerged=(CHART_DATA.allPRDetails||[]).filter(function(p){return cutoff?new Date(p.mergedAt)>=cutoff:true;}).length;
+  var prsMerged=filteredPR.length;
   // Update doughnut charts
   if(charts.issues){
     if(period==="all"){
@@ -773,10 +936,47 @@ function applyFilter(period){
     if(prLbl)prLbl.textContent="Merged PRs";
     if(prSub)prSub.textContent=prsOpened+" opened";
   }
+  // Update Copilot KPI
+  var copilotFiltered=filteredPR.filter(function(p){return p.isCopilotAuthored;});
+  var copilotVal=document.getElementById("kpiCopilotVal");
+  var copilotSub=document.getElementById("kpiCopilotSub");
+  if(copilotVal){
+    copilotVal.textContent=filteredPR.length>0?(copilotFiltered.length/filteredPR.length*100).toFixed(1)+"%":"\u2013";
+  }
+  if(copilotSub){copilotSub.textContent=copilotFiltered.length+" authored";}
+  // Update Cycle time KPI
+  var cycleVals=filteredPR.map(function(p){return p.timeToMergeHours;}).filter(function(h){return h>0;});
+  var medCycle=medianOf(cycleVals);
+  var cycleVal=document.getElementById("kpiCycleVal");
+  if(cycleVal){cycleVal.textContent=medCycle>0?fmtDur(medCycle):"\u2013";}
+  // Update delivery charts with filtered data
+  if(charts.cycleTime){
+    var weekCT={};
+    filteredPR.forEach(function(p){if(p.timeToMergeHours>0){var w=getISOWeek(p.mergedAt);if(!weekCT[w])weekCT[w]=[];weekCT[w].push(p.timeToMergeHours);}});
+    var ctWeeks=Object.keys(weekCT).sort();
+    charts.cycleTime.data.labels=ctWeeks;
+    charts.cycleTime.data.datasets[0].data=ctWeeks.map(function(w){return Math.round(medianOf(weekCT[w])*10)/10;});
+    charts.cycleTime.update();
+  }
+  if(charts.actorBreakdown){
+    var wA={};
+    filteredPR.forEach(function(p){
+      var w=getISOWeek(p.mergedAt);
+      if(!wA[w])wA[w]={human:0,copilot:0,dependabot:0,otherBot:0};
+      if(p.isCopilotAuthored)wA[w].copilot++;
+      else if(p.isBotAuthor&&p.author&&p.author.toLowerCase().indexOf("dependabot")!==-1)wA[w].dependabot++;
+      else if(p.isBotAuthor)wA[w].otherBot++;
+      else wA[w].human++;
+    });
+    var aW=Object.keys(wA).sort();
+    charts.actorBreakdown.data.labels=aW;
+    charts.actorBreakdown.data.datasets[0].data=aW.map(function(w){return wA[w].human;});
+    charts.actorBreakdown.data.datasets[1].data=aW.map(function(w){return wA[w].copilot;});
+    charts.actorBreakdown.data.datasets[2].data=aW.map(function(w){return wA[w].dependabot;});
+    charts.actorBreakdown.data.datasets[3].data=aW.map(function(w){return wA[w].otherBot;});
+    charts.actorBreakdown.update();
+  }
   // Update the merged-PR column cells to reflect the selected period.
-  // For "all time" restore from the data attribute (true API total).
-  // For time-bounded periods count from allPRDetails; key is lowercased to
-  // match data-repo-name which is always stored lowercase.
   if(period==="all"){
     document.querySelectorAll(".repo-row[data-repo-name]").forEach(function(row){
       var cell=row.querySelector(".td-merged-prs");
@@ -784,8 +984,7 @@ function applyFilter(period){
     });
   }else{
     var repoCounts={};
-    (CHART_DATA.allPRDetails||[]).forEach(function(p){
-      if(cutoff&&new Date(p.mergedAt)<cutoff)return;
+    filteredPR.forEach(function(p){
       var key=p.repo.toLowerCase();
       repoCounts[key]=(repoCounts[key]||0)+1;
     });

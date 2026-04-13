@@ -11,8 +11,10 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
  *
  * Version history:
  *   1 — initial versioning; adds mergedPRDates per repo
+ *   2 — replaces mergedPRDates with mergedPRTimeline; adds copilotAdoption,
+ *       issueLeadTimes, and enriched PullRequestDetail fields
  */
-export const CURRENT_SCHEMA_VERSION = 1;
+export const CURRENT_SCHEMA_VERSION = 2;
 
 function cacheFilePath(owner: string): string {
   return path.join(DATA_DIR, `${owner}.json`);

@@ -1,7 +1,8 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { setOctokit, resetOctokit } from "../github-client.js";
 import { Octokit } from "@octokit/rest";
-import { collectIssueCounts } from "./issues.js";
+import { collectIssueCounts, collectIssueLeadTimes } from "./issues.js";
+import type { MergedPRSummary } from "../types.js";
 
 /** Build a fake Octokit whose issues list endpoint returns controlled Link headers. */
 function buildMockOctokit(opts: {
@@ -96,5 +97,136 @@ describe("collectIssueCounts", () => {
     expect(counts).toEqual({ open: 0, closed: 0 });
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("403"));
     warnSpy.mockRestore();
+  });
+});
+
+// ── collectIssueLeadTimes ─────────────────────────────────────────────────────
+
+function makePRSummary(overrides: Partial<MergedPRSummary> & Pick<MergedPRSummary, "number" | "mergedAt" | "closesIssues">): MergedPRSummary {
+  return {
+    createdAt: "2026-01-01T00:00:00Z",
+    author: "dev",
+    isBotAuthor: false,
+    isCopilotAuthored: false,
+    timeToMergeHours: 24,
+    ...overrides,
+  };
+}
+
+describe("collectIssueLeadTimes", () => {
+  afterEach(() => resetOctokit());
+
+  it("computes lead time from issue creation to PR merge", async () => {
+    const timeline: MergedPRSummary[] = [
+      makePRSummary({ number: 10, mergedAt: "2026-01-05T00:00:00Z", closesIssues: [1] }),
+    ];
+
+    setOctokit({
+      rest: {
+        issues: {
+          get: async () => ({
+            data: { created_at: "2026-01-01T00:00:00Z" },
+          }),
+        },
+      },
+    } as unknown as Octokit);
+
+    const result = await collectIssueLeadTimes("owner", "repo", timeline);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      issueNumber: 1,
+      prNumber: 10,
+      issueCreatedAt: "2026-01-01T00:00:00Z",
+      prMergedAt: "2026-01-05T00:00:00Z",
+      leadTimeHours: 96, // 4 days
+    });
+  });
+
+  it("picks the earliest-merged PR when multiple PRs close the same issue", async () => {
+    const timeline: MergedPRSummary[] = [
+      makePRSummary({ number: 10, mergedAt: "2026-01-10T00:00:00Z", closesIssues: [5] }),
+      makePRSummary({ number: 20, mergedAt: "2026-01-05T00:00:00Z", closesIssues: [5] }),
+    ];
+
+    setOctokit({
+      rest: {
+        issues: {
+          get: async () => ({
+            data: { created_at: "2026-01-01T00:00:00Z" },
+          }),
+        },
+      },
+    } as unknown as Octokit);
+
+    const result = await collectIssueLeadTimes("owner", "repo", timeline);
+    expect(result).toHaveLength(1);
+    expect(result[0].prNumber).toBe(20); // earlier merge
+  });
+
+  it("returns [] when timeline has no issue refs", async () => {
+    const timeline: MergedPRSummary[] = [
+      makePRSummary({ number: 1, mergedAt: "2026-01-02T00:00:00Z", closesIssues: [] }),
+    ];
+
+    setOctokit({
+      rest: {
+        issues: {
+          get: async () => { throw new Error("should not be called"); },
+        },
+      },
+    } as unknown as Octokit);
+
+    const result = await collectIssueLeadTimes("owner", "repo", timeline);
+    expect(result).toEqual([]);
+  });
+
+  it("skips issues that return 404", async () => {
+    const timeline: MergedPRSummary[] = [
+      makePRSummary({ number: 1, mergedAt: "2026-01-02T00:00:00Z", closesIssues: [99] }),
+    ];
+
+    setOctokit({
+      rest: {
+        issues: {
+          get: async () => { throw Object.assign(new Error("Not Found"), { status: 404 }); },
+        },
+      },
+    } as unknown as Octokit);
+
+    const result = await collectIssueLeadTimes("owner", "repo", timeline);
+    expect(result).toEqual([]);
+  });
+
+  it("skips issues that return 403", async () => {
+    const timeline: MergedPRSummary[] = [
+      makePRSummary({ number: 1, mergedAt: "2026-01-02T00:00:00Z", closesIssues: [99] }),
+    ];
+
+    setOctokit({
+      rest: {
+        issues: {
+          get: async () => { throw Object.assign(new Error("Forbidden"), { status: 403 }); },
+        },
+      },
+    } as unknown as Octokit);
+
+    const result = await collectIssueLeadTimes("owner", "repo", timeline);
+    expect(result).toEqual([]);
+  });
+
+  it("re-throws non-403/404 errors", async () => {
+    const timeline: MergedPRSummary[] = [
+      makePRSummary({ number: 1, mergedAt: "2026-01-02T00:00:00Z", closesIssues: [99] }),
+    ];
+
+    setOctokit({
+      rest: {
+        issues: {
+          get: async () => { throw Object.assign(new Error("Server Error"), { status: 500 }); },
+        },
+      },
+    } as unknown as Octokit);
+
+    await expect(collectIssueLeadTimes("owner", "repo", timeline)).rejects.toThrow("Server Error");
   });
 });
