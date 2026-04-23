@@ -639,7 +639,7 @@ function makePRNode(overrides: Partial<GraphQLPRNode> = {}): GraphQLPRNode {
     deletions: 5,
     commits: { totalCount: 2 },
     comments: { totalCount: 1 },
-    reviewComments: { totalCount: 1 },
+    reviewThreads: { totalCount: 1 },
     reviews: { nodes: [] },
     ...overrides,
   };
@@ -731,7 +731,7 @@ describe("collectPullRequestDetailsFromNodes", () => {
       deletions: 5,
       commits: { totalCount: 3 },
       comments: { totalCount: 2 },
-      reviewComments: { totalCount: 1 },
+      reviewThreads: { totalCount: 1 },
       reviews: { nodes: [{ author: { login: "reviewer1" } }] },
     });
 
@@ -760,7 +760,7 @@ describe("collectPullRequestDetailsFromNodes", () => {
       hasCopilotReview: false,
       linesAdded: 20,
       linesDeleted: 5,
-      commentCount: 3, // comments(2) + reviewComments(1)
+      commentCount: 3, // comments(2) + reviewThreads(1)
       commitCount: 3,
       mergedAt: "2026-01-03T00:00:00Z",
     });
@@ -853,4 +853,6 @@ describe("extractReviewerLogins", () => {
     expect(extractReviewerLogins([])).toEqual(new Set());
   });
 });
+
+
 

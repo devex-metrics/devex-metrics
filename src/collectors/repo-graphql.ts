@@ -20,7 +20,8 @@ export interface GraphQLPRNode {
   deletions: number;
   commits: { totalCount: number };
   comments: { totalCount: number };
-  reviewComments: { totalCount: number };
+  /** Inline review comment threads (maps to REST `review_comments` count). */
+  reviewThreads: { totalCount: number };
   reviews: { nodes: Array<{ author: { login: string } | null }> };
 }
 
@@ -83,7 +84,7 @@ const REPO_DATA_QUERY = `
           deletions
           commits(first: 1) { totalCount }
           comments(first: 1) { totalCount }
-          reviewComments(first: 1) { totalCount }
+          reviewThreads(first: 1) { totalCount }
           reviews(first: 100) {
             nodes { author { login } }
           }

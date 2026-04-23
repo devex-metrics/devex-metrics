@@ -23,7 +23,7 @@ function makePRNode(overrides: Partial<GraphQLPRNode> = {}): GraphQLPRNode {
     deletions: 5,
     commits: { totalCount: 1 },
     comments: { totalCount: 0 },
-    reviewComments: { totalCount: 0 },
+    reviewThreads: { totalCount: 0 },
     reviews: { nodes: [] },
     ...overrides,
   };
@@ -239,3 +239,4 @@ describe("collectRepoGraphQL", () => {
     expect(result!.isFork).toBe(true);
   });
 });
+

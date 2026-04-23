@@ -359,7 +359,7 @@ export async function collectPullRequestDetailsFromNodes(
       hasCopilotReview,
       linesAdded: node.additions,
       linesDeleted: node.deletions,
-      commentCount: node.comments.totalCount + node.reviewComments.totalCount,
+      commentCount: node.comments.totalCount + node.reviewThreads.totalCount,
       commitCount: node.commits.totalCount,
       actionsMinutes: Math.round(actionsMinutes * 100) / 100,
       timeToMergeHours: node.mergedAt
