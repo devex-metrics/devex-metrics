@@ -209,14 +209,19 @@ describe("collectRepoGraphQL", () => {
     vi.useRealTimers();
   });
 
-  it("re-throws after exhausting all transient retries", async () => {
+  it("returns null and warns after exhausting all transient retries", async () => {
     vi.useFakeTimers();
     const err = Object.assign(new Error("Bad gateway"), { status: 502 });
     setOctokit(buildMockOctokit([err])); // clamped — all attempts throw
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
-    const checkPromise = expect(collectRepoGraphQL("owner", "repo")).rejects.toMatchObject({ status: 502 });
+    const resultPromise = collectRepoGraphQL("owner", "repo");
     await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
-    await checkPromise;
+    const result = await resultPromise;
+
+    expect(result).toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("falling back to REST"));
+    warnSpy.mockRestore();
     vi.useRealTimers();
   });
 
