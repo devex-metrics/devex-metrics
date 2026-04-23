@@ -128,11 +128,12 @@ export async function collectRepoGraphQL(
   for (let page = 0; page < maxPages; page++) {
     let response: GraphQLPageResponse;
     try {
-      response = await octokit.graphql<GraphQLPageResponse>(REPO_DATA_QUERY, {
-        owner,
-        name: repo,
-        cursor,
-      });
+      response = await fetchGraphQLPage<GraphQLPageResponse>(
+        octokit,
+        REPO_DATA_QUERY,
+        { owner, name: repo, cursor },
+        `${owner}/${repo}`
+      );
     } catch (err: unknown) {
       if (isGraphQLNotFoundOrForbidden(err)) {
         if (hasGraphQLForbiddenError(err)) {
@@ -188,6 +189,49 @@ export async function collectRepoGraphQL(
 
   result.prNodes = allNodes;
   return result;
+}
+
+/** Resolve after `ms` milliseconds. */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** Return true for transient server-side HTTP errors (5xx). */
+function isTransientServerError(err: unknown): boolean {
+  const httpError = err as { status?: number };
+  return typeof httpError.status === "number" && httpError.status >= 500 && httpError.status < 600;
+}
+
+const TRANSIENT_BACKOFF_MS = [5_000, 15_000, 30_000];
+
+/**
+ * Execute a single GraphQL request with automatic retry on transient 5xx errors.
+ * Retries up to TRANSIENT_BACKOFF_MS.length times with increasing delays.
+ * Non-transient errors (4xx, GraphQL field errors) are re-thrown immediately.
+ */
+async function fetchGraphQLPage<T>(
+  octokit: Awaited<ReturnType<typeof getOctokit>>,
+  query: string,
+  variables: Record<string, unknown>,
+  label: string
+): Promise<T> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= TRANSIENT_BACKOFF_MS.length; attempt++) {
+    try {
+      return await octokit.graphql<T>(query, variables);
+    } catch (err) {
+      if (!isTransientServerError(err) || attempt === TRANSIENT_BACKOFF_MS.length) {
+        throw err;
+      }
+      lastErr = err;
+      const wait = TRANSIENT_BACKOFF_MS[attempt];
+      console.warn(
+        `  ⚠ graphql: transient error for ${label} (attempt ${attempt + 1}/${TRANSIENT_BACKOFF_MS.length}), retrying in ${wait / 1000}s…`
+      );
+      await sleep(wait);
+    }
+  }
+  throw lastErr;
 }
 
 /** Check if a GraphQL error indicates the resource was not found or is forbidden. */
