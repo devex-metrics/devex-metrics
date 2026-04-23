@@ -10,7 +10,13 @@ import {
   collectContributors,
   collectDependentCount,
   collectWeeklyTrends,
+  collectRepoGraphQL,
+  buildPullRequestCounts,
+  buildMergedPRTimeline,
+  collectPullRequestDetailsFromNodes,
+  extractReviewerLogins,
 } from "./collectors/index.js";
+import type { GraphQLPRNode } from "./collectors/index.js";
 import type { OrgMetrics, RepoMetrics } from "./types.js";
 
 export interface CollectOptions {
@@ -62,6 +68,8 @@ export async function collect(
 
   const repos: RepoMetrics[] = [];
   let freshCount = 0;
+  // Collects pre-fetched GraphQL PR nodes per repo for the trends collector.
+  const prDataByRepo = new Map<string, GraphQLPRNode[]>();
 
   for (const { fullName, pushedAt } of repoList) {
     // Reuse per-repo data if it is recent enough.
@@ -85,15 +93,43 @@ export async function collect(
     const repoOwner = fullName.slice(0, slashIndex);
     const repoName = fullName.slice(slashIndex + 1);
 
-    const [issues, prCounts, prDetails, mergedPRTimeline, contributors, dependentCount] =
-      await Promise.all([
-        collectIssueCounts(repoOwner, repoName),
-        collectPullRequestCounts(repoOwner, repoName),
-        collectPullRequestDetails(repoOwner, repoName),
-        collectMergedPRTimeline(repoOwner, repoName),
-        collectContributors(repoOwner, repoName),
+    // Try the GraphQL path first (1-2 calls vs ~100 REST calls per repo).
+    const graphqlData = await collectRepoGraphQL(repoOwner, repoName);
+
+    let issues, prCounts, prDetails, mergedPRTimeline, contributors, dependentCount;
+
+    if (graphqlData !== null) {
+      // Fast path: derive most data from the pre-fetched GraphQL result.
+      issues = {
+        open: graphqlData.openIssueCount,
+        closed: graphqlData.closedIssueCount,
+      };
+      prCounts = buildPullRequestCounts(graphqlData);
+      mergedPRTimeline = buildMergedPRTimeline(graphqlData.prNodes);
+      prDetails = await collectPullRequestDetailsFromNodes(
+        repoOwner,
+        repoName,
+        graphqlData.prNodes
+      );
+      const reviewerLogins = extractReviewerLogins(graphqlData.prNodes);
+      [contributors, dependentCount] = await Promise.all([
+        collectContributors(repoOwner, repoName, reviewerLogins),
         collectDependentCount(repoOwner, repoName),
       ]);
+      // Store PR nodes for the trends collector (avoids pulls.get detail fetches).
+      prDataByRepo.set(fullName, graphqlData.prNodes);
+    } else {
+      // Fallback: full REST path (GraphQL returned null = not found/forbidden).
+      [issues, prCounts, prDetails, mergedPRTimeline, contributors, dependentCount] =
+        await Promise.all([
+          collectIssueCounts(repoOwner, repoName),
+          collectPullRequestCounts(repoOwner, repoName),
+          collectPullRequestDetails(repoOwner, repoName),
+          collectMergedPRTimeline(repoOwner, repoName),
+          collectContributors(repoOwner, repoName),
+          collectDependentCount(repoOwner, repoName),
+        ]);
+    }
 
     // Fetch issue lead times for PRs that reference issues
     const issueLeadTimes = await collectIssueLeadTimes(
@@ -129,7 +165,7 @@ export async function collect(
       const slash = r.fullName.indexOf("/");
       return { owner: r.fullName.slice(0, slash), name: r.name };
     });
-    weeklyTrends = await collectWeeklyTrends(trendRepos);
+    weeklyTrends = await collectWeeklyTrends(trendRepos, 12, 200, prDataByRepo);
   } else {
     console.log(`Reusing cached weekly trends (all ${repos.length} repos were fresh)`);
   }

@@ -6,6 +6,7 @@ import type {
   MergedPRSummary,
   CopilotAdoption,
 } from "../types.js";
+import type { GraphQLRepoData, GraphQLPRNode } from "./repo-graphql.js";
 
 const COPILOT_LOGIN = "copilot[bot]";
 
@@ -259,4 +260,128 @@ export function computeCopilotAdoption(
     totalMergedPRs: timeline.length,
     totalDetailedPRs: details.length,
   };
+}
+
+// ── GraphQL-based pure transforms ─────────────────────────────────────────────
+
+/**
+ * Derive PullRequestCounts from pre-fetched GraphQL repository data.
+ * No API calls.
+ */
+export function buildPullRequestCounts(data: GraphQLRepoData): PullRequestCounts {
+  return {
+    open: data.openPRCount,
+    closed: data.closedPRCount,
+    merged: data.mergedPRCount,
+  };
+}
+
+/**
+ * Build a MergedPRSummary timeline from pre-fetched GraphQL PR nodes.
+ * Only includes MERGED nodes. No API calls.
+ */
+export function buildMergedPRTimeline(nodes: GraphQLPRNode[]): MergedPRSummary[] {
+  const timeline: MergedPRSummary[] = [];
+  for (const node of nodes) {
+    if (node.state !== "MERGED" || !node.mergedAt) continue;
+    const authorLogin = node.author?.login ?? "unknown";
+    const isBot = node.author?.__typename === "Bot" || isBotLogin(authorLogin);
+    timeline.push({
+      number: node.number,
+      createdAt: node.createdAt,
+      mergedAt: node.mergedAt,
+      author: authorLogin,
+      isBotAuthor: isBot,
+      isCopilotAuthored: authorLogin.toLowerCase() === COPILOT_LOGIN,
+      timeToMergeHours:
+        Math.round(hoursBetween(node.createdAt, node.mergedAt) * 100) / 100,
+      closesIssues: parseIssueRefs(node.body),
+    });
+  }
+  return timeline.sort((a, b) => (b.mergedAt > a.mergedAt ? 1 : -1));
+}
+
+/**
+ * Build PullRequestDetail[] from pre-fetched GraphQL PR nodes.
+ * Only includes MERGED nodes (up to `limit`). For each PR, calls
+ * `checks.listForRef` to compute actionsMinutes; all other data comes
+ * from the pre-fetched nodes.
+ */
+export async function collectPullRequestDetailsFromNodes(
+  owner: string,
+  repo: string,
+  nodes: GraphQLPRNode[],
+  limit = 10
+): Promise<PullRequestDetail[]> {
+  const octokit = await getOctokit();
+
+  const mergedNodes = nodes
+    .filter((n) => n.state === "MERGED" && n.mergedAt)
+    .sort((a, b) => (b.mergedAt! > a.mergedAt! ? 1 : -1))
+    .slice(0, limit);
+
+  const details: PullRequestDetail[] = [];
+  for (const node of mergedNodes) {
+    let actionsMinutes = 0;
+    try {
+      const { data: checkRuns } = await octokit.rest.checks.listForRef({
+        owner,
+        repo,
+        ref: node.headRefOid,
+        per_page: 100,
+      });
+      for (const run of checkRuns.check_runs) {
+        if (run.started_at && run.completed_at) {
+          const start = new Date(run.started_at).getTime();
+          const end = new Date(run.completed_at).getTime();
+          actionsMinutes += (end - start) / 60000;
+        }
+      }
+    } catch {
+      // Check runs may not be accessible; leave as 0
+    }
+
+    const authorLogin = node.author?.login ?? "unknown";
+    const reviewerLogins = node.reviews.nodes
+      .map((r) => r.author?.login ?? "")
+      .filter(Boolean);
+    const hasCopilotReview = reviewerLogins.some(
+      (l) => l.toLowerCase() === COPILOT_LOGIN
+    );
+
+    details.push({
+      number: node.number,
+      title: node.title,
+      state: "merged",
+      createdAt: node.createdAt,
+      author: authorLogin,
+      isCopilotAuthored: authorLogin.toLowerCase() === COPILOT_LOGIN,
+      hasCopilotReview,
+      linesAdded: node.additions,
+      linesDeleted: node.deletions,
+      commentCount: node.comments.totalCount + node.reviewComments.totalCount,
+      commitCount: node.commits.totalCount,
+      actionsMinutes: Math.round(actionsMinutes * 100) / 100,
+      timeToMergeHours: node.mergedAt
+        ? Math.round(hoursBetween(node.createdAt, node.mergedAt) * 100) / 100
+        : undefined,
+      mergedAt: node.mergedAt ?? undefined,
+    });
+  }
+  return details;
+}
+
+/**
+ * Extract reviewer logins from a list of GraphQL PR nodes.
+ * Returns a Set of unique non-bot reviewer logins.
+ */
+export function extractReviewerLogins(nodes: GraphQLPRNode[]): Set<string> {
+  const reviewers = new Set<string>();
+  for (const node of nodes) {
+    for (const review of node.reviews.nodes) {
+      const login = review.author?.login;
+      if (login) reviewers.add(login);
+    }
+  }
+  return reviewers;
 }

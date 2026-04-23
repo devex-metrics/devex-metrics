@@ -158,4 +158,34 @@ describe("collectContributors", () => {
     expect(result.committerCount).toBe(0);
     expect(result.reviewerCount).toBe(0);
   });
+
+  it("uses pre-fetched reviewerLogins when provided and skips REST review calls", async () => {
+    let reviewsCallCount = 0;
+    const octokit = buildMockOctokit({
+      commits: [{ author: { login: "alice" }, commit: { author: null } }],
+      prs: [{ number: 1 }],
+      reviews: new Map([[1, [{ user: { login: "shouldNotCount" } }]]]),
+    });
+    // Wrap listReviews to count calls
+    const origListReviews = (octokit as unknown as { rest: { pulls: { listReviews: (...args: unknown[]) => unknown } } }).rest.pulls.listReviews;
+    (octokit as unknown as { rest: { pulls: { listReviews: (...args: unknown[]) => unknown } } }).rest.pulls.listReviews = async (...args: unknown[]) => {
+      reviewsCallCount++;
+      return origListReviews(...args);
+    };
+    setOctokit(octokit);
+
+    const prefetched = new Set(["bob", "carol"]);
+    const result = await collectContributors("owner", "repo", prefetched);
+    expect(result.committerCount).toBe(1);
+    expect(result.reviewerCount).toBe(2);
+    // Should not have called REST listReviews at all
+    expect(reviewsCallCount).toBe(0);
+  });
+
+  it("returns 0 reviewerCount when pre-fetched set is empty", async () => {
+    setOctokit(buildMockOctokit({ commits: [] }));
+
+    const result = await collectContributors("owner", "repo", new Set());
+    expect(result.reviewerCount).toBe(0);
+  });
 });

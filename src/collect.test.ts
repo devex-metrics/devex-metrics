@@ -19,6 +19,11 @@ vi.mock("./collectors/index.js", () => ({
   collectContributors: vi.fn(),
   collectDependentCount: vi.fn(),
   collectWeeklyTrends: vi.fn(),
+  collectRepoGraphQL: vi.fn(),
+  buildPullRequestCounts: vi.fn(),
+  buildMergedPRTimeline: vi.fn(),
+  collectPullRequestDetailsFromNodes: vi.fn(),
+  extractReviewerLogins: vi.fn(),
 }));
 
 import { collect } from "./collect.js";
@@ -34,6 +39,11 @@ import {
   collectContributors,
   collectDependentCount,
   collectWeeklyTrends,
+  collectRepoGraphQL,
+  buildPullRequestCounts,
+  buildMergedPRTimeline,
+  collectPullRequestDetailsFromNodes,
+  extractReviewerLogins,
 } from "./collectors/index.js";
 import type { OrgMetrics } from "./types.js";
 
@@ -43,6 +53,8 @@ function setupDefaultMocks() {
   vi.mocked(isWithinHours).mockReturnValue(false);
   vi.mocked(saveCache).mockReturnValue(undefined);
   vi.mocked(collectRepos).mockResolvedValue([]);
+  // GraphQL path returns null by default → triggers REST fallback
+  vi.mocked(collectRepoGraphQL).mockResolvedValue(null);
   vi.mocked(collectIssueCounts).mockResolvedValue({ open: 0, closed: 0 });
   vi.mocked(collectPullRequestCounts).mockResolvedValue({ open: 0, closed: 0, merged: 0 });
   vi.mocked(collectPullRequestDetails).mockResolvedValue([]);
@@ -54,6 +66,10 @@ function setupDefaultMocks() {
   vi.mocked(collectContributors).mockResolvedValue({ committerCount: 0, reviewerCount: 0 });
   vi.mocked(collectDependentCount).mockResolvedValue(0);
   vi.mocked(collectWeeklyTrends).mockResolvedValue([]);
+  vi.mocked(buildPullRequestCounts).mockReturnValue({ open: 0, closed: 0, merged: 0 });
+  vi.mocked(buildMergedPRTimeline).mockReturnValue([]);
+  vi.mocked(collectPullRequestDetailsFromNodes).mockResolvedValue([]);
+  vi.mocked(extractReviewerLogins).mockReturnValue(new Set());
 }
 
 describe("collect", () => {

@@ -331,3 +331,113 @@ describe("collectWeeklyTrends", () => {
     expect(getCallCount).toBe(4);
   });
 });
+
+// ── prDataByRepo fast path ─────────────────────────────────────────────────────
+
+import type { GraphQLPRNode } from "./repo-graphql.js";
+
+function makeGraphQLPRNode(overrides: Partial<GraphQLPRNode> = {}): GraphQLPRNode {
+  const now = new Date().toISOString();
+  return {
+    number: 1,
+    title: "PR",
+    state: "MERGED",
+    createdAt: now,
+    mergedAt: now,
+    closedAt: now,
+    updatedAt: now,
+    headRefOid: "sha",
+    body: null,
+    author: { login: "alice", __typename: "User" },
+    additions: 0,
+    deletions: 0,
+    commits: { totalCount: 1 },
+    comments: { totalCount: 0 },
+    reviewComments: { totalCount: 0 },
+    reviews: { nodes: [] },
+    ...overrides,
+  };
+}
+
+describe("collectWeeklyTrends with prDataByRepo", () => {
+  afterEach(() => resetOctokit());
+
+  it("uses pre-fetched PR nodes and skips pulls.get when prDataByRepo provided", async () => {
+    let getCallCount = 0;
+
+    setOctokit({
+      rest: {
+        issues: { listForRepo: {} },
+        pulls: {
+          list: {},
+          get: async () => {
+            getCallCount++;
+            return { data: { additions: 0, deletions: 0 } };
+          },
+        },
+      },
+      paginate: Object.assign(
+        (_m: unknown) => Promise.resolve([]),
+        {
+          iterator: async function* () {
+            yield { data: [] };
+          },
+        }
+      ),
+    } as unknown as Octokit);
+
+    const prDataByRepo = new Map([
+      [
+        "o/r",
+        [
+          makeGraphQLPRNode({
+            number: 1,
+            state: "MERGED",
+            createdAt: daysAgo(2),
+            mergedAt: daysAgo(1),
+            updatedAt: daysAgo(1),
+            additions: 50,
+            deletions: 20,
+          }),
+        ],
+      ],
+    ]);
+
+    const trends = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4, 200, prDataByRepo);
+    // Should have counted the merged PR with lines
+    const totalMerged = trends.reduce((s, t) => s + t.prsMerged, 0);
+    const totalAdded = trends.reduce((s, t) => s + t.linesAdded, 0);
+    expect(totalMerged).toBe(1);
+    expect(totalAdded).toBe(50);
+    // Should NOT have called pulls.get since additions/deletions came from GraphQL node
+    expect(getCallCount).toBe(0);
+  });
+
+  it("counts prsOpened for CLOSED/MERGED nodes created within window", async () => {
+    setOctokit({
+      rest: { issues: { listForRepo: {} }, pulls: { list: {}, get: vi.fn() } },
+      paginate: Object.assign(
+        (_m: unknown) => Promise.resolve([]),
+        { iterator: async function* () { yield { data: [] }; } }
+      ),
+    } as unknown as Octokit);
+
+    const prDataByRepo = new Map([
+      [
+        "o/r",
+        [
+          makeGraphQLPRNode({
+            state: "CLOSED",
+            createdAt: daysAgo(2),
+            updatedAt: daysAgo(1),
+            mergedAt: null,
+          }),
+        ],
+      ],
+    ]);
+
+    const trends = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4, 200, prDataByRepo);
+    const totalOpened = trends.reduce((s, t) => s + t.prsOpened, 0);
+    expect(totalOpened).toBe(1);
+  });
+});

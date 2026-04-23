@@ -611,3 +611,246 @@ describe("computeCopilotAdoption", () => {
     });
   });
 });
+
+// ── GraphQL-based pure transforms ─────────────────────────────────────────────
+
+import {
+  buildPullRequestCounts,
+  buildMergedPRTimeline,
+  collectPullRequestDetailsFromNodes,
+  extractReviewerLogins,
+} from "./pull-requests.js";
+import type { GraphQLPRNode, GraphQLRepoData } from "./repo-graphql.js";
+
+function makePRNode(overrides: Partial<GraphQLPRNode> = {}): GraphQLPRNode {
+  const now = new Date().toISOString();
+  return {
+    number: 1,
+    title: "Test PR",
+    state: "MERGED",
+    createdAt: now,
+    mergedAt: now,
+    closedAt: now,
+    updatedAt: now,
+    headRefOid: "abc123",
+    body: null,
+    author: { login: "alice", __typename: "User" },
+    additions: 10,
+    deletions: 5,
+    commits: { totalCount: 2 },
+    comments: { totalCount: 1 },
+    reviewComments: { totalCount: 1 },
+    reviews: { nodes: [] },
+    ...overrides,
+  };
+}
+
+describe("buildPullRequestCounts", () => {
+  it("derives counts from GraphQL data", () => {
+    const data: GraphQLRepoData = {
+      isFork: false,
+      openIssueCount: 3,
+      closedIssueCount: 7,
+      openPRCount: 2,
+      closedPRCount: 4,
+      mergedPRCount: 10,
+      prNodes: [],
+    };
+    expect(buildPullRequestCounts(data)).toEqual({ open: 2, closed: 4, merged: 10 });
+  });
+});
+
+describe("buildMergedPRTimeline", () => {
+  it("includes only MERGED nodes", () => {
+    const nodes = [
+      makePRNode({ number: 1, state: "MERGED", mergedAt: "2026-01-03T00:00:00Z", createdAt: "2026-01-01T00:00:00Z" }),
+      makePRNode({ number: 2, state: "CLOSED", mergedAt: null }),
+      makePRNode({ number: 3, state: "OPEN", mergedAt: null }),
+    ];
+    const result = buildMergedPRTimeline(nodes);
+    expect(result).toHaveLength(1);
+    expect(result[0].number).toBe(1);
+    expect(result[0].timeToMergeHours).toBe(48);
+  });
+
+  it("detects copilot[bot] author and isCopilotAuthored", () => {
+    const node = makePRNode({
+      author: { login: "copilot[bot]", __typename: "Bot" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isBotAuthor).toBe(true);
+    expect(result[0].isCopilotAuthored).toBe(true);
+  });
+
+  it("detects bot by __typename Bot", () => {
+    const node = makePRNode({
+      author: { login: "dependabot[bot]", __typename: "Bot" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isBotAuthor).toBe(true);
+    expect(result[0].isCopilotAuthored).toBe(false);
+  });
+
+  it("handles null author as 'unknown'", () => {
+    const node = makePRNode({ author: null });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].author).toBe("unknown");
+    expect(result[0].isBotAuthor).toBe(false);
+  });
+
+  it("parses issue refs from body", () => {
+    const node = makePRNode({ body: "Fixes #42" });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].closesIssues).toEqual([42]);
+  });
+
+  it("sorts by mergedAt descending", () => {
+    const nodes = [
+      makePRNode({ number: 1, mergedAt: "2026-01-01T00:00:00Z" }),
+      makePRNode({ number: 2, mergedAt: "2026-01-03T00:00:00Z" }),
+    ];
+    const result = buildMergedPRTimeline(nodes);
+    expect(result[0].number).toBe(2);
+    expect(result[1].number).toBe(1);
+  });
+});
+
+describe("collectPullRequestDetailsFromNodes", () => {
+  afterEach(() => resetOctokit());
+
+  it("builds details from GraphQL nodes and fetches check runs", async () => {
+    const sha = "abc123";
+    const node = makePRNode({
+      number: 7,
+      title: "My PR",
+      state: "MERGED",
+      createdAt: "2026-01-01T00:00:00Z",
+      mergedAt: "2026-01-03T00:00:00Z",
+      headRefOid: sha,
+      additions: 20,
+      deletions: 5,
+      commits: { totalCount: 3 },
+      comments: { totalCount: 2 },
+      reviewComments: { totalCount: 1 },
+      reviews: { nodes: [{ author: { login: "reviewer1" } }] },
+    });
+
+    setOctokit({
+      rest: {
+        checks: {
+          listForRef: async () => ({
+            data: {
+              check_runs: [
+                { started_at: "2026-01-02T10:00:00Z", completed_at: "2026-01-02T10:10:00Z" },
+              ],
+            },
+          }),
+        },
+      },
+    } as unknown as Octokit);
+
+    const result = await collectPullRequestDetailsFromNodes("owner", "repo", [node]);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      number: 7,
+      title: "My PR",
+      state: "merged",
+      author: "alice",
+      isCopilotAuthored: false,
+      hasCopilotReview: false,
+      linesAdded: 20,
+      linesDeleted: 5,
+      commentCount: 3, // comments(2) + reviewComments(1)
+      commitCount: 3,
+      mergedAt: "2026-01-03T00:00:00Z",
+    });
+    expect(result[0].actionsMinutes).toBeCloseTo(10, 0);
+    expect(result[0].timeToMergeHours).toBe(48);
+  });
+
+  it("detects hasCopilotReview from review nodes", async () => {
+    const node = makePRNode({
+      reviews: { nodes: [{ author: { login: "copilot[bot]" } }] },
+    });
+
+    setOctokit({
+      rest: { checks: { listForRef: async () => ({ data: { check_runs: [] } }) } },
+    } as unknown as Octokit);
+
+    const result = await collectPullRequestDetailsFromNodes("owner", "repo", [node]);
+    expect(result[0].hasCopilotReview).toBe(true);
+  });
+
+  it("returns 0 actionsMinutes when check runs throw", async () => {
+    const node = makePRNode();
+
+    setOctokit({
+      rest: {
+        checks: {
+          listForRef: async () => { throw new Error("No access"); },
+        },
+      },
+    } as unknown as Octokit);
+
+    const result = await collectPullRequestDetailsFromNodes("owner", "repo", [node]);
+    expect(result[0].actionsMinutes).toBe(0);
+  });
+
+  it("respects limit parameter", async () => {
+    const nodes = Array.from({ length: 5 }, (_, i) =>
+      makePRNode({ number: i + 1, mergedAt: `2026-01-0${i + 1}T00:00:00Z` })
+    );
+
+    setOctokit({
+      rest: { checks: { listForRef: async () => ({ data: { check_runs: [] } }) } },
+    } as unknown as Octokit);
+
+    const result = await collectPullRequestDetailsFromNodes("owner", "repo", nodes, 2);
+    expect(result).toHaveLength(2);
+  });
+
+  it("excludes non-MERGED nodes", async () => {
+    const nodes = [
+      makePRNode({ number: 1, state: "MERGED" }),
+      makePRNode({ number: 2, state: "CLOSED", mergedAt: null }),
+      makePRNode({ number: 3, state: "OPEN", mergedAt: null }),
+    ];
+
+    setOctokit({
+      rest: { checks: { listForRef: async () => ({ data: { check_runs: [] } }) } },
+    } as unknown as Octokit);
+
+    const result = await collectPullRequestDetailsFromNodes("owner", "repo", nodes, 10);
+    expect(result).toHaveLength(1);
+    expect(result[0].number).toBe(1);
+  });
+});
+
+describe("extractReviewerLogins", () => {
+  it("returns unique reviewer logins from all PR nodes", () => {
+    const nodes = [
+      makePRNode({ reviews: { nodes: [{ author: { login: "alice" } }, { author: { login: "bob" } }] } }),
+      makePRNode({ reviews: { nodes: [{ author: { login: "alice" } }, { author: { login: "carol" } }] } }),
+    ];
+    const result = extractReviewerLogins(nodes);
+    expect(result.size).toBe(3);
+    expect(result.has("alice")).toBe(true);
+    expect(result.has("bob")).toBe(true);
+    expect(result.has("carol")).toBe(true);
+  });
+
+  it("skips review nodes with null author", () => {
+    const nodes = [
+      makePRNode({ reviews: { nodes: [{ author: null }, { author: { login: "dave" } }] } }),
+    ];
+    const result = extractReviewerLogins(nodes);
+    expect(result.size).toBe(1);
+    expect(result.has("dave")).toBe(true);
+  });
+
+  it("returns empty set for no reviews", () => {
+    expect(extractReviewerLogins([makePRNode({ reviews: { nodes: [] } })])).toEqual(new Set());
+    expect(extractReviewerLogins([])).toEqual(new Set());
+  });
+});
+
