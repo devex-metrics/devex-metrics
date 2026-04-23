@@ -148,6 +148,11 @@ export async function collectRepoGraphQL(
       throw err;
     }
 
+    if (!response?.repository) {
+      console.warn(`  ⚠ graphql: empty response for ${owner}/${repo}, falling back to REST`);
+      return null;
+    }
+
     const repoData = response.repository;
 
     if (firstPage) {
