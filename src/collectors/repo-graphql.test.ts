@@ -271,5 +271,18 @@ describe("collectRepoGraphQL", () => {
     const result = await collectRepoGraphQL("owner", "forked-repo");
     expect(result!.isFork).toBe(true);
   });
+
+  it("returns null and warns when API returns an empty/undefined response body", async () => {
+    // GitHub occasionally returns HTTP 200 with data: null or no data field;
+    // @octokit/graphql passes through undefined in that case.
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    setOctokit(buildMockOctokit([undefined]));
+
+    const result = await collectRepoGraphQL("owner", "repo");
+
+    expect(result).toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("empty response"));
+    warnSpy.mockRestore();
+  });
 });
 
