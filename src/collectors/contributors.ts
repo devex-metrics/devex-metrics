@@ -3,10 +3,15 @@ import { getOctokit } from "../github-client.js";
 /**
  * Count unique committers (last 90 days) and unique PR reviewers
  * for a repository.
+ *
+ * When `reviewerLogins` is provided (pre-fetched from GraphQL), the REST
+ * pulls.list + listReviews loop is skipped entirely and the provided set is
+ * used directly.
  */
 export async function collectContributors(
   owner: string,
-  repo: string
+  repo: string,
+  reviewerLogins?: Set<string>
 ): Promise<{ committerCount: number; reviewerCount: number }> {
   const octokit = await getOctokit();
   const since = new Date(
@@ -32,7 +37,15 @@ export async function collectContributors(
     // Repo may be empty or inaccessible
   }
 
-  // --- Unique reviewers from recent PRs ---
+  // --- Unique reviewers ---
+  // When pre-fetched from GraphQL, skip the REST review loop entirely.
+  if (reviewerLogins !== undefined) {
+    return {
+      committerCount: committers.size,
+      reviewerCount: reviewerLogins.size,
+    };
+  }
+
   const reviewers = new Set<string>();
   try {
     const { data: prs } = await octokit.rest.pulls.list({
