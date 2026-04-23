@@ -62,7 +62,7 @@ function makeGraphQLResponse(opts: {
 function buildMockOctokit(responses: unknown[]): Octokit {
   let callCount = 0;
   const graphql = async (_query: string, _vars: unknown) => {
-    const response = responses[callCount];
+    const response = responses[Math.min(callCount, responses.length - 1)];
     callCount++;
     if (response instanceof Error) throw response;
     return response;
@@ -185,11 +185,39 @@ describe("collectRepoGraphQL", () => {
     expect(result).toBeNull();
   });
 
-  it("re-throws non-404/403 errors", async () => {
-    const err = Object.assign(new Error("Server error"), { status: 500 });
+  it("re-throws non-transient errors (e.g. 400) immediately without retrying", async () => {
+    const err = Object.assign(new Error("Bad request"), { status: 400 });
     setOctokit(buildMockOctokit([err]));
 
-    await expect(collectRepoGraphQL("owner", "repo")).rejects.toMatchObject({ status: 500 });
+    await expect(collectRepoGraphQL("owner", "repo")).rejects.toMatchObject({ status: 400 });
+  });
+
+  it("retries on transient 502 error and succeeds on the retry", async () => {
+    vi.useFakeTimers();
+    const err = Object.assign(new Error("Bad gateway"), { status: 502 });
+    const success = makeGraphQLResponse({ nodes: [], hasNextPage: false });
+    setOctokit(buildMockOctokit([err, success]));
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const p = collectRepoGraphQL("owner", "repo");
+    await vi.advanceTimersByTimeAsync(5_001);
+    const result = await p;
+
+    expect(result).not.toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("transient"));
+    warnSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it("re-throws after exhausting all transient retries", async () => {
+    vi.useFakeTimers();
+    const err = Object.assign(new Error("Bad gateway"), { status: 502 });
+    setOctokit(buildMockOctokit([err])); // clamped — all attempts throw
+
+    const checkPromise = expect(collectRepoGraphQL("owner", "repo")).rejects.toMatchObject({ status: 502 });
+    await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
+    await checkPromise;
+    vi.useRealTimers();
   });
 
   it("returns empty prNodes for a repo with no PRs", async () => {
