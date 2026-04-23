@@ -141,6 +141,10 @@ export async function collectRepoGraphQL(
         }
         return null;
       }
+      if (isTransientServerError(err)) {
+        console.warn(`  ⚠ graphql: giving up on ${owner}/${repo} after repeated 5xx errors, falling back to REST`);
+        return null;
+      }
       throw err;
     }
 
