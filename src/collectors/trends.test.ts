@@ -353,7 +353,7 @@ function makeGraphQLPRNode(overrides: Partial<GraphQLPRNode> = {}): GraphQLPRNod
     deletions: 0,
     commits: { totalCount: 1 },
     comments: { totalCount: 0 },
-    reviewComments: { totalCount: 0 },
+    reviewThreads: { totalCount: 0 },
     reviews: { nodes: [] },
     ...overrides,
   };
@@ -441,3 +441,4 @@ describe("collectWeeklyTrends with prDataByRepo", () => {
     expect(totalOpened).toBe(1);
   });
 });
+
