@@ -1,14 +1,19 @@
 import { getOctokit } from "../github-client.js";
-import { getCountFromLinkHeader } from "../link-header.js";
 import type { IssueCounts, IssueLeadTime, MergedPRSummary } from "../types.js";
 
 /**
- * Count open and closed issues for a repository.
+ * Count open and closed issues for a repository (REST fallback).
  *
- * Uses the list-issues endpoint with `per_page=1` and parses the Link header
- * to derive totals. The GitHub issues API returns only issues (not pull
- * requests) for the authenticated user context, so no PR subtraction is
- * needed. Math.max(0, …) guards against any edge-case negative values.
+ * Used only when the primary GraphQL path in `collectRepoGraphQL` returns
+ * null (e.g. the repo can't be queried via GraphQL). Uses the Search API,
+ * which returns `total_count` directly and explicitly filters out PRs via
+ * `type:issue`.
+ *
+ * The previous implementation derived totals from the `Link` header on
+ * `issues.listForRepo` with `per_page=1`, but GitHub has migrated the issues
+ * endpoint to cursor-based pagination, so the `Link` header no longer
+ * exposes a `rel="last"` page number. That made every repo report at most
+ * 1 open + 1 closed issue.
  */
 export async function collectIssueCounts(
   owner: string,
@@ -17,18 +22,26 @@ export async function collectIssueCounts(
   const octokit = await getOctokit();
 
   try {
-    const [openAll, closedAll] = await Promise.all([
-      octokit.rest.issues.listForRepo({ owner, repo, state: "open", per_page: 1 }),
-      octokit.rest.issues.listForRepo({ owner, repo, state: "closed", per_page: 1 }),
+    const [openRes, closedRes] = await Promise.all([
+      octokit.rest.search.issuesAndPullRequests({
+        q: `repo:${owner}/${repo} type:issue state:open`,
+        per_page: 1,
+        advanced_search: "true",
+      }),
+      octokit.rest.search.issuesAndPullRequests({
+        q: `repo:${owner}/${repo} type:issue state:closed`,
+        per_page: 1,
+        advanced_search: "true",
+      }),
     ]);
 
     return {
-      open: Math.max(0, getCountFromLinkHeader(openAll)),
-      closed: Math.max(0, getCountFromLinkHeader(closedAll)),
+      open: Math.max(0, openRes.data.total_count),
+      closed: Math.max(0, closedRes.data.total_count),
     };
   } catch (err: unknown) {
     const status = (err as { status?: number }).status;
-    if (status === 404 || status === 403) {
+    if (status === 404 || status === 403 || status === 422) {
       if (status === 403) {
         console.warn(`  ⚠ issues: skipping ${owner}/${repo}: access denied (403) — token may need SAML SSO authorization`);
       }
