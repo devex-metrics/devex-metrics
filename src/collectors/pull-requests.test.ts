@@ -487,17 +487,27 @@ describe("collectMergedPRTimeline", () => {
         user: { login: "copilot[bot]", type: "Bot" },
         body: null,
       },
+      {
+        number: 12,
+        created_at: "2026-01-01T00:00:00Z",
+        merged_at: "2026-01-03T01:00:00Z",
+        user: { login: "Copilot", type: "Bot" },
+        body: null,
+      },
     ]]));
 
     const result = await collectMergedPRTimeline("owner", "repo");
-    expect(result).toHaveLength(2);
-    // sorted desc by mergedAt: copilot[bot] (Jan 2) first, dependabot[bot] (Jan 1) second
+    expect(result).toHaveLength(3);
     const copilotEntry = result.find((e) => e.number === 11)!;
     const dependabotEntry = result.find((e) => e.number === 10)!;
+    const copilotSweEntry = result.find((e) => e.number === 12)!;
     expect(dependabotEntry.isBotAuthor).toBe(true);
     expect(dependabotEntry.isCopilotAuthored).toBe(false);
     expect(copilotEntry.isBotAuthor).toBe(true);
     expect(copilotEntry.isCopilotAuthored).toBe(true);
+    // Copilot coding agent (copilot-swe-agent) uses "Copilot" login with type "Bot"
+    expect(copilotSweEntry.isBotAuthor).toBe(true);
+    expect(copilotSweEntry.isCopilotAuthored).toBe(true);
   });
 
   it("returns sorted by mergedAt descending", async () => {
@@ -676,6 +686,15 @@ describe("buildMergedPRTimeline", () => {
   it("detects copilot[bot] author and isCopilotAuthored", () => {
     const node = makePRNode({
       author: { login: "copilot[bot]", __typename: "Bot" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isBotAuthor).toBe(true);
+    expect(result[0].isCopilotAuthored).toBe(true);
+  });
+
+  it("detects Copilot coding agent (login 'Copilot', __typename 'Bot') as isCopilotAuthored", () => {
+    const node = makePRNode({
+      author: { login: "Copilot", __typename: "Bot" },
     });
     const result = buildMergedPRTimeline([node]);
     expect(result[0].isBotAuthor).toBe(true);

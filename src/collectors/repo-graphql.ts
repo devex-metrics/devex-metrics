@@ -1,7 +1,5 @@
 import { getOctokit } from "../github-client.js";
 
-const COPILOT_LOGIN = "copilot[bot]";
-
 /** A single PR node returned by the GraphQL query. */
 export interface GraphQLPRNode {
   number: number;
@@ -95,11 +93,14 @@ const REPO_DATA_QUERY = `
 `;
 
 /**
- * Determine whether the author login represents a known Copilot bot.
- * Checks for exact match of copilot[bot] login.
+ * Return true when the login belongs to a Copilot bot account.
+ * Checks for the legacy `copilot[bot]` review-bot login and the newer
+ * Copilot coding agent (copilot-swe-agent) that uses login `"Copilot"` with
+ * GraphQL `__typename` `"Bot"`.
  */
-export function isCopilotLogin(login: string): boolean {
-  return login.toLowerCase() === COPILOT_LOGIN;
+export function isCopilotLogin(login: string, typename?: string): boolean {
+  const lower = login.toLowerCase();
+  return lower === "copilot[bot]" || (lower === "copilot" && typename === "Bot");
 }
 
 /**

@@ -8,7 +8,16 @@ import type {
 } from "../types.js";
 import type { GraphQLRepoData, GraphQLPRNode } from "./repo-graphql.js";
 
-const COPILOT_LOGIN = "copilot[bot]";
+/**
+ * Return true when the login belongs to a Copilot bot account.
+ * Handles both the legacy `copilot[bot]` review-bot login and the newer
+ * Copilot coding agent (copilot-swe-agent), which uses the login `"Copilot"`
+ * with user.type / __typename `"Bot"`.
+ */
+function isCopilotUser(login: string, typeHint?: string): boolean {
+  const lower = login.toLowerCase();
+  return lower === "copilot[bot]" || (lower === "copilot" && typeHint === "Bot");
+}
 
 /**
  * Extract issue numbers from a PR body that use closing keywords.
@@ -161,14 +170,14 @@ export async function collectPullRequestDetails(
           per_page: 100,
         });
         hasCopilotReview = reviews.some(
-          (r) => r.user?.login?.toLowerCase() === COPILOT_LOGIN,
+          (r) => isCopilotUser(r.user?.login ?? "", r.user?.type),
         );
       } catch {
         // Reviews may not be accessible
       }
 
       const authorLogin = pr.user?.login ?? "unknown";
-      const isCopilotAuthored = authorLogin.toLowerCase() === COPILOT_LOGIN;
+      const isCopilotAuthored = isCopilotUser(authorLogin, pr.user?.type);
 
       details.push({
         number: pr.number,
@@ -231,7 +240,7 @@ export async function collectMergedPRTimeline(
           mergedAt: pr.merged_at,
           author: authorLogin,
           isBotAuthor: pr.user?.type === "Bot" || isBotLogin(authorLogin),
-          isCopilotAuthored: authorLogin.toLowerCase() === COPILOT_LOGIN,
+          isCopilotAuthored: isCopilotUser(authorLogin, pr.user?.type),
           timeToMergeHours:
             Math.round(hoursBetween(pr.created_at, pr.merged_at) * 100) / 100,
           closesIssues: parseIssueRefs(pr.body),
@@ -292,7 +301,7 @@ export function buildMergedPRTimeline(nodes: GraphQLPRNode[]): MergedPRSummary[]
       mergedAt: node.mergedAt,
       author: authorLogin,
       isBotAuthor: isBot,
-      isCopilotAuthored: authorLogin.toLowerCase() === COPILOT_LOGIN,
+      isCopilotAuthored: isCopilotUser(authorLogin, node.author?.__typename),
       timeToMergeHours:
         Math.round(hoursBetween(node.createdAt, node.mergedAt) * 100) / 100,
       closesIssues: parseIssueRefs(node.body),
@@ -346,7 +355,7 @@ export async function collectPullRequestDetailsFromNodes(
       .map((r) => r.author?.login ?? "")
       .filter(Boolean);
     const hasCopilotReview = reviewerLogins.some(
-      (l) => l.toLowerCase() === COPILOT_LOGIN
+      (l) => l.toLowerCase() === "copilot[bot]" || l.toLowerCase() === "copilot"
     );
 
     details.push({
@@ -355,7 +364,7 @@ export async function collectPullRequestDetailsFromNodes(
       state: "merged",
       createdAt: node.createdAt,
       author: authorLogin,
-      isCopilotAuthored: authorLogin.toLowerCase() === COPILOT_LOGIN,
+      isCopilotAuthored: isCopilotUser(authorLogin, node.author?.__typename),
       hasCopilotReview,
       linesAdded: node.additions,
       linesDeleted: node.deletions,
