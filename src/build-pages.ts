@@ -489,6 +489,7 @@ function buildRepoRow(repo: RepoMetrics): string {
     `data-repo-name="${escapeHtml(repo.name.toLowerCase())}" ` +
     `data-open-issues="${repo.issues.open}" ` +
     `data-merged-prs="${repo.pullRequests.merged}" ` +
+    `data-merged-prs-all="${repo.pullRequests.merged}" ` +
     `data-open-prs="${repo.pullRequests.open}" ` +
     `data-contributors="${totalContrib}" ` +
     `data-dependents="${repo.dependentCount}" ` +
@@ -996,7 +997,9 @@ function applyFilter(period){
   if(period==="all"){
     document.querySelectorAll(".repo-row[data-repo-name]").forEach(function(row){
       var cell=row.querySelector(".td-merged-prs");
-      if(cell)cell.textContent=String(row.dataset.mergedPrs||0);
+      var v=String(row.dataset.mergedPrsAll||0);
+      if(cell)cell.textContent=v;
+      row.dataset.mergedPrs=v;
     });
   }else{
     var repoCounts={};
@@ -1006,7 +1009,9 @@ function applyFilter(period){
     });
     document.querySelectorAll(".repo-row[data-repo-name]").forEach(function(row){
       var cell=row.querySelector(".td-merged-prs");
-      if(cell)cell.textContent=String(repoCounts[row.dataset.repoName]||0);
+      var v=String(repoCounts[row.dataset.repoName]||0);
+      if(cell)cell.textContent=v;
+      row.dataset.mergedPrs=v;
     });
   }
   var note=document.getElementById("reposPeriodNote");
