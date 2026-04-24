@@ -11,10 +11,11 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
  *
  * Version history:
  *   1 — initial versioning; adds mergedPRDates per repo
- *   2 — replaces mergedPRDates with mergedPRTimeline; adds copilotAdoption,
- *       issueLeadTimes, and enriched PullRequestDetail fields
+ *   3 — fix Copilot authorship detection to also match the Copilot coding
+ *       agent login "Copilot" (type "Bot"); previous cache has incorrect
+ *       isCopilotAuthored: false for copilot-swe-agent PRs
  */
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 
 function cacheFilePath(owner: string): string {
   return path.join(DATA_DIR, `${owner}.json`);
