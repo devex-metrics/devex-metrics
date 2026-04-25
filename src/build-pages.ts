@@ -953,14 +953,16 @@ function applyFilter(period){
     if(prLbl)prLbl.textContent="Merged PRs";
     if(prSub)prSub.textContent=prsOpened+" opened";
   }
-  // Update Copilot KPI
-  var copilotFiltered=filteredPR.filter(function(p){return p.isCopilotAuthored;});
+  // Copilot adoption is a long-term org metric — always show the all-time rate
+  // from CHART_DATA.copilot rather than filtering by the selected period,
+  // which would produce misleading 0% values in windows with no recent Copilot PRs.
+  var cop=CHART_DATA.copilot||{};
   var copilotVal=document.getElementById("kpiCopilotVal");
   var copilotSub=document.getElementById("kpiCopilotSub");
   if(copilotVal){
-    copilotVal.textContent=filteredPR.length>0?(copilotFiltered.length/filteredPR.length*100).toFixed(1)+"%":"\u2013";
+    copilotVal.textContent=cop.totalMerged>0?(cop.authored/cop.totalMerged*100).toFixed(1)+"%":"\u2013";
   }
-  if(copilotSub){copilotSub.textContent=copilotFiltered.length+" authored";}
+  if(copilotSub){copilotSub.textContent=(cop.authored||0)+" authored \u00B7 "+(cop.reviewed||0)+" reviewed";}
   // Update Cycle time KPI
   var cycleVals=filteredPR.map(function(p){return p.timeToMergeHours;}).filter(function(h){return h>0;});
   var medCycle=medianOf(cycleVals);
