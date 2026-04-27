@@ -527,4 +527,76 @@ describe("build-pages", () => {
       })
     ).toThrow();
   });
+
+  it("should initialise KPI panels with 30-day values to prevent load-time flicker", () => {
+    // collectedAt = 2026-04-01T12:00:00Z → 30d cutoff = 2026-03-02T12:00:00Z
+    // W09 Monday = 2026-02-23 → before cutoff (excluded)
+    // W11 Monday = 2026-03-09 → after cutoff (included)
+    // W13 Monday = 2026-03-23 → after cutoff (included)
+    const envelope: CacheEnvelope = {
+      date: "2026-04-01",
+      data: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-04-01T12:00:00Z",
+        repoCount: 1,
+        repos: [
+          {
+            name: "repo-a",
+            fullName: "test-pages-owner/repo-a",
+            // All-time totals deliberately differ from 30d values
+            issues: { open: 15, closed: 20 },
+            pullRequests: { open: 3, closed: 2, merged: 10 },
+            pullRequestDetails: [],
+            mergedPRTimeline: [
+              // Before cutoff — must NOT appear in 30d KPIs
+              { number: 1, createdAt: "2026-01-14T00:00:00Z", mergedAt: "2026-01-15T00:00:00Z", author: "dev", isBotAuthor: false, isCopilotAuthored: false, timeToMergeHours: 100, closesIssues: [] },
+              // After cutoff — must appear in 30d KPIs
+              { number: 2, createdAt: "2026-03-14T00:00:00Z", mergedAt: "2026-03-15T00:00:00Z", author: "dev", isBotAuthor: false, isCopilotAuthored: false, timeToMergeHours: 24, closesIssues: [] },
+              { number: 3, createdAt: "2026-03-24T00:00:00Z", mergedAt: "2026-03-25T00:00:00Z", author: "dev", isBotAuthor: false, isCopilotAuthored: false, timeToMergeHours: 48, closesIssues: [] },
+            ],
+            committerCount: 2,
+            reviewerCount: 1,
+            contributorCount: 3,
+            dependentCount: 0,
+          },
+        ],
+        weeklyTrends: [
+          // Excluded (before cutoff)
+          { week: "2026-W09", prsOpened: 5, prsMerged: 4, issuesOpened: 10, issuesClosed: 8, linesAdded: 100, linesDeleted: 40 },
+          // Included (after cutoff): issuesOpened=5, issuesClosed=3, prsOpened=4
+          { week: "2026-W11", prsOpened: 4, prsMerged: 3, issuesOpened: 5, issuesClosed: 3, linesAdded: 80, linesDeleted: 20 },
+          // Included: issuesOpened=3, issuesClosed=2, prsOpened=2
+          { week: "2026-W13", prsOpened: 2, prsMerged: 2, issuesOpened: 3, issuesClosed: 2, linesAdded: 50, linesDeleted: 10 },
+        ],
+      },
+    };
+    fs.writeFileSync(cacheFile, JSON.stringify(envelope));
+
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+
+    // Parse without running JS to check the server-rendered initial values
+    const dom = new JSDOM(html);
+    const document = dom.window.document;
+
+    // 30d issuesOpened = 5 + 3 = 8; issuesClosed = 3 + 2 = 5
+    expect(document.getElementById("kpiIssueVal")?.textContent).toBe("8");
+    expect(document.getElementById("kpiIssueLbl")?.textContent).toBe("Issues Opened");
+    expect(document.getElementById("kpiIssueSub")?.textContent).toBe("5 closed");
+
+    // 30d prsMerged = 2 (PR#2 and PR#3); prsOpened = 4 + 2 = 6
+    expect(document.getElementById("kpiPRVal")?.textContent).toBe("2");
+    expect(document.getElementById("kpiPRSub")?.textContent).toBe("6 opened");
+
+    // 30d cycle time: median([24, 48]) = 36h → formats as "1.5d" (36 ≥ 24h)
+    expect(document.getElementById("kpiCycleVal")?.textContent).toBe("1.5d");
+
+    // Sanity-check: all-time values must NOT appear in these elements
+    expect(document.getElementById("kpiIssueVal")?.textContent).not.toBe("15");
+    expect(document.getElementById("kpiPRVal")?.textContent).not.toBe("10");
+  });
 });
