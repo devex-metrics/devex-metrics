@@ -14,8 +14,9 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
  *   3 — fix Copilot authorship detection to also match the Copilot coding
  *       agent login "Copilot" (type "Bot"); previous cache has incorrect
  *       isCopilotAuthored: false for copilot-swe-agent PRs
+ *   4 — add contributorCount (unique union of committers + reviewers) to RepoMetrics
  */
-export const CURRENT_SCHEMA_VERSION = 3;
+export const CURRENT_SCHEMA_VERSION = 4;
 
 function cacheFilePath(owner: string): string {
   return path.join(DATA_DIR, `${owner}.json`);

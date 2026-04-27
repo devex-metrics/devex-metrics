@@ -51,6 +51,8 @@ export interface RepoMetrics {
   committerCount: number;
   /** Unique PR reviewers (last 90 days). */
   reviewerCount: number;
+  /** Unique contributors (union of committers and reviewers, last 90 days). */
+  contributorCount: number;
   /** Number of repositories that depend on this repo (from dependency graph). */
   dependentCount: number;
 }

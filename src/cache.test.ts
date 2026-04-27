@@ -20,6 +20,7 @@ function makeSampleMetrics(): OrgMetrics {
         pullRequestDetails: [],
         committerCount: 1,
         reviewerCount: 0,
+        contributorCount: 1,
         dependentCount: 0,
       },
     ],
