@@ -685,15 +685,27 @@ document.addEventListener("DOMContentLoaded",function(){
   applyFilter("30days");
 });
 function renderCharts(){
+  function hexToRgba(hex,a){
+    var h=(hex||"").replace("#","");
+    if(h.length===3)h=h.split("").map(function(c){return c+c;}).join("");
+    var r=parseInt(h.slice(0,2),16)||0, g=parseInt(h.slice(2,4),16)||0, b=parseInt(h.slice(4,6),16)||0;
+    return "rgba("+r+","+g+","+b+","+a+")";
+  }
   Chart.register({id:"repoBarGrad",beforeUpdate:function(chart){
     if(chart.canvas.id!=="chartRepos")return;
     var ctx=chart.ctx,ca=chart.chartArea;
     if(!ca)return;
     chart.data.datasets.forEach(function(ds){
       var base=ds._gradBase;if(!base)return;
-      var g=ctx.createLinearGradient(ca.left,0,ca.right,0);
-      g.addColorStop(0,base+"55");g.addColorStop(1,base);
+      // vertical gradient across the bar height for better contrast in narrow widths
+      var g=ctx.createLinearGradient(0,ca.top,0,ca.bottom);
+      g.addColorStop(0,hexToRgba(base,0.95));
+      g.addColorStop(0.6,hexToRgba(base,0.85));
+      g.addColorStop(1,hexToRgba(base,0.72));
       ds.backgroundColor=g;
+      // subtle border to improve separation from background
+      ds.borderColor=hexToRgba(base,0.9);
+      ds.borderWidth=0;
     });
   }});
   Chart.defaults.color=cssColors.muted;
