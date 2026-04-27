@@ -188,4 +188,38 @@ describe("collectContributors", () => {
     const result = await collectContributors("owner", "repo", new Set());
     expect(result.reviewerCount).toBe(0);
   });
+
+  it("deduplicates across committers and reviewers for contributorCount", async () => {
+    // alice commits and reviews — should count once in contributorCount
+    const reviews = new Map([[1, [{ user: { login: "alice" } }, { user: { login: "bob" } }]]]);
+    setOctokit(
+      buildMockOctokit({
+        commits: [
+          { author: { login: "alice" }, commit: { author: null } },
+          { author: { login: "carol" }, commit: { author: null } },
+        ],
+        prs: [{ number: 1 }],
+        reviews,
+      })
+    );
+
+    const result = await collectContributors("owner", "repo");
+    expect(result.committerCount).toBe(2); // alice, carol
+    expect(result.reviewerCount).toBe(2);  // alice, bob
+    expect(result.contributorCount).toBe(3); // alice, bob, carol (alice deduped)
+  });
+
+  it("deduplicates across committers and pre-fetched reviewers for contributorCount", async () => {
+    setOctokit(
+      buildMockOctokit({
+        commits: [{ author: { login: "alice" }, commit: { author: null } }],
+      })
+    );
+
+    const prefetched = new Set(["alice", "bob"]); // alice overlaps with committers
+    const result = await collectContributors("owner", "repo", prefetched);
+    expect(result.committerCount).toBe(1);
+    expect(result.reviewerCount).toBe(2);
+    expect(result.contributorCount).toBe(2); // alice, bob (alice deduped)
+  });
 });

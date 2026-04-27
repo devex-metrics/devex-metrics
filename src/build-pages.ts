@@ -468,7 +468,7 @@ function buildRepoRow(repo: RepoMetrics): string {
       <tbody>${prRows}</tbody></table></div>`
       : "";
 
-  const totalContrib = repo.committerCount + repo.reviewerCount;
+  const totalContrib = repo.contributorCount;
   const linesAdded = repo.pullRequestDetails.reduce(
     (s, pr) => s + pr.linesAdded,
     0,

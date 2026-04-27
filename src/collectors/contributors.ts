@@ -12,7 +12,7 @@ export async function collectContributors(
   owner: string,
   repo: string,
   reviewerLogins?: Set<string>
-): Promise<{ committerCount: number; reviewerCount: number }> {
+): Promise<{ committerCount: number; reviewerCount: number; contributorCount: number }> {
   const octokit = await getOctokit();
   const since = new Date(
     Date.now() - 90 * 24 * 60 * 60 * 1000
@@ -43,6 +43,7 @@ export async function collectContributors(
     return {
       committerCount: committers.size,
       reviewerCount: reviewerLogins.size,
+      contributorCount: new Set([...committers, ...reviewerLogins]).size,
     };
   }
 
@@ -81,5 +82,6 @@ export async function collectContributors(
   return {
     committerCount: committers.size,
     reviewerCount: reviewers.size,
+    contributorCount: new Set([...committers, ...reviewers]).size,
   };
 }

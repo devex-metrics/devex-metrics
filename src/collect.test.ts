@@ -63,7 +63,7 @@ function setupDefaultMocks() {
   vi.mocked(computeCopilotAdoption).mockReturnValue({
     copilotAuthoredPRs: 0, copilotReviewedPRs: 0, totalMergedPRs: 0, totalDetailedPRs: 0,
   });
-  vi.mocked(collectContributors).mockResolvedValue({ committerCount: 0, reviewerCount: 0 });
+  vi.mocked(collectContributors).mockResolvedValue({ committerCount: 0, reviewerCount: 0, contributorCount: 0 });
   vi.mocked(collectDependentCount).mockResolvedValue(0);
   vi.mocked(collectWeeklyTrends).mockResolvedValue([]);
   vi.mocked(buildPullRequestCounts).mockReturnValue({ open: 0, closed: 0, merged: 0 });

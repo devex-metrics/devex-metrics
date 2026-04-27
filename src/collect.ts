@@ -153,6 +153,7 @@ export async function collect(
       issueLeadTimes,
       committerCount: contributors.committerCount,
       reviewerCount: contributors.reviewerCount,
+      contributorCount: contributors.contributorCount,
       dependentCount,
     });
   }
