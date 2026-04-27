@@ -152,6 +152,18 @@ function formatDurationHtml(hours: number): string {
   return `${days.toFixed(1)}d`;
 }
 
+/** Mirrors the client-side weekToDate() — returns the Monday of the given ISO week. */
+function weekToDate(weekStr: string): Date {
+  const [yearStr, weekNum] = weekStr.split('-W');
+  const year = parseInt(yearStr, 10);
+  const week = parseInt(weekNum, 10);
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const dow = jan4.getUTCDay() || 7;
+  const mon = new Date(jan4);
+  mon.setUTCDate(jan4.getUTCDate() - dow + 1 + (week - 1) * 7);
+  return mon;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Dashboard HTML builder                                            */
 /* ------------------------------------------------------------------ */
@@ -258,9 +270,27 @@ function buildDashboardHtml(
     })),
   );
 
-  // Median cycle time
+  // Median cycle time (all-time)
   const cycleTimes = allPRDetails.map((p) => p.timeToMergeHours).filter((h) => h > 0);
   const medianCycleHrs = computeMedian(cycleTimes);
+
+  // Pre-compute 30-day initial values so the HTML is already correct for the
+  // default "Last 30 Days" filter, preventing a visible flicker on page load.
+  // This mirrors getCutoffDate("30days") + applyFilter logic in the client JS.
+  const collected = new Date(data.collectedAt);
+  const cutoff30d = new Date(collected);
+  cutoff30d.setUTCDate(cutoff30d.getUTCDate() - 30);
+  const trends30d = (data.weeklyTrends ?? []).filter(
+    (t) => weekToDate(t.week) >= cutoff30d,
+  );
+  const issuesOpened30 = trends30d.reduce((s, t) => s + (t.issuesOpened ?? 0), 0);
+  const issuesClosed30 = trends30d.reduce((s, t) => s + (t.issuesClosed ?? 0), 0);
+  const prsOpened30 = trends30d.reduce((s, t) => s + (t.prsOpened ?? 0), 0);
+  const filtered30d = allPRDetails.filter((p) => new Date(p.mergedAt) >= cutoff30d);
+  const prsMerged30 = filtered30d.length;
+  const medianCycle30d = computeMedian(
+    filtered30d.map((p) => p.timeToMergeHours).filter((h) => h > 0),
+  );
 
   const chartPayload = JSON.stringify({
     issues: { open: totals.openIssues, closed: totals.closedIssues },
@@ -335,15 +365,15 @@ function buildDashboardHtml(
     </div>
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x26A0;&#xFE0F;</div>
-      <div class="kpi-val" id="kpiIssueVal">${totals.openIssues}</div>
-      <div class="kpi-lbl" id="kpiIssueLbl">Open Issues</div>
-      <div class="kpi-sub" id="kpiIssueSub">${totals.closedIssues} closed</div>
+      <div class="kpi-val" id="kpiIssueVal">${issuesOpened30}</div>
+      <div class="kpi-lbl" id="kpiIssueLbl">Issues Opened</div>
+      <div class="kpi-sub" id="kpiIssueSub">${issuesClosed30} closed</div>
     </div>
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x1F500;</div>
-      <div class="kpi-val" id="kpiPRVal">${totals.mergedPRs}</div>
+      <div class="kpi-val" id="kpiPRVal">${prsMerged30}</div>
       <div class="kpi-lbl" id="kpiPRLbl">Merged PRs</div>
-      <div class="kpi-sub" id="kpiPRSub">${totals.openPRs} open &middot; ${totals.closedPRs} closed</div>
+      <div class="kpi-sub" id="kpiPRSub">${prsOpened30} opened</div>
     </div>
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x1F465;</div>
@@ -359,7 +389,7 @@ function buildDashboardHtml(
     </div>
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x23F1;&#xFE0F;</div>
-      <div class="kpi-val" id="kpiCycleVal">${medianCycleHrs > 0 ? formatDurationHtml(medianCycleHrs) : '–'}</div>
+      <div class="kpi-val" id="kpiCycleVal">${medianCycle30d > 0 ? formatDurationHtml(medianCycle30d) : '–'}</div>
       <div class="kpi-lbl" id="kpiCycleLbl">Median Cycle Time</div>
       <div class="kpi-sub" id="kpiCycleSub">PR created &rarr; merged</div>
     </div>
