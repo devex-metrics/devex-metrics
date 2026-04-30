@@ -442,7 +442,7 @@ function buildDashboardHtml(
           <th class="col-num th-sortable" data-sort="contributors">Contributors <span class="sort-ind" aria-hidden="true"></span></th>
           <th class="col-num th-sortable" data-sort="dependents">Dependents <span class="sort-ind" aria-hidden="true"></span></th>
           <th class="col-date th-sortable" data-sort="pushed">Last Updated <span class="sort-ind" aria-hidden="true"></span></th>
-          <th class="col-lines th-sortable" data-sort="linesAdded">Lines +/- <span class="sort-ind" aria-hidden="true"></span></th>
+          <th class="col-lines th-sortable" data-sort="linesAdded" title="Total lines added/removed across merged PRs in the last ~13 months (or last 10 detailed PRs when full timeline data is unavailable)">Lines +/- <span class="sort-ind" aria-hidden="true"></span></th>
         </tr></thead>
         <tbody id="repoList">${repoRows}</tbody>
       </table>
@@ -499,14 +499,21 @@ function buildRepoRow(repo: RepoMetrics): string {
       : "";
 
   const totalContrib = repo.contributorCount;
-  const linesAdded = repo.pullRequestDetails.reduce(
-    (s, pr) => s + pr.linesAdded,
-    0,
-  );
-  const linesDeleted = repo.pullRequestDetails.reduce(
-    (s, pr) => s + pr.linesDeleted,
-    0,
-  );
+  // Prefer the full merged-PR timeline (covers ~13 months) over the
+  // 10-PR detailed sample so the per-repo Lines +/- column reflects all
+  // recent activity. Fall back to the detailed sample when the timeline
+  // lacks line counts (REST fallback path doesn't fetch them).
+  const timelineLineEntries =
+    repo.mergedPRTimeline?.filter(
+      (pr) => pr.linesAdded !== undefined || pr.linesDeleted !== undefined,
+    ) ?? [];
+  const useTimeline = timelineLineEntries.length > 0;
+  const linesAdded = useTimeline
+    ? timelineLineEntries.reduce((s, pr) => s + (pr.linesAdded ?? 0), 0)
+    : repo.pullRequestDetails.reduce((s, pr) => s + pr.linesAdded, 0);
+  const linesDeleted = useTimeline
+    ? timelineLineEntries.reduce((s, pr) => s + (pr.linesDeleted ?? 0), 0)
+    : repo.pullRequestDetails.reduce((s, pr) => s + pr.linesDeleted, 0);
   const pushedDate = repo.pushedAt ? repo.pushedAt.slice(0, 10) : "";
   const repoUrl = `https://github.com/${escapeHtml(repo.fullName)}`;
   const repoId = repo.fullName

@@ -732,6 +732,13 @@ describe("buildMergedPRTimeline", () => {
     expect(result[0].number).toBe(2);
     expect(result[1].number).toBe(1);
   });
+
+  it("populates linesAdded/linesDeleted from GraphQL node additions/deletions", () => {
+    const node = makePRNode({ additions: 123, deletions: 45 });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].linesAdded).toBe(123);
+    expect(result[0].linesDeleted).toBe(45);
+  });
 });
 
 describe("collectPullRequestDetailsFromNodes", () => {

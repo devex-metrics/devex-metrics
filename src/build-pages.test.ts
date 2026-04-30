@@ -320,6 +320,104 @@ describe("build-pages", () => {
     expect(html).toContain('id="chartPRSizeTrends"');
   });
 
+  it("sums per-repo Lines +/- across the full mergedPRTimeline, not just the 10 detailed PRs", () => {
+    const envelope: CacheEnvelope = {
+      date: "2026-03-28",
+      data: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-03-28T12:00:00Z",
+        repoCount: 1,
+        repos: [
+          {
+            name: "repo-a",
+            fullName: "test-pages-owner/repo-a",
+            issues: { open: 0, closed: 0 },
+            pullRequests: { open: 0, closed: 0, merged: 5 },
+            pullRequestDetails: [
+              {
+                number: 1,
+                title: "Latest",
+                state: "merged",
+                createdAt: "2026-03-01T00:00:00Z",
+                author: "alice",
+                isCopilotAuthored: false,
+                hasCopilotReview: false,
+                mergedAt: "2026-03-02T00:00:00Z",
+                linesAdded: 100,
+                linesDeleted: 10,
+                commentCount: 0,
+                commitCount: 1,
+                actionsMinutes: 0,
+              },
+            ],
+            mergedPRTimeline: [
+              { number: 1, createdAt: "2026-03-01T00:00:00Z", mergedAt: "2026-03-02T00:00:00Z", author: "alice", isBotAuthor: false, isCopilotAuthored: false, timeToMergeHours: 24, closesIssues: [], linesAdded: 100, linesDeleted: 10 },
+              { number: 2, createdAt: "2026-02-01T00:00:00Z", mergedAt: "2026-02-02T00:00:00Z", author: "alice", isBotAuthor: false, isCopilotAuthored: false, timeToMergeHours: 24, closesIssues: [], linesAdded: 200, linesDeleted: 20 },
+              { number: 3, createdAt: "2026-01-01T00:00:00Z", mergedAt: "2026-01-02T00:00:00Z", author: "alice", isBotAuthor: false, isCopilotAuthored: false, timeToMergeHours: 24, closesIssues: [], linesAdded: 300, linesDeleted: 30 },
+            ],
+            committerCount: 1,
+            reviewerCount: 0,
+            contributorCount: 1,
+            dependentCount: 0,
+          },
+        ],
+      },
+    };
+    fs.writeFileSync(cacheFile, JSON.stringify(envelope));
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    // Sum across timeline: 100+200+300 added, 10+20+30 deleted.
+    expect(html).toContain('data-lines-added="600"');
+    expect(html).toContain('data-lines-deleted="60"');
+  });
+
+  it("falls back to pullRequestDetails for Lines +/- when timeline lacks line counts", () => {
+    const envelope: CacheEnvelope = {
+      date: "2026-03-28",
+      data: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-03-28T12:00:00Z",
+        repoCount: 1,
+        repos: [
+          {
+            name: "repo-a",
+            fullName: "test-pages-owner/repo-a",
+            issues: { open: 0, closed: 0 },
+            pullRequests: { open: 0, closed: 0, merged: 1 },
+            pullRequestDetails: [
+              {
+                number: 1, title: "x", state: "merged",
+                createdAt: "2026-03-01T00:00:00Z", author: "a",
+                isCopilotAuthored: false, hasCopilotReview: false,
+                mergedAt: "2026-03-02T00:00:00Z",
+                linesAdded: 42, linesDeleted: 7,
+                commentCount: 0, commitCount: 1, actionsMinutes: 0,
+              },
+            ],
+            // Timeline present but without linesAdded/linesDeleted (REST fallback)
+            mergedPRTimeline: [
+              { number: 1, createdAt: "2026-03-01T00:00:00Z", mergedAt: "2026-03-02T00:00:00Z", author: "a", isBotAuthor: false, isCopilotAuthored: false, timeToMergeHours: 24, closesIssues: [] },
+            ],
+            committerCount: 1, reviewerCount: 0, contributorCount: 1, dependentCount: 0,
+          },
+        ],
+      },
+    };
+    fs.writeFileSync(cacheFile, JSON.stringify(envelope));
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    expect(html).toContain('data-lines-added="42"');
+    expect(html).toContain('data-lines-deleted="7"');
+  });
+
   it("normalizes missing linesAdded/linesDeleted to 0 for old cached data", () => {
     // Simulate old cached data where weeklyTrends lacks the new fields
     const oldEnvelope: CacheEnvelope = {

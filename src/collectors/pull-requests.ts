@@ -305,6 +305,8 @@ export function buildMergedPRTimeline(nodes: GraphQLPRNode[]): MergedPRSummary[]
       timeToMergeHours:
         Math.round(hoursBetween(node.createdAt, node.mergedAt) * 100) / 100,
       closesIssues: parseIssueRefs(node.body),
+      linesAdded: node.additions,
+      linesDeleted: node.deletions,
     });
   }
   return timeline.sort((a, b) => (b.mergedAt > a.mergedAt ? 1 : -1));

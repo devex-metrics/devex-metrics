@@ -111,6 +111,15 @@ export interface MergedPRSummary {
   timeToMergeHours: number;
   /** Issue numbers referenced via "Fixes #N" / "Closes #N" in the PR body. */
   closesIssues: number[];
+  /**
+   * Lines added by this PR. Populated when the timeline is sourced from
+   * GraphQL (which exposes additions/deletions on the PR node for free);
+   * undefined when sourced from the REST fallback path, which only paginates
+   * `pulls.list` and does not fetch per-PR detail.
+   */
+  linesAdded?: number;
+  /** Lines deleted by this PR. See `linesAdded` for source caveats. */
+  linesDeleted?: number;
 }
 
 /** Per-repo Copilot adoption summary. */
