@@ -15,8 +15,11 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
  *       agent login "Copilot" (type "Bot"); previous cache has incorrect
  *       isCopilotAuthored: false for copilot-swe-agent PRs
  *   4 — add contributorCount (unique union of committers + reviewers) to RepoMetrics
+ *   5 — add linesAdded/linesDeleted to MergedPRSummary so the dashboard's
+ *       per-repo Lines +/- column can sum across the full ~13-month merged-PR
+ *       timeline instead of just the 10 most recent detailed PRs
  */
-export const CURRENT_SCHEMA_VERSION = 4;
+export const CURRENT_SCHEMA_VERSION = 5;
 
 function cacheFilePath(owner: string): string {
   return path.join(DATA_DIR, `${owner}.json`);
