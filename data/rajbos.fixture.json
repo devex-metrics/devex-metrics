@@ -2,14 +2,14 @@
   "schemaVersion": 5,
   "owner": "rajbos",
   "ownerType": "user",
-  "collectedAt": "2026-05-02T07:36:03.920Z",
+  "collectedAt": "2026-05-03T08:05:06.616Z",
   "repoCount": 147,
   "repos": [
     {
       "name": "docker-action-demo",
       "fullName": "devops-actions/docker-action-demo",
       "pushedAt": "2023-07-20T15:55:13Z",
-      "collectedAt": "2026-05-02T07:24:23.848Z",
+      "collectedAt": "2026-05-03T07:53:50.443Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -37,7 +37,7 @@
       "name": "issue-comment-tag",
       "fullName": "devops-actions/issue-comment-tag",
       "pushedAt": "2026-05-01T01:55:56Z",
-      "collectedAt": "2026-05-02T07:24:38.248Z",
+      "collectedAt": "2026-05-03T07:54:03.072Z",
       "issues": {
         "open": 0,
         "closed": 12
@@ -1099,24 +1099,12 @@
           "closesIssues": [],
           "linesAdded": 1,
           "linesDeleted": 1
-        },
-        {
-          "number": 390,
-          "createdAt": "2025-04-01T01:23:11Z",
-          "mergedAt": "2025-04-02T13:14:33Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 35.86,
-          "closesIssues": [],
-          "linesAdded": 8,
-          "linesDeleted": 8
         }
       ],
       "copilotAdoption": {
         "copilotAuthoredPRs": 0,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 75,
+        "totalMergedPRs": 74,
         "totalDetailedPRs": 10
       },
       "issueLeadTimes": [
@@ -1137,7 +1125,7 @@
       "name": "load-available-actions",
       "fullName": "devops-actions/load-available-actions",
       "pushedAt": "2026-05-01T20:24:48Z",
-      "collectedAt": "2026-05-02T07:25:02.037Z",
+      "collectedAt": "2026-05-03T07:54:23.868Z",
       "issues": {
         "open": 5,
         "closed": 35
@@ -2642,7 +2630,7 @@
       "name": "load-used-actions",
       "fullName": "devops-actions/load-used-actions",
       "pushedAt": "2026-05-01T08:16:54Z",
-      "collectedAt": "2026-05-02T07:25:23.364Z",
+      "collectedAt": "2026-05-03T07:54:42.040Z",
       "issues": {
         "open": 1,
         "closed": 14
@@ -3991,7 +3979,7 @@
       "name": "partner-actions",
       "fullName": "github-technology-partners/partner-actions",
       "pushedAt": "2024-06-24T17:45:02Z",
-      "collectedAt": "2026-05-02T07:25:25.455Z",
+      "collectedAt": "2026-05-03T07:54:44.241Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -4019,7 +4007,7 @@
       "name": "azure-devops-extension-action",
       "fullName": "jessehouwing/azure-devops-extension-action",
       "pushedAt": "2020-12-09T18:50:18Z",
-      "collectedAt": "2026-05-02T07:25:26.228Z",
+      "collectedAt": "2026-05-03T07:54:44.878Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -4047,7 +4035,7 @@
       "name": "octogotchi",
       "fullName": "marcduiker/octogotchi",
       "pushedAt": "2021-04-09T20:43:11Z",
-      "collectedAt": "2026-05-02T07:25:27.573Z",
+      "collectedAt": "2026-05-03T07:54:46.067Z",
       "issues": {
         "open": 1,
         "closed": 3
@@ -4075,7 +4063,7 @@
       "name": "octogotchi-backend",
       "fullName": "marcduiker/octogotchi-backend",
       "pushedAt": "2021-04-29T21:52:12Z",
-      "collectedAt": "2026-05-02T07:25:28.668Z",
+      "collectedAt": "2026-05-03T07:54:47.087Z",
       "issues": {
         "open": 2,
         "closed": 3
@@ -4103,7 +4091,7 @@
       "name": "MondrianMuse",
       "fullName": "MatthijsvdVeer/MondrianMuse",
       "pushedAt": "2026-04-07T07:58:06Z",
-      "collectedAt": "2026-05-02T07:25:36.731Z",
+      "collectedAt": "2026-05-03T07:54:53.934Z",
       "issues": {
         "open": 8,
         "closed": 102
@@ -4533,7 +4521,7 @@
       "name": "mcp-security-scans",
       "fullName": "mcp-research/mcp-security-scans",
       "pushedAt": "2026-05-01T18:06:28Z",
-      "collectedAt": "2026-05-02T07:26:00.955Z",
+      "collectedAt": "2026-05-03T07:55:13.856Z",
       "issues": {
         "open": 4,
         "closed": 83
@@ -6320,7 +6308,7 @@
       "name": "copilot-custom-extension",
       "fullName": "molson504x/copilot-custom-extension",
       "pushedAt": "2025-11-16T05:21:22Z",
-      "collectedAt": "2026-05-02T07:26:02.121Z",
+      "collectedAt": "2026-05-03T07:55:14.534Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -6348,7 +6336,7 @@
       "name": "lfs-warning",
       "fullName": "ppremk/lfs-warning",
       "pushedAt": "2024-09-07T09:39:08Z",
-      "collectedAt": "2026-05-02T07:26:08.301Z",
+      "collectedAt": "2026-05-03T07:55:19.703Z",
       "issues": {
         "open": 4,
         "closed": 13
@@ -6376,7 +6364,7 @@
       "name": "ActionsFundamentals",
       "fullName": "ps-actions-sandbox/ActionsFundamentals",
       "pushedAt": "2025-08-13T09:24:28Z",
-      "collectedAt": "2026-05-02T07:26:13.330Z",
+      "collectedAt": "2026-05-03T07:55:24.136Z",
       "issues": {
         "open": 4,
         "closed": 10
@@ -6404,7 +6392,7 @@
       "name": ".github",
       "fullName": "rajbos/.github",
       "pushedAt": "2024-04-27T10:59:56Z",
-      "collectedAt": "2026-05-02T07:26:14.414Z",
+      "collectedAt": "2026-05-03T07:55:24.650Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -6432,7 +6420,7 @@
       "name": "acp-editor-demo",
       "fullName": "rajbos/acp-editor-demo",
       "pushedAt": "2026-01-26T08:46:03Z",
-      "collectedAt": "2026-05-02T07:26:15.389Z",
+      "collectedAt": "2026-05-03T07:55:26.298Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -6460,7 +6448,7 @@
       "name": "actions-load-test",
       "fullName": "rajbos/actions-load-test",
       "pushedAt": "2022-09-09T21:31:11Z",
-      "collectedAt": "2026-05-02T07:26:16.487Z",
+      "collectedAt": "2026-05-03T07:55:27.155Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -6488,7 +6476,7 @@
       "name": "actions-marketplace",
       "fullName": "rajbos/actions-marketplace",
       "pushedAt": "2026-04-01T17:33:28Z",
-      "collectedAt": "2026-05-02T07:26:24.818Z",
+      "collectedAt": "2026-05-03T07:55:34.587Z",
       "issues": {
         "open": 9,
         "closed": 14
@@ -7134,7 +7122,7 @@
       "name": "actions-marketplace-checks",
       "fullName": "rajbos/actions-marketplace-checks",
       "pushedAt": "2026-04-09T20:59:39Z",
-      "collectedAt": "2026-05-02T07:28:18.600Z",
+      "collectedAt": "2026-05-03T07:57:23.479Z",
       "issues": {
         "open": 0,
         "closed": 18
@@ -9284,7 +9272,7 @@
       "name": "actions-permissions",
       "fullName": "rajbos/actions-permissions",
       "pushedAt": "2023-07-24T15:08:46Z",
-      "collectedAt": "2026-05-02T07:28:19.214Z",
+      "collectedAt": "2026-05-03T07:57:23.828Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -9312,7 +9300,7 @@
       "name": "actions-testing",
       "fullName": "rajbos/actions-testing",
       "pushedAt": "2021-01-27T19:00:39Z",
-      "collectedAt": "2026-05-02T07:28:20.631Z",
+      "collectedAt": "2026-05-03T07:57:25.184Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -9340,7 +9328,7 @@
       "name": "actions-testing-grounds",
       "fullName": "rajbos/actions-testing-grounds",
       "pushedAt": "2021-09-12T14:17:37Z",
-      "collectedAt": "2026-05-02T07:28:21.494Z",
+      "collectedAt": "2026-05-03T07:57:26.172Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -9368,7 +9356,7 @@
       "name": "actions-usage",
       "fullName": "rajbos/actions-usage",
       "pushedAt": "2023-07-30T10:42:05Z",
-      "collectedAt": "2026-05-02T07:28:22.248Z",
+      "collectedAt": "2026-05-03T07:57:26.832Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -9395,8 +9383,8 @@
     {
       "name": "ai-engineering-fluency",
       "fullName": "rajbos/ai-engineering-fluency",
-      "pushedAt": "2026-05-01T18:01:36Z",
-      "collectedAt": "2026-05-02T07:29:22.400Z",
+      "pushedAt": "2026-05-02T13:54:43Z",
+      "collectedAt": "2026-05-03T07:58:23.108Z",
       "issues": {
         "open": 3,
         "closed": 110
@@ -9404,9 +9392,25 @@
       "pullRequests": {
         "open": 4,
         "closed": 39,
-        "merged": 579
+        "merged": 580
       },
       "pullRequestDetails": [
+        {
+          "number": 739,
+          "title": "fix: unbind custom domains and delete managed certs before terraform destroy",
+          "state": "merged",
+          "createdAt": "2026-05-02T08:48:31Z",
+          "author": "rajbos",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 45,
+          "linesDeleted": 0,
+          "commentCount": 1,
+          "commitCount": 3,
+          "actionsMinutes": 17.55,
+          "timeToMergeHours": 0.87,
+          "mergedAt": "2026-05-02T09:40:41Z"
+        },
         {
           "number": 736,
           "title": "chore: sync model data from rajbos/github-copilot-model-notifier",
@@ -9550,25 +9554,21 @@
           "actionsMinutes": 38.22,
           "timeToMergeHours": 0.85,
           "mergedAt": "2026-04-30T19:36:40Z"
-        },
-        {
-          "number": 729,
-          "title": "Rename project to 'AI Engineering Fluency'",
-          "state": "merged",
-          "createdAt": "2026-04-30T19:32:23Z",
-          "author": "rajbos",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 2,
-          "linesDeleted": 1,
-          "commentCount": 0,
-          "commitCount": 1,
-          "actionsMinutes": 17,
-          "timeToMergeHours": 0,
-          "mergedAt": "2026-04-30T19:32:33Z"
         }
       ],
       "mergedPRTimeline": [
+        {
+          "number": 739,
+          "createdAt": "2026-05-02T08:48:31Z",
+          "mergedAt": "2026-05-02T09:40:41Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.87,
+          "closesIssues": [],
+          "linesAdded": 45,
+          "linesDeleted": 0
+        },
         {
           "number": 736,
           "createdAt": "2026-05-01T08:57:12Z",
@@ -16567,7 +16567,7 @@
       "copilotAdoption": {
         "copilotAuthoredPRs": 0,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 579,
+        "totalMergedPRs": 580,
         "totalDetailedPRs": 10
       },
       "issueLeadTimes": [
@@ -16742,7 +16742,7 @@
       "name": "arm.chocolateyserver",
       "fullName": "rajbos/arm.chocolateyserver",
       "pushedAt": "2018-07-24T10:01:38Z",
-      "collectedAt": "2026-05-02T07:29:23.695Z",
+      "collectedAt": "2026-05-03T07:58:23.956Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -16770,7 +16770,7 @@
       "name": "authority-contribution-scraper",
       "fullName": "rajbos/authority-contribution-scraper",
       "pushedAt": "2026-04-25T11:41:01Z",
-      "collectedAt": "2026-05-02T07:29:24.168Z",
+      "collectedAt": "2026-05-03T07:58:24.480Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -16798,7 +16798,7 @@
       "name": "azure-openai-service-proxy",
       "fullName": "rajbos/azure-openai-service-proxy",
       "pushedAt": "2025-12-08T16:22:02Z",
-      "collectedAt": "2026-05-02T07:29:25.228Z",
+      "collectedAt": "2026-05-03T07:58:25.525Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -16826,7 +16826,7 @@
       "name": "Azure-scripts",
       "fullName": "rajbos/Azure-scripts",
       "pushedAt": "2018-11-08T10:06:52Z",
-      "collectedAt": "2026-05-02T07:29:26.624Z",
+      "collectedAt": "2026-05-03T07:58:26.767Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -16854,7 +16854,7 @@
       "name": "centralPackageVersioningSample",
       "fullName": "rajbos/centralPackageVersioningSample",
       "pushedAt": "2026-04-14T08:24:56Z",
-      "collectedAt": "2026-05-02T07:29:27.189Z",
+      "collectedAt": "2026-05-03T07:58:27.439Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -16882,7 +16882,7 @@
       "name": "check-dependabot",
       "fullName": "rajbos/check-dependabot",
       "pushedAt": "2023-02-05T20:17:41Z",
-      "collectedAt": "2026-05-02T07:29:28.189Z",
+      "collectedAt": "2026-05-03T07:58:28.490Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -16910,7 +16910,7 @@
       "name": "CleanupCopilotLicenses",
       "fullName": "rajbos/CleanupCopilotLicenses",
       "pushedAt": "2024-04-16T01:28:42Z",
-      "collectedAt": "2026-05-02T07:29:29.147Z",
+      "collectedAt": "2026-05-03T07:58:29.519Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -16938,7 +16938,7 @@
       "name": "cli",
       "fullName": "rajbos/cli",
       "pushedAt": "2023-02-05T20:15:52Z",
-      "collectedAt": "2026-05-02T07:29:30.179Z",
+      "collectedAt": "2026-05-03T07:58:30.573Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -16966,7 +16966,7 @@
       "name": "codespaces-models",
       "fullName": "rajbos/codespaces-models",
       "pushedAt": "2024-09-22T21:31:55Z",
-      "collectedAt": "2026-05-02T07:29:31.235Z",
+      "collectedAt": "2026-05-03T07:58:31.517Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -16994,7 +16994,7 @@
       "name": "CodeToCloud-Student",
       "fullName": "rajbos/CodeToCloud-Student",
       "pushedAt": "2022-03-31T12:57:57Z",
-      "collectedAt": "2026-05-02T07:29:32.230Z",
+      "collectedAt": "2026-05-03T07:58:32.510Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17022,7 +17022,7 @@
       "name": "container-scan",
       "fullName": "rajbos/container-scan",
       "pushedAt": "2025-01-05T17:19:59Z",
-      "collectedAt": "2026-05-02T07:29:33.181Z",
+      "collectedAt": "2026-05-03T07:58:33.492Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17050,7 +17050,7 @@
       "name": "continuous-compliance-action",
       "fullName": "rajbos/continuous-compliance-action",
       "pushedAt": "2023-03-21T13:27:07Z",
-      "collectedAt": "2026-05-02T07:29:34.193Z",
+      "collectedAt": "2026-05-03T07:58:34.503Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17078,7 +17078,7 @@
       "name": "copilot-custom-agents",
       "fullName": "rajbos/copilot-custom-agents",
       "pushedAt": "2025-11-23T21:34:41Z",
-      "collectedAt": "2026-05-02T07:29:35.761Z",
+      "collectedAt": "2026-05-03T07:58:35.816Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17106,7 +17106,7 @@
       "name": "copilot-usage-advanced-dashboard",
       "fullName": "rajbos/copilot-usage-advanced-dashboard",
       "pushedAt": "2026-02-04T15:52:29Z",
-      "collectedAt": "2026-05-02T07:29:36.275Z",
+      "collectedAt": "2026-05-03T07:58:36.486Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17134,7 +17134,7 @@
       "name": "create-github-app-from-manifest",
       "fullName": "rajbos/create-github-app-from-manifest",
       "pushedAt": "2026-03-31T19:05:53Z",
-      "collectedAt": "2026-05-02T07:29:41.538Z",
+      "collectedAt": "2026-05-03T07:58:40.676Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17444,7 +17444,7 @@
       "name": "demo",
       "fullName": "rajbos/demo",
       "pushedAt": "2023-02-15T15:47:32Z",
-      "collectedAt": "2026-05-02T07:29:42.379Z",
+      "collectedAt": "2026-05-03T07:58:41.367Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -17472,7 +17472,7 @@
       "name": "demo-actions",
       "fullName": "rajbos/demo-actions",
       "pushedAt": "2026-04-08T14:45:37Z",
-      "collectedAt": "2026-05-02T07:29:50.370Z",
+      "collectedAt": "2026-05-03T07:58:48.222Z",
       "issues": {
         "open": 6,
         "closed": 22
@@ -17500,7 +17500,7 @@
       "name": "demo-javascript-action",
       "fullName": "rajbos/demo-javascript-action",
       "pushedAt": "2024-06-17T06:44:23Z",
-      "collectedAt": "2026-05-02T07:29:51.991Z",
+      "collectedAt": "2026-05-03T07:58:49.796Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17528,7 +17528,7 @@
       "name": "Demo-Pages",
       "fullName": "rajbos/Demo-Pages",
       "pushedAt": "2021-10-25T18:51:45Z",
-      "collectedAt": "2026-05-02T07:29:52.837Z",
+      "collectedAt": "2026-05-03T07:58:50.553Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17556,7 +17556,7 @@
       "name": "demo-repo",
       "fullName": "rajbos/demo-repo",
       "pushedAt": "2025-05-08T12:03:02Z",
-      "collectedAt": "2026-05-02T07:29:53.757Z",
+      "collectedAt": "2026-05-03T07:58:51.408Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17584,7 +17584,7 @@
       "name": "demo-repo-monday",
       "fullName": "rajbos/demo-repo-monday",
       "pushedAt": "2023-03-27T08:28:13Z",
-      "collectedAt": "2026-05-02T07:29:54.832Z",
+      "collectedAt": "2026-05-03T07:58:52.463Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17612,7 +17612,7 @@
       "name": "demo-training",
       "fullName": "rajbos/demo-training",
       "pushedAt": "2022-03-07T10:23:23Z",
-      "collectedAt": "2026-05-02T07:29:55.893Z",
+      "collectedAt": "2026-05-03T07:58:53.615Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -17640,7 +17640,7 @@
       "name": "demo-webgoat",
       "fullName": "rajbos/demo-webgoat",
       "pushedAt": "2024-10-18T08:00:35Z",
-      "collectedAt": "2026-05-02T07:29:57.145Z",
+      "collectedAt": "2026-05-03T07:58:55.162Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17668,7 +17668,7 @@
       "name": "demo-wiki",
       "fullName": "rajbos/demo-wiki",
       "pushedAt": "2023-01-16T10:15:38Z",
-      "collectedAt": "2026-05-02T07:29:58.032Z",
+      "collectedAt": "2026-05-03T07:58:55.858Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17696,7 +17696,7 @@
       "name": "dependency-review-action",
       "fullName": "rajbos/dependency-review-action",
       "pushedAt": "2023-10-16T15:00:40Z",
-      "collectedAt": "2026-05-02T07:29:58.595Z",
+      "collectedAt": "2026-05-03T07:58:56.508Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17724,7 +17724,7 @@
       "name": "dependency-updates",
       "fullName": "rajbos/dependency-updates",
       "pushedAt": "2022-05-24T21:18:27Z",
-      "collectedAt": "2026-05-02T07:30:01.611Z",
+      "collectedAt": "2026-05-03T07:58:58.930Z",
       "issues": {
         "open": 2,
         "closed": 3
@@ -17752,7 +17752,7 @@
       "name": "DevTrainingDemo",
       "fullName": "rajbos/DevTrainingDemo",
       "pushedAt": "2022-06-08T09:11:40Z",
-      "collectedAt": "2026-05-02T07:30:02.401Z",
+      "collectedAt": "2026-05-03T07:58:59.644Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -17780,7 +17780,7 @@
       "name": "dind-rootless-runner",
       "fullName": "rajbos/dind-rootless-runner",
       "pushedAt": "2021-10-12T08:03:09Z",
-      "collectedAt": "2026-05-02T07:30:03.517Z",
+      "collectedAt": "2026-05-03T07:59:00.641Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17808,7 +17808,7 @@
       "name": "dind-secure",
       "fullName": "rajbos/dind-secure",
       "pushedAt": "2021-06-09T14:36:08Z",
-      "collectedAt": "2026-05-02T07:30:04.649Z",
+      "collectedAt": "2026-05-03T07:59:01.597Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17836,7 +17836,7 @@
       "name": "docker-test",
       "fullName": "rajbos/docker-test",
       "pushedAt": "2023-03-30T12:58:01Z",
-      "collectedAt": "2026-05-02T07:30:06.749Z",
+      "collectedAt": "2026-05-03T07:59:03.688Z",
       "issues": {
         "open": 0,
         "closed": 1
@@ -17864,7 +17864,7 @@
       "name": "doom-sharp",
       "fullName": "rajbos/doom-sharp",
       "pushedAt": "2023-09-21T17:29:40Z",
-      "collectedAt": "2026-05-02T07:30:07.251Z",
+      "collectedAt": "2026-05-03T07:59:04.056Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17892,7 +17892,7 @@
       "name": "dotnetcore-angular",
       "fullName": "rajbos/dotnetcore-angular",
       "pushedAt": "2019-10-26T19:29:04Z",
-      "collectedAt": "2026-05-02T07:30:08.596Z",
+      "collectedAt": "2026-05-03T07:59:05.350Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17920,7 +17920,7 @@
       "name": "dotnetcore-webapp",
       "fullName": "rajbos/dotnetcore-webapp",
       "pushedAt": "2024-07-07T15:29:19Z",
-      "collectedAt": "2026-05-02T07:30:17.099Z",
+      "collectedAt": "2026-05-03T07:59:13.203Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17948,7 +17948,7 @@
       "name": "eco-ci-activity-checker",
       "fullName": "rajbos/eco-ci-activity-checker",
       "pushedAt": "2023-04-09T00:04:04Z",
-      "collectedAt": "2026-05-02T07:30:17.603Z",
+      "collectedAt": "2026-05-03T07:59:13.575Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -17976,7 +17976,7 @@
       "name": "eco-ci-energy-estimation",
       "fullName": "rajbos/eco-ci-energy-estimation",
       "pushedAt": "2023-06-08T21:22:02Z",
-      "collectedAt": "2026-05-02T07:30:18.678Z",
+      "collectedAt": "2026-05-03T07:59:14.537Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -18004,7 +18004,7 @@
       "name": "find-action-used",
       "fullName": "rajbos/find-action-used",
       "pushedAt": "2024-11-08T07:43:21Z",
-      "collectedAt": "2026-05-02T07:30:20.555Z",
+      "collectedAt": "2026-05-03T07:59:15.872Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -18032,7 +18032,7 @@
       "name": "game-center",
       "fullName": "rajbos/game-center",
       "pushedAt": "2026-05-01T08:23:39Z",
-      "collectedAt": "2026-05-02T07:30:26.161Z",
+      "collectedAt": "2026-05-03T07:59:20.129Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -18474,7 +18474,7 @@
       "name": "get-organization-repositories-fork",
       "fullName": "rajbos/get-organization-repositories-fork",
       "pushedAt": "2023-02-05T20:20:43Z",
-      "collectedAt": "2026-05-02T07:30:26.665Z",
+      "collectedAt": "2026-05-03T07:59:20.532Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -18502,7 +18502,7 @@
       "name": "gh-developer-games",
       "fullName": "rajbos/gh-developer-games",
       "pushedAt": "2023-01-17T10:29:15Z",
-      "collectedAt": "2026-05-02T07:30:27.650Z",
+      "collectedAt": "2026-05-03T07:59:21.511Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -18530,7 +18530,7 @@
       "name": "ghas-bootcamp",
       "fullName": "rajbos/ghas-bootcamp",
       "pushedAt": "2025-05-03T22:35:38Z",
-      "collectedAt": "2026-05-02T07:30:28.657Z",
+      "collectedAt": "2026-05-03T07:59:22.495Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -18558,7 +18558,7 @@
       "name": "ghas-mcp-server",
       "fullName": "rajbos/ghas-mcp-server",
       "pushedAt": "2025-05-21T15:43:10Z",
-      "collectedAt": "2026-05-02T07:30:32.883Z",
+      "collectedAt": "2026-05-03T07:59:25.948Z",
       "issues": {
         "open": 4,
         "closed": 0
@@ -18783,18 +18783,130 @@
     {
       "name": "GHAzDo-widget",
       "fullName": "rajbos/GHAzDo-widget",
-      "pushedAt": "2026-05-01T04:21:42Z",
-      "collectedAt": "2026-05-02T07:30:44.684Z",
+      "pushedAt": "2026-05-02T09:54:18Z",
+      "collectedAt": "2026-05-03T07:59:51.702Z",
       "issues": {
         "open": 5,
         "closed": 18
       },
       "pullRequests": {
-        "open": 5,
+        "open": 0,
         "closed": 26,
-        "merged": 123
+        "merged": 130
       },
       "pullRequestDetails": [
+        {
+          "number": 179,
+          "title": "fix: upgrade uuid to ^14.0.0 (dependabot alerts #89, #90, #91)",
+          "state": "merged",
+          "createdAt": "2026-05-02T09:42:10Z",
+          "author": "rajbos",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 23,
+          "linesDeleted": 11,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.6,
+          "timeToMergeHours": 0.2,
+          "mergedAt": "2026-05-02T09:54:16Z"
+        },
+        {
+          "number": 178,
+          "title": "fix: pin npm commands with npm ci (Pinned-Dependencies #16 and #17)",
+          "state": "merged",
+          "createdAt": "2026-05-02T09:39:46Z",
+          "author": "rajbos",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.38,
+          "timeToMergeHours": 0.24,
+          "mergedAt": "2026-05-02T09:53:59Z"
+        },
+        {
+          "number": 177,
+          "title": "build(deps): bump the all-in-one group with 4 updates",
+          "state": "merged",
+          "createdAt": "2026-05-01T04:21:43Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 15,
+          "linesDeleted": 15,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.55,
+          "timeToMergeHours": 29.27,
+          "mergedAt": "2026-05-02T09:38:09Z"
+        },
+        {
+          "number": 176,
+          "title": "build(deps-dev): bump npm from 11.12.1 to 11.13.0 in /widgets",
+          "state": "merged",
+          "createdAt": "2026-05-01T04:21:18Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 51,
+          "linesDeleted": 60,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.72,
+          "timeToMergeHours": 29.28,
+          "mergedAt": "2026-05-02T09:38:07Z"
+        },
+        {
+          "number": 175,
+          "title": "build(deps-dev): bump @types/node from 25.5.0 to 25.6.0 in /widgets",
+          "state": "merged",
+          "createdAt": "2026-05-01T04:21:03Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 7,
+          "linesDeleted": 7,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.47,
+          "timeToMergeHours": 29.28,
+          "mergedAt": "2026-05-02T09:38:06Z"
+        },
+        {
+          "number": 174,
+          "title": "build(deps-dev): bump typescript from 6.0.2 to 6.0.3 in /dependencyReviewTask",
+          "state": "merged",
+          "createdAt": "2026-05-01T04:17:40Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 5,
+          "linesDeleted": 5,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.42,
+          "timeToMergeHours": 29.34,
+          "mergedAt": "2026-05-02T09:38:00Z"
+        },
+        {
+          "number": 173,
+          "title": "build(deps): bump azure-pipelines-task-lib from 5.2.8 to 5.2.10 in /dependencyReviewTask",
+          "state": "merged",
+          "createdAt": "2026-05-01T04:17:33Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 5,
+          "linesDeleted": 5,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 3.43,
+          "timeToMergeHours": 29.34,
+          "mergedAt": "2026-05-02T09:37:52Z"
+        },
         {
           "number": 172,
           "title": "docs: document tag-based release process in copilot instructions",
@@ -18842,121 +18954,93 @@
           "actionsMinutes": 3.47,
           "timeToMergeHours": 0.02,
           "mergedAt": "2026-04-20T21:05:13Z"
-        },
-        {
-          "number": 168,
-          "title": "Bump follow-redirects from 1.15.11 to 1.16.0 in /dependencyReviewTask in the npm_and_yarn group across 1 directory",
-          "state": "merged",
-          "createdAt": "2026-04-15T19:17:07Z",
-          "author": "dependabot",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 3,
-          "linesDeleted": 3,
-          "commentCount": 0,
-          "commitCount": 1,
-          "actionsMinutes": 3.4,
-          "timeToMergeHours": 121.52,
-          "mergedAt": "2026-04-20T20:48:17Z"
-        },
-        {
-          "number": 167,
-          "title": "Bump lodash from 4.17.23 to 4.18.1 in /widgets in the npm_and_yarn group across 1 directory",
-          "state": "merged",
-          "createdAt": "2026-04-15T19:16:46Z",
-          "author": "dependabot",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 3,
-          "linesDeleted": 3,
-          "commentCount": 0,
-          "commitCount": 1,
-          "actionsMinutes": 3.33,
-          "timeToMergeHours": 121.52,
-          "mergedAt": "2026-04-20T20:47:45Z"
-        },
-        {
-          "number": 169,
-          "title": "fix: quick wins - rename workflow, add tests, fix vsix var",
-          "state": "merged",
-          "createdAt": "2026-04-20T20:37:36Z",
-          "author": "rajbos",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 16,
-          "linesDeleted": 4,
-          "commentCount": 0,
-          "commitCount": 2,
-          "actionsMinutes": 3.57,
-          "timeToMergeHours": 0.14,
-          "mergedAt": "2026-04-20T20:46:00Z"
-        },
-        {
-          "number": 166,
-          "title": "Increase test coverage and fix run() setResult bug (closes #150)",
-          "state": "merged",
-          "createdAt": "2026-04-10T21:18:09Z",
-          "author": "rajbos",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 408,
-          "linesDeleted": 3,
-          "commentCount": 0,
-          "commitCount": 1,
-          "actionsMinutes": 3.88,
-          "timeToMergeHours": 0.05,
-          "mergedAt": "2026-04-10T21:21:13Z"
-        },
-        {
-          "number": 165,
-          "title": "fix: unpin tfx-cli so Dependabot can update it",
-          "state": "merged",
-          "createdAt": "2026-04-10T20:55:51Z",
-          "author": "rajbos",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 1,
-          "linesDeleted": 1,
-          "commentCount": 0,
-          "commitCount": 2,
-          "actionsMinutes": 3.67,
-          "timeToMergeHours": 0.02,
-          "mergedAt": "2026-04-10T20:57:02Z"
-        },
-        {
-          "number": 164,
-          "title": "Bump vite from 8.0.1 to 8.0.8 in /dependencyReviewTask in the npm_and_yarn group across 1 directory",
-          "state": "merged",
-          "createdAt": "2026-04-10T15:13:50Z",
-          "author": "dependabot",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 0,
-          "linesDeleted": 0,
-          "commentCount": 0,
-          "commitCount": 2,
-          "actionsMinutes": 3.65,
-          "timeToMergeHours": 1.43,
-          "mergedAt": "2026-04-10T16:39:50Z"
-        },
-        {
-          "number": 162,
-          "title": "Bump vite from 8.0.1 to 8.0.5 in /widgets in the npm_and_yarn group across 1 directory",
-          "state": "merged",
-          "createdAt": "2026-04-06T18:20:10Z",
-          "author": "dependabot",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 92,
-          "linesDeleted": 93,
-          "commentCount": 0,
-          "commitCount": 1,
-          "actionsMinutes": 3.63,
-          "timeToMergeHours": 93.12,
-          "mergedAt": "2026-04-10T15:27:24Z"
         }
       ],
       "mergedPRTimeline": [
+        {
+          "number": 179,
+          "createdAt": "2026-05-02T09:42:10Z",
+          "mergedAt": "2026-05-02T09:54:16Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.2,
+          "closesIssues": [],
+          "linesAdded": 23,
+          "linesDeleted": 11
+        },
+        {
+          "number": 178,
+          "createdAt": "2026-05-02T09:39:46Z",
+          "mergedAt": "2026-05-02T09:53:59Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.24,
+          "closesIssues": [],
+          "linesAdded": 2,
+          "linesDeleted": 2
+        },
+        {
+          "number": 177,
+          "createdAt": "2026-05-01T04:21:43Z",
+          "mergedAt": "2026-05-02T09:38:09Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 29.27,
+          "closesIssues": [],
+          "linesAdded": 15,
+          "linesDeleted": 15
+        },
+        {
+          "number": 176,
+          "createdAt": "2026-05-01T04:21:18Z",
+          "mergedAt": "2026-05-02T09:38:07Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 29.28,
+          "closesIssues": [],
+          "linesAdded": 51,
+          "linesDeleted": 60
+        },
+        {
+          "number": 175,
+          "createdAt": "2026-05-01T04:21:03Z",
+          "mergedAt": "2026-05-02T09:38:06Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 29.28,
+          "closesIssues": [],
+          "linesAdded": 7,
+          "linesDeleted": 7
+        },
+        {
+          "number": 174,
+          "createdAt": "2026-05-01T04:17:40Z",
+          "mergedAt": "2026-05-02T09:38:00Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 29.34,
+          "closesIssues": [],
+          "linesAdded": 5,
+          "linesDeleted": 5
+        },
+        {
+          "number": 173,
+          "createdAt": "2026-05-01T04:17:33Z",
+          "mergedAt": "2026-05-02T09:37:52Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 29.34,
+          "closesIssues": [],
+          "linesAdded": 5,
+          "linesDeleted": 5
+        },
         {
           "number": 172,
           "createdAt": "2026-04-27T10:02:29Z",
@@ -19937,7 +20021,7 @@
       "copilotAdoption": {
         "copilotAuthoredPRs": 0,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 81,
+        "totalMergedPRs": 88,
         "totalDetailedPRs": 10
       },
       "issueLeadTimes": [
@@ -19965,7 +20049,7 @@
       "name": "giphy-action",
       "fullName": "rajbos/giphy-action",
       "pushedAt": "2023-05-13T22:02:46Z",
-      "collectedAt": "2026-05-02T07:30:45.187Z",
+      "collectedAt": "2026-05-03T07:59:52.093Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -19993,7 +20077,7 @@
       "name": "github-action-composite-message",
       "fullName": "rajbos/github-action-composite-message",
       "pushedAt": "2021-09-12T14:23:58Z",
-      "collectedAt": "2026-05-02T07:30:46.560Z",
+      "collectedAt": "2026-05-03T07:59:53.351Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -20021,7 +20105,7 @@
       "name": "github-actions-requests",
       "fullName": "rajbos/github-actions-requests",
       "pushedAt": "2024-09-03T21:00:19Z",
-      "collectedAt": "2026-05-02T07:30:48.795Z",
+      "collectedAt": "2026-05-03T07:59:55.628Z",
       "issues": {
         "open": 19,
         "closed": 8
@@ -20049,7 +20133,7 @@
       "name": "github-azure-devops-marketplace-extension-news",
       "fullName": "rajbos/github-azure-devops-marketplace-extension-news",
       "pushedAt": "2026-05-01T09:58:37Z",
-      "collectedAt": "2026-05-02T07:31:06.365Z",
+      "collectedAt": "2026-05-03T08:00:11.831Z",
       "issues": {
         "open": 0,
         "closed": 7
@@ -21091,7 +21175,7 @@
       "name": "github-composite-action-goodbye",
       "fullName": "rajbos/github-composite-action-goodbye",
       "pushedAt": "2021-09-12T14:25:11Z",
-      "collectedAt": "2026-05-02T07:31:07.174Z",
+      "collectedAt": "2026-05-03T08:00:12.588Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -21119,7 +21203,7 @@
       "name": "github-config-as-code",
       "fullName": "rajbos/github-config-as-code",
       "pushedAt": "2023-06-07T15:24:41Z",
-      "collectedAt": "2026-05-02T07:31:08.192Z",
+      "collectedAt": "2026-05-03T08:00:13.599Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -21147,7 +21231,7 @@
       "name": "github-copilot-game-dev",
       "fullName": "rajbos/github-copilot-game-dev",
       "pushedAt": "2026-04-01T09:55:18Z",
-      "collectedAt": "2026-05-02T07:31:09.235Z",
+      "collectedAt": "2026-05-03T08:00:14.550Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -21175,7 +21259,7 @@
       "name": "github-copilot-model-notifier",
       "fullName": "rajbos/github-copilot-model-notifier",
       "pushedAt": "2026-05-01T08:41:49Z",
-      "collectedAt": "2026-05-02T07:31:13.158Z",
+      "collectedAt": "2026-05-03T08:00:17.867Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -21457,7 +21541,7 @@
       "name": "github-copilot-premium-reqs-usage-fork",
       "fullName": "rajbos/github-copilot-premium-reqs-usage-fork",
       "pushedAt": "2026-04-20T07:27:21Z",
-      "collectedAt": "2026-05-02T07:31:21.976Z",
+      "collectedAt": "2026-05-03T08:00:24.722Z",
       "issues": {
         "open": 1,
         "closed": 19
@@ -21975,7 +22059,7 @@
       "name": "github-fork-updater",
       "fullName": "rajbos/github-fork-updater",
       "pushedAt": "2026-05-01T00:07:06Z",
-      "collectedAt": "2026-05-02T07:31:29.901Z",
+      "collectedAt": "2026-05-03T08:00:31.790Z",
       "issues": {
         "open": 50,
         "closed": 79
@@ -22573,7 +22657,7 @@
       "name": "github-graphql-examples",
       "fullName": "rajbos/github-graphql-examples",
       "pushedAt": "2022-11-28T22:28:51Z",
-      "collectedAt": "2026-05-02T07:31:30.713Z",
+      "collectedAt": "2026-05-03T08:00:32.464Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -22601,7 +22685,7 @@
       "name": "github-mcp-server",
       "fullName": "rajbos/github-mcp-server",
       "pushedAt": "2025-05-13T18:59:47Z",
-      "collectedAt": "2026-05-02T07:31:31.367Z",
+      "collectedAt": "2026-05-03T08:00:33.138Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -22629,7 +22713,7 @@
       "name": "github-models-example",
       "fullName": "rajbos/github-models-example",
       "pushedAt": "2024-10-13T15:22:28Z",
-      "collectedAt": "2026-05-02T07:31:32.713Z",
+      "collectedAt": "2026-05-03T08:00:34.599Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -22657,7 +22741,7 @@
       "name": "github-org-information",
       "fullName": "rajbos/github-org-information",
       "pushedAt": "2023-06-08T20:48:09Z",
-      "collectedAt": "2026-05-02T07:31:33.813Z",
+      "collectedAt": "2026-05-03T08:00:35.631Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -22684,10 +22768,10 @@
     {
       "name": "GitHub-ratelimit-research",
       "fullName": "rajbos/GitHub-ratelimit-research",
-      "pushedAt": "2026-05-02T06:58:21Z",
-      "collectedAt": "2026-05-02T07:31:38.786Z",
+      "pushedAt": "2026-05-03T07:53:46Z",
+      "collectedAt": "2026-05-03T08:00:39.564Z",
       "issues": {
-        "open": 0,
+        "open": 2,
         "closed": 41
       },
       "pullRequests": {
@@ -23103,7 +23187,7 @@
       "name": "github-secure-code-game",
       "fullName": "rajbos/github-secure-code-game",
       "pushedAt": "2023-07-20T17:58:55Z",
-      "collectedAt": "2026-05-02T07:31:39.588Z",
+      "collectedAt": "2026-05-03T08:00:40.290Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23131,7 +23215,7 @@
       "name": "github-upload-action",
       "fullName": "rajbos/github-upload-action",
       "pushedAt": "2021-11-29T16:22:30Z",
-      "collectedAt": "2026-05-02T07:31:40.280Z",
+      "collectedAt": "2026-05-03T08:00:40.968Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23159,7 +23243,7 @@
       "name": "GitHubBootcamp",
       "fullName": "rajbos/GitHubBootcamp",
       "pushedAt": "2022-06-17T14:57:02Z",
-      "collectedAt": "2026-05-02T07:31:41.315Z",
+      "collectedAt": "2026-05-03T08:00:41.961Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23187,7 +23271,7 @@
       "name": "Goat-test",
       "fullName": "rajbos/Goat-test",
       "pushedAt": "2023-10-07T10:11:36Z",
-      "collectedAt": "2026-05-02T07:31:42.529Z",
+      "collectedAt": "2026-05-03T08:00:43.120Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23215,7 +23299,7 @@
       "name": "greenframe-action",
       "fullName": "rajbos/greenframe-action",
       "pushedAt": "2023-04-08T21:12:31Z",
-      "collectedAt": "2026-05-02T07:31:43.260Z",
+      "collectedAt": "2026-05-03T08:00:43.946Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23243,7 +23327,7 @@
       "name": "ha-config",
       "fullName": "rajbos/ha-config",
       "pushedAt": "2019-01-27T10:48:16Z",
-      "collectedAt": "2026-05-02T07:31:44.644Z",
+      "collectedAt": "2026-05-03T08:00:45.315Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23271,7 +23355,7 @@
       "name": "hol-demo",
       "fullName": "rajbos/hol-demo",
       "pushedAt": "2022-09-06T15:17:57Z",
-      "collectedAt": "2026-05-02T07:31:45.794Z",
+      "collectedAt": "2026-05-03T08:00:46.476Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23299,7 +23383,7 @@
       "name": "home-automation",
       "fullName": "rajbos/home-automation",
       "pushedAt": "2022-03-25T14:54:30Z",
-      "collectedAt": "2026-05-02T07:31:46.709Z",
+      "collectedAt": "2026-05-03T08:00:47.309Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23327,7 +23411,7 @@
       "name": "html-timer",
       "fullName": "rajbos/html-timer",
       "pushedAt": "2024-12-01T21:42:34Z",
-      "collectedAt": "2026-05-02T07:31:48.075Z",
+      "collectedAt": "2026-05-03T08:00:48.842Z",
       "issues": {
         "open": 2,
         "closed": 2
@@ -23355,7 +23439,7 @@
       "name": "issue-labeler",
       "fullName": "rajbos/issue-labeler",
       "pushedAt": "2023-06-29T08:42:00Z",
-      "collectedAt": "2026-05-02T07:31:48.566Z",
+      "collectedAt": "2026-05-03T08:00:49.227Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23382,18 +23466,66 @@
     {
       "name": "Jarvis",
       "fullName": "rajbos/Jarvis",
-      "pushedAt": "2026-04-29T02:09:28Z",
-      "collectedAt": "2026-05-02T07:32:01.745Z",
+      "pushedAt": "2026-05-02T15:48:54Z",
+      "collectedAt": "2026-05-03T08:01:01.764Z",
       "issues": {
         "open": 2,
         "closed": 30
       },
       "pullRequests": {
-        "open": 2,
+        "open": 1,
         "closed": 14,
-        "merged": 64
+        "merged": 67
       },
       "pullRequestDetails": [
+        {
+          "number": 111,
+          "title": "build(deps-dev): bump typescript-eslint from 8.59.0 to 8.59.1 in the dev-dependencies group",
+          "state": "merged",
+          "createdAt": "2026-04-29T02:09:29Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 63,
+          "linesDeleted": 63,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.75,
+          "timeToMergeHours": 85.57,
+          "mergedAt": "2026-05-02T15:43:32Z"
+        },
+        {
+          "number": 114,
+          "title": "Add GitHub rate limit checker to status bar",
+          "state": "merged",
+          "createdAt": "2026-05-02T11:49:12Z",
+          "author": "rajbos",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 328,
+          "linesDeleted": 28,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 2.58,
+          "timeToMergeHours": 3.88,
+          "mergedAt": "2026-05-02T15:42:05Z"
+        },
+        {
+          "number": 113,
+          "title": "feat: dismiss notifications for merged Dependabot PRs",
+          "state": "merged",
+          "createdAt": "2026-05-02T09:09:58Z",
+          "author": "rajbos",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 492,
+          "linesDeleted": 6,
+          "commentCount": 0,
+          "commitCount": 5,
+          "actionsMinutes": 2.8,
+          "timeToMergeHours": 1.75,
+          "mergedAt": "2026-05-02T10:54:44Z"
+        },
         {
           "number": 108,
           "title": "Refactor code structure for improved readability and maintainability",
@@ -23505,57 +23637,45 @@
           "actionsMinutes": 2.8,
           "timeToMergeHours": 526.42,
           "mergedAt": "2026-04-24T19:02:20Z"
-        },
-        {
-          "number": 95,
-          "title": "build(deps-dev): bump the dev-dependencies group with 5 updates",
-          "state": "merged",
-          "createdAt": "2026-04-15T02:09:35Z",
-          "author": "dependabot",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 220,
-          "linesDeleted": 220,
-          "commentCount": 0,
-          "commitCount": 2,
-          "actionsMinutes": 9.27,
-          "timeToMergeHours": 138.17,
-          "mergedAt": "2026-04-20T20:19:33Z"
-        },
-        {
-          "number": 94,
-          "title": "build(deps): bump the github-actions group with 3 updates",
-          "state": "merged",
-          "createdAt": "2026-04-15T02:08:55Z",
-          "author": "dependabot",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 32,
-          "linesDeleted": 32,
-          "commentCount": 0,
-          "commitCount": 1,
-          "actionsMinutes": 0.75,
-          "timeToMergeHours": 138.07,
-          "mergedAt": "2026-04-20T20:13:16Z"
-        },
-        {
-          "number": 98,
-          "title": "Add handler test coverage for agents, dashboard, and github-auth plugins",
-          "state": "merged",
-          "createdAt": "2026-04-20T19:44:49Z",
-          "author": "copilot-swe-agent",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 939,
-          "linesDeleted": 0,
-          "commentCount": 0,
-          "commitCount": 2,
-          "actionsMinutes": 2.6,
-          "timeToMergeHours": 0.33,
-          "mergedAt": "2026-04-20T20:04:21Z"
         }
       ],
       "mergedPRTimeline": [
+        {
+          "number": 111,
+          "createdAt": "2026-04-29T02:09:29Z",
+          "mergedAt": "2026-05-02T15:43:32Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 85.57,
+          "closesIssues": [],
+          "linesAdded": 63,
+          "linesDeleted": 63
+        },
+        {
+          "number": 114,
+          "createdAt": "2026-05-02T11:49:12Z",
+          "mergedAt": "2026-05-02T15:42:05Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 3.88,
+          "closesIssues": [],
+          "linesAdded": 328,
+          "linesDeleted": 28
+        },
+        {
+          "number": 113,
+          "createdAt": "2026-05-02T09:09:58Z",
+          "mergedAt": "2026-05-02T10:54:44Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 1.75,
+          "closesIssues": [],
+          "linesAdded": 492,
+          "linesDeleted": 6
+        },
         {
           "number": 108,
           "createdAt": "2026-04-25T10:49:51Z",
@@ -24342,7 +24462,7 @@
       "copilotAdoption": {
         "copilotAuthoredPRs": 0,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 64,
+        "totalMergedPRs": 67,
         "totalDetailedPRs": 10
       },
       "issueLeadTimes": [
@@ -24405,7 +24525,7 @@
       "name": "juice-shop",
       "fullName": "rajbos/juice-shop",
       "pushedAt": "2023-02-15T07:27:33Z",
-      "collectedAt": "2026-05-02T07:32:02.340Z",
+      "collectedAt": "2026-05-03T08:01:02.168Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -24433,7 +24553,7 @@
       "name": "kvm",
       "fullName": "rajbos/kvm",
       "pushedAt": "2021-03-15T15:16:08Z",
-      "collectedAt": "2026-05-02T07:32:03.486Z",
+      "collectedAt": "2026-05-03T08:01:03.345Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -24461,7 +24581,7 @@
       "name": "legitify",
       "fullName": "rajbos/legitify",
       "pushedAt": "2025-01-05T17:20:31Z",
-      "collectedAt": "2026-05-02T07:32:04.283Z",
+      "collectedAt": "2026-05-03T08:01:04.196Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -24489,7 +24609,7 @@
       "name": "local-setup",
       "fullName": "rajbos/local-setup",
       "pushedAt": "2025-12-20T11:46:04Z",
-      "collectedAt": "2026-05-02T07:32:07.042Z",
+      "collectedAt": "2026-05-03T08:01:06.331Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -24631,7 +24751,7 @@
       "name": "mcp-agents-hub",
       "fullName": "rajbos/mcp-agents-hub",
       "pushedAt": "2026-04-20T07:29:27Z",
-      "collectedAt": "2026-05-02T07:32:07.529Z",
+      "collectedAt": "2026-05-03T08:01:06.763Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -24659,7 +24779,7 @@
       "name": "mcp-registry-demo",
       "fullName": "rajbos/mcp-registry-demo",
       "pushedAt": "2026-03-28T20:24:33Z",
-      "collectedAt": "2026-05-02T07:32:12.206Z",
+      "collectedAt": "2026-05-03T08:01:10.297Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -24993,7 +25113,7 @@
       "name": "mcp-servers",
       "fullName": "rajbos/mcp-servers",
       "pushedAt": "2025-03-27T13:42:05Z",
-      "collectedAt": "2026-05-02T07:32:12.656Z",
+      "collectedAt": "2026-05-03T08:01:10.673Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25021,7 +25141,7 @@
       "name": "melos-action",
       "fullName": "rajbos/melos-action",
       "pushedAt": "2024-04-26T12:36:37Z",
-      "collectedAt": "2026-05-02T07:32:13.683Z",
+      "collectedAt": "2026-05-03T08:01:11.693Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25049,7 +25169,7 @@
       "name": "microsoft-learn",
       "fullName": "rajbos/microsoft-learn",
       "pushedAt": "2022-10-25T20:25:46Z",
-      "collectedAt": "2026-05-02T07:32:14.676Z",
+      "collectedAt": "2026-05-03T08:01:12.702Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25077,7 +25197,7 @@
       "name": "microsoft-todo-mcp-server",
       "fullName": "rajbos/microsoft-todo-mcp-server",
       "pushedAt": "2026-04-11T15:06:10Z",
-      "collectedAt": "2026-05-02T07:32:16.040Z",
+      "collectedAt": "2026-05-03T08:01:13.949Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25135,7 +25255,7 @@
       "name": "modern-development",
       "fullName": "rajbos/modern-development",
       "pushedAt": "2023-04-21T00:45:05Z",
-      "collectedAt": "2026-05-02T07:32:17.357Z",
+      "collectedAt": "2026-05-03T08:01:15.114Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25163,7 +25283,7 @@
       "name": "NuGetDefense.Core",
       "fullName": "rajbos/NuGetDefense.Core",
       "pushedAt": "2021-07-27T18:25:03Z",
-      "collectedAt": "2026-05-02T07:32:17.856Z",
+      "collectedAt": "2026-05-03T08:01:15.685Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25191,7 +25311,7 @@
       "name": "openssf-scorecard-monitor",
       "fullName": "rajbos/openssf-scorecard-monitor",
       "pushedAt": "2026-04-23T07:20:19Z",
-      "collectedAt": "2026-05-02T07:32:19.480Z",
+      "collectedAt": "2026-05-03T08:01:17.186Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25249,7 +25369,7 @@
       "name": "pages-test",
       "fullName": "rajbos/pages-test",
       "pushedAt": "2022-02-07T20:33:42Z",
-      "collectedAt": "2026-05-02T07:32:20.250Z",
+      "collectedAt": "2026-05-03T08:01:17.923Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25277,7 +25397,7 @@
       "name": "pipelines",
       "fullName": "rajbos/pipelines",
       "pushedAt": "2023-02-20T03:59:19Z",
-      "collectedAt": "2026-05-02T07:32:29.447Z",
+      "collectedAt": "2026-05-03T08:01:25.977Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25305,7 +25425,7 @@
       "name": "pr-template-test",
       "fullName": "rajbos/pr-template-test",
       "pushedAt": "2022-11-30T21:10:28Z",
-      "collectedAt": "2026-05-02T07:32:30.379Z",
+      "collectedAt": "2026-05-03T08:01:26.763Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25333,7 +25453,7 @@
       "name": "PS-NetworkAnalyzer",
       "fullName": "rajbos/PS-NetworkAnalyzer",
       "pushedAt": "2025-12-21T20:57:04Z",
-      "collectedAt": "2026-05-02T07:32:32.687Z",
+      "collectedAt": "2026-05-03T08:01:28.928Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25475,7 +25595,7 @@
       "name": "PublicGitHubActionsTest",
       "fullName": "rajbos/PublicGitHubActionsTest",
       "pushedAt": "2022-02-18T14:54:25Z",
-      "collectedAt": "2026-05-02T07:32:33.189Z",
+      "collectedAt": "2026-05-03T08:01:29.293Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25502,8 +25622,8 @@
     {
       "name": "rajbos",
       "fullName": "rajbos/rajbos",
-      "pushedAt": "2026-05-01T08:25:04Z",
-      "collectedAt": "2026-05-02T07:33:05.007Z",
+      "pushedAt": "2026-05-02T23:21:48Z",
+      "collectedAt": "2026-05-03T08:01:58.761Z",
       "issues": {
         "open": 0,
         "closed": 29
@@ -26947,18 +27067,50 @@
     {
       "name": "rajbos.github.io",
       "fullName": "rajbos/rajbos.github.io",
-      "pushedAt": "2026-05-01T18:37:20Z",
-      "collectedAt": "2026-05-02T07:33:12.184Z",
+      "pushedAt": "2026-05-02T10:05:51Z",
+      "collectedAt": "2026-05-03T08:02:05.360Z",
       "issues": {
         "open": 0,
         "closed": 2
       },
       "pullRequests": {
-        "open": 3,
+        "open": 1,
         "closed": 6,
-        "merged": 46
+        "merged": 48
       },
       "pullRequestDetails": [
+        {
+          "number": 91,
+          "title": "Bump actions/github-script from 8 to 9",
+          "state": "merged",
+          "createdAt": "2026-05-01T18:37:21Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0.18,
+          "timeToMergeHours": 15.47,
+          "mergedAt": "2026-05-02T10:05:49Z"
+        },
+        {
+          "number": 90,
+          "title": "Add post: Where the new Copilot extension points break governance",
+          "state": "merged",
+          "createdAt": "2026-05-01T18:17:01Z",
+          "author": "rajbos",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 162,
+          "linesDeleted": 1118,
+          "commentCount": 0,
+          "commitCount": 6,
+          "actionsMinutes": 0.22,
+          "timeToMergeHours": 15.8,
+          "mergedAt": "2026-05-02T10:04:49Z"
+        },
         {
           "number": 89,
           "title": "Add Qwen3-8B benchmark results: 22.1 tok/s new fastest local model",
@@ -27086,41 +27238,33 @@
           "actionsMinutes": 0.23,
           "timeToMergeHours": 57.76,
           "mergedAt": "2026-03-10T20:27:09Z"
-        },
-        {
-          "number": 68,
-          "title": "Add GitHub Copilot section to magic files blog post",
-          "state": "merged",
-          "createdAt": "2025-07-14T09:30:43Z",
-          "author": "copilot-swe-agent",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 23,
-          "linesDeleted": 1,
-          "commentCount": 5,
-          "commitCount": 6,
-          "actionsMinutes": 0,
-          "timeToMergeHours": 5674.78,
-          "mergedAt": "2026-03-07T20:17:21Z"
-        },
-        {
-          "number": 76,
-          "title": "Remove broken link",
-          "state": "merged",
-          "createdAt": "2026-02-18T20:08:44Z",
-          "author": "melroy89",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 0,
-          "linesDeleted": 4,
-          "commentCount": 0,
-          "commitCount": 1,
-          "actionsMinutes": 0,
-          "timeToMergeHours": 97.29,
-          "mergedAt": "2026-02-22T21:26:00Z"
         }
       ],
       "mergedPRTimeline": [
+        {
+          "number": 91,
+          "createdAt": "2026-05-01T18:37:21Z",
+          "mergedAt": "2026-05-02T10:05:49Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 15.47,
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 1
+        },
+        {
+          "number": 90,
+          "createdAt": "2026-05-01T18:17:01Z",
+          "mergedAt": "2026-05-02T10:04:49Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 15.8,
+          "closesIssues": [],
+          "linesAdded": 162,
+          "linesDeleted": 1118
+        },
         {
           "number": 89,
           "createdAt": "2026-04-20T20:09:39Z",
@@ -27355,7 +27499,7 @@
       "copilotAdoption": {
         "copilotAuthoredPRs": 0,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 19,
+        "totalMergedPRs": 21,
         "totalDetailedPRs": 10
       },
       "issueLeadTimes": [
@@ -27376,7 +27520,7 @@
       "name": "runner-tests",
       "fullName": "rajbos/runner-tests",
       "pushedAt": "2023-07-08T15:04:33Z",
-      "collectedAt": "2026-05-02T07:33:13.142Z",
+      "collectedAt": "2026-05-03T08:02:06.174Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27404,7 +27548,7 @@
       "name": "sample-app-aoai-chatGPT",
       "fullName": "rajbos/sample-app-aoai-chatGPT",
       "pushedAt": "2024-09-27T13:39:08Z",
-      "collectedAt": "2026-05-02T07:33:13.665Z",
+      "collectedAt": "2026-05-03T08:02:06.757Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27432,7 +27576,7 @@
       "name": "scorecard-action",
       "fullName": "rajbos/scorecard-action",
       "pushedAt": "2023-11-17T07:04:21Z",
-      "collectedAt": "2026-05-02T07:33:14.676Z",
+      "collectedAt": "2026-05-03T08:02:07.730Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27460,7 +27604,7 @@
       "name": "scorecard-ghes",
       "fullName": "rajbos/scorecard-ghes",
       "pushedAt": "2023-05-26T19:41:22Z",
-      "collectedAt": "2026-05-02T07:33:15.922Z",
+      "collectedAt": "2026-05-03T08:02:09.007Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27488,7 +27632,7 @@
       "name": "scorecard-webapp",
       "fullName": "rajbos/scorecard-webapp",
       "pushedAt": "2023-07-11T08:40:16Z",
-      "collectedAt": "2026-05-02T07:33:16.716Z",
+      "collectedAt": "2026-05-03T08:02:09.744Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27516,7 +27660,7 @@
       "name": "secret-scanning-custom-patterns",
       "fullName": "rajbos/secret-scanning-custom-patterns",
       "pushedAt": "2023-07-17T13:23:57Z",
-      "collectedAt": "2026-05-02T07:33:17.699Z",
+      "collectedAt": "2026-05-03T08:02:10.747Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27544,7 +27688,7 @@
       "name": "security-demo",
       "fullName": "rajbos/security-demo",
       "pushedAt": "2022-03-05T09:36:07Z",
-      "collectedAt": "2026-05-02T07:33:19.319Z",
+      "collectedAt": "2026-05-03T08:02:12.074Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27572,7 +27716,7 @@
       "name": "SonarQube-AzureAppService",
       "fullName": "rajbos/SonarQube-AzureAppService",
       "pushedAt": "2024-10-14T14:25:11Z",
-      "collectedAt": "2026-05-02T07:33:19.814Z",
+      "collectedAt": "2026-05-03T08:02:12.715Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27600,7 +27744,7 @@
       "name": "Stryker.MultipleProjectRunner",
       "fullName": "rajbos/Stryker.MultipleProjectRunner",
       "pushedAt": "2023-12-20T13:29:35Z",
-      "collectedAt": "2026-05-02T07:33:21.490Z",
+      "collectedAt": "2026-05-03T08:02:14.301Z",
       "issues": {
         "open": 0,
         "closed": 4
@@ -27628,7 +27772,7 @@
       "name": "tag-npm-version",
       "fullName": "rajbos/tag-npm-version",
       "pushedAt": "2025-12-08T12:22:32Z",
-      "collectedAt": "2026-05-02T07:33:22.309Z",
+      "collectedAt": "2026-05-03T08:02:15.068Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27656,7 +27800,7 @@
       "name": "TailwindTraders",
       "fullName": "rajbos/TailwindTraders",
       "pushedAt": "2021-05-20T17:44:45Z",
-      "collectedAt": "2026-05-02T07:33:23.013Z",
+      "collectedAt": "2026-05-03T08:02:15.783Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27684,7 +27828,7 @@
       "name": "teams-automation",
       "fullName": "rajbos/teams-automation",
       "pushedAt": "2025-09-06T08:30:58Z",
-      "collectedAt": "2026-05-02T07:33:24.725Z",
+      "collectedAt": "2026-05-03T08:02:17.388Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27742,7 +27886,7 @@
       "name": "test-repo",
       "fullName": "rajbos/test-repo",
       "pushedAt": "2023-01-05T18:13:06Z",
-      "collectedAt": "2026-05-02T07:33:25.802Z",
+      "collectedAt": "2026-05-03T08:02:18.272Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -27770,7 +27914,7 @@
       "name": "tfsec-sarif-action",
       "fullName": "rajbos/tfsec-sarif-action",
       "pushedAt": "2023-07-17T14:46:28Z",
-      "collectedAt": "2026-05-02T07:33:26.299Z",
+      "collectedAt": "2026-05-03T08:02:18.797Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27798,7 +27942,7 @@
       "name": "training-manual",
       "fullName": "rajbos/training-manual",
       "pushedAt": "2024-02-05T16:53:38Z",
-      "collectedAt": "2026-05-02T07:33:27.291Z",
+      "collectedAt": "2026-05-03T08:02:19.786Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27826,7 +27970,7 @@
       "name": "trivy-action",
       "fullName": "rajbos/trivy-action",
       "pushedAt": "2025-02-10T22:13:37Z",
-      "collectedAt": "2026-05-02T07:33:28.314Z",
+      "collectedAt": "2026-05-03T08:02:20.733Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27854,7 +27998,7 @@
       "name": "typescript-demo",
       "fullName": "rajbos/typescript-demo",
       "pushedAt": "2023-10-19T02:13:23Z",
-      "collectedAt": "2026-05-02T07:33:32.200Z",
+      "collectedAt": "2026-05-03T08:02:24.577Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27882,7 +28026,7 @@
       "name": "vscode-github-ratelimit",
       "fullName": "rajbos/vscode-github-ratelimit",
       "pushedAt": "2026-01-03T17:05:44Z",
-      "collectedAt": "2026-05-02T07:33:33.081Z",
+      "collectedAt": "2026-05-03T08:02:25.371Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27940,7 +28084,7 @@
       "name": "VSTSClient",
       "fullName": "rajbos/VSTSClient",
       "pushedAt": "2021-04-22T09:27:30Z",
-      "collectedAt": "2026-05-02T07:33:34.085Z",
+      "collectedAt": "2026-05-03T08:02:26.360Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27968,7 +28112,7 @@
       "name": "webdis-fork",
       "fullName": "rajbos/webdis-fork",
       "pushedAt": "2024-02-05T16:52:08Z",
-      "collectedAt": "2026-05-02T07:33:34.661Z",
+      "collectedAt": "2026-05-03T08:02:26.969Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27996,7 +28140,7 @@
       "name": "WebGoat.Net-Test",
       "fullName": "rajbos/WebGoat.Net-Test",
       "pushedAt": "2023-10-07T10:10:59Z",
-      "collectedAt": "2026-05-02T07:33:35.937Z",
+      "collectedAt": "2026-05-03T08:02:28.226Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -28024,7 +28168,7 @@
       "name": "WebGoat.NETCore",
       "fullName": "rajbos/WebGoat.NETCore",
       "pushedAt": "2024-10-09T07:49:26Z",
-      "collectedAt": "2026-05-02T07:33:36.833Z",
+      "collectedAt": "2026-05-03T08:02:29.066Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -28052,7 +28196,7 @@
       "name": "workflow-composition",
       "fullName": "rajbos/workflow-composition",
       "pushedAt": "2023-09-13T13:20:26Z",
-      "collectedAt": "2026-05-02T07:33:38.028Z",
+      "collectedAt": "2026-05-03T08:02:30.286Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -28080,7 +28224,7 @@
       "name": "TailWind",
       "fullName": "renevanosnabrugge/TailWind",
       "pushedAt": "2022-10-28T12:04:18Z",
-      "collectedAt": "2026-05-02T07:33:39.010Z",
+      "collectedAt": "2026-05-03T08:02:31.214Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -28108,7 +28252,7 @@
       "name": "demo-actions",
       "fullName": "rob-demo/demo-actions",
       "pushedAt": "2023-07-07T11:08:52Z",
-      "collectedAt": "2026-05-02T07:33:40.340Z",
+      "collectedAt": "2026-05-03T08:02:32.454Z",
       "issues": {
         "open": 6,
         "closed": 5
@@ -28135,18 +28279,66 @@
     {
       "name": "techhub",
       "fullName": "techhubms/techhub",
-      "pushedAt": "2026-05-01T16:07:16Z",
-      "collectedAt": "2026-05-02T07:34:27.869Z",
+      "pushedAt": "2026-05-02T21:33:40Z",
+      "collectedAt": "2026-05-03T08:03:43.950Z",
       "issues": {
         "open": 19,
-        "closed": 126
+        "closed": 127
       },
       "pullRequests": {
-        "open": 1,
+        "open": 0,
         "closed": 38,
-        "merged": 188
+        "merged": 191
       },
       "pullRequestDetails": [
+        {
+          "number": 381,
+          "title": "fix: serialize Application Insights annotation Properties as JSON string",
+          "state": "merged",
+          "createdAt": "2026-05-02T21:30:03Z",
+          "author": "copilot-swe-agent",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 19,
+          "linesDeleted": 14,
+          "commentCount": 1,
+          "commitCount": 2,
+          "actionsMinutes": 5.63,
+          "timeToMergeHours": 0.06,
+          "mergedAt": "2026-05-02T21:33:39Z"
+        },
+        {
+          "number": 379,
+          "title": "Fix production stability, scaling, and test reliability",
+          "state": "merged",
+          "createdAt": "2026-05-02T16:45:07Z",
+          "author": "rvanmaanen",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 1338,
+          "linesDeleted": 523,
+          "commentCount": 27,
+          "commitCount": 14,
+          "actionsMinutes": 6.63,
+          "timeToMergeHours": 4.38,
+          "mergedAt": "2026-05-02T21:07:58Z"
+        },
+        {
+          "number": 378,
+          "title": "Add JavaScript testing framework with Vitest + jsdom",
+          "state": "merged",
+          "createdAt": "2026-05-01T13:51:17Z",
+          "author": "rvanmaanen",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 4608,
+          "linesDeleted": 217,
+          "commentCount": 23,
+          "commitCount": 6,
+          "actionsMinutes": 20.68,
+          "timeToMergeHours": 20.89,
+          "mergedAt": "2026-05-02T10:44:38Z"
+        },
         {
           "number": 377,
           "title": "fix(cd): require staging infra success before production deployment",
@@ -28258,57 +28450,45 @@
           "actionsMinutes": 20.1,
           "timeToMergeHours": 0.33,
           "mergedAt": "2026-04-28T09:11:01Z"
-        },
-        {
-          "number": 365,
-          "title": "Fix legacy-redirect endpoint producing 10,000+ errors",
-          "state": "merged",
-          "createdAt": "2026-04-28T07:58:10Z",
-          "author": "rvanmaanen",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 66,
-          "linesDeleted": 7,
-          "commentCount": 6,
-          "commitCount": 2,
-          "actionsMinutes": 32.55,
-          "timeToMergeHours": 0.87,
-          "mergedAt": "2026-04-28T08:50:34Z"
-        },
-        {
-          "number": 364,
-          "title": "Fix E2E tests failing on production in CD workflow",
-          "state": "merged",
-          "createdAt": "2026-04-27T16:45:49Z",
-          "author": "copilot-swe-agent",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 13,
-          "linesDeleted": 2,
-          "commentCount": 8,
-          "commitCount": 4,
-          "actionsMinutes": 31.38,
-          "timeToMergeHours": 1.74,
-          "mergedAt": "2026-04-27T18:30:22Z"
-        },
-        {
-          "number": 362,
-          "title": "Consolidate URL routing middleware and add legacy redirect support",
-          "state": "merged",
-          "createdAt": "2026-04-27T12:00:06Z",
-          "author": "rvanmaanen",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 2249,
-          "linesDeleted": 653,
-          "commentCount": 12,
-          "commitCount": 4,
-          "actionsMinutes": 32.78,
-          "timeToMergeHours": 3.97,
-          "mergedAt": "2026-04-27T15:58:15Z"
         }
       ],
       "mergedPRTimeline": [
+        {
+          "number": 381,
+          "createdAt": "2026-05-02T21:30:03Z",
+          "mergedAt": "2026-05-02T21:33:39Z",
+          "author": "copilot-swe-agent",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": [],
+          "linesAdded": 19,
+          "linesDeleted": 14
+        },
+        {
+          "number": 379,
+          "createdAt": "2026-05-02T16:45:07Z",
+          "mergedAt": "2026-05-02T21:07:58Z",
+          "author": "rvanmaanen",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 4.38,
+          "closesIssues": [],
+          "linesAdded": 1338,
+          "linesDeleted": 523
+        },
+        {
+          "number": 378,
+          "createdAt": "2026-05-01T13:51:17Z",
+          "mergedAt": "2026-05-02T10:44:38Z",
+          "author": "rvanmaanen",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 20.89,
+          "closesIssues": [],
+          "linesAdded": 4608,
+          "linesDeleted": 217
+        },
         {
           "number": 377,
           "createdAt": "2026-05-01T13:28:17Z",
@@ -30591,7 +30771,7 @@
       "copilotAdoption": {
         "copilotAuthoredPRs": 0,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 188,
+        "totalMergedPRs": 191,
         "totalDetailedPRs": 10
       },
       "issueLeadTimes": [
@@ -30689,7 +30869,7 @@
       "name": "gh-developer-caption-this",
       "fullName": "UncleBats/gh-developer-caption-this",
       "pushedAt": "2024-04-05T04:29:17Z",
-      "collectedAt": "2026-05-02T07:34:29.408Z",
+      "collectedAt": "2026-05-03T08:03:44.987Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -30717,7 +30897,7 @@
       "name": "Anythink-Market-dedwkp0p",
       "fullName": "Wilcolab/Anythink-Market-dedwkp0p",
       "pushedAt": "2024-10-30T15:18:38Z",
-      "collectedAt": "2026-05-02T07:34:30.950Z",
+      "collectedAt": "2026-05-03T08:03:46.396Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -30745,7 +30925,7 @@
       "name": "doepicshit",
       "fullName": "xebia/doepicshit",
       "pushedAt": "2026-04-20T22:00:54Z",
-      "collectedAt": "2026-05-02T07:34:34.789Z",
+      "collectedAt": "2026-05-03T08:03:49.813Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -30886,8 +31066,8 @@
     {
       "name": "github-copilot-premium-reqs-usage",
       "fullName": "xebia/github-copilot-premium-reqs-usage",
-      "pushedAt": "2026-05-01T08:51:14Z",
-      "collectedAt": "2026-05-02T07:34:54.736Z",
+      "pushedAt": "2026-05-02T19:24:12Z",
+      "collectedAt": "2026-05-03T08:04:07.900Z",
       "issues": {
         "open": 1,
         "closed": 28
@@ -30895,9 +31075,25 @@
       "pullRequests": {
         "open": 6,
         "closed": 35,
-        "merged": 93
+        "merged": 94
       },
       "pullRequestDetails": [
+        {
+          "number": 164,
+          "title": "Update model multipliers from rajbos/github-copilot-model-notifier",
+          "state": "merged",
+          "createdAt": "2026-05-02T08:41:42Z",
+          "author": "github-actions",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 2.73,
+          "timeToMergeHours": 10.71,
+          "mergedAt": "2026-05-02T19:24:10Z"
+        },
         {
           "number": 162,
           "title": "Update model multipliers from rajbos/github-copilot-model-notifier",
@@ -31041,25 +31237,21 @@
           "actionsMinutes": 3.35,
           "timeToMergeHours": 8.13,
           "mergedAt": "2026-04-09T15:48:17Z"
-        },
-        {
-          "number": 145,
-          "title": "Bump actions/setup-node from 3 to 6",
-          "state": "merged",
-          "createdAt": "2026-04-09T07:40:15Z",
-          "author": "dependabot",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 3,
-          "linesDeleted": 3,
-          "commentCount": 1,
-          "commitCount": 1,
-          "actionsMinutes": 3.32,
-          "timeToMergeHours": 8.13,
-          "mergedAt": "2026-04-09T15:47:53Z"
         }
       ],
       "mergedPRTimeline": [
+        {
+          "number": 164,
+          "createdAt": "2026-05-02T08:41:42Z",
+          "mergedAt": "2026-05-02T19:24:10Z",
+          "author": "github-actions",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 10.71,
+          "closesIssues": [],
+          "linesAdded": 2,
+          "linesDeleted": 2
+        },
         {
           "number": 162,
           "createdAt": "2026-04-30T12:41:33Z",
@@ -32228,7 +32420,7 @@
       "copilotAdoption": {
         "copilotAuthoredPRs": 0,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 93,
+        "totalMergedPRs": 94,
         "totalDetailedPRs": 10
       },
       "issueLeadTimes": [
@@ -32403,7 +32595,7 @@
       "name": "github-copilot-updates",
       "fullName": "xebia/github-copilot-updates",
       "pushedAt": "2025-07-14T08:12:06Z",
-      "collectedAt": "2026-05-02T07:35:04.848Z",
+      "collectedAt": "2026-05-03T08:04:16.960Z",
       "issues": {
         "open": 17,
         "closed": 18
@@ -32735,7 +32927,7 @@
       "name": "github-governance-references",
       "fullName": "xebia/github-governance-references",
       "pushedAt": "2026-04-10T12:45:47Z",
-      "collectedAt": "2026-05-02T07:35:06.070Z",
+      "collectedAt": "2026-05-03T08:04:18.025Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -32793,7 +32985,7 @@
       "name": "octocat",
       "fullName": "xebia/octocat",
       "pushedAt": "2025-07-18T16:14:25Z",
-      "collectedAt": "2026-05-02T07:35:06.976Z",
+      "collectedAt": "2026-05-03T08:04:18.703Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -32821,7 +33013,7 @@
       "name": "GDBC2018-Challenges",
       "fullName": "XpiritBV/GDBC2018-Challenges",
       "pushedAt": "2018-06-21T02:31:07Z",
-      "collectedAt": "2026-05-02T07:35:08.275Z",
+      "collectedAt": "2026-05-03T08:04:20.221Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -32849,7 +33041,7 @@
       "name": "LeaderboardsGlobalDevopsBootcamp",
       "fullName": "XpiritBV/LeaderboardsGlobalDevopsBootcamp",
       "pushedAt": "2022-12-08T00:56:12Z",
-      "collectedAt": "2026-05-02T07:35:10.047Z",
+      "collectedAt": "2026-05-03T08:04:21.773Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -32877,7 +33069,7 @@
       "name": "legitify-scan",
       "fullName": "XpiritUSA/legitify-scan",
       "pushedAt": "2023-05-04T12:28:25Z",
-      "collectedAt": "2026-05-02T07:35:10.926Z",
+      "collectedAt": "2026-05-03T08:04:22.553Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -33004,12 +33196,12 @@
     },
     {
       "week": "2026-W18",
-      "prsOpened": 83,
-      "prsMerged": 83,
-      "issuesOpened": 13,
-      "issuesClosed": 15,
-      "linesAdded": 24470,
-      "linesDeleted": 102691
+      "prsOpened": 100,
+      "prsMerged": 100,
+      "issuesOpened": 16,
+      "issuesClosed": 16,
+      "linesAdded": 31636,
+      "linesDeleted": 104768
     }
   ]
 }
