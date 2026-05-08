@@ -85,7 +85,7 @@ describe("collectWeeklyTrends", () => {
 
   it("returns exactly weeksBack buckets all zeroed for an empty repo", async () => {
     setOctokit(buildMockOctokit({ issues: [], prs: [] }));
-    const trends = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
+    const { orgTrends: trends } = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
     expect(trends).toHaveLength(4);
     for (const t of trends) {
       expect(t.prsOpened).toBe(0);
@@ -104,7 +104,7 @@ describe("collectWeeklyTrends", () => {
         prs: [],
       })
     );
-    const trends = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
+    const { orgTrends: trends } = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
     const total = trends.reduce((s, t) => s + t.issuesOpened, 0);
     expect(total).toBe(1);
   });
@@ -118,7 +118,7 @@ describe("collectWeeklyTrends", () => {
         prs: [],
       })
     );
-    const trends = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
+    const { orgTrends: trends } = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
     const total = trends.reduce((s, t) => s + t.issuesOpened, 0);
     expect(total).toBe(0);
   });
@@ -136,7 +136,7 @@ describe("collectWeeklyTrends", () => {
         prs: [],
       })
     );
-    const trends = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
+    const { orgTrends: trends } = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
     const total = trends.reduce((s, t) => s + t.issuesClosed, 0);
     expect(total).toBe(1);
   });
@@ -154,7 +154,7 @@ describe("collectWeeklyTrends", () => {
         ],
       })
     );
-    const trends = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
+    const { orgTrends: trends } = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
     const total = trends.reduce((s, t) => s + t.prsOpened, 0);
     expect(total).toBe(1);
   });
@@ -172,7 +172,7 @@ describe("collectWeeklyTrends", () => {
         ],
       })
     );
-    const trends = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
+    const { orgTrends: trends } = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
     const total = trends.reduce((s, t) => s + t.prsMerged, 0);
     expect(total).toBe(1);
   });
@@ -206,7 +206,7 @@ describe("collectWeeklyTrends", () => {
     } as unknown as Octokit);
 
     // Should not throw; returns buckets with the second repo's data
-    const trends = await collectWeeklyTrends(
+    const { orgTrends: trends } = await collectWeeklyTrends(
       [
         { owner: "o", name: "missing" },
         { owner: "o", name: "good" },
@@ -219,7 +219,7 @@ describe("collectWeeklyTrends", () => {
 
   it("returns buckets sorted by week ascending", async () => {
     setOctokit(buildMockOctokit({ issues: [], prs: [] }));
-    const trends = await collectWeeklyTrends([{ owner: "o", name: "r" }], 6);
+    const { orgTrends: trends } = await collectWeeklyTrends([{ owner: "o", name: "r" }], 6);
     for (let i = 1; i < trends.length; i++) {
       expect(trends[i].week >= trends[i - 1].week).toBe(true);
     }
@@ -241,7 +241,7 @@ describe("collectWeeklyTrends", () => {
         ],
       })
     );
-    const trends = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
+    const { orgTrends: trends } = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
     const totalAdded = trends.reduce((s, t) => s + t.linesAdded, 0);
     const totalDeleted = trends.reduce((s, t) => s + t.linesDeleted, 0);
     expect(totalAdded).toBe(120);
@@ -330,6 +330,66 @@ describe("collectWeeklyTrends", () => {
     );
     expect(getCallCount).toBe(4);
   });
+
+  it("populates repoTrends keyed by full repo name", async () => {
+    setOctokit(
+      buildMockOctokit({
+        issues: [{ created_at: daysAgo(1), state: "open" }],
+        prs: [],
+      })
+    );
+    const { repoTrends } = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4);
+    expect(repoTrends.has("o/r")).toBe(true);
+    const repoData = repoTrends.get("o/r")!;
+    const total = repoData.reduce((s, t) => s + t.issuesOpened, 0);
+    expect(total).toBe(1);
+  });
+
+  it("isolates per-repo counts so repo1 issues do not appear in repo2", async () => {
+    let callCount = 0;
+
+    async function* paginateIterator(): AsyncGenerator<{ data: Array<{ created_at: string; updated_at: string; merged_at: null }> }> {
+      yield { data: [] };
+    }
+
+    const paginateFn = Object.assign(
+      (_method: unknown, _params: unknown) => {
+        callCount++;
+        // First call: repo1 gets 2 issues; second call: repo2 gets 0 issues
+        if (callCount === 1) {
+          return Promise.resolve([
+            { created_at: daysAgo(1), state: "open" },
+            { created_at: daysAgo(2), state: "open" },
+          ]);
+        }
+        return Promise.resolve([]);
+      },
+      { iterator: paginateIterator }
+    );
+
+    setOctokit({
+      rest: { issues: { listForRepo: {} }, pulls: { list: {} } },
+      paginate: paginateFn,
+    } as unknown as Octokit);
+
+    const { orgTrends, repoTrends } = await collectWeeklyTrends(
+      [
+        { owner: "o", name: "r1" },
+        { owner: "o", name: "r2" },
+      ],
+      4
+    );
+
+    // Org aggregate should have both repos' issues
+    const orgTotal = orgTrends.reduce((s, t) => s + t.issuesOpened, 0);
+    expect(orgTotal).toBe(2);
+
+    // repo1 should have 2 issues, repo2 should have 0
+    const r1Total = (repoTrends.get("o/r1") ?? []).reduce((s, t) => s + t.issuesOpened, 0);
+    const r2Total = (repoTrends.get("o/r2") ?? []).reduce((s, t) => s + t.issuesOpened, 0);
+    expect(r1Total).toBe(2);
+    expect(r2Total).toBe(0);
+  });
 });
 
 // ── prDataByRepo fast path ─────────────────────────────────────────────────────
@@ -403,7 +463,7 @@ describe("collectWeeklyTrends with prDataByRepo", () => {
       ],
     ]);
 
-    const trends = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4, 200, prDataByRepo);
+    const { orgTrends: trends } = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4, 200, prDataByRepo);
     // Should have counted the merged PR with lines
     const totalMerged = trends.reduce((s, t) => s + t.prsMerged, 0);
     const totalAdded = trends.reduce((s, t) => s + t.linesAdded, 0);
@@ -436,7 +496,7 @@ describe("collectWeeklyTrends with prDataByRepo", () => {
       ],
     ]);
 
-    const trends = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4, 200, prDataByRepo);
+    const { orgTrends: trends } = await collectWeeklyTrends([{ owner: "o", name: "r" }], 4, 200, prDataByRepo);
     const totalOpened = trends.reduce((s, t) => s + t.prsOpened, 0);
     expect(totalOpened).toBe(1);
   });

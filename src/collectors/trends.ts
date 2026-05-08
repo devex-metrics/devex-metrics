@@ -38,33 +38,27 @@ function isoWeekMonday(date: Date): Date {
   return d;
 }
 
-/**
- * Collect weekly PR and issue activity trends aggregated across a list of
- * repos for the last `weeksBack` ISO weeks (including the current partial
- * week).
- *
- * When `prDataByRepo` is provided for a repo, its pre-fetched GraphQL PR nodes
- * (which include additions/deletions) are used instead of calling `pulls.get`
- * per merged PR, eliminating up to 200 REST detail fetches per run.
- */
-export async function collectWeeklyTrends(
-  repos: { owner: string; name: string }[],
-  weeksBack = 12,
-  maxDetailFetches = 200,
-  prDataByRepo?: Map<string, GraphQLPRNode[]>
-): Promise<WeeklyTrendPoint[]> {
-  const octokit = await getOctokit();
+/** Combined result from `collectWeeklyTrends`. */
+export interface WeeklyTrendsResult {
+  /** Weekly trends aggregated across all repos. */
+  orgTrends: WeeklyTrendPoint[];
+  /**
+   * Per-repo weekly trends, keyed by full repo name ("owner/repo").
+   * Skipped repos (inaccessible, 404, etc.) have no entry.
+   */
+  repoTrends: Map<string, WeeklyTrendPoint[]>;
+}
 
-  // Build exactly `weeksBack` buckets: current week and the preceding ones.
-  const currentMonday = isoWeekMonday(new Date());
-  const startMonday = new Date(currentMonday);
-  startMonday.setUTCDate(currentMonday.getUTCDate() - (weeksBack - 1) * 7);
-
-  const weeks = new Map<string, WeeklyTrendPoint>();
+/** Create a fresh set of zero-filled week buckets starting at `startMonday`. */
+function createWeekBuckets(
+  startMonday: Date,
+  weeksBack: number
+): Map<string, WeeklyTrendPoint> {
+  const m = new Map<string, WeeklyTrendPoint>();
   const cursor = new Date(startMonday);
   for (let i = 0; i < weeksBack; i++) {
     const label = toIsoWeekLabel(cursor);
-    weeks.set(label, {
+    m.set(label, {
       week: label,
       prsOpened: 0,
       prsMerged: 0,
@@ -75,6 +69,36 @@ export async function collectWeeklyTrends(
     });
     cursor.setUTCDate(cursor.getUTCDate() + 7);
   }
+  return m;
+}
+
+/**
+ * Collect weekly PR and issue activity trends aggregated across a list of
+ * repos for the last `weeksBack` ISO weeks (including the current partial
+ * week).
+ *
+ * Returns both an org-wide aggregate (`orgTrends`) and per-repo breakdowns
+ * (`repoTrends`) so the dashboard can filter issue trends by repository.
+ *
+ * When `prDataByRepo` is provided for a repo, its pre-fetched GraphQL PR nodes
+ * (which include additions/deletions) are used instead of calling `pulls.get`
+ * per merged PR, eliminating up to 200 REST detail fetches per run.
+ */
+export async function collectWeeklyTrends(
+  repos: { owner: string; name: string }[],
+  weeksBack = 12,
+  maxDetailFetches = 200,
+  prDataByRepo?: Map<string, GraphQLPRNode[]>
+): Promise<WeeklyTrendsResult> {
+  const octokit = await getOctokit();
+
+  // Build exactly `weeksBack` buckets: current week and the preceding ones.
+  const currentMonday = isoWeekMonday(new Date());
+  const startMonday = new Date(currentMonday);
+  startMonday.setUTCDate(currentMonday.getUTCDate() - (weeksBack - 1) * 7);
+
+  const weeks = createWeekBuckets(startMonday, weeksBack);
+  const repoTrends = new Map<string, WeeklyTrendPoint[]>();
 
   // cutoff = start of the oldest bucket (inclusive).
   const cutoff = startMonday;
@@ -86,6 +110,7 @@ export async function collectWeeklyTrends(
   for (const { owner, name } of repos) {
     const repoKey = `${owner}/${name}`;
     const prefetchedPRs = prDataByRepo?.get(repoKey);
+    const repoWeeks = createWeekBuckets(startMonday, weeksBack);
 
     try {
       // ── Issues ────────────────────────────────────────────────────────────
@@ -105,16 +130,20 @@ export async function collectWeeklyTrends(
         const createdAt = new Date(issue.created_at);
         if (createdAt >= cutoff) {
           const wk = toIsoWeekLabel(createdAt);
-          const bucket = weeks.get(wk);
-          if (bucket) bucket.issuesOpened++;
+          const orgBucket = weeks.get(wk);
+          if (orgBucket) orgBucket.issuesOpened++;
+          const repoBucket = repoWeeks.get(wk);
+          if (repoBucket) repoBucket.issuesOpened++;
         }
 
         if (issue.state === "closed" && issue.closed_at) {
           const closedAt = new Date(issue.closed_at);
           if (closedAt >= cutoff) {
             const wk = toIsoWeekLabel(closedAt);
-            const bucket = weeks.get(wk);
-            if (bucket) bucket.issuesClosed++;
+            const orgBucket = weeks.get(wk);
+            if (orgBucket) orgBucket.issuesClosed++;
+            const repoBucket = repoWeeks.get(wk);
+            if (repoBucket) repoBucket.issuesClosed++;
           }
         }
       }
@@ -134,19 +163,27 @@ export async function collectWeeklyTrends(
           const createdAt = new Date(node.createdAt);
           if (createdAt >= cutoff) {
             const wk = toIsoWeekLabel(createdAt);
-            const bucket = weeks.get(wk);
-            if (bucket) bucket.prsOpened++;
+            const orgBucket = weeks.get(wk);
+            if (orgBucket) orgBucket.prsOpened++;
+            const repoBucket = repoWeeks.get(wk);
+            if (repoBucket) repoBucket.prsOpened++;
           }
 
           if (node.state === "MERGED" && node.mergedAt) {
             const mergedAt = new Date(node.mergedAt);
             if (mergedAt >= cutoff) {
               const wk = toIsoWeekLabel(mergedAt);
-              const bucket = weeks.get(wk);
-              if (bucket) {
-                bucket.prsMerged++;
-                bucket.linesAdded += node.additions;
-                bucket.linesDeleted += node.deletions;
+              const orgBucket = weeks.get(wk);
+              if (orgBucket) {
+                orgBucket.prsMerged++;
+                orgBucket.linesAdded += node.additions;
+                orgBucket.linesDeleted += node.deletions;
+              }
+              const repoBucket = repoWeeks.get(wk);
+              if (repoBucket) {
+                repoBucket.prsMerged++;
+                repoBucket.linesAdded += node.additions;
+                repoBucket.linesDeleted += node.deletions;
               }
             }
           }
@@ -175,30 +212,38 @@ export async function collectWeeklyTrends(
             const createdAt = new Date(pr.created_at);
             if (createdAt >= cutoff) {
               const wk = toIsoWeekLabel(createdAt);
-              const bucket = weeks.get(wk);
-              if (bucket) bucket.prsOpened++;
+              const orgBucket = weeks.get(wk);
+              if (orgBucket) orgBucket.prsOpened++;
+              const repoBucket = repoWeeks.get(wk);
+              if (repoBucket) repoBucket.prsOpened++;
             }
 
             if (pr.merged_at) {
               const mergedAt = new Date(pr.merged_at);
               if (mergedAt >= cutoff) {
                 const wk = toIsoWeekLabel(mergedAt);
-                const bucket = weeks.get(wk);
-                if (bucket) {
-                  bucket.prsMerged++;
-                  if (detailFetchBudget > 0) {
-                    detailFetchBudget--;
-                    try {
-                      const { data: detail } = await octokit.rest.pulls.get({
-                        owner,
-                        repo: name,
-                        pull_number: pr.number,
-                      });
-                      bucket.linesAdded += detail.additions;
-                      bucket.linesDeleted += detail.deletions;
-                    } catch {
-                      // Skip line counts if detail fetch fails
+                const orgBucket = weeks.get(wk);
+                const repoBucket = repoWeeks.get(wk);
+                if (orgBucket) orgBucket.prsMerged++;
+                if (repoBucket) repoBucket.prsMerged++;
+                if (detailFetchBudget > 0) {
+                  detailFetchBudget--;
+                  try {
+                    const { data: detail } = await octokit.rest.pulls.get({
+                      owner,
+                      repo: name,
+                      pull_number: pr.number,
+                    });
+                    if (orgBucket) {
+                      orgBucket.linesAdded += detail.additions;
+                      orgBucket.linesDeleted += detail.deletions;
                     }
+                    if (repoBucket) {
+                      repoBucket.linesAdded += detail.additions;
+                      repoBucket.linesDeleted += detail.deletions;
+                    }
+                  } catch {
+                    // Skip line counts if detail fetch fails
                   }
                 }
               }
@@ -207,6 +252,11 @@ export async function collectWeeklyTrends(
           if (reachedCutoff) break;
         }
       }
+
+      repoTrends.set(
+        repoKey,
+        [...repoWeeks.values()].sort((a, b) => a.week.localeCompare(b.week))
+      );
     } catch (err: unknown) {
       // Skip repos that are inaccessible or have features disabled.
       const status = (err as { status?: number }).status;
@@ -215,5 +265,8 @@ export async function collectWeeklyTrends(
     }
   }
 
-  return [...weeks.values()].sort((a, b) => a.week.localeCompare(b.week));
+  return {
+    orgTrends: [...weeks.values()].sort((a, b) => a.week.localeCompare(b.week)),
+    repoTrends,
+  };
 }

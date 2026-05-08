@@ -13,5 +13,6 @@ export {
 export { collectContributors } from "./contributors.js";
 export { collectDependentCount } from "./dependents.js";
 export { collectWeeklyTrends } from "./trends.js";
+export type { WeeklyTrendsResult } from "./trends.js";
 export { collectRepoGraphQL } from "./repo-graphql.js";
 export type { GraphQLPRNode, GraphQLRepoData } from "./repo-graphql.js";

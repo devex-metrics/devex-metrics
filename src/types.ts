@@ -33,6 +33,8 @@ export interface RepoMetrics {
   collectedAt?: string;
   /** Issue counts by state. */
   issues: IssueCounts;
+  /** Weekly activity trends for this repository (last ~12 weeks). */
+  weeklyTrends?: WeeklyTrendPoint[];
   /** Pull request counts by state. */
   pullRequests: PullRequestCounts;
   /** Detailed PR metrics (sampled from recently closed PRs). */

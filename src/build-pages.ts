@@ -317,6 +317,18 @@ function buildDashboardHtml(
       linesAdded: t.linesAdded ?? 0,
       linesDeleted: t.linesDeleted ?? 0,
     })),
+    repoWeeklyTrends: Object.fromEntries(
+      data.repos
+        .filter((r) => r.weeklyTrends && r.weeklyTrends.length > 0)
+        .map((r) => [
+          r.name,
+          r.weeklyTrends!.map((t) => ({
+            week: t.week,
+            issuesOpened: t.issuesOpened ?? 0,
+            issuesClosed: t.issuesClosed ?? 0,
+          })),
+        ])
+    ),
     allPRDetails,
     allIssueLeadTimes,
     copilot: {
@@ -961,6 +973,23 @@ function computeTrendsFromPRDetails(prs){
   });
   return Object.keys(weekData).map(function(k){return weekData[k];}).sort(function(a,b){return a.week<b.week?-1:1;});
 }
+// Aggregate issue trends from per-repo data for the selected repos.
+// Uses org-level week labels as a baseline for a consistent x-axis.
+function computeIssueTrendsForRepos(repoNames){
+  var rwt=CHART_DATA.repoWeeklyTrends||{};
+  var weekData={};
+  (CHART_DATA.weeklyTrends||[]).forEach(function(t){
+    weekData[t.week]={week:t.week,issuesOpened:0,issuesClosed:0};
+  });
+  repoNames.forEach(function(name){
+    (rwt[name]||[]).forEach(function(t){
+      if(!weekData[t.week])weekData[t.week]={week:t.week,issuesOpened:0,issuesClosed:0};
+      weekData[t.week].issuesOpened+=(t.issuesOpened||0);
+      weekData[t.week].issuesClosed+=(t.issuesClosed||0);
+    });
+  });
+  return Object.keys(weekData).map(function(k){return weekData[k];}).sort(function(a,b){return a.week<b.week?-1:1;});
+}
 function setupRepoPicker(){
   var names=CHART_DATA.repoNames||[];
   if(names.length===0)return;
@@ -1058,15 +1087,20 @@ function applyFilter(period){
   var allPRBase=getRepoFilteredPRDetails();
 
   // ── Trends ──
-  // Issue trends are always org-wide (no per-repo issue event data available).
   // PR/size trends are recomputed from allPRBase when a repo filter is active.
+  // Issue trends use per-repo data when available for ALL selected repos;
+  // otherwise fall back to org-wide data.
   var orgTrends=CHART_DATA.weeklyTrends||[];
+  var rwt=CHART_DATA.repoWeeklyTrends||{};
+  var selRepoArr=repoFiltered?Array.from(selectedRepos):[];
+  var allSelectedHaveRepoTrends=repoFiltered&&selRepoArr.length>0&&selRepoArr.every(function(n){return!!rwt[n];});
   var prTrends=repoFiltered?computeTrendsFromPRDetails(allPRBase):orgTrends;
   var prTrendsPeriod=cutoff?prTrends.filter(function(t){return weekToDate(t.week)>=cutoff;}):prTrends;
-  var issueTrendsPeriod=cutoff?orgTrends.filter(function(t){return weekToDate(t.week)>=cutoff;}):orgTrends;
+  var issueTrends=allSelectedHaveRepoTrends?computeIssueTrendsForRepos(selRepoArr):orgTrends;
+  var issueTrendsPeriod=cutoff?issueTrends.filter(function(t){return weekToDate(t.week)>=cutoff;}):issueTrends;
 
-  // Show/hide org-wide note on charts whose data cannot be repo-filtered
-  document.querySelectorAll(".trends-org-note").forEach(function(n){n.style.display=repoFiltered?"":"none";});
+  // Show/hide org-wide note: only when repo-filtered AND per-repo data is unavailable
+  document.querySelectorAll(".trends-org-note").forEach(function(n){n.style.display=(repoFiltered&&!allSelectedHaveRepoTrends)?"":"none";});
 
   // PR trends: when repo-filtered, hide "Opened" since allPRDetails is merged-PRs-only
   if(charts.prTrends){
@@ -1138,7 +1172,7 @@ function applyFilter(period){
   }
 
   // ── Period sums from trends ──
-  // Issue counts are always org-wide; prsOpened from PR trends (0 when repo-filtered)
+  // Issue counts use per-repo data when available; prsOpened from PR trends (0 when repo-filtered)
   var issuesOpened=0,issuesClosed=0,prsOpened=0;
   issueTrendsPeriod.forEach(function(t){issuesOpened+=(t.issuesOpened||0);issuesClosed+=(t.issuesClosed||0);});
   prTrendsPeriod.forEach(function(t){prsOpened+=(t.prsOpened||0);});
@@ -1190,7 +1224,7 @@ function applyFilter(period){
     if(prSub)prSub.textContent=CHART_DATA.prs.open+" open \u00B7 "+CHART_DATA.prs.closed+" closed";
   }else{
     if(issueVal)issueVal.textContent=String(issuesOpened);
-    if(issueLbl)issueLbl.textContent="Issues Opened"+(repoFiltered?" (org-wide)":"");
+    if(issueLbl)issueLbl.textContent="Issues Opened"+(repoFiltered&&!allSelectedHaveRepoTrends?" (org-wide)":"");
     if(issueSub)issueSub.textContent=issuesClosed+" closed";
     if(prVal)prVal.textContent=String(prsMerged);
     if(prLbl)prLbl.textContent="Merged PRs";

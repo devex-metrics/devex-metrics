@@ -697,4 +697,51 @@ describe("build-pages", () => {
     expect(document.getElementById("kpiIssueVal")?.textContent).not.toBe("15");
     expect(document.getElementById("kpiPRVal")?.textContent).not.toBe("10");
   });
+
+  it("should include repoWeeklyTrends in the CHART_DATA payload when repos have per-repo trends", () => {
+    const envelope: CacheEnvelope = {
+      date: "2026-03-28",
+      data: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-03-28T12:00:00Z",
+        repoCount: 1,
+        repos: [
+          {
+            name: "repo-a",
+            fullName: "test-pages-owner/repo-a",
+            issues: { open: 2, closed: 5 },
+            pullRequests: { open: 1, closed: 0, merged: 3 },
+            pullRequestDetails: [],
+            committerCount: 2,
+            reviewerCount: 1,
+            contributorCount: 3,
+            dependentCount: 0,
+            weeklyTrends: [
+              { week: "2026-W12", prsOpened: 1, prsMerged: 1, issuesOpened: 4, issuesClosed: 2, linesAdded: 20, linesDeleted: 5 },
+            ],
+          },
+        ],
+      },
+    };
+    fs.writeFileSync(cacheFile, JSON.stringify(envelope));
+
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+
+    // repoWeeklyTrends should be embedded in the payload with issue-only fields
+    expect(html).toContain('"repoWeeklyTrends"');
+    expect(html).toContain('"repo-a"');
+    expect(html).toContain('"issuesOpened":4');
+    expect(html).toContain('"issuesClosed":2');
+    // PR/line data should NOT appear in the trimmed repo trend payload
+    // (it only has week, issuesOpened, issuesClosed)
+    // The chart should still work; the org-wide note should be hidden by default
+    const dom = new JSDOM(html);
+    const orgNote = dom.window.document.querySelector(".trends-org-note") as HTMLElement | null;
+    expect(orgNote?.style.display).toBe("none");
+  });
 });

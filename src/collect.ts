@@ -158,15 +158,21 @@ export async function collect(
     });
   }
 
-  // Reuse cached weekly trends if every repo came from cache.
+  // Reuse cached weekly trends if every repo came from cache and all repos
+  // already have per-repo weeklyTrends (i.e. cache was built with this version).
   let weeklyTrends = loadRawCache(owner)?.weeklyTrends;
-  if (freshCount > 0 || !weeklyTrends) {
+  const missingRepoTrends = repos.some((r) => !Array.isArray(r.weeklyTrends));
+  if (freshCount > 0 || !weeklyTrends || missingRepoTrends) {
     console.log(`Collecting weekly trends… (${freshCount} repos refreshed)`);
     const trendRepos = repos.map((r) => {
       const slash = r.fullName.indexOf("/");
       return { owner: r.fullName.slice(0, slash), name: r.name };
     });
-    weeklyTrends = await collectWeeklyTrends(trendRepos, 12, 200, prDataByRepo);
+    const result = await collectWeeklyTrends(trendRepos, 12, 200, prDataByRepo);
+    weeklyTrends = result.orgTrends;
+    for (const repo of repos) {
+      repo.weeklyTrends = result.repoTrends.get(repo.fullName) ?? [];
+    }
   } else {
     console.log(`Reusing cached weekly trends (all ${repos.length} repos were fresh)`);
   }
