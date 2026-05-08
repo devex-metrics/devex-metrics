@@ -233,6 +233,8 @@ function buildDashboardHtml(
         isBotAuthor: p.isBotAuthor,
         isCopilotAuthored: p.isCopilotAuthored,
         timeToMergeHours: p.timeToMergeHours,
+        linesAdded: p.linesAdded,
+        linesDeleted: p.linesDeleted,
       }));
     }
     return r.pullRequestDetails
@@ -245,6 +247,8 @@ function buildDashboardHtml(
         isBotAuthor: false,
         isCopilotAuthored: pr.isCopilotAuthored,
         timeToMergeHours: pr.timeToMergeHours ?? 0,
+        linesAdded: pr.linesAdded,
+        linesDeleted: pr.linesDeleted,
       }));
   });
 
@@ -292,6 +296,12 @@ function buildDashboardHtml(
     filtered30d.map((p) => p.timeToMergeHours).filter((h) => h > 0),
   );
 
+  const repoSummaries = data.repos.map((r) => ({
+    name: r.name,
+    issues: Math.max(0, r.issues.open) + Math.max(0, r.issues.closed),
+    prs: r.pullRequests.open + r.pullRequests.merged + r.pullRequests.closed,
+  }));
+
   const chartPayload = JSON.stringify({
     issues: { open: totals.openIssues, closed: totals.closedIssues },
     prs: {
@@ -300,6 +310,8 @@ function buildDashboardHtml(
       closed: totals.closedPRs,
     },
     topRepos,
+    repoSummaries,
+    repoNames: data.repos.map((r) => r.name).sort(),
     weeklyTrends: (data.weeklyTrends ?? []).map((t) => ({
       ...t,
       linesAdded: t.linesAdded ?? 0,
@@ -353,6 +365,19 @@ function buildDashboardHtml(
     <label class="filter-toggle" title="Exclude PRs authored by bots (dependabot, renovate, etc.) from charts and KPIs">
       <input type="checkbox" id="excludeBots" /> Exclude bots
     </label>
+    <div class="repo-picker" id="repoPicker">
+      <button class="repo-picker-btn" id="repoPickerBtn" aria-haspopup="true" aria-expanded="false" title="Filter charts by repository">
+        <span id="repoPickerLabel">All repos</span> <span class="repo-picker-caret" aria-hidden="true">&#9660;</span>
+      </button>
+      <div class="repo-picker-panel" id="repoPickerPanel" hidden>
+        <div class="repo-picker-toolbar">
+          <button class="repo-picker-action" id="repoPickerReset">Reset</button>
+          <button class="repo-picker-action" id="repoPickerClear">Clear</button>
+          <input type="search" class="repo-picker-search" id="repoPickerSearch" placeholder="Search repos&hellip;" autocomplete="off" />
+        </div>
+        <div class="repo-picker-list" id="repoPickerList"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -403,7 +428,7 @@ function buildDashboardHtml(
 
   <section class="charts" aria-label="Trend charts">
     <div class="card card-chart card-wide"><h2>PR Trends (per week)</h2><canvas id="chartPRTrends"></canvas></div>
-    <div class="card card-chart card-wide"><h2>Issue Trends (per week)</h2><canvas id="chartIssueTrends"></canvas></div>
+    <div class="card card-chart card-wide"><h2>Issue Trends (per week)</h2><div class="trends-org-note" style="display:none">&#x2139;&#xFE0F; Issue trend data is org-wide and cannot be filtered by repository.</div><canvas id="chartIssueTrends"></canvas></div>
     <div class="card card-chart card-wide"><h2>PR Size Trends (lines/week)</h2><canvas id="chartPRSizeTrends"></canvas></div>
   </section>
 
@@ -696,7 +721,32 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
   .toolbar-ctrls{flex-direction:column;width:100%}
   #repoFilter{width:100%}
   .col-date,.col-lines{display:none}
-}`;
+}
+.repo-picker{position:relative;margin-left:.75rem;padding-left:.75rem;border-left:1px solid var(--border)}
+.repo-picker-btn{font:inherit;font-size:.82rem;padding:.3rem .7rem;border:1px solid var(--border);
+  border-radius:999px;background:transparent;color:var(--muted);cursor:pointer;
+  display:inline-flex;align-items:center;gap:.35rem;transition:all .15s;white-space:nowrap}
+.repo-picker-btn:hover{border-color:var(--accent);color:var(--accent)}
+.repo-picker-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+.repo-picker-caret{font-size:.65rem;opacity:.7}
+.repo-picker-panel{position:absolute;top:calc(100% + .4rem);left:0;z-index:200;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--rs);
+  box-shadow:var(--sh-h);min-width:240px;max-width:320px}
+.repo-picker-toolbar{display:flex;align-items:center;gap:.4rem;padding:.5rem .6rem;
+  border-bottom:1px solid var(--border)}
+.repo-picker-action{font:inherit;font-size:.75rem;padding:.2rem .55rem;border:1px solid var(--border);
+  border-radius:999px;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .15s}
+.repo-picker-action:hover{border-color:var(--accent);color:var(--accent)}
+.repo-picker-search{font:inherit;font-size:.8rem;padding:.25rem .5rem;flex:1;min-width:0;
+  border:1px solid var(--border);border-radius:var(--rs);background:var(--bg);color:var(--fg)}
+.repo-picker-search:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.repo-picker-list{max-height:260px;overflow-y:auto;padding:.3rem 0}
+.repo-picker-item{display:flex;align-items:center;gap:.45rem;padding:.3rem .75rem;
+  font-size:.83rem;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.repo-picker-item:hover{background:var(--accent-s)}
+.repo-picker-item input{accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.trends-org-note{font-size:.75rem;color:var(--muted);padding:.3rem .5rem .1rem;
+  background:var(--warn-s);border-left:3px solid var(--warn);border-radius:0 var(--rs) var(--rs) 0;margin-bottom:.5rem}`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -708,17 +758,20 @@ function getJS(): string {
 var charts={};
 var reposVisibility=[true,true];
 var cssColors={};
+var selectedRepos=new Set();
 document.addEventListener("DOMContentLoaded",function(){
   var cs=getComputedStyle(document.documentElement);
   var cv=function(v){return cs.getPropertyValue(v).trim();};
   cssColors={warn:cv("--warn"),ok:cv("--ok"),accent:cv("--accent"),
     accentS:cv("--accent-s"),okS:cv("--ok-s"),warnS:cv("--warn-s"),
-    err:cv("--err"),errS:cv("--err-s"),muted:cv("--muted"),border:cv("--border")};
+    err:cv("--err"),errS:cv("--err-s"),muted:cv("--muted"),border:cv("--border"),
+    purple:cv("--purple")||"#8250df"};
   if(typeof Chart!=="undefined"){renderCharts();}
   setupGroups();
   setupControls();
   setupSortHeaders();
   setupFilter();
+  setupRepoPicker();
   applyFilter("30days");
 });
 function renderCharts(){
@@ -875,6 +928,109 @@ function setupFilter(){
     applyFilter(activeBtn?activeBtn.dataset.period:"30days");
   });}
 }
+// ── Repo filter helpers ──
+function getRepoFilteredPRDetails(){
+  var all=CHART_DATA.allPRDetails||[];
+  if(selectedRepos.size===0)return all;
+  return all.filter(function(p){return selectedRepos.has(p.repo);});
+}
+function getRepoFilteredIssueLeadTimes(){
+  var all=CHART_DATA.allIssueLeadTimes||[];
+  if(selectedRepos.size===0)return all;
+  return all.filter(function(p){return selectedRepos.has(p.repo);});
+}
+function isRepoFilterActive(){
+  var total=(CHART_DATA.repoNames||[]).length;
+  return selectedRepos.size>0&&selectedRepos.size<total;
+}
+// Compute weekly PR/size trends from per-PR data (for repo-filtered view).
+// Uses org-level week labels as a baseline so charts keep a consistent x-axis.
+// prsOpened is NOT computed here (allPRDetails only contains merged PRs).
+// Issue counts are always zero — issue trend data is org-wide only.
+function computeTrendsFromPRDetails(prs){
+  var weekData={};
+  (CHART_DATA.weeklyTrends||[]).forEach(function(t){
+    weekData[t.week]={week:t.week,prsOpened:0,prsMerged:0,issuesOpened:0,issuesClosed:0,linesAdded:0,linesDeleted:0};
+  });
+  prs.forEach(function(p){
+    var wm=getISOWeek(p.mergedAt);
+    if(!weekData[wm])weekData[wm]={week:wm,prsOpened:0,prsMerged:0,issuesOpened:0,issuesClosed:0,linesAdded:0,linesDeleted:0};
+    weekData[wm].prsMerged++;
+    weekData[wm].linesAdded+=(p.linesAdded||0);
+    weekData[wm].linesDeleted+=(p.linesDeleted||0);
+  });
+  return Object.keys(weekData).map(function(k){return weekData[k];}).sort(function(a,b){return a.week<b.week?-1:1;});
+}
+function setupRepoPicker(){
+  var names=CHART_DATA.repoNames||[];
+  if(names.length===0)return;
+  var panel=document.getElementById("repoPickerPanel");
+  var list=document.getElementById("repoPickerList");
+  var btn=document.getElementById("repoPickerBtn");
+  var lbl=document.getElementById("repoPickerLabel");
+  var searchInput=document.getElementById("repoPickerSearch");
+  if(!panel||!list||!btn)return;
+  names.forEach(function(name){
+    var item=document.createElement("label");
+    item.className="repo-picker-item";
+    item.dataset.name=name.toLowerCase();
+    var cb=document.createElement("input");
+    cb.type="checkbox";
+    cb.value=name;
+    cb.addEventListener("change",function(){
+      if(cb.checked)selectedRepos.add(name);
+      else selectedRepos.delete(name);
+      updatePickerLabel();
+      triggerRepoFilter();
+    });
+    var txt=document.createTextNode("\u00a0"+name);
+    item.appendChild(cb);
+    item.appendChild(txt);
+    list.appendChild(item);
+  });
+  btn.addEventListener("click",function(e){
+    e.stopPropagation();
+    var open=!panel.hidden;
+    panel.hidden=open;
+    btn.setAttribute("aria-expanded",String(!open));
+    if(!open&&searchInput){setTimeout(function(){searchInput.focus();},0);}
+  });
+  document.addEventListener("click",function(e){
+    var picker=document.getElementById("repoPicker");
+    if(picker&&!picker.contains(e.target)){panel.hidden=true;btn.setAttribute("aria-expanded","false");}
+  });
+  var resetBtn=document.getElementById("repoPickerReset");
+  var clearBtn=document.getElementById("repoPickerClear");
+  if(resetBtn)resetBtn.addEventListener("click",function(){
+    selectedRepos=new Set();
+    list.querySelectorAll("input[type=checkbox]").forEach(function(cb){cb.checked=false;});
+    if(searchInput){searchInput.value="";list.querySelectorAll(".repo-picker-item").forEach(function(it){it.style.display="";});}
+    updatePickerLabel();
+    triggerRepoFilter();
+  });
+  if(clearBtn)clearBtn.addEventListener("click",function(){
+    list.querySelectorAll("input[type=checkbox]:checked").forEach(function(cb){cb.checked=false;selectedRepos.delete(cb.value);});
+    updatePickerLabel();
+    triggerRepoFilter();
+  });
+  if(searchInput)searchInput.addEventListener("input",function(){
+    var q=searchInput.value.toLowerCase();
+    list.querySelectorAll(".repo-picker-item").forEach(function(item){
+      item.style.display=(!q||item.dataset.name.indexOf(q)!==-1)?"":"none";
+    });
+  });
+  function updatePickerLabel(){
+    if(!lbl)return;
+    var active=isRepoFilterActive();
+    if(active){lbl.textContent=selectedRepos.size+" repo"+(selectedRepos.size===1?"":"s");}
+    else{lbl.textContent="All repos";}
+    btn.classList.toggle("active",active);
+  }
+  function triggerRepoFilter(){
+    var activeBtn=document.querySelector(".filter-btn.active");
+    applyFilter(activeBtn?activeBtn.dataset.period:"30days");
+  }
+}
 function getCutoffDate(period){
   var collected=new Date(CHART_DATA.collectedAt);
   var d;
@@ -896,35 +1052,66 @@ function weekToDate(weekStr){
 function applyFilter(period){
   var cutoff=getCutoffDate(period);
   var excludeBots=!!document.getElementById("excludeBots")&&document.getElementById("excludeBots").checked;
-  var trends=CHART_DATA.weeklyTrends||[];
-  if(cutoff)trends=trends.filter(function(t){return weekToDate(t.week)>=cutoff;});
-  var tLabels=trends.map(function(t){return t.week;});
+  var repoFiltered=isRepoFilterActive();
+
+  // ── Repo-filtered PR base (no period/bot filter yet) ──
+  var allPRBase=getRepoFilteredPRDetails();
+
+  // ── Trends ──
+  // Issue trends are always org-wide (no per-repo issue event data available).
+  // PR/size trends are recomputed from allPRBase when a repo filter is active.
+  var orgTrends=CHART_DATA.weeklyTrends||[];
+  var prTrends=repoFiltered?computeTrendsFromPRDetails(allPRBase):orgTrends;
+  var prTrendsPeriod=cutoff?prTrends.filter(function(t){return weekToDate(t.week)>=cutoff;}):prTrends;
+  var issueTrendsPeriod=cutoff?orgTrends.filter(function(t){return weekToDate(t.week)>=cutoff;}):orgTrends;
+
+  // Show/hide org-wide note on charts whose data cannot be repo-filtered
+  document.querySelectorAll(".trends-org-note").forEach(function(n){n.style.display=repoFiltered?"":"none";});
+
+  // PR trends: when repo-filtered, hide "Opened" since allPRDetails is merged-PRs-only
   if(charts.prTrends){
-    charts.prTrends.data.labels=tLabels;
-    charts.prTrends.data.datasets[0].data=trends.map(function(t){return t.prsOpened;});
-    charts.prTrends.data.datasets[1].data=trends.map(function(t){return t.prsMerged;});
+    charts.prTrends.data.labels=prTrendsPeriod.map(function(t){return t.week;});
+    charts.prTrends.data.datasets[0].data=prTrendsPeriod.map(function(t){return t.prsOpened;});
+    charts.prTrends.data.datasets[1].data=prTrendsPeriod.map(function(t){return t.prsMerged;});
+    charts.prTrends.setDatasetVisibility(0,!repoFiltered);
     charts.prTrends.update();
   }
   if(charts.issueTrends){
-    charts.issueTrends.data.labels=tLabels;
-    charts.issueTrends.data.datasets[0].data=trends.map(function(t){return t.issuesOpened;});
-    charts.issueTrends.data.datasets[1].data=trends.map(function(t){return t.issuesClosed;});
+    charts.issueTrends.data.labels=issueTrendsPeriod.map(function(t){return t.week;});
+    charts.issueTrends.data.datasets[0].data=issueTrendsPeriod.map(function(t){return t.issuesOpened;});
+    charts.issueTrends.data.datasets[1].data=issueTrendsPeriod.map(function(t){return t.issuesClosed;});
     charts.issueTrends.update();
   }
   if(charts.prSizeTrends){
-    charts.prSizeTrends.data.labels=tLabels;
-    charts.prSizeTrends.data.datasets[0].data=trends.map(function(t){return t.linesAdded;});
-    charts.prSizeTrends.data.datasets[1].data=trends.map(function(t){return t.linesDeleted;});
+    charts.prSizeTrends.data.labels=prTrendsPeriod.map(function(t){return t.week;});
+    charts.prSizeTrends.data.datasets[0].data=prTrendsPeriod.map(function(t){return t.linesAdded;});
+    charts.prSizeTrends.data.datasets[1].data=prTrendsPeriod.map(function(t){return t.linesDeleted;});
     charts.prSizeTrends.update();
   }
-  // Filter allPRDetails by period and bot exclusion
-  var allPR=(CHART_DATA.allPRDetails||[]);
+
+  // ── Apply period + bot filter to repo-filtered PR base ──
+  var allPR=allPRBase;
   if(excludeBots)allPR=allPR.filter(function(p){return !p.isBotAuthor;});
-  var filteredPR=allPR;
-  if(cutoff)filteredPR=allPR.filter(function(p){return new Date(p.mergedAt)>=cutoff;});
+  var filteredPR=cutoff?allPR.filter(function(p){return new Date(p.mergedAt)>=cutoff;}):allPR;
+
+  // ── Top repos chart ──
   if(charts.repos){
     var titleEl=document.getElementById("chartReposTitle");
-    if(period==="all"){
+    if(repoFiltered){
+      // Show only selected repos; all-time issue totals from repoSummaries
+      var selArr=Array.from(selectedRepos);
+      var selData=selArr.map(function(n){
+        var rs=(CHART_DATA.repoSummaries||[]).find(function(r){return r.name===n;})||{issues:0,prs:0};
+        var prCnt=0;filteredPR.forEach(function(p){if(p.repo===n)prCnt++;});
+        return{name:n,issues:rs.issues,prs:prCnt};
+      }).sort(function(a,b){return b.issues+b.prs-(a.issues+a.prs);}).slice(0,15);
+      charts.repos.data.labels=selData.map(function(r){return r.name;});
+      charts.repos.data.datasets=[
+        {label:"Issues",data:selData.map(function(r){return r.issues;}),xAxisID:"xIssues",_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
+        {label:"Pull Requests",data:selData.map(function(r){return r.prs;}),xAxisID:"xPRs",_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}];
+      var pLabel=period==="all"?"All Time":period==="year"?"This Year":period==="90days"?"Last 90 Days":"Last 30 Days";
+      if(titleEl)titleEl.textContent="Selected Repositories \u2014 "+pLabel;
+    }else if(period==="all"){
       charts.repos.data.labels=CHART_DATA.topRepos.map(function(r){return r.name;});
       charts.repos.data.datasets=[
         {label:"Issues",data:CHART_DATA.topRepos.map(function(r){return r.issues;}),xAxisID:"xIssues",_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
@@ -949,17 +1136,17 @@ function applyFilter(period){
     });
     charts.repos.update();
   }
-  // Compute period sums from filtered trends
+
+  // ── Period sums from trends ──
+  // Issue counts are always org-wide; prsOpened from PR trends (0 when repo-filtered)
   var issuesOpened=0,issuesClosed=0,prsOpened=0;
-  trends.forEach(function(t){
-    issuesOpened+=(t.issuesOpened||0);
-    issuesClosed+=(t.issuesClosed||0);
-    prsOpened+=(t.prsOpened||0);
-  });
+  issueTrendsPeriod.forEach(function(t){issuesOpened+=(t.issuesOpened||0);issuesClosed+=(t.issuesClosed||0);});
+  prTrendsPeriod.forEach(function(t){prsOpened+=(t.prsOpened||0);});
   var prsMerged=filteredPR.length;
-  // Update doughnut charts
+
+  // ── Doughnut charts ──
   if(charts.issues){
-    if(period==="all"){
+    if(period==="all"&&!repoFiltered){
       charts.issues.data.labels=["Open","Closed"];
       charts.issues.data.datasets[0].data=[CHART_DATA.issues.open,CHART_DATA.issues.closed];
     }else{
@@ -969,10 +1156,16 @@ function applyFilter(period){
     charts.issues.update();
   }
   if(charts.prs){
-    if(period==="all"){
+    if(period==="all"&&!repoFiltered){
       charts.prs.data.labels=["Open","Merged","Closed"];
       charts.prs.data.datasets[0].data=[CHART_DATA.prs.open,CHART_DATA.prs.merged,CHART_DATA.prs.closed];
       charts.prs.data.datasets[0].backgroundColor=[cssColors.accent,cssColors.ok,cssColors.muted];
+    }else if(repoFiltered){
+      // Show selected repos' merged PRs as a share of total org merged PRs
+      var orgMerged=CHART_DATA.prs.merged;
+      charts.prs.data.labels=["Selected repos (merged)","Other repos"];
+      charts.prs.data.datasets[0].data=[prsMerged,Math.max(0,orgMerged-prsMerged)];
+      charts.prs.data.datasets[0].backgroundColor=[cssColors.ok,cssColors.muted];
     }else{
       charts.prs.data.labels=["Opened","Merged"];
       charts.prs.data.datasets[0].data=[prsOpened,prsMerged];
@@ -980,14 +1173,15 @@ function applyFilter(period){
     }
     charts.prs.update();
   }
-  // Update KPI numbers and labels
+
+  // ── KPIs ──
   var issueVal=document.getElementById("kpiIssueVal");
   var issueLbl=document.getElementById("kpiIssueLbl");
   var issueSub=document.getElementById("kpiIssueSub");
   var prVal=document.getElementById("kpiPRVal");
   var prLbl=document.getElementById("kpiPRLbl");
   var prSub=document.getElementById("kpiPRSub");
-  if(period==="all"){
+  if(period==="all"&&!repoFiltered){
     if(issueVal)issueVal.textContent=String(CHART_DATA.issues.open);
     if(issueLbl)issueLbl.textContent="Open Issues";
     if(issueSub)issueSub.textContent=CHART_DATA.issues.closed+" closed";
@@ -996,28 +1190,43 @@ function applyFilter(period){
     if(prSub)prSub.textContent=CHART_DATA.prs.open+" open \u00B7 "+CHART_DATA.prs.closed+" closed";
   }else{
     if(issueVal)issueVal.textContent=String(issuesOpened);
-    if(issueLbl)issueLbl.textContent="Issues Opened";
+    if(issueLbl)issueLbl.textContent="Issues Opened"+(repoFiltered?" (org-wide)":"");
     if(issueSub)issueSub.textContent=issuesClosed+" closed";
     if(prVal)prVal.textContent=String(prsMerged);
     if(prLbl)prLbl.textContent="Merged PRs";
-    if(prSub)prSub.textContent=prsOpened+" opened";
+    // prsOpened is unavailable per repo (allPRDetails = merged only)
+    if(prSub)prSub.textContent=repoFiltered?"":prsOpened+" opened";
   }
-  // Copilot adoption is a long-term org metric — always show the all-time rate
-  // from CHART_DATA.copilot rather than filtering by the selected period,
-  // which would produce misleading 0% values in windows with no recent Copilot PRs.
-  var cop=CHART_DATA.copilot||{};
+
+  // ── Copilot adoption ──
+  // When repo-filtered: recompute authored % from the repo-filtered all-time PRs.
+  // "Reviewed" count is not available per repo; shown only for unfiltered view.
+  var cop;
+  if(repoFiltered){
+    var copAuthored=allPRBase.filter(function(p){return p.isCopilotAuthored;}).length;
+    cop={authored:copAuthored,totalMerged:allPRBase.length,reviewed:null};
+  }else{
+    cop=CHART_DATA.copilot||{};
+  }
   var copilotVal=document.getElementById("kpiCopilotVal");
   var copilotSub=document.getElementById("kpiCopilotSub");
-  if(copilotVal){
-    copilotVal.textContent=cop.totalMerged>0?(cop.authored/cop.totalMerged*100).toFixed(1)+"%":"\u2013";
+  if(copilotVal){copilotVal.textContent=cop.totalMerged>0?(cop.authored/cop.totalMerged*100).toFixed(1)+"%":"\u2013";}
+  if(copilotSub){
+    if(repoFiltered)copilotSub.textContent=(cop.authored||0)+" Copilot-authored";
+    else copilotSub.textContent=(cop.authored||0)+" authored \u00B7 "+(cop.reviewed||0)+" reviewed";
   }
-  if(copilotSub){copilotSub.textContent=(cop.authored||0)+" authored \u00B7 "+(cop.reviewed||0)+" reviewed";}
-  // Update Cycle time KPI
+  if(charts.copilotAdoption&&cop.totalMerged>0){
+    charts.copilotAdoption.data.datasets[0].data=[cop.authored,cop.totalMerged-cop.authored];
+    charts.copilotAdoption.update();
+  }
+
+  // ── Cycle time KPI ──
   var cycleVals=filteredPR.map(function(p){return p.timeToMergeHours;}).filter(function(h){return h>0;});
   var medCycle=medianOf(cycleVals);
   var cycleVal=document.getElementById("kpiCycleVal");
   if(cycleVal){cycleVal.textContent=medCycle>0?fmtDur(medCycle):"\u2013";}
-  // Update delivery charts with filtered data
+
+  // ── Delivery charts ──
   if(charts.cycleTime){
     var weekCT={};
     filteredPR.forEach(function(p){if(p.timeToMergeHours>0){var w=getISOWeek(p.mergedAt);if(!weekCT[w])weekCT[w]=[];weekCT[w].push(p.timeToMergeHours);}});
@@ -1044,8 +1253,19 @@ function applyFilter(period){
     charts.actorBreakdown.data.datasets[3].data=aW.map(function(w){return wA[w].otherBot;});
     charts.actorBreakdown.update();
   }
-  // Update the merged-PR column cells to reflect the selected period.
-  if(period==="all"){
+
+  // ── Issue lead times chart ──
+  var filteredLT=getRepoFilteredIssueLeadTimes();
+  if(cutoff)filteredLT=filteredLT.filter(function(lt){return new Date(lt.prMergedAt)>=cutoff;});
+  if(charts.leadTime){
+    var ltData=filteredLT.map(function(lt){return{x:lt.prMergedAt.slice(0,10),y:Math.round(lt.leadTimeHours/24*10)/10};}).sort(function(a,b){return a.x<b.x?-1:1;});
+    charts.leadTime.data.labels=ltData.map(function(d){return d.x;});
+    charts.leadTime.data.datasets[0].data=ltData.map(function(d){return d.y;});
+    charts.leadTime.update();
+  }
+
+  // ── Repo table merged-PR cells ──
+  if(period==="all"&&!repoFiltered){
     document.querySelectorAll(".repo-row[data-repo-name]").forEach(function(row){
       var cell=row.querySelector(".td-merged-prs");
       var v=String(row.dataset.mergedPrsAll||0);
@@ -1054,10 +1274,7 @@ function applyFilter(period){
     });
   }else{
     var repoCounts={};
-    filteredPR.forEach(function(p){
-      var key=p.repo.toLowerCase();
-      repoCounts[key]=(repoCounts[key]||0)+1;
-    });
+    filteredPR.forEach(function(p){var key=p.repo.toLowerCase();repoCounts[key]=(repoCounts[key]||0)+1;});
     document.querySelectorAll(".repo-row[data-repo-name]").forEach(function(row){
       var cell=row.querySelector(".td-merged-prs");
       var v=String(repoCounts[row.dataset.repoName]||0);
@@ -1066,7 +1283,7 @@ function applyFilter(period){
     });
   }
   var note=document.getElementById("reposPeriodNote");
-  if(note)note.style.display=period==="all"?"none":"";
+  if(note)note.style.display=(period==="all"&&!repoFiltered)?"none":"";
 }
 function compareRows(a,b,by){
   if(by==="name")return a.dataset.name.localeCompare(b.dataset.name);
