@@ -311,7 +311,7 @@ function buildDashboardHtml(
     },
     topRepos,
     repoSummaries,
-    repoNames: data.repos.map((r) => r.name).sort(),
+    repoNames: data.repos.map((r) => r.name).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" })),
     weeklyTrends: (data.weeklyTrends ?? []).map((t) => ({
       ...t,
       linesAdded: t.linesAdded ?? 0,
@@ -1320,7 +1320,7 @@ function applyFilter(period){
   if(note)note.style.display=(period==="all"&&!repoFiltered)?"none":"";
 }
 function compareRows(a,b,by){
-  if(by==="name")return a.dataset.name.localeCompare(b.dataset.name);
+  if(by==="name")return a.dataset.name.localeCompare(b.dataset.name,undefined,{sensitivity:"base"});
   if(by==="pushed"){var pa=a.dataset.pushed||"";var pb=b.dataset.pushed||"";return pb.localeCompare(pa);}
   return Number(b.dataset[by]||0)-Number(a.dataset[by]||0);
 }
