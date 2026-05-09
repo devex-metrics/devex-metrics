@@ -440,7 +440,7 @@ function buildDashboardHtml(
 
   <section class="charts" aria-label="Trend charts">
     <div class="card card-chart card-wide"><h2>PR Trends (per week)</h2><canvas id="chartPRTrends"></canvas></div>
-    <div class="card card-chart card-wide"><h2>Issue Trends (per week)</h2><div class="trends-org-note" style="display:none">&#x2139;&#xFE0F; Issue trend data is org-wide and cannot be filtered by repository.</div><canvas id="chartIssueTrends"></canvas></div>
+    <div class="card card-chart card-wide"><h2>Issue Trends (per week)</h2><canvas id="chartIssueTrends"></canvas></div>
     <div class="card card-chart card-wide"><h2>PR Size Trends (lines/week)</h2><canvas id="chartPRSizeTrends"></canvas></div>
   </section>
 
@@ -757,8 +757,7 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
   font-size:.83rem;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .repo-picker-item:hover{background:var(--accent-s)}
 .repo-picker-item input{accent-color:var(--accent);cursor:pointer;flex-shrink:0}
-.trends-org-note{font-size:.75rem;color:var(--muted);padding:.3rem .5rem .1rem;
-  background:var(--warn-s);border-left:3px solid var(--warn);border-radius:0 var(--rs) var(--rs) 0;margin-bottom:.5rem}`;
+`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1099,8 +1098,7 @@ function applyFilter(period){
   var issueTrends=allSelectedHaveRepoTrends?computeIssueTrendsForRepos(selRepoArr):orgTrends;
   var issueTrendsPeriod=cutoff?issueTrends.filter(function(t){return weekToDate(t.week)>=cutoff;}):issueTrends;
 
-  // Show/hide org-wide note: only when repo-filtered AND per-repo data is unavailable
-  document.querySelectorAll(".trends-org-note").forEach(function(n){n.style.display=(repoFiltered&&!allSelectedHaveRepoTrends)?"":"none";});
+
 
   // PR trends: when repo-filtered, hide "Opened" since allPRDetails is merged-PRs-only
   if(charts.prTrends){

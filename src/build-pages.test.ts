@@ -739,9 +739,8 @@ describe("build-pages", () => {
     expect(html).toContain('"issuesClosed":2');
     // PR/line data should NOT appear in the trimmed repo trend payload
     // (it only has week, issuesOpened, issuesClosed)
-    // The chart should still work; the org-wide note should be hidden by default
+    // The chart should still work; the org-wide note has been removed
     const dom = new JSDOM(html);
-    const orgNote = dom.window.document.querySelector(".trends-org-note") as HTMLElement | null;
-    expect(orgNote?.style.display).toBe("none");
+    expect(dom.window.document.querySelector(".trends-org-note")).toBeNull();
   });
 });
