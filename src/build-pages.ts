@@ -326,6 +326,10 @@ function buildDashboardHtml(
             week: t.week,
             issuesOpened: t.issuesOpened ?? 0,
             issuesClosed: t.issuesClosed ?? 0,
+            prsOpened: t.prsOpened ?? 0,
+            prsMerged: t.prsMerged ?? 0,
+            linesAdded: t.linesAdded ?? 0,
+            linesDeleted: t.linesDeleted ?? 0,
           })),
         ])
     ),
@@ -972,6 +976,26 @@ function computeTrendsFromPRDetails(prs){
   });
   return Object.keys(weekData).map(function(k){return weekData[k];}).sort(function(a,b){return a.week<b.week?-1:1;});
 }
+// Aggregate PR trends from per-repo data for the selected repos.
+// Uses org-level week labels as a baseline for a consistent x-axis.
+// prsOpened reflects opened+closed/merged PRs within the window (open-only PRs may be undercounted).
+function computePRTrendsForRepos(repoNames){
+  var rwt=CHART_DATA.repoWeeklyTrends||{};
+  var weekData={};
+  (CHART_DATA.weeklyTrends||[]).forEach(function(t){
+    weekData[t.week]={week:t.week,prsOpened:0,prsMerged:0,issuesOpened:0,issuesClosed:0,linesAdded:0,linesDeleted:0};
+  });
+  repoNames.forEach(function(name){
+    (rwt[name]||[]).forEach(function(t){
+      if(!weekData[t.week])weekData[t.week]={week:t.week,prsOpened:0,prsMerged:0,issuesOpened:0,issuesClosed:0,linesAdded:0,linesDeleted:0};
+      weekData[t.week].prsOpened+=(t.prsOpened||0);
+      weekData[t.week].prsMerged+=(t.prsMerged||0);
+      weekData[t.week].linesAdded+=(t.linesAdded||0);
+      weekData[t.week].linesDeleted+=(t.linesDeleted||0);
+    });
+  });
+  return Object.keys(weekData).map(function(k){return weekData[k];}).sort(function(a,b){return a.week<b.week?-1:1;});
+}
 // Aggregate issue trends from per-repo data for the selected repos.
 // Uses org-level week labels as a baseline for a consistent x-axis.
 function computeIssueTrendsForRepos(repoNames){
@@ -1093,19 +1117,19 @@ function applyFilter(period){
   var rwt=CHART_DATA.repoWeeklyTrends||{};
   var selRepoArr=repoFiltered?Array.from(selectedRepos):[];
   var allSelectedHaveRepoTrends=repoFiltered&&selRepoArr.length>0&&selRepoArr.every(function(n){return!!rwt[n];});
-  var prTrends=repoFiltered?computeTrendsFromPRDetails(allPRBase):orgTrends;
+  var prTrends=allSelectedHaveRepoTrends?computePRTrendsForRepos(selRepoArr):(repoFiltered?computeTrendsFromPRDetails(allPRBase):orgTrends);
   var prTrendsPeriod=cutoff?prTrends.filter(function(t){return weekToDate(t.week)>=cutoff;}):prTrends;
   var issueTrends=allSelectedHaveRepoTrends?computeIssueTrendsForRepos(selRepoArr):orgTrends;
   var issueTrendsPeriod=cutoff?issueTrends.filter(function(t){return weekToDate(t.week)>=cutoff;}):issueTrends;
 
 
 
-  // PR trends: when repo-filtered, hide "Opened" since allPRDetails is merged-PRs-only
+  // PR trends: hide "Opened" only when repo-filtered without per-repo trend data
   if(charts.prTrends){
     charts.prTrends.data.labels=prTrendsPeriod.map(function(t){return t.week;});
     charts.prTrends.data.datasets[0].data=prTrendsPeriod.map(function(t){return t.prsOpened;});
     charts.prTrends.data.datasets[1].data=prTrendsPeriod.map(function(t){return t.prsMerged;});
-    charts.prTrends.setDatasetVisibility(0,!repoFiltered);
+    charts.prTrends.setDatasetVisibility(0,!repoFiltered||allSelectedHaveRepoTrends);
     charts.prTrends.update();
   }
   if(charts.issueTrends){
@@ -1226,8 +1250,8 @@ function applyFilter(period){
     if(issueSub)issueSub.textContent=issuesClosed+" closed";
     if(prVal)prVal.textContent=String(prsMerged);
     if(prLbl)prLbl.textContent="Merged PRs";
-    // prsOpened is unavailable per repo (allPRDetails = merged only)
-    if(prSub)prSub.textContent=repoFiltered?"":prsOpened+" opened";
+    // prsOpened is unavailable per repo only when no per-repo trend data exists
+    if(prSub)prSub.textContent=(repoFiltered&&!allSelectedHaveRepoTrends)?"":prsOpened+" opened";
   }
 
   // ── Copilot adoption ──

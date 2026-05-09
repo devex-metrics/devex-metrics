@@ -732,14 +732,17 @@ describe("build-pages", () => {
     });
     const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
 
-    // repoWeeklyTrends should be embedded in the payload with issue-only fields
+    // repoWeeklyTrends should be embedded in the payload with all trend fields
     expect(html).toContain('"repoWeeklyTrends"');
     expect(html).toContain('"repo-a"');
     expect(html).toContain('"issuesOpened":4');
     expect(html).toContain('"issuesClosed":2');
-    // PR/line data should NOT appear in the trimmed repo trend payload
-    // (it only has week, issuesOpened, issuesClosed)
-    // The chart should still work; the org-wide note has been removed
+    // PR and line data should also appear in the repo trend payload so the
+    // "Opened" dataset can be shown when a single repo is selected.
+    expect(html).toContain('"prsOpened":1');
+    expect(html).toContain('"prsMerged":1');
+    expect(html).toContain('"linesAdded":20');
+    expect(html).toContain('"linesDeleted":5');
     const dom = new JSDOM(html);
     expect(dom.window.document.querySelector(".trends-org-note")).toBeNull();
   });
