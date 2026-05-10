@@ -746,4 +746,166 @@ describe("build-pages", () => {
     const dom = new JSDOM(html);
     expect(dom.window.document.querySelector(".trends-org-note")).toBeNull();
   });
+
+  it("should render Agent Tasks KPI card and chart canvases", () => {
+    const envelope: CacheEnvelope = {
+      date: "2026-03-28",
+      data: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-03-28T12:00:00Z",
+        repoCount: 1,
+        repos: [
+          {
+            name: "repo-a",
+            fullName: "test-pages-owner/repo-a",
+            issues: { open: 2, closed: 5 },
+            pullRequests: { open: 1, closed: 0, merged: 3 },
+            pullRequestDetails: [],
+            committerCount: 2,
+            reviewerCount: 1,
+            contributorCount: 3,
+            dependentCount: 0,
+            copilotAgentMetrics: {
+              totalTasks: 5,
+              completedTasks: 3,
+              failedTasks: 1,
+              cancelledTasks: 0,
+              timedOutTasks: 0,
+              activeTasksCount: 1,
+              totalSessions: 8,
+              cloudAgentSessions: 6,
+              cliRemoteSessions: 2,
+              totalCreditsUsed: 12.5,
+              avgCompletedSessionHours: 0.75,
+              agentCreatedPRs: 3,
+            },
+          },
+        ],
+      },
+    };
+    fs.writeFileSync(cacheFile, JSON.stringify(envelope));
+
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+
+    // KPI card elements
+    expect(html).toContain('id="kpiAgentVal"');
+    expect(html).toContain('id="kpiAgentSub"');
+    expect(html).toContain("Agent Tasks (30d)");
+    // KPI should show total task count and summary
+    expect(html).toContain(">5<");
+    expect(html).toContain("3 completed");
+    expect(html).toContain("3 PRs");
+
+    // New chart canvases
+    expect(html).toContain('id="chartCopilotPRTrend"');
+    expect(html).toContain('id="chartAgentTasks"');
+    expect(html).toContain("Copilot-authored PRs merged per week");
+    expect(html).toContain("Agent Tasks by Repository");
+  });
+
+  it("should add data-agent-tasks attribute and Agent Tasks column to repo table", () => {
+    const envelope: CacheEnvelope = {
+      date: "2026-03-28",
+      data: {
+        schemaVersion: CURRENT_SCHEMA_VERSION,
+        owner: "test-pages-owner",
+        ownerType: "org",
+        collectedAt: "2026-03-28T12:00:00Z",
+        repoCount: 2,
+        repos: [
+          {
+            name: "repo-with-agent",
+            fullName: "test-pages-owner/repo-with-agent",
+            issues: { open: 1, closed: 2 },
+            pullRequests: { open: 0, closed: 0, merged: 1 },
+            pullRequestDetails: [],
+            committerCount: 1,
+            reviewerCount: 0,
+            contributorCount: 1,
+            dependentCount: 0,
+            copilotAgentMetrics: {
+              totalTasks: 7,
+              completedTasks: 3,
+              failedTasks: 2,
+              cancelledTasks: 1,
+              timedOutTasks: 1,
+              activeTasksCount: 0,
+              totalSessions: 10,
+              cloudAgentSessions: 10,
+              cliRemoteSessions: 0,
+              totalCreditsUsed: 20.0,
+              agentCreatedPRs: 5,
+            },
+          },
+          {
+            name: "repo-no-agent",
+            fullName: "test-pages-owner/repo-no-agent",
+            issues: { open: 0, closed: 1 },
+            pullRequests: { open: 0, closed: 0, merged: 0 },
+            pullRequestDetails: [],
+            committerCount: 1,
+            reviewerCount: 0,
+            contributorCount: 1,
+            dependentCount: 0,
+          },
+        ],
+      },
+    };
+    fs.writeFileSync(cacheFile, JSON.stringify(envelope));
+
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+
+    // Column header should be present
+    expect(html).toContain("Agent Tasks");
+    expect(html).toContain('data-sort="agentTasks"');
+    expect(html).toContain('<option value="agentTasks">');
+
+    // data-agent-tasks attribute on repo rows
+    expect(html).toContain('data-agent-tasks="7"');
+    expect(html).toContain('data-agent-tasks="0"');
+
+    // detail row should use colspan=9
+    expect(html).toContain('colspan="9"');
+
+    // group header rows should use colspan=9
+    expect(html).toContain('colspan="9" class="grp-hdr-cell"');
+
+    // CHART_DATA should include agent byRepo data
+    expect(html).toContain('"repo-with-agent"');
+    expect(html).toContain('"totalTasks":7');
+
+    // Extended detail fields should be present for repo with agent data
+    expect(html).toContain("Cancelled");
+    expect(html).toContain("Timed out");
+
+    const dom = new JSDOM(html);
+    const doc = dom.window.document;
+    // Repo with agent tasks should show count in table cell
+    const repoRow = Array.from(doc.querySelectorAll<HTMLElement>("tr.repo-row")).find(
+      r => r.dataset.repoName === "repo-with-agent"
+    );
+    expect(repoRow).toBeDefined();
+    expect(repoRow!.dataset.agentTasks).toBe("7");
+  });
+
+  it("should show – for repos with no agent data in Agent Tasks column", () => {
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    // The default fixture has no copilotAgentMetrics, so should show dash
+    expect(html).toContain('data-agent-tasks="0"');
+    // KPI shows – when no agent data
+    expect(html).toContain('id="kpiAgentVal"');
+    const dom = new JSDOM(html);
+    expect(dom.window.document.getElementById("kpiAgentVal")?.textContent).toBe("–");
+  });
 });

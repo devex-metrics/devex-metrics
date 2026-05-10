@@ -265,9 +265,13 @@ function buildDashboardHtml(
 
   // Aggregate Copilot agent metrics
   let agentTotalTasks = 0, agentCompleted = 0, agentFailed = 0, agentCancelled = 0,
-    agentActive = 0, agentTotalSessions = 0, agentCloudSessions = 0, agentCliSessions = 0,
-    agentCredits = 0, agentPRs = 0;
-  const agentByRepo: Record<string, { totalTasks: number; completed: number; failed: number; sessions: number; credits: number; agentPRs: number }> = {};
+    agentTimedOut = 0, agentActive = 0, agentTotalSessions = 0, agentCloudSessions = 0,
+    agentCliSessions = 0, agentCredits = 0, agentPRs = 0;
+  const agentByRepo: Record<string, {
+    totalTasks: number; completed: number; failed: number;
+    cancelled: number; timedOut: number; active: number;
+    sessions: number; credits: number; agentPRs: number;
+  }> = {};
   for (const r of data.repos) {
     const a = r.copilotAgentMetrics;
     if (!a || a.totalTasks === 0) continue;
@@ -275,6 +279,7 @@ function buildDashboardHtml(
     agentCompleted += a.completedTasks;
     agentFailed += a.failedTasks;
     agentCancelled += a.cancelledTasks;
+    agentTimedOut += a.timedOutTasks;
     agentActive += a.activeTasksCount;
     agentTotalSessions += a.totalSessions;
     agentCloudSessions += a.cloudAgentSessions;
@@ -285,6 +290,9 @@ function buildDashboardHtml(
       totalTasks: a.totalTasks,
       completed: a.completedTasks,
       failed: a.failedTasks,
+      cancelled: a.cancelledTasks,
+      timedOut: a.timedOutTasks,
+      active: a.activeTasksCount,
       sessions: a.totalSessions,
       credits: a.totalCreditsUsed,
       agentPRs: a.agentCreatedPRs,
@@ -374,6 +382,7 @@ function buildDashboardHtml(
       completed: agentCompleted,
       failed: agentFailed,
       cancelled: agentCancelled,
+      timedOut: agentTimedOut,
       active: agentActive,
       totalSessions: agentTotalSessions,
       cloudSessions: agentCloudSessions,
@@ -470,6 +479,12 @@ function buildDashboardHtml(
       <div class="kpi-sub" id="kpiCopilotSub">${copilotAuthored} authored &middot; ${copilotReviewed} reviewed</div>
     </div>
     <div class="kpi">
+      <div class="kpi-icon" aria-hidden="true">&#x1F6E0;&#xFE0F;</div>
+      <div class="kpi-val" id="kpiAgentVal">${agentTotalTasks > 0 ? agentTotalTasks : '–'}</div>
+      <div class="kpi-lbl">Agent Tasks (30d)</div>
+      <div class="kpi-sub" id="kpiAgentSub">${agentTotalTasks > 0 ? `${agentCompleted} completed &middot; ${agentPRs} PRs` : 'no agent data'}</div>
+    </div>
+    <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x23F1;&#xFE0F;</div>
       <div class="kpi-val" id="kpiCycleVal">${medianCycle30d > 0 ? formatDurationHtml(medianCycle30d) : '–'}</div>
       <div class="kpi-lbl" id="kpiCycleLbl">Median Cycle Time</div>
@@ -496,6 +511,11 @@ function buildDashboardHtml(
     <div class="card card-chart"><h2>Issue &rarr; PR Lead Time</h2><canvas id="chartLeadTime"></canvas></div>
   </section>
 
+  <section class="charts" aria-label="Copilot and Agent metrics">
+    <div class="card card-chart card-wide"><h2>Copilot-authored PRs merged per week</h2><canvas id="chartCopilotPRTrend"></canvas></div>
+    <div class="card card-chart card-wide"><h2>Agent Tasks by Repository (30&nbsp;d)</h2><canvas id="chartAgentTasks"></canvas></div>
+  </section>
+
   <section class="repos-section" aria-label="Repositories">
     <div class="repos-toolbar">
       <h2>Repositories</h2>
@@ -510,6 +530,7 @@ function buildDashboardHtml(
           <option value="dependents">Dependents</option>
           <option value="pushed">Last Updated</option>
           <option value="linesAdded">Lines Added</option>
+          <option value="agentTasks">Agent Tasks</option>
         </select>
       </div>
     </div>
@@ -525,6 +546,7 @@ function buildDashboardHtml(
           <th class="col-num th-sortable" data-sort="dependents">Dependents <span class="sort-ind" aria-hidden="true"></span></th>
           <th class="col-date th-sortable" data-sort="pushed">Last Updated <span class="sort-ind" aria-hidden="true"></span></th>
           <th class="col-lines th-sortable" data-sort="linesAdded" title="Total lines added/removed across merged PRs in the last ~13 months (or last 10 detailed PRs when full timeline data is unavailable)">Lines +/- <span class="sort-ind" aria-hidden="true"></span></th>
+          <th class="col-num th-sortable" data-sort="agentTasks" title="Copilot agent tasks in the 30-day collection window">Agent Tasks <span class="sort-ind" aria-hidden="true"></span></th>
         </tr></thead>
         <tbody id="repoList">${repoRows}</tbody>
       </table>
@@ -602,6 +624,7 @@ function buildRepoRow(repo: RepoMetrics): string {
     .replace(/[^a-zA-Z0-9]/g, "-")
     .replace(/-+/g, "-");
 
+  const agentTaskCount = repo.copilotAgentMetrics?.totalTasks ?? 0;
   const dataRow =
     `<tr class="repo-row" ` +
     `data-name="${escapeHtml(repo.fullName.toLowerCase())}" ` +
@@ -615,6 +638,7 @@ function buildRepoRow(repo: RepoMetrics): string {
     `data-pushed="${escapeHtml(repo.pushedAt ?? "")}" ` +
     `data-lines-added="${linesAdded}" ` +
     `data-lines-deleted="${linesDeleted}" ` +
+    `data-agent-tasks="${agentTaskCount}" ` +
     `data-repo-id="${repoId}">` +
     `<td><div class="repo-name-cell">` +
     `<button class="repo-expand-btn" onclick="toggleRepo(this)" aria-expanded="false" aria-label="Toggle details for ${escapeHtml(repo.fullName)}"><span class="chev" aria-hidden="true">&rsaquo;</span></button>` +
@@ -628,11 +652,12 @@ function buildRepoRow(repo: RepoMetrics): string {
     `<td>${repo.dependentCount}</td>` +
     `<td>${pushedDate}</td>` +
     `<td><span class="add">+${linesAdded}</span> <span class="del">-${linesDeleted}</span></td>` +
+    `<td>${agentTaskCount > 0 ? agentTaskCount : '<span class="col-muted">&ndash;</span>'}</td>` +
     `</tr>`;
 
   const detailRow =
     `<tr class="repo-detail-row" id="detail-${repoId}" hidden>` +
-    `<td colspan="8" class="repo-detail-cell">` +
+    `<td colspan="9" class="repo-detail-cell">` +
     `<div class="stats-grid">` +
     `<div class="sg"><h4>Issues</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.issues.open}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.issues.closed}</dd></div></dl></div>` +
     `<div class="sg"><h4>Pull Requests</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.pullRequests.open}</dd></div><div class="dr"><dt>Merged</dt><dd>${repo.pullRequests.merged}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.pullRequests.closed}</dd></div></dl></div>` +
@@ -643,8 +668,12 @@ function buildRepoRow(repo: RepoMetrics): string {
         `<div class="dr"><dt>Total</dt><dd>${repo.copilotAgentMetrics.totalTasks}</dd></div>` +
         `<div class="dr"><dt>Completed</dt><dd>${repo.copilotAgentMetrics.completedTasks}</dd></div>` +
         (repo.copilotAgentMetrics.failedTasks > 0 ? `<div class="dr"><dt>Failed</dt><dd>${repo.copilotAgentMetrics.failedTasks}</dd></div>` : "") +
+        (repo.copilotAgentMetrics.cancelledTasks > 0 ? `<div class="dr"><dt>Cancelled</dt><dd>${repo.copilotAgentMetrics.cancelledTasks}</dd></div>` : "") +
+        (repo.copilotAgentMetrics.timedOutTasks > 0 ? `<div class="dr"><dt>Timed out</dt><dd>${repo.copilotAgentMetrics.timedOutTasks}</dd></div>` : "") +
+        (repo.copilotAgentMetrics.activeTasksCount > 0 ? `<div class="dr"><dt>Active</dt><dd>${repo.copilotAgentMetrics.activeTasksCount}</dd></div>` : "") +
         `<div class="dr"><dt>Sessions</dt><dd>${repo.copilotAgentMetrics.totalSessions}</dd></div>` +
         (repo.copilotAgentMetrics.totalCreditsUsed > 0 ? `<div class="dr"><dt>Credits</dt><dd>${repo.copilotAgentMetrics.totalCreditsUsed.toFixed(1)}</dd></div>` : "") +
+        (repo.copilotAgentMetrics.avgCompletedSessionHours != null ? `<div class="dr"><dt>Avg&nbsp;duration</dt><dd>${formatDurationHtml(repo.copilotAgentMetrics.avgCompletedSessionHours)}</dd></div>` : "") +
         (repo.copilotAgentMetrics.agentCreatedPRs > 0 ? `<div class="dr"><dt>PRs created</dt><dd>${repo.copilotAgentMetrics.agentCreatedPRs}</dd></div>` : "") +
         `</dl></div>`
       : "") +
@@ -978,6 +1007,36 @@ function renderDeliveryCharts(){
       options:{responsive:true,maintainAspectRatio:true,
         scales:{x:{grid:{display:false}},y:{beginAtZero:true,title:{display:true,text:"Days"},grid:{color:cssColors.border}}},
         plugins:{legend:{display:false}}}});
+  }
+  // Copilot-authored PRs merged per week (line chart)
+  var copPRs=CHART_DATA.allPRDetails||[];
+  if(copPRs.length>0){
+    var wCopPR={};
+    copPRs.forEach(function(p){if(p.isCopilotAuthored){var w=getISOWeek(p.mergedAt);wCopPR[w]=(wCopPR[w]||0)+1;}});
+    var copWeeks=Object.keys(wCopPR).sort();
+    if(copWeeks.length>0){
+      charts.copilotPRTrend=new Chart(document.getElementById("chartCopilotPRTrend"),{type:"line",
+        data:{labels:copWeeks,datasets:[
+          {label:"Copilot-authored PRs merged",data:copWeeks.map(function(w){return wCopPR[w];}),
+            borderColor:cssColors.purple||"#8250df",backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3}]},
+        options:lineOpts});
+    }
+  }
+  // Agent tasks by repo — horizontal stacked bar (30d window, static)
+  var agentByRepo=(CHART_DATA.copilotAgent||{}).byRepo||{};
+  var agentRepoNames=Object.keys(agentByRepo).filter(function(n){return agentByRepo[n].totalTasks>0;})
+    .sort(function(a,b){return agentByRepo[b].totalTasks-agentByRepo[a].totalTasks;}).slice(0,15);
+  if(agentRepoNames.length>0){
+    charts.agentTasks=new Chart(document.getElementById("chartAgentTasks"),{type:"bar",
+      data:{labels:agentRepoNames,datasets:[
+        {label:"Completed",data:agentRepoNames.map(function(n){return agentByRepo[n].completed||0;}),backgroundColor:cssColors.ok,borderRadius:2},
+        {label:"Failed",data:agentRepoNames.map(function(n){return agentByRepo[n].failed||0;}),backgroundColor:cssColors.err,borderRadius:2},
+        {label:"Other",data:agentRepoNames.map(function(n){
+          var r=agentByRepo[n];return Math.max(0,r.totalTasks-(r.completed||0)-(r.failed||0));
+        }),backgroundColor:cssColors.muted,borderRadius:2}]},
+      options:{indexAxis:"y",responsive:true,maintainAspectRatio:true,
+        scales:{x:{stacked:true,grid:{display:false},beginAtZero:true},y:{stacked:true,grid:{display:false}}},
+        plugins:{legend:{position:"top",align:"end"}}}});
   }
 }
 function setupFilter(){
@@ -1361,6 +1420,34 @@ function applyFilter(period){
     charts.actorBreakdown.update();
   }
 
+  // ── Copilot PR trend chart ──
+  if(charts.copilotPRTrend){
+    var wCopPR2={};
+    filteredPR.forEach(function(p){if(p.isCopilotAuthored){var w=getISOWeek(p.mergedAt);wCopPR2[w]=(wCopPR2[w]||0)+1;}});
+    var copWeeks2=Object.keys(wCopPR2).sort();
+    charts.copilotPRTrend.data.labels=copWeeks2;
+    charts.copilotPRTrend.data.datasets[0].data=copWeeks2.map(function(w){return wCopPR2[w];});
+    charts.copilotPRTrend.update();
+  }
+
+  // ── Agent tasks KPI (responds to repo filter; not period-filtered) ──
+  var agentVal=document.getElementById("kpiAgentVal");
+  var agentSub=document.getElementById("kpiAgentSub");
+  var agentCopilotData=CHART_DATA.copilotAgent||{};
+  if(repoFiltered){
+    var selAgentTasks=0,selAgentCompleted=0,selAgentPRs=0;
+    var aByRepo=agentCopilotData.byRepo||{};
+    Array.from(selectedRepos).forEach(function(name){
+      var rd=aByRepo[name];
+      if(rd){selAgentTasks+=rd.totalTasks;selAgentCompleted+=rd.completed;selAgentPRs+=rd.agentPRs;}
+    });
+    if(agentVal)agentVal.textContent=selAgentTasks>0?String(selAgentTasks):"\u2013";
+    if(agentSub)agentSub.textContent=selAgentTasks>0?selAgentCompleted+" completed \u00B7 "+selAgentPRs+" PRs":"no agent data";
+  }else{
+    if(agentVal)agentVal.textContent=agentCopilotData.totalTasks>0?String(agentCopilotData.totalTasks):"\u2013";
+    if(agentSub)agentSub.textContent=agentCopilotData.totalTasks>0?agentCopilotData.completed+" completed \u00B7 "+agentCopilotData.agentPRs+" PRs":"no agent data";
+  }
+
   // ── Issue lead times chart ──
   var filteredLT=getRepoFilteredIssueLeadTimes();
   if(cutoff)filteredLT=filteredLT.filter(function(lt){return new Date(lt.prMergedAt)>=cutoff;});
@@ -1521,7 +1608,7 @@ function setupGroups(){
     var hdrTr=document.createElement("tr");
     hdrTr.className="grp-hdr-row";
     hdrTr.dataset.grpId=g.id;
-    hdrTr.innerHTML='<td colspan="8" class="grp-hdr-cell"><span class="grp-chevron">&#9654;</span><span class="grp-label">'+g.label+'</span><span class="grp-count"> ('+grpRows.length+')</span></td>';
+    hdrTr.innerHTML='<td colspan="9" class="grp-hdr-cell"><span class="grp-chevron">&#9654;</span><span class="grp-label">'+g.label+'</span><span class="grp-count"> ('+grpRows.length+')</span></td>';
     hdrTr.addEventListener("click",function(){toggleGroup(g.id);});
     tbody.appendChild(hdrTr);
     grpRows.forEach(function(row){
