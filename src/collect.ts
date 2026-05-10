@@ -15,6 +15,7 @@ import {
   buildMergedPRTimeline,
   collectPullRequestDetailsFromNodes,
   extractReviewerLogins,
+  collectCopilotAgentMetrics,
 } from "./collectors/index.js";
 import type { GraphQLPRNode } from "./collectors/index.js";
 import type { OrgMetrics, RepoMetrics } from "./types.js";
@@ -140,6 +141,10 @@ export async function collect(
 
     const copilotAdoption = computeCopilotAdoption(mergedPRTimeline, prDetails);
 
+    // Collect Copilot agent metrics (heavy, per-repo; uses its own cache).
+    const copilotAgentMetrics =
+      (await collectCopilotAgentMetrics(repoOwner, repoName)) ?? undefined;
+
     repos.push({
       name: repoName,
       fullName,
@@ -155,6 +160,7 @@ export async function collect(
       reviewerCount: contributors.reviewerCount,
       contributorCount: contributors.contributorCount,
       dependentCount,
+      copilotAgentMetrics,
     });
   }
 

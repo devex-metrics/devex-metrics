@@ -18,8 +18,10 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
  *   5 — add linesAdded/linesDeleted to MergedPRSummary so the dashboard's
  *       per-repo Lines +/- column can sum across the full ~13-month merged-PR
  *       timeline instead of just the 10 most recent detailed PRs
+ *   6 — add copilotAgentMetrics to RepoMetrics (Copilot agent task/session
+ *       counts, credit usage, and PR correlation)
  */
-export const CURRENT_SCHEMA_VERSION = 5;
+export const CURRENT_SCHEMA_VERSION = 6;
 
 function cacheFilePath(owner: string): string {
   return path.join(DATA_DIR, `${owner}.json`);

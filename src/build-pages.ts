@@ -263,6 +263,34 @@ function buildDashboardHtml(
     }
   }
 
+  // Aggregate Copilot agent metrics
+  let agentTotalTasks = 0, agentCompleted = 0, agentFailed = 0, agentCancelled = 0,
+    agentActive = 0, agentTotalSessions = 0, agentCloudSessions = 0, agentCliSessions = 0,
+    agentCredits = 0, agentPRs = 0;
+  const agentByRepo: Record<string, { totalTasks: number; completed: number; failed: number; sessions: number; credits: number; agentPRs: number }> = {};
+  for (const r of data.repos) {
+    const a = r.copilotAgentMetrics;
+    if (!a || a.totalTasks === 0) continue;
+    agentTotalTasks += a.totalTasks;
+    agentCompleted += a.completedTasks;
+    agentFailed += a.failedTasks;
+    agentCancelled += a.cancelledTasks;
+    agentActive += a.activeTasksCount;
+    agentTotalSessions += a.totalSessions;
+    agentCloudSessions += a.cloudAgentSessions;
+    agentCliSessions += a.cliRemoteSessions;
+    agentCredits += a.totalCreditsUsed;
+    agentPRs += a.agentCreatedPRs;
+    agentByRepo[r.name] = {
+      totalTasks: a.totalTasks,
+      completed: a.completedTasks,
+      failed: a.failedTasks,
+      sessions: a.totalSessions,
+      credits: a.totalCreditsUsed,
+      agentPRs: a.agentCreatedPRs,
+    };
+  }
+
   // Aggregate issue lead times
   const allIssueLeadTimes = data.repos.flatMap((r) =>
     (r.issueLeadTimes ?? []).map((lt) => ({
@@ -340,6 +368,19 @@ function buildDashboardHtml(
       reviewed: copilotReviewed,
       totalMerged: copilotTotalMerged,
       totalDetailed: copilotTotalDetailed,
+    },
+    copilotAgent: {
+      totalTasks: agentTotalTasks,
+      completed: agentCompleted,
+      failed: agentFailed,
+      cancelled: agentCancelled,
+      active: agentActive,
+      totalSessions: agentTotalSessions,
+      cloudSessions: agentCloudSessions,
+      cliSessions: agentCliSessions,
+      totalCredits: Math.round(agentCredits * 100) / 100,
+      agentPRs,
+      byRepo: agentByRepo,
     },
     collectedAt: data.collectedAt,
   });
@@ -597,6 +638,16 @@ function buildRepoRow(repo: RepoMetrics): string {
     `<div class="sg"><h4>Pull Requests</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.pullRequests.open}</dd></div><div class="dr"><dt>Merged</dt><dd>${repo.pullRequests.merged}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.pullRequests.closed}</dd></div></dl></div>` +
     `<div class="sg"><h4>People (90 d)</h4><dl><div class="dr"><dt>Committers</dt><dd>${repo.committerCount}</dd></div><div class="dr"><dt>Reviewers</dt><dd>${repo.reviewerCount}</dd></div></dl></div>` +
     `<div class="sg"><h4>Dependents</h4><dl><div class="dr"><dt>Repos</dt><dd>${repo.dependentCount}</dd></div></dl></div>` +
+    (repo.copilotAgentMetrics && repo.copilotAgentMetrics.totalTasks > 0
+      ? `<div class="sg"><h4>Agent Tasks (30 d)</h4><dl>` +
+        `<div class="dr"><dt>Total</dt><dd>${repo.copilotAgentMetrics.totalTasks}</dd></div>` +
+        `<div class="dr"><dt>Completed</dt><dd>${repo.copilotAgentMetrics.completedTasks}</dd></div>` +
+        (repo.copilotAgentMetrics.failedTasks > 0 ? `<div class="dr"><dt>Failed</dt><dd>${repo.copilotAgentMetrics.failedTasks}</dd></div>` : "") +
+        `<div class="dr"><dt>Sessions</dt><dd>${repo.copilotAgentMetrics.totalSessions}</dd></div>` +
+        (repo.copilotAgentMetrics.totalCreditsUsed > 0 ? `<div class="dr"><dt>Credits</dt><dd>${repo.copilotAgentMetrics.totalCreditsUsed.toFixed(1)}</dd></div>` : "") +
+        (repo.copilotAgentMetrics.agentCreatedPRs > 0 ? `<div class="dr"><dt>PRs created</dt><dd>${repo.copilotAgentMetrics.agentCreatedPRs}</dd></div>` : "") +
+        `</dl></div>`
+      : "") +
     `</div>` +
     prTable +
     `</td>` +

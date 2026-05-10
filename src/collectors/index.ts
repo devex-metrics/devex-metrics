@@ -16,3 +16,7 @@ export { collectWeeklyTrends } from "./trends.js";
 export type { WeeklyTrendsResult } from "./trends.js";
 export { collectRepoGraphQL } from "./repo-graphql.js";
 export type { GraphQLPRNode, GraphQLRepoData } from "./repo-graphql.js";
+export {
+  collectCopilotAgentMetrics,
+  computeAgentMetrics,
+} from "./copilot-agent.js";

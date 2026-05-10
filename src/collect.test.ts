@@ -24,6 +24,7 @@ vi.mock("./collectors/index.js", () => ({
   buildMergedPRTimeline: vi.fn(),
   collectPullRequestDetailsFromNodes: vi.fn(),
   extractReviewerLogins: vi.fn(),
+  collectCopilotAgentMetrics: vi.fn(),
 }));
 
 import { collect } from "./collect.js";
@@ -44,6 +45,7 @@ import {
   buildMergedPRTimeline,
   collectPullRequestDetailsFromNodes,
   extractReviewerLogins,
+  collectCopilotAgentMetrics,
 } from "./collectors/index.js";
 import type { OrgMetrics } from "./types.js";
 
@@ -70,6 +72,7 @@ function setupDefaultMocks() {
   vi.mocked(buildMergedPRTimeline).mockReturnValue([]);
   vi.mocked(collectPullRequestDetailsFromNodes).mockResolvedValue([]);
   vi.mocked(extractReviewerLogins).mockReturnValue(new Set());
+  vi.mocked(collectCopilotAgentMetrics).mockResolvedValue(null);
 }
 
 describe("collect", () => {

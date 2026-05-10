@@ -63,6 +63,19 @@ jobs:
           path: data
           key: metrics-data-${{ github.repository_owner }}-${{ steps.date.outputs.date }}
 
+      # Agent data is cached separately with a stable restore-key so terminal
+      # tasks (completed/failed/cancelled) persist across days without being
+      # re-fetched.  The exact key includes the date so updates are saved under
+      # a new key each day; the prefix restore-key picks up the most recent
+      # prior cache when today's key has no entry yet.
+      - name: Restore agent data cache
+        uses: actions/cache@v5
+        with:
+          path: data/agents-*.json
+          key: agent-data-${{ github.repository_owner }}-${{ steps.date.outputs.date }}
+          restore-keys: |
+            agent-data-${{ github.repository_owner }}-
+
       # Collection is only needed for scheduled runs and manual dispatches.
       # Push-triggered runs rebuild the pages from existing fixture/cache data so
       # that a same-day fixture (collected with older code) is never used to skip
@@ -81,6 +94,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.METRICS_GITHUB_TOKEN }}
           APP_ID: ${{ vars.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+          # Fine-grained PAT with "Agent tasks" repo permission.
+          # GitHub App installation tokens are not supported for this API.
+          COPILOT_AGENT_TOKEN: ${{ secrets.METRICS_GITHUB_TOKEN }}
           FORCE_REFRESH: ${{ github.event.inputs.force_refresh || 'false' }}
         run: |
           OWNER="${{ github.event.inputs.owner || 'rajbos' }}"

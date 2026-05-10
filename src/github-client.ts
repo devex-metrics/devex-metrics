@@ -162,3 +162,55 @@ export function setOctokit(octokit: Octokit): void {
 export function resetOctokit(): void {
   _octokit = undefined;
 }
+
+// ── Agent-specific Octokit (PAT-only) ────────────────────────────────────────
+// The Copilot Agent Tasks API requires a fine-grained PAT or GitHub App
+// **user access token** with the "Agent tasks" repo permission.
+// GitHub App **installation tokens are not supported** for this API.
+// This dedicated client always uses PAT auth, falling back gracefully when
+// no suitable token is available.
+
+let _agentOctokit: Octokit | undefined;
+
+/**
+ * Return a lazily-initialised Octokit instance for the Copilot Agent Tasks
+ * API, using PAT authentication only.
+ *
+ * Token precedence:
+ *   1. `COPILOT_AGENT_TOKEN` – dedicated fine-grained PAT with "Agent tasks"
+ *      repo permission (recommended for production).
+ *   2. `GITHUB_TOKEN` – fallback; works when it is a fine-grained PAT with
+ *      "Agent tasks" permission (not a GitHub App installation token).
+ *
+ * Returns `null` (silently) when no suitable token is configured so callers
+ * can skip agent metric collection without a hard failure.
+ */
+export async function getAgentOctokit(): Promise<Octokit | null> {
+  if (_agentOctokit) return _agentOctokit;
+
+  const token =
+    process.env.COPILOT_AGENT_TOKEN ?? process.env.GITHUB_TOKEN;
+  if (!token) {
+    return null;
+  }
+
+  _agentOctokit = new ThrottledOctokit({
+    auth: token,
+    throttle: throttleOptions(),
+  });
+  return _agentOctokit;
+}
+
+/**
+ * Allow tests to inject a mock Octokit for agent calls.
+ */
+export function setAgentOctokit(octokit: Octokit): void {
+  _agentOctokit = octokit;
+}
+
+/**
+ * Reset the agent Octokit singleton (useful in tests).
+ */
+export function resetAgentOctokit(): void {
+  _agentOctokit = undefined;
+}
