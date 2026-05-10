@@ -590,7 +590,7 @@ function buildRepoRow(repo: RepoMetrics): string {
       (pr) =>
         `<tr><td>#${pr.number} ${escapeHtml(pr.title)}</td>` +
         `<td>${pr.mergedAt ? pr.mergedAt.slice(0, 10) : ""}</td>` +
-        `<td><span class="add">+${pr.linesAdded}</span> <span class="del">-${pr.linesDeleted}</span></td>` +
+        `<td class="td-lines"><span class="add">+${pr.linesAdded}</span><span class="del">-${pr.linesDeleted}</span></td>` +
         `<td>${pr.commentCount}</td><td>${pr.commitCount}</td><td>${pr.actionsMinutes}</td></tr>`,
     )
     .join("");
@@ -651,7 +651,7 @@ function buildRepoRow(repo: RepoMetrics): string {
     `<td title="${repo.committerCount} committers, ${repo.reviewerCount} reviewers">${totalContrib}</td>` +
     `<td>${repo.dependentCount}</td>` +
     `<td>${pushedDate}</td>` +
-    `<td><span class="add">+${linesAdded}</span> <span class="del">-${linesDeleted}</span></td>` +
+    `<td class="td-lines"><span class="add">+${linesAdded}</span><span class="del">-${linesDeleted}</span></td>` +
     `<td>${agentTaskCount > 0 ? agentTaskCount : '<span class="col-muted">&ndash;</span>'}</td>` +
     `</tr>`;
 
@@ -772,7 +772,8 @@ a{color:var(--accent)}
 .rname:hover{text-decoration:underline}
 .col-muted{color:var(--muted);font-size:.8rem}
 .col-num{text-align:right}
-.col-date,.col-lines{white-space:nowrap}
+.col-date,.col-lines{white-space:nowrap;text-align:right}
+.td-lines{text-align:right}.td-lines span{display:block}
 .grp-hdr-row{cursor:pointer;user-select:none}
 .grp-hdr-cell{padding:.5rem .8rem;font-size:.82rem;font-weight:600;
   background:var(--bg);color:var(--muted);border-bottom:1px solid var(--border)}
@@ -867,8 +868,17 @@ document.addEventListener("DOMContentLoaded",function(){
   setupSortHeaders();
   setupFilter();
   setupRepoPicker();
+  formatLineNumbers();
   applyFilter("30days");
 });
+function formatLineNumbers(){
+  document.querySelectorAll(".td-lines .add,.td-lines .del").forEach(function(el){
+    var t=el.textContent||"";
+    var sign=t.charAt(0);
+    var n=parseInt(t.slice(1),10);
+    if(!isNaN(n))el.textContent=sign+n.toLocaleString();
+  });
+}
 function renderCharts(){
   function hexToRgba(hex,a){
     var h=(hex||"").replace("#","");
