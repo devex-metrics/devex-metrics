@@ -2,14 +2,14 @@
   "schemaVersion": 6,
   "owner": "rajbos",
   "ownerType": "user",
-  "collectedAt": "2026-05-10T20:25:55.341Z",
+  "collectedAt": "2026-05-11T08:45:38.823Z",
   "repoCount": 147,
   "repos": [
     {
       "name": "docker-action-demo",
       "fullName": "devops-actions/docker-action-demo",
       "pushedAt": "2023-07-20T15:55:13Z",
-      "collectedAt": "2026-05-10T20:15:30.240Z",
+      "collectedAt": "2026-05-11T08:33:21.197Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -33,15 +33,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -140,6 +131,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -147,7 +147,7 @@
       "name": "issue-comment-tag",
       "fullName": "devops-actions/issue-comment-tag",
       "pushedAt": "2026-05-01T01:55:56Z",
-      "collectedAt": "2026-05-10T20:15:43.100Z",
+      "collectedAt": "2026-05-11T08:33:39.319Z",
       "issues": {
         "open": 0,
         "closed": 12
@@ -1232,15 +1232,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 6,
           "prsMerged": 6,
@@ -1338,6 +1329,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -1345,7 +1345,7 @@
       "name": "load-available-actions",
       "fullName": "devops-actions/load-available-actions",
       "pushedAt": "2026-05-01T20:24:48Z",
-      "collectedAt": "2026-05-10T20:16:01.623Z",
+      "collectedAt": "2026-05-11T08:34:07.459Z",
       "issues": {
         "open": 5,
         "closed": 35
@@ -2847,15 +2847,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 3,
-          "prsMerged": 3,
-          "issuesOpened": 2,
-          "issuesClosed": 6,
-          "linesAdded": 23019,
-          "linesDeleted": 24893
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 6,
           "prsMerged": 5,
@@ -2953,6 +2944,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -2960,7 +2960,7 @@
       "name": "load-used-actions",
       "fullName": "devops-actions/load-used-actions",
       "pushedAt": "2026-05-01T08:16:54Z",
-      "collectedAt": "2026-05-10T20:16:20.091Z",
+      "collectedAt": "2026-05-11T08:34:34.200Z",
       "issues": {
         "open": 1,
         "closed": 14
@@ -4306,15 +4306,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 8,
           "prsMerged": 4,
@@ -4412,6 +4403,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -4419,7 +4419,7 @@
       "name": "partner-actions",
       "fullName": "github-technology-partners/partner-actions",
       "pushedAt": "2024-06-24T17:45:02Z",
-      "collectedAt": "2026-05-10T20:16:22.184Z",
+      "collectedAt": "2026-05-11T08:34:37.366Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -4444,15 +4444,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -4550,6 +4541,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -4557,7 +4557,7 @@
       "name": "azure-devops-extension-action",
       "fullName": "jessehouwing/azure-devops-extension-action",
       "pushedAt": "2020-12-09T18:50:18Z",
-      "collectedAt": "2026-05-10T20:16:23.121Z",
+      "collectedAt": "2026-05-11T08:34:38.434Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -4582,15 +4582,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -4688,6 +4679,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -4695,7 +4695,7 @@
       "name": "octogotchi",
       "fullName": "marcduiker/octogotchi",
       "pushedAt": "2021-04-09T20:43:11Z",
-      "collectedAt": "2026-05-10T20:16:24.304Z",
+      "collectedAt": "2026-05-11T08:34:39.672Z",
       "issues": {
         "open": 1,
         "closed": 3
@@ -4720,15 +4720,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -4826,6 +4817,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -4833,7 +4833,7 @@
       "name": "octogotchi-backend",
       "fullName": "marcduiker/octogotchi-backend",
       "pushedAt": "2021-04-29T21:52:12Z",
-      "collectedAt": "2026-05-10T20:16:25.413Z",
+      "collectedAt": "2026-05-11T08:34:41.071Z",
       "issues": {
         "open": 2,
         "closed": 3
@@ -4858,15 +4858,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -4964,6 +4955,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -4971,7 +4971,7 @@
       "name": "MondrianMuse",
       "fullName": "MatthijsvdVeer/MondrianMuse",
       "pushedAt": "2026-04-07T07:58:06Z",
-      "collectedAt": "2026-05-10T20:16:33.084Z",
+      "collectedAt": "2026-05-11T08:34:51.530Z",
       "issues": {
         "open": 8,
         "closed": 102
@@ -5386,15 +5386,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -5492,6 +5483,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -5499,7 +5499,7 @@
       "name": "mcp-security-scans",
       "fullName": "mcp-research/mcp-security-scans",
       "pushedAt": "2026-05-01T18:06:28Z",
-      "collectedAt": "2026-05-10T20:16:57.516Z",
+      "collectedAt": "2026-05-11T08:35:21.784Z",
       "issues": {
         "open": 4,
         "closed": 83
@@ -7283,15 +7283,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 14,
           "prsMerged": 15,
@@ -7389,6 +7380,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -7396,7 +7396,7 @@
       "name": "copilot-custom-extension",
       "fullName": "molson504x/copilot-custom-extension",
       "pushedAt": "2025-11-16T05:21:22Z",
-      "collectedAt": "2026-05-10T20:16:58.854Z",
+      "collectedAt": "2026-05-11T08:35:23.907Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -7421,15 +7421,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -7527,6 +7518,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -7534,7 +7534,7 @@
       "name": "lfs-warning",
       "fullName": "ppremk/lfs-warning",
       "pushedAt": "2024-09-07T09:39:08Z",
-      "collectedAt": "2026-05-10T20:17:03.242Z",
+      "collectedAt": "2026-05-11T08:35:30.183Z",
       "issues": {
         "open": 4,
         "closed": 13
@@ -7559,15 +7559,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -7665,6 +7656,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -7672,7 +7672,7 @@
       "name": "ActionsFundamentals",
       "fullName": "ps-actions-sandbox/ActionsFundamentals",
       "pushedAt": "2025-08-13T09:24:28Z",
-      "collectedAt": "2026-05-10T20:17:07.374Z",
+      "collectedAt": "2026-05-11T08:35:36.491Z",
       "issues": {
         "open": 4,
         "closed": 10
@@ -7697,15 +7697,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -7803,6 +7794,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -7810,7 +7810,7 @@
       "name": ".github",
       "fullName": "rajbos/.github",
       "pushedAt": "2024-04-27T10:59:56Z",
-      "collectedAt": "2026-05-10T20:17:08.277Z",
+      "collectedAt": "2026-05-11T08:35:37.436Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -7835,15 +7835,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -7941,6 +7932,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -7948,7 +7948,7 @@
       "name": "acp-editor-demo",
       "fullName": "rajbos/acp-editor-demo",
       "pushedAt": "2026-01-26T08:46:03Z",
-      "collectedAt": "2026-05-10T20:17:09.601Z",
+      "collectedAt": "2026-05-11T08:35:38.474Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -7973,15 +7973,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -8079,6 +8070,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -8086,7 +8086,7 @@
       "name": "actions-load-test",
       "fullName": "rajbos/actions-load-test",
       "pushedAt": "2022-09-09T21:31:11Z",
-      "collectedAt": "2026-05-10T20:17:10.683Z",
+      "collectedAt": "2026-05-11T08:35:41.182Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -8111,15 +8111,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -8217,6 +8208,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -8224,7 +8224,7 @@
       "name": "actions-marketplace",
       "fullName": "rajbos/actions-marketplace",
       "pushedAt": "2026-05-05T13:58:14Z",
-      "collectedAt": "2026-05-10T20:17:19.372Z",
+      "collectedAt": "2026-05-11T08:35:52.497Z",
       "issues": {
         "open": 9,
         "closed": 14
@@ -8867,15 +8867,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 10,
           "prsMerged": 10,
@@ -8973,6 +8964,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -8980,7 +8980,7 @@
       "name": "actions-marketplace-checks",
       "fullName": "rajbos/actions-marketplace-checks",
       "pushedAt": "2026-05-06T18:51:31Z",
-      "collectedAt": "2026-05-10T20:17:38.050Z",
+      "collectedAt": "2026-05-11T08:36:16.564Z",
       "issues": {
         "open": 0,
         "closed": 18
@@ -11435,15 +11435,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 4,
-          "prsMerged": 4,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 273,
-          "linesDeleted": 27
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 3,
           "prsMerged": 0,
@@ -11541,6 +11532,15 @@
           "issuesClosed": 0,
           "linesAdded": 38,
           "linesDeleted": 2
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -11548,7 +11548,7 @@
       "name": "actions-permissions",
       "fullName": "rajbos/actions-permissions",
       "pushedAt": "2023-07-24T15:08:46Z",
-      "collectedAt": "2026-05-10T20:17:38.579Z",
+      "collectedAt": "2026-05-11T08:36:17.187Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -11572,15 +11572,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -11673,6 +11664,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -11686,7 +11686,7 @@
       "name": "actions-testing",
       "fullName": "rajbos/actions-testing",
       "pushedAt": "2021-01-27T19:00:39Z",
-      "collectedAt": "2026-05-10T20:17:39.952Z",
+      "collectedAt": "2026-05-11T08:36:18.621Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -11710,15 +11710,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -11811,6 +11802,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -11824,7 +11824,7 @@
       "name": "actions-testing-grounds",
       "fullName": "rajbos/actions-testing-grounds",
       "pushedAt": "2021-09-12T14:17:37Z",
-      "collectedAt": "2026-05-10T20:17:40.920Z",
+      "collectedAt": "2026-05-11T08:36:19.601Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -11848,15 +11848,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -11949,6 +11940,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -11962,7 +11962,7 @@
       "name": "actions-usage",
       "fullName": "rajbos/actions-usage",
       "pushedAt": "2023-07-30T10:42:05Z",
-      "collectedAt": "2026-05-10T20:17:41.572Z",
+      "collectedAt": "2026-05-11T08:36:20.207Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -11986,15 +11986,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -12093,14 +12084,23 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
     {
       "name": "ai-engineering-fluency",
       "fullName": "rajbos/ai-engineering-fluency",
-      "pushedAt": "2026-05-10T13:08:38Z",
-      "collectedAt": "2026-05-10T20:18:41.622Z",
+      "pushedAt": "2026-05-11T07:35:20Z",
+      "collectedAt": "2026-05-11T08:37:38.929Z",
       "issues": {
         "open": 2,
         "closed": 124
@@ -12108,9 +12108,121 @@
       "pullRequests": {
         "open": 3,
         "closed": 39,
-        "merged": 664
+        "merged": 671
       },
       "pullRequestDetails": [
+        {
+          "number": 842,
+          "title": "chore: bump VS Code extension version to 0.7.0",
+          "state": "merged",
+          "createdAt": "2026-05-11T07:29:39Z",
+          "author": "rajbos",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 9,
+          "linesDeleted": 3,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 18.6,
+          "timeToMergeHours": 0.05,
+          "mergedAt": "2026-05-11T07:32:37Z"
+        },
+        {
+          "number": 839,
+          "title": "github-actions(deps): Bump gradle/actions from 4.3.1 to 6.1.0",
+          "state": "merged",
+          "createdAt": "2026-05-11T04:37:13Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 20.07,
+          "timeToMergeHours": 2.61,
+          "mergedAt": "2026-05-11T07:13:42Z"
+        },
+        {
+          "number": 841,
+          "title": "github-actions(deps): Bump actions/cache from 4.2.3 to 5.0.5",
+          "state": "merged",
+          "createdAt": "2026-05-11T04:37:23Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 2,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 20.27,
+          "timeToMergeHours": 2.6,
+          "mergedAt": "2026-05-11T07:13:10Z"
+        },
+        {
+          "number": 840,
+          "title": "github-actions(deps): Bump actions/dependency-review-action from 4.9.0 to 5.0.0",
+          "state": "merged",
+          "createdAt": "2026-05-11T04:37:16Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 20.52,
+          "timeToMergeHours": 2.6,
+          "mergedAt": "2026-05-11T07:13:02Z"
+        },
+        {
+          "number": 838,
+          "title": "github-actions(deps): Bump actions/download-artifact from 4.3.0 to 8.0.1",
+          "state": "merged",
+          "createdAt": "2026-05-11T04:37:09Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 19.45,
+          "timeToMergeHours": 2.59,
+          "mergedAt": "2026-05-11T07:12:46Z"
+        },
+        {
+          "number": 837,
+          "title": "github-actions(deps): Bump github/codeql-action from 4.35.3 to 4.35.4 in the minor-and-patch-updates group",
+          "state": "merged",
+          "createdAt": "2026-05-11T04:37:07Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 4,
+          "linesDeleted": 4,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 19.65,
+          "timeToMergeHours": 2.59,
+          "mergedAt": "2026-05-11T07:12:38Z"
+        },
+        {
+          "number": 836,
+          "title": "feat(chart): add rolling average toggle for Total Tokens and Est. Cost views",
+          "state": "merged",
+          "createdAt": "2026-05-10T20:32:15Z",
+          "author": "rajbos",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 94,
+          "linesDeleted": 11,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 38.3,
+          "timeToMergeHours": 0.41,
+          "mergedAt": "2026-05-10T20:57:07Z"
+        },
         {
           "number": 835,
           "title": "feat: add Copilot Cloud Agent sessions view",
@@ -12158,121 +12270,93 @@
           "actionsMinutes": 59.78,
           "timeToMergeHours": 1.95,
           "mergedAt": "2026-05-10T10:02:56Z"
-        },
-        {
-          "number": 832,
-          "title": "Add friendly names for EnterPlanMode and ExitPlanMode tools",
-          "state": "merged",
-          "createdAt": "2026-05-10T07:22:17Z",
-          "author": "copilot-swe-agent",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 4,
-          "linesDeleted": 0,
-          "commentCount": 0,
-          "commitCount": 2,
-          "actionsMinutes": 0,
-          "timeToMergeHours": 0.07,
-          "mergedAt": "2026-05-10T07:26:39Z"
-        },
-        {
-          "number": 830,
-          "title": "fix: keep chart in sync with toolbar on background stat refreshes",
-          "state": "merged",
-          "createdAt": "2026-05-09T14:17:23Z",
-          "author": "rajbos",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 9,
-          "linesDeleted": 0,
-          "commentCount": 0,
-          "commitCount": 1,
-          "actionsMinutes": 37.85,
-          "timeToMergeHours": 0.39,
-          "mergedAt": "2026-05-09T14:41:02Z"
-        },
-        {
-          "number": 827,
-          "title": "chore(cli): bump version to v0.1.2",
-          "state": "merged",
-          "createdAt": "2026-05-09T11:54:47Z",
-          "author": "github-actions",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 3,
-          "linesDeleted": 3,
-          "commentCount": 0,
-          "commitCount": 2,
-          "actionsMinutes": 41.12,
-          "timeToMergeHours": 0.84,
-          "mergedAt": "2026-05-09T12:45:14Z"
-        },
-        {
-          "number": 829,
-          "title": "fix(mutation-benchmark): gracefully handle invalid/expired GH_PAT",
-          "state": "merged",
-          "createdAt": "2026-05-09T12:08:17Z",
-          "author": "rajbos",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 14,
-          "linesDeleted": 5,
-          "commentCount": 0,
-          "commitCount": 3,
-          "actionsMinutes": 36.67,
-          "timeToMergeHours": 0.5,
-          "mergedAt": "2026-05-09T12:38:31Z"
-        },
-        {
-          "number": 828,
-          "title": "fix: always show friendly model names in all display locations",
-          "state": "merged",
-          "createdAt": "2026-05-09T12:03:58Z",
-          "author": "rajbos",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 113,
-          "linesDeleted": 51,
-          "commentCount": 0,
-          "commitCount": 1,
-          "actionsMinutes": 43.1,
-          "timeToMergeHours": 0.43,
-          "mergedAt": "2026-05-09T12:29:49Z"
-        },
-        {
-          "number": 826,
-          "title": "fix(ci): use OIDC provenance for npm publish",
-          "state": "merged",
-          "createdAt": "2026-05-09T11:33:41Z",
-          "author": "rajbos",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 38,
-          "linesDeleted": 2,
-          "commentCount": 0,
-          "commitCount": 3,
-          "actionsMinutes": 19.53,
-          "timeToMergeHours": 0.06,
-          "mergedAt": "2026-05-09T11:37:25Z"
-        },
-        {
-          "number": 825,
-          "title": "chore: bump versions for release (vscode-extension v0.5.2, cli v0.1.1)",
-          "state": "merged",
-          "createdAt": "2026-05-09T11:09:07Z",
-          "author": "rajbos",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 24,
-          "linesDeleted": 6,
-          "commentCount": 0,
-          "commitCount": 1,
-          "actionsMinutes": 24.83,
-          "timeToMergeHours": 0.18,
-          "mergedAt": "2026-05-09T11:20:03Z"
         }
       ],
       "mergedPRTimeline": [
+        {
+          "number": 842,
+          "createdAt": "2026-05-11T07:29:39Z",
+          "mergedAt": "2026-05-11T07:32:37Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.05,
+          "closesIssues": [],
+          "linesAdded": 9,
+          "linesDeleted": 3
+        },
+        {
+          "number": 839,
+          "createdAt": "2026-05-11T04:37:13Z",
+          "mergedAt": "2026-05-11T07:13:42Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 2.61,
+          "closesIssues": [],
+          "linesAdded": 2,
+          "linesDeleted": 2
+        },
+        {
+          "number": 841,
+          "createdAt": "2026-05-11T04:37:23Z",
+          "mergedAt": "2026-05-11T07:13:10Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 2.6,
+          "closesIssues": [],
+          "linesAdded": 2,
+          "linesDeleted": 2
+        },
+        {
+          "number": 840,
+          "createdAt": "2026-05-11T04:37:16Z",
+          "mergedAt": "2026-05-11T07:13:02Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 2.6,
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 1
+        },
+        {
+          "number": 838,
+          "createdAt": "2026-05-11T04:37:09Z",
+          "mergedAt": "2026-05-11T07:12:46Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 2.59,
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 1
+        },
+        {
+          "number": 837,
+          "createdAt": "2026-05-11T04:37:07Z",
+          "mergedAt": "2026-05-11T07:12:38Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 2.59,
+          "closesIssues": [],
+          "linesAdded": 4,
+          "linesDeleted": 4
+        },
+        {
+          "number": 836,
+          "createdAt": "2026-05-10T20:32:15Z",
+          "mergedAt": "2026-05-10T20:57:07Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.41,
+          "closesIssues": [],
+          "linesAdded": 94,
+          "linesDeleted": 11
+        },
         {
           "number": 835,
           "createdAt": "2026-05-10T12:18:40Z",
@@ -20291,7 +20375,7 @@
       "copilotAdoption": {
         "copilotAuthoredPRs": 0,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 664,
+        "totalMergedPRs": 671,
         "totalDetailedPRs": 10
       },
       "issueLeadTimes": [
@@ -20463,15 +20547,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 46,
-          "prsMerged": 43,
-          "issuesOpened": 8,
-          "issuesClosed": 12,
-          "linesAdded": 9058,
-          "linesDeleted": 1300
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 50,
           "prsMerged": 48,
@@ -20563,12 +20638,21 @@
         },
         {
           "week": "2026-W19",
-          "prsOpened": 62,
-          "prsMerged": 72,
+          "prsOpened": 63,
+          "prsMerged": 73,
           "issuesOpened": 12,
           "issuesClosed": 13,
-          "linesAdded": 4773,
-          "linesDeleted": 1842
+          "linesAdded": 4867,
+          "linesDeleted": 1853
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 6,
+          "prsMerged": 6,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 19,
+          "linesDeleted": 13
         }
       ]
     },
@@ -20576,7 +20660,7 @@
       "name": "arm.chocolateyserver",
       "fullName": "rajbos/arm.chocolateyserver",
       "pushedAt": "2018-07-24T10:01:38Z",
-      "collectedAt": "2026-05-10T20:18:42.773Z",
+      "collectedAt": "2026-05-11T08:37:40.224Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -20600,15 +20684,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -20707,6 +20782,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -20714,7 +20798,7 @@
       "name": "authority-contribution-scraper",
       "fullName": "rajbos/authority-contribution-scraper",
       "pushedAt": "2026-04-25T11:41:01Z",
-      "collectedAt": "2026-05-10T20:18:43.270Z",
+      "collectedAt": "2026-05-11T08:37:40.814Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -20739,15 +20823,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -20839,6 +20914,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -20852,7 +20936,7 @@
       "name": "azure-openai-service-proxy",
       "fullName": "rajbos/azure-openai-service-proxy",
       "pushedAt": "2025-12-08T16:22:02Z",
-      "collectedAt": "2026-05-10T20:18:44.280Z",
+      "collectedAt": "2026-05-11T08:37:41.856Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -20876,15 +20960,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -20977,6 +21052,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -20990,7 +21074,7 @@
       "name": "Azure-scripts",
       "fullName": "rajbos/Azure-scripts",
       "pushedAt": "2018-11-08T10:06:52Z",
-      "collectedAt": "2026-05-10T20:18:45.670Z",
+      "collectedAt": "2026-05-11T08:37:43.244Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -21014,15 +21098,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -21121,6 +21196,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -21128,7 +21212,7 @@
       "name": "centralPackageVersioningSample",
       "fullName": "rajbos/centralPackageVersioningSample",
       "pushedAt": "2026-04-14T08:24:56Z",
-      "collectedAt": "2026-05-10T20:18:46.336Z",
+      "collectedAt": "2026-05-11T08:37:43.934Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -21153,15 +21237,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -21253,6 +21328,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -21266,7 +21350,7 @@
       "name": "check-dependabot",
       "fullName": "rajbos/check-dependabot",
       "pushedAt": "2023-02-05T20:17:41Z",
-      "collectedAt": "2026-05-10T20:18:47.267Z",
+      "collectedAt": "2026-05-11T08:37:44.859Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -21290,15 +21374,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -21391,6 +21466,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -21404,7 +21488,7 @@
       "name": "CleanupCopilotLicenses",
       "fullName": "rajbos/CleanupCopilotLicenses",
       "pushedAt": "2024-04-16T01:28:42Z",
-      "collectedAt": "2026-05-10T20:18:48.272Z",
+      "collectedAt": "2026-05-11T08:37:45.835Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -21428,15 +21512,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -21529,6 +21604,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -21542,7 +21626,7 @@
       "name": "cli",
       "fullName": "rajbos/cli",
       "pushedAt": "2023-02-05T20:15:52Z",
-      "collectedAt": "2026-05-10T20:18:49.277Z",
+      "collectedAt": "2026-05-11T08:37:46.914Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -21566,15 +21650,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -21667,6 +21742,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -21680,7 +21764,7 @@
       "name": "codespaces-models",
       "fullName": "rajbos/codespaces-models",
       "pushedAt": "2024-09-22T21:31:55Z",
-      "collectedAt": "2026-05-10T20:18:50.318Z",
+      "collectedAt": "2026-05-11T08:37:47.863Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -21704,15 +21788,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -21805,6 +21880,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -21818,7 +21902,7 @@
       "name": "CodeToCloud-Student",
       "fullName": "rajbos/CodeToCloud-Student",
       "pushedAt": "2022-03-31T12:57:57Z",
-      "collectedAt": "2026-05-10T20:18:51.336Z",
+      "collectedAt": "2026-05-11T08:37:48.920Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -21842,15 +21926,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -21943,6 +22018,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -21956,7 +22040,7 @@
       "name": "container-scan",
       "fullName": "rajbos/container-scan",
       "pushedAt": "2025-01-05T17:19:59Z",
-      "collectedAt": "2026-05-10T20:18:52.283Z",
+      "collectedAt": "2026-05-11T08:37:49.842Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -21980,15 +22064,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -22081,6 +22156,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -22094,7 +22178,7 @@
       "name": "continuous-compliance-action",
       "fullName": "rajbos/continuous-compliance-action",
       "pushedAt": "2023-03-21T13:27:07Z",
-      "collectedAt": "2026-05-10T20:18:53.269Z",
+      "collectedAt": "2026-05-11T08:37:50.845Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -22118,15 +22202,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -22219,6 +22294,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -22232,7 +22316,7 @@
       "name": "copilot-custom-agents",
       "fullName": "rajbos/copilot-custom-agents",
       "pushedAt": "2025-11-23T21:34:41Z",
-      "collectedAt": "2026-05-10T20:18:54.796Z",
+      "collectedAt": "2026-05-11T08:37:52.490Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -22256,15 +22340,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -22357,6 +22432,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -22370,7 +22454,7 @@
       "name": "copilot-usage-advanced-dashboard",
       "fullName": "rajbos/copilot-usage-advanced-dashboard",
       "pushedAt": "2026-02-04T15:52:29Z",
-      "collectedAt": "2026-05-10T20:18:55.314Z",
+      "collectedAt": "2026-05-11T08:37:53.057Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -22394,15 +22478,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -22501,6 +22576,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -22508,7 +22592,7 @@
       "name": "create-github-app-from-manifest",
       "fullName": "rajbos/create-github-app-from-manifest",
       "pushedAt": "2026-03-31T19:05:53Z",
-      "collectedAt": "2026-05-10T20:19:01.010Z",
+      "collectedAt": "2026-05-11T08:38:00.095Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -22815,15 +22899,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 1,
           "prsMerged": 1,
@@ -22921,6 +22996,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -22928,7 +23012,7 @@
       "name": "demo",
       "fullName": "rajbos/demo",
       "pushedAt": "2023-02-15T15:47:32Z",
-      "collectedAt": "2026-05-10T20:19:01.844Z",
+      "collectedAt": "2026-05-11T08:38:01.110Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -22952,15 +23036,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -23059,6 +23134,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -23066,7 +23150,7 @@
       "name": "demo-actions",
       "fullName": "rajbos/demo-actions",
       "pushedAt": "2026-04-08T14:45:37Z",
-      "collectedAt": "2026-05-10T20:19:09.319Z",
+      "collectedAt": "2026-05-11T08:38:10.573Z",
       "issues": {
         "open": 6,
         "closed": 22
@@ -23091,15 +23175,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -23197,6 +23272,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -23204,7 +23288,7 @@
       "name": "demo-javascript-action",
       "fullName": "rajbos/demo-javascript-action",
       "pushedAt": "2024-06-17T06:44:23Z",
-      "collectedAt": "2026-05-10T20:19:10.791Z",
+      "collectedAt": "2026-05-11T08:38:12.641Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23229,15 +23313,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -23329,6 +23404,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -23342,7 +23426,7 @@
       "name": "Demo-Pages",
       "fullName": "rajbos/Demo-Pages",
       "pushedAt": "2021-10-25T18:51:45Z",
-      "collectedAt": "2026-05-10T20:19:11.645Z",
+      "collectedAt": "2026-05-11T08:38:13.617Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23366,15 +23450,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -23467,6 +23542,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -23480,7 +23564,7 @@
       "name": "demo-repo",
       "fullName": "rajbos/demo-repo",
       "pushedAt": "2025-05-08T12:03:02Z",
-      "collectedAt": "2026-05-10T20:19:12.646Z",
+      "collectedAt": "2026-05-11T08:38:14.835Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23504,15 +23588,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -23605,6 +23680,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -23618,7 +23702,7 @@
       "name": "demo-repo-monday",
       "fullName": "rajbos/demo-repo-monday",
       "pushedAt": "2023-03-27T08:28:13Z",
-      "collectedAt": "2026-05-10T20:19:13.687Z",
+      "collectedAt": "2026-05-11T08:38:15.809Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23642,15 +23726,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -23749,6 +23824,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -23756,7 +23840,7 @@
       "name": "demo-training",
       "fullName": "rajbos/demo-training",
       "pushedAt": "2022-03-07T10:23:23Z",
-      "collectedAt": "2026-05-10T20:19:14.700Z",
+      "collectedAt": "2026-05-11T08:38:16.785Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -23781,15 +23865,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -23887,6 +23962,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -23894,7 +23978,7 @@
       "name": "demo-webgoat",
       "fullName": "rajbos/demo-webgoat",
       "pushedAt": "2024-10-18T08:00:35Z",
-      "collectedAt": "2026-05-10T20:19:15.780Z",
+      "collectedAt": "2026-05-11T08:38:18.177Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23919,15 +24003,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -24019,6 +24094,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -24032,7 +24116,7 @@
       "name": "demo-wiki",
       "fullName": "rajbos/demo-wiki",
       "pushedAt": "2023-01-16T10:15:38Z",
-      "collectedAt": "2026-05-10T20:19:16.744Z",
+      "collectedAt": "2026-05-11T08:38:19.347Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -24056,15 +24140,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -24157,6 +24232,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -24170,7 +24254,7 @@
       "name": "dependency-review-action",
       "fullName": "rajbos/dependency-review-action",
       "pushedAt": "2023-10-16T15:00:40Z",
-      "collectedAt": "2026-05-10T20:19:17.308Z",
+      "collectedAt": "2026-05-11T08:38:19.972Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -24194,15 +24278,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -24301,6 +24376,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -24308,7 +24392,7 @@
       "name": "dependency-updates",
       "fullName": "rajbos/dependency-updates",
       "pushedAt": "2022-05-24T21:18:27Z",
-      "collectedAt": "2026-05-10T20:19:19.325Z",
+      "collectedAt": "2026-05-11T08:38:22.451Z",
       "issues": {
         "open": 2,
         "closed": 3
@@ -24333,15 +24417,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -24439,6 +24514,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -24446,7 +24530,7 @@
       "name": "DevTrainingDemo",
       "fullName": "rajbos/DevTrainingDemo",
       "pushedAt": "2022-06-08T09:11:40Z",
-      "collectedAt": "2026-05-10T20:19:20.251Z",
+      "collectedAt": "2026-05-11T08:38:23.572Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -24471,15 +24555,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -24571,6 +24646,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -24584,7 +24668,7 @@
       "name": "dind-rootless-runner",
       "fullName": "rajbos/dind-rootless-runner",
       "pushedAt": "2021-10-12T08:03:09Z",
-      "collectedAt": "2026-05-10T20:19:21.140Z",
+      "collectedAt": "2026-05-11T08:38:24.690Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -24608,15 +24692,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -24709,6 +24784,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -24722,7 +24806,7 @@
       "name": "dind-secure",
       "fullName": "rajbos/dind-secure",
       "pushedAt": "2021-06-09T14:36:08Z",
-      "collectedAt": "2026-05-10T20:19:22.212Z",
+      "collectedAt": "2026-05-11T08:38:25.839Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -24746,15 +24830,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -24853,6 +24928,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -24860,7 +24944,7 @@
       "name": "docker-test",
       "fullName": "rajbos/docker-test",
       "pushedAt": "2023-03-30T12:58:01Z",
-      "collectedAt": "2026-05-10T20:19:24.084Z",
+      "collectedAt": "2026-05-11T08:38:28.325Z",
       "issues": {
         "open": 0,
         "closed": 1
@@ -24885,15 +24969,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -24991,6 +25066,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -24998,7 +25082,7 @@
       "name": "doom-sharp",
       "fullName": "rajbos/doom-sharp",
       "pushedAt": "2023-09-21T17:29:40Z",
-      "collectedAt": "2026-05-10T20:19:24.758Z",
+      "collectedAt": "2026-05-11T08:38:28.962Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25023,15 +25107,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -25129,6 +25204,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -25136,7 +25220,7 @@
       "name": "dotnetcore-angular",
       "fullName": "rajbos/dotnetcore-angular",
       "pushedAt": "2019-10-26T19:29:04Z",
-      "collectedAt": "2026-05-10T20:19:25.929Z",
+      "collectedAt": "2026-05-11T08:38:30.306Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25161,15 +25245,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -25267,6 +25342,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -25274,7 +25358,7 @@
       "name": "dotnetcore-webapp",
       "fullName": "rajbos/dotnetcore-webapp",
       "pushedAt": "2024-07-07T15:29:19Z",
-      "collectedAt": "2026-05-10T20:19:31.932Z",
+      "collectedAt": "2026-05-11T08:38:39.585Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25299,15 +25383,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -25405,6 +25480,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -25412,7 +25496,7 @@
       "name": "eco-ci-activity-checker",
       "fullName": "rajbos/eco-ci-activity-checker",
       "pushedAt": "2023-04-09T00:04:04Z",
-      "collectedAt": "2026-05-10T20:19:32.446Z",
+      "collectedAt": "2026-05-11T08:38:40.228Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25437,15 +25521,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -25543,6 +25618,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -25550,7 +25634,7 @@
       "name": "eco-ci-energy-estimation",
       "fullName": "rajbos/eco-ci-energy-estimation",
       "pushedAt": "2023-06-08T21:22:02Z",
-      "collectedAt": "2026-05-10T20:19:33.480Z",
+      "collectedAt": "2026-05-11T08:38:41.292Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -25575,15 +25659,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -25681,6 +25756,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -25688,7 +25772,7 @@
       "name": "find-action-used",
       "fullName": "rajbos/find-action-used",
       "pushedAt": "2024-11-08T07:43:21Z",
-      "collectedAt": "2026-05-10T20:19:34.871Z",
+      "collectedAt": "2026-05-11T08:38:42.717Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -25713,15 +25797,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -25819,6 +25894,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -25826,7 +25910,7 @@
       "name": "game-center",
       "fullName": "rajbos/game-center",
       "pushedAt": "2026-05-01T08:23:39Z",
-      "collectedAt": "2026-05-10T20:19:40.704Z",
+      "collectedAt": "2026-05-11T08:38:49.881Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -26265,15 +26349,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -26371,6 +26446,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -26378,7 +26462,7 @@
       "name": "get-organization-repositories-fork",
       "fullName": "rajbos/get-organization-repositories-fork",
       "pushedAt": "2023-02-05T20:20:43Z",
-      "collectedAt": "2026-05-10T20:19:41.217Z",
+      "collectedAt": "2026-05-11T08:38:50.550Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -26403,15 +26487,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -26509,6 +26584,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -26516,7 +26600,7 @@
       "name": "gh-developer-games",
       "fullName": "rajbos/gh-developer-games",
       "pushedAt": "2023-01-17T10:29:15Z",
-      "collectedAt": "2026-05-10T20:19:42.265Z",
+      "collectedAt": "2026-05-11T08:38:51.507Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -26541,15 +26625,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -26647,6 +26722,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -26654,7 +26738,7 @@
       "name": "ghas-bootcamp",
       "fullName": "rajbos/ghas-bootcamp",
       "pushedAt": "2025-05-03T22:35:38Z",
-      "collectedAt": "2026-05-10T20:19:43.178Z",
+      "collectedAt": "2026-05-11T08:38:52.722Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -26679,15 +26763,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -26785,6 +26860,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -26792,7 +26876,7 @@
       "name": "ghas-mcp-server",
       "fullName": "rajbos/ghas-mcp-server",
       "pushedAt": "2025-05-21T15:43:10Z",
-      "collectedAt": "2026-05-10T20:19:45.045Z",
+      "collectedAt": "2026-05-11T08:38:55.139Z",
       "issues": {
         "open": 4,
         "closed": 0
@@ -26817,15 +26901,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -26923,6 +26998,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -26930,7 +27014,7 @@
       "name": "GHAzDo-widget",
       "fullName": "rajbos/GHAzDo-widget",
       "pushedAt": "2026-05-02T09:54:18Z",
-      "collectedAt": "2026-05-10T20:19:55.604Z",
+      "collectedAt": "2026-05-11T08:39:07.053Z",
       "issues": {
         "open": 5,
         "closed": 18
@@ -28192,15 +28276,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 28,
-          "prsMerged": 30,
-          "issuesOpened": 2,
-          "issuesClosed": 9,
-          "linesAdded": 13216,
-          "linesDeleted": 7657
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 6,
           "prsMerged": 6,
@@ -28298,6 +28373,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -28305,7 +28389,7 @@
       "name": "giphy-action",
       "fullName": "rajbos/giphy-action",
       "pushedAt": "2023-05-13T22:02:46Z",
-      "collectedAt": "2026-05-10T20:19:56.138Z",
+      "collectedAt": "2026-05-11T08:39:07.700Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -28329,15 +28413,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -28430,6 +28505,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -28443,7 +28527,7 @@
       "name": "github-action-composite-message",
       "fullName": "rajbos/github-action-composite-message",
       "pushedAt": "2021-09-12T14:23:58Z",
-      "collectedAt": "2026-05-10T20:19:57.432Z",
+      "collectedAt": "2026-05-11T08:39:09.125Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -28467,15 +28551,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -28574,6 +28649,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -28581,7 +28665,7 @@
       "name": "github-actions-requests",
       "fullName": "rajbos/github-actions-requests",
       "pushedAt": "2024-09-03T21:00:19Z",
-      "collectedAt": "2026-05-10T20:19:59.482Z",
+      "collectedAt": "2026-05-11T08:39:11.735Z",
       "issues": {
         "open": 19,
         "closed": 8
@@ -28606,15 +28690,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -28712,6 +28787,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -28719,7 +28803,7 @@
       "name": "github-azure-devops-marketplace-extension-news",
       "fullName": "rajbos/github-azure-devops-marketplace-extension-news",
       "pushedAt": "2026-05-05T15:25:20Z",
-      "collectedAt": "2026-05-10T20:20:14.749Z",
+      "collectedAt": "2026-05-11T08:39:29.354Z",
       "issues": {
         "open": 0,
         "closed": 7
@@ -29794,15 +29878,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 2,
-          "prsMerged": 2,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 24,
-          "linesDeleted": 8
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 4,
           "prsMerged": 4,
@@ -29900,6 +29975,15 @@
           "issuesClosed": 0,
           "linesAdded": 330,
           "linesDeleted": 330
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -29907,7 +29991,7 @@
       "name": "github-composite-action-goodbye",
       "fullName": "rajbos/github-composite-action-goodbye",
       "pushedAt": "2021-09-12T14:25:11Z",
-      "collectedAt": "2026-05-10T20:20:15.710Z",
+      "collectedAt": "2026-05-11T08:39:30.510Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -29931,15 +30015,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -30032,6 +30107,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -30045,7 +30129,7 @@
       "name": "github-config-as-code",
       "fullName": "rajbos/github-config-as-code",
       "pushedAt": "2023-06-07T15:24:41Z",
-      "collectedAt": "2026-05-10T20:20:16.586Z",
+      "collectedAt": "2026-05-11T08:39:31.546Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -30069,15 +30153,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -30176,6 +30251,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -30183,7 +30267,7 @@
       "name": "github-copilot-game-dev",
       "fullName": "rajbos/github-copilot-game-dev",
       "pushedAt": "2026-04-01T09:55:18Z",
-      "collectedAt": "2026-05-10T20:20:17.580Z",
+      "collectedAt": "2026-05-11T08:39:32.611Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -30208,15 +30292,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -30314,6 +30389,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -30321,7 +30405,7 @@
       "name": "github-copilot-model-notifier",
       "fullName": "rajbos/github-copilot-model-notifier",
       "pushedAt": "2026-05-07T08:56:04Z",
-      "collectedAt": "2026-05-10T20:20:22.985Z",
+      "collectedAt": "2026-05-11T08:39:38.021Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -30600,15 +30684,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -30706,6 +30781,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -30713,7 +30797,7 @@
       "name": "github-copilot-premium-reqs-usage-fork",
       "fullName": "rajbos/github-copilot-premium-reqs-usage-fork",
       "pushedAt": "2026-04-20T07:27:21Z",
-      "collectedAt": "2026-05-10T20:20:32.119Z",
+      "collectedAt": "2026-05-11T08:39:48.231Z",
       "issues": {
         "open": 1,
         "closed": 19
@@ -31228,15 +31312,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -31334,6 +31409,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -31341,7 +31425,7 @@
       "name": "github-fork-updater",
       "fullName": "rajbos/github-fork-updater",
       "pushedAt": "2026-05-01T00:07:06Z",
-      "collectedAt": "2026-05-10T20:20:40.557Z",
+      "collectedAt": "2026-05-11T08:39:57.289Z",
       "issues": {
         "open": 51,
         "closed": 79
@@ -31936,15 +32020,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 5,
           "prsMerged": 0,
@@ -32042,6 +32117,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -32049,7 +32133,7 @@
       "name": "github-graphql-examples",
       "fullName": "rajbos/github-graphql-examples",
       "pushedAt": "2022-11-28T22:28:51Z",
-      "collectedAt": "2026-05-10T20:20:41.381Z",
+      "collectedAt": "2026-05-11T08:39:58.224Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -32073,15 +32157,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -32174,6 +32249,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -32187,7 +32271,7 @@
       "name": "github-mcp-server",
       "fullName": "rajbos/github-mcp-server",
       "pushedAt": "2025-05-13T18:59:47Z",
-      "collectedAt": "2026-05-10T20:20:42.082Z",
+      "collectedAt": "2026-05-11T08:39:58.896Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -32211,15 +32295,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -32312,6 +32387,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -32325,7 +32409,7 @@
       "name": "github-models-example",
       "fullName": "rajbos/github-models-example",
       "pushedAt": "2024-10-13T15:22:28Z",
-      "collectedAt": "2026-05-10T20:20:43.391Z",
+      "collectedAt": "2026-05-11T08:40:00.227Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -32349,15 +32433,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -32450,6 +32525,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -32463,7 +32547,7 @@
       "name": "github-org-information",
       "fullName": "rajbos/github-org-information",
       "pushedAt": "2023-06-08T20:48:09Z",
-      "collectedAt": "2026-05-10T20:20:44.378Z",
+      "collectedAt": "2026-05-11T08:40:01.342Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -32487,15 +32571,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -32594,14 +32669,23 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
     {
       "name": "GitHub-ratelimit-research",
       "fullName": "rajbos/GitHub-ratelimit-research",
-      "pushedAt": "2026-05-10T20:03:53Z",
-      "collectedAt": "2026-05-10T20:20:50.100Z",
+      "pushedAt": "2026-05-11T07:35:23Z",
+      "collectedAt": "2026-05-11T08:40:07.894Z",
       "issues": {
         "open": 3,
         "closed": 41
@@ -33016,15 +33100,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 8,
           "prsMerged": 8,
@@ -33122,6 +33197,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -33129,7 +33213,7 @@
       "name": "github-secure-code-game",
       "fullName": "rajbos/github-secure-code-game",
       "pushedAt": "2023-07-20T17:58:55Z",
-      "collectedAt": "2026-05-10T20:20:50.961Z",
+      "collectedAt": "2026-05-11T08:40:08.888Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -33153,15 +33237,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -33254,6 +33329,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -33267,7 +33351,7 @@
       "name": "github-upload-action",
       "fullName": "rajbos/github-upload-action",
       "pushedAt": "2021-11-29T16:22:30Z",
-      "collectedAt": "2026-05-10T20:20:51.636Z",
+      "collectedAt": "2026-05-11T08:40:09.491Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -33291,15 +33375,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -33392,6 +33467,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -33405,7 +33489,7 @@
       "name": "GitHubBootcamp",
       "fullName": "rajbos/GitHubBootcamp",
       "pushedAt": "2022-06-17T14:57:02Z",
-      "collectedAt": "2026-05-10T20:20:52.626Z",
+      "collectedAt": "2026-05-11T08:40:10.522Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -33429,15 +33513,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -33530,6 +33605,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -33543,7 +33627,7 @@
       "name": "Goat-test",
       "fullName": "rajbos/Goat-test",
       "pushedAt": "2023-10-07T10:11:36Z",
-      "collectedAt": "2026-05-10T20:20:53.902Z",
+      "collectedAt": "2026-05-11T08:40:11.773Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -33567,15 +33651,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -33668,6 +33743,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -33681,7 +33765,7 @@
       "name": "greenframe-action",
       "fullName": "rajbos/greenframe-action",
       "pushedAt": "2023-04-08T21:12:31Z",
-      "collectedAt": "2026-05-10T20:20:54.618Z",
+      "collectedAt": "2026-05-11T08:40:12.579Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -33705,15 +33789,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -33806,6 +33881,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -33819,7 +33903,7 @@
       "name": "ha-config",
       "fullName": "rajbos/ha-config",
       "pushedAt": "2019-01-27T10:48:16Z",
-      "collectedAt": "2026-05-10T20:20:55.948Z",
+      "collectedAt": "2026-05-11T08:40:13.880Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -33843,15 +33927,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -33950,6 +34025,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -33957,7 +34041,7 @@
       "name": "hol-demo",
       "fullName": "rajbos/hol-demo",
       "pushedAt": "2022-09-06T15:17:57Z",
-      "collectedAt": "2026-05-10T20:20:57.198Z",
+      "collectedAt": "2026-05-11T08:40:14.973Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -33982,15 +34066,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -34088,6 +34163,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -34095,7 +34179,7 @@
       "name": "home-automation",
       "fullName": "rajbos/home-automation",
       "pushedAt": "2022-03-25T14:54:30Z",
-      "collectedAt": "2026-05-10T20:20:58.034Z",
+      "collectedAt": "2026-05-11T08:40:15.991Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -34120,15 +34204,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -34226,6 +34301,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -34233,7 +34317,7 @@
       "name": "html-timer",
       "fullName": "rajbos/html-timer",
       "pushedAt": "2024-12-01T21:42:34Z",
-      "collectedAt": "2026-05-10T20:20:59.440Z",
+      "collectedAt": "2026-05-11T08:40:17.609Z",
       "issues": {
         "open": 2,
         "closed": 2
@@ -34258,15 +34342,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -34364,6 +34439,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -34371,7 +34455,7 @@
       "name": "issue-labeler",
       "fullName": "rajbos/issue-labeler",
       "pushedAt": "2023-06-29T08:42:00Z",
-      "collectedAt": "2026-05-10T20:20:59.938Z",
+      "collectedAt": "2026-05-11T08:40:18.180Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -34396,15 +34480,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -34502,6 +34577,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -34509,7 +34593,7 @@
       "name": "Jarvis",
       "fullName": "rajbos/Jarvis",
       "pushedAt": "2026-05-10T20:07:09Z",
-      "collectedAt": "2026-05-10T20:21:14.653Z",
+      "collectedAt": "2026-05-11T08:40:35.073Z",
       "issues": {
         "open": 2,
         "closed": 33
@@ -35660,15 +35744,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -35766,6 +35841,15 @@
           "issuesClosed": 3,
           "linesAdded": 7176,
           "linesDeleted": 1145
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -35773,7 +35857,7 @@
       "name": "juice-shop",
       "fullName": "rajbos/juice-shop",
       "pushedAt": "2023-02-15T07:27:33Z",
-      "collectedAt": "2026-05-10T20:21:15.370Z",
+      "collectedAt": "2026-05-11T08:40:35.818Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -35798,15 +35882,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -35904,6 +35979,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -35911,7 +35995,7 @@
       "name": "kvm",
       "fullName": "rajbos/kvm",
       "pushedAt": "2021-03-15T15:16:08Z",
-      "collectedAt": "2026-05-10T20:21:16.380Z",
+      "collectedAt": "2026-05-11T08:40:37.042Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -35936,15 +36020,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -36042,6 +36117,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -36049,7 +36133,7 @@
       "name": "legitify",
       "fullName": "rajbos/legitify",
       "pushedAt": "2025-01-05T17:20:31Z",
-      "collectedAt": "2026-05-10T20:21:17.178Z",
+      "collectedAt": "2026-05-11T08:40:37.680Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -36074,15 +36158,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -36180,6 +36255,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -36187,7 +36271,7 @@
       "name": "local-setup",
       "fullName": "rajbos/local-setup",
       "pushedAt": "2025-12-20T11:46:04Z",
-      "collectedAt": "2026-05-10T20:21:20.234Z",
+      "collectedAt": "2026-05-11T08:40:41.020Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -36326,15 +36410,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -36432,6 +36507,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -36439,7 +36523,7 @@
       "name": "mcp-agents-hub",
       "fullName": "rajbos/mcp-agents-hub",
       "pushedAt": "2026-04-20T07:29:27Z",
-      "collectedAt": "2026-05-10T20:21:20.795Z",
+      "collectedAt": "2026-05-11T08:40:41.644Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -36464,15 +36548,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -36570,6 +36645,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -36577,7 +36661,7 @@
       "name": "mcp-registry-demo",
       "fullName": "rajbos/mcp-registry-demo",
       "pushedAt": "2026-03-28T20:24:33Z",
-      "collectedAt": "2026-05-10T20:21:26.146Z",
+      "collectedAt": "2026-05-11T08:40:47.610Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -36908,15 +36992,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -37008,6 +37083,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -37021,7 +37105,7 @@
       "name": "mcp-servers",
       "fullName": "rajbos/mcp-servers",
       "pushedAt": "2025-03-27T13:42:05Z",
-      "collectedAt": "2026-05-10T20:21:26.686Z",
+      "collectedAt": "2026-05-11T08:40:48.231Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -37045,15 +37129,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -37146,6 +37221,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -37159,7 +37243,7 @@
       "name": "melos-action",
       "fullName": "rajbos/melos-action",
       "pushedAt": "2024-04-26T12:36:37Z",
-      "collectedAt": "2026-05-10T20:21:27.656Z",
+      "collectedAt": "2026-05-11T08:40:49.237Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -37183,15 +37267,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -37284,6 +37359,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -37297,7 +37381,7 @@
       "name": "microsoft-learn",
       "fullName": "rajbos/microsoft-learn",
       "pushedAt": "2022-10-25T20:25:46Z",
-      "collectedAt": "2026-05-10T20:21:28.693Z",
+      "collectedAt": "2026-05-11T08:40:50.223Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -37321,15 +37405,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -37428,6 +37503,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -37435,7 +37519,7 @@
       "name": "microsoft-todo-mcp-server",
       "fullName": "rajbos/microsoft-todo-mcp-server",
       "pushedAt": "2026-04-11T15:06:10Z",
-      "collectedAt": "2026-05-10T20:21:30.033Z",
+      "collectedAt": "2026-05-11T08:40:51.770Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -37489,15 +37573,6 @@
       "contributorCount": 1,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -37596,6 +37671,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -37603,7 +37687,7 @@
       "name": "modern-development",
       "fullName": "rajbos/modern-development",
       "pushedAt": "2023-04-21T00:45:05Z",
-      "collectedAt": "2026-05-10T20:21:31.363Z",
+      "collectedAt": "2026-05-11T08:40:53.084Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -37628,15 +37712,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -37734,6 +37809,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -37741,7 +37825,7 @@
       "name": "NuGetDefense.Core",
       "fullName": "rajbos/NuGetDefense.Core",
       "pushedAt": "2021-07-27T18:25:03Z",
-      "collectedAt": "2026-05-10T20:21:31.875Z",
+      "collectedAt": "2026-05-11T08:40:53.673Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -37766,15 +37850,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -37872,6 +37947,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -37879,7 +37963,7 @@
       "name": "openssf-scorecard-monitor",
       "fullName": "rajbos/openssf-scorecard-monitor",
       "pushedAt": "2026-04-23T07:20:19Z",
-      "collectedAt": "2026-05-10T20:21:33.648Z",
+      "collectedAt": "2026-05-11T08:40:55.534Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -37933,15 +38017,6 @@
       "contributorCount": 1,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 1,
@@ -38040,6 +38115,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -38047,7 +38131,7 @@
       "name": "pages-test",
       "fullName": "rajbos/pages-test",
       "pushedAt": "2022-02-07T20:33:42Z",
-      "collectedAt": "2026-05-10T20:21:34.518Z",
+      "collectedAt": "2026-05-11T08:40:57.310Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -38072,15 +38156,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -38178,6 +38253,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -38185,7 +38269,7 @@
       "name": "pipelines",
       "fullName": "rajbos/pipelines",
       "pushedAt": "2023-02-20T03:59:19Z",
-      "collectedAt": "2026-05-10T20:21:40.793Z",
+      "collectedAt": "2026-05-11T08:41:04.805Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -38210,15 +38294,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -38316,6 +38391,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -38323,7 +38407,7 @@
       "name": "pr-template-test",
       "fullName": "rajbos/pr-template-test",
       "pushedAt": "2022-11-30T21:10:28Z",
-      "collectedAt": "2026-05-10T20:21:41.848Z",
+      "collectedAt": "2026-05-11T08:41:06.337Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -38348,15 +38432,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -38454,6 +38529,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -38461,7 +38545,7 @@
       "name": "PS-NetworkAnalyzer",
       "fullName": "rajbos/PS-NetworkAnalyzer",
       "pushedAt": "2025-12-21T20:57:04Z",
-      "collectedAt": "2026-05-10T20:21:44.513Z",
+      "collectedAt": "2026-05-11T08:41:09.382Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -38600,15 +38684,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -38706,6 +38781,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -38713,7 +38797,7 @@
       "name": "PublicGitHubActionsTest",
       "fullName": "rajbos/PublicGitHubActionsTest",
       "pushedAt": "2022-02-18T14:54:25Z",
-      "collectedAt": "2026-05-10T20:21:45.119Z",
+      "collectedAt": "2026-05-11T08:41:10.049Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -38738,15 +38822,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -38844,21 +38919,30 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
     {
       "name": "rajbos",
       "fullName": "rajbos/rajbos",
-      "pushedAt": "2026-05-08T23:26:31Z",
-      "collectedAt": "2026-05-10T20:22:01.376Z",
+      "pushedAt": "2026-05-11T06:59:16Z",
+      "collectedAt": "2026-05-11T08:41:28.848Z",
       "issues": {
         "open": 0,
         "closed": 29
       },
       "pullRequests": {
-        "open": 7,
-        "closed": 9,
+        "open": 8,
+        "closed": 10,
         "merged": 87
       },
       "pullRequestDetails": [
@@ -40293,15 +40377,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 3,
-          "prsMerged": 3,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 20,
-          "linesDeleted": 19
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -40393,6 +40468,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 1,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -40405,8 +40489,8 @@
     {
       "name": "rajbos.github.io",
       "fullName": "rajbos/rajbos.github.io",
-      "pushedAt": "2026-05-09T12:42:05Z",
-      "collectedAt": "2026-05-10T20:22:09.492Z",
+      "pushedAt": "2026-05-11T08:03:14Z",
+      "collectedAt": "2026-05-11T08:41:37.848Z",
       "issues": {
         "open": 0,
         "closed": 2
@@ -40414,9 +40498,25 @@
       "pullRequests": {
         "open": 1,
         "closed": 6,
-        "merged": 52
+        "merged": 53
       },
       "pullRequestDetails": [
+        {
+          "number": 96,
+          "title": "Fixed a remark that was wrong way round",
+          "state": "merged",
+          "createdAt": "2026-05-11T07:43:02Z",
+          "author": "FokkoVeegens",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 1,
+          "linesDeleted": 1,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 0,
+          "timeToMergeHours": 0.34,
+          "mergedAt": "2026-05-11T08:03:14Z"
+        },
         {
           "number": 94,
           "title": "Bump nokogiri from 1.19.1 to 1.19.3",
@@ -40560,25 +40660,21 @@
           "actionsMinutes": 0.25,
           "timeToMergeHours": 0.04,
           "mergedAt": "2026-04-18T11:25:08Z"
-        },
-        {
-          "number": 84,
-          "title": "Bump nokogiri from 1.18.10 to 1.19.1",
-          "state": "merged",
-          "createdAt": "2026-04-08T10:41:32Z",
-          "author": "dependabot",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 1,
-          "linesDeleted": 1,
-          "commentCount": 0,
-          "commitCount": 1,
-          "actionsMinutes": 0,
-          "timeToMergeHours": 0.01,
-          "mergedAt": "2026-04-08T10:42:18Z"
         }
       ],
       "mergedPRTimeline": [
+        {
+          "number": 96,
+          "createdAt": "2026-05-11T07:43:02Z",
+          "mergedAt": "2026-05-11T08:03:14Z",
+          "author": "FokkoVeegens",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.34,
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 1
+        },
         {
           "number": 94,
           "createdAt": "2026-05-08T15:41:30Z",
@@ -40885,7 +40981,7 @@
       "copilotAdoption": {
         "copilotAuthoredPRs": 0,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 25,
+        "totalMergedPRs": 26,
         "totalDetailedPRs": 10
       },
       "issueLeadTimes": [
@@ -40897,20 +40993,11 @@
           "leadTimeHours": 0.15
         }
       ],
-      "committerCount": 4,
+      "committerCount": 5,
       "reviewerCount": 1,
-      "contributorCount": 4,
+      "contributorCount": 5,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 2,
-          "prsMerged": 2,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 1,
-          "linesDeleted": 5
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -41009,6 +41096,15 @@
           "issuesClosed": 0,
           "linesAdded": 205,
           "linesDeleted": 19
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 1,
+          "prsMerged": 1,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 1,
+          "linesDeleted": 1
         }
       ]
     },
@@ -41016,7 +41112,7 @@
       "name": "runner-tests",
       "fullName": "rajbos/runner-tests",
       "pushedAt": "2023-07-08T15:04:33Z",
-      "collectedAt": "2026-05-10T20:22:10.453Z",
+      "collectedAt": "2026-05-11T08:41:39.042Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -41041,15 +41137,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -41141,6 +41228,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -41154,7 +41250,7 @@
       "name": "sample-app-aoai-chatGPT",
       "fullName": "rajbos/sample-app-aoai-chatGPT",
       "pushedAt": "2024-09-27T13:39:08Z",
-      "collectedAt": "2026-05-10T20:22:11.025Z",
+      "collectedAt": "2026-05-11T08:41:39.615Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -41178,15 +41274,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -41279,6 +41366,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -41292,7 +41388,7 @@
       "name": "scorecard-action",
       "fullName": "rajbos/scorecard-action",
       "pushedAt": "2023-11-17T07:04:21Z",
-      "collectedAt": "2026-05-10T20:22:12.002Z",
+      "collectedAt": "2026-05-11T08:41:40.674Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -41316,15 +41412,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -41423,6 +41510,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -41430,7 +41526,7 @@
       "name": "scorecard-ghes",
       "fullName": "rajbos/scorecard-ghes",
       "pushedAt": "2023-05-26T19:41:22Z",
-      "collectedAt": "2026-05-10T20:22:13.210Z",
+      "collectedAt": "2026-05-11T08:41:41.848Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -41455,15 +41551,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -41555,6 +41642,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -41568,7 +41664,7 @@
       "name": "scorecard-webapp",
       "fullName": "rajbos/scorecard-webapp",
       "pushedAt": "2023-07-11T08:40:16Z",
-      "collectedAt": "2026-05-10T20:22:13.995Z",
+      "collectedAt": "2026-05-11T08:41:42.670Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -41592,15 +41688,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -41693,6 +41780,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -41706,7 +41802,7 @@
       "name": "secret-scanning-custom-patterns",
       "fullName": "rajbos/secret-scanning-custom-patterns",
       "pushedAt": "2023-07-17T13:23:57Z",
-      "collectedAt": "2026-05-10T20:22:14.982Z",
+      "collectedAt": "2026-05-11T08:41:43.635Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -41730,15 +41826,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -41831,6 +41918,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -41844,7 +41940,7 @@
       "name": "security-demo",
       "fullName": "rajbos/security-demo",
       "pushedAt": "2022-03-05T09:36:07Z",
-      "collectedAt": "2026-05-10T20:22:16.619Z",
+      "collectedAt": "2026-05-11T08:41:45.327Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -41868,15 +41964,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -41969,6 +42056,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -41982,7 +42078,7 @@
       "name": "SonarQube-AzureAppService",
       "fullName": "rajbos/SonarQube-AzureAppService",
       "pushedAt": "2024-10-14T14:25:11Z",
-      "collectedAt": "2026-05-10T20:22:17.150Z",
+      "collectedAt": "2026-05-11T08:41:46.001Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -42006,15 +42102,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -42113,6 +42200,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -42120,7 +42216,7 @@
       "name": "Stryker.MultipleProjectRunner",
       "fullName": "rajbos/Stryker.MultipleProjectRunner",
       "pushedAt": "2023-12-20T13:29:35Z",
-      "collectedAt": "2026-05-10T20:22:18.741Z",
+      "collectedAt": "2026-05-11T08:41:47.605Z",
       "issues": {
         "open": 0,
         "closed": 4
@@ -42145,15 +42241,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -42245,6 +42332,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -42258,7 +42354,7 @@
       "name": "tag-npm-version",
       "fullName": "rajbos/tag-npm-version",
       "pushedAt": "2025-12-08T12:22:32Z",
-      "collectedAt": "2026-05-10T20:22:19.738Z",
+      "collectedAt": "2026-05-11T08:41:48.613Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -42282,15 +42378,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -42383,6 +42470,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -42396,7 +42492,7 @@
       "name": "TailwindTraders",
       "fullName": "rajbos/TailwindTraders",
       "pushedAt": "2021-05-20T17:44:45Z",
-      "collectedAt": "2026-05-10T20:22:20.296Z",
+      "collectedAt": "2026-05-11T08:41:49.200Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -42420,15 +42516,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -42527,6 +42614,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -42534,7 +42630,7 @@
       "name": "teams-automation",
       "fullName": "rajbos/teams-automation",
       "pushedAt": "2025-09-06T08:30:58Z",
-      "collectedAt": "2026-05-10T20:22:22.086Z",
+      "collectedAt": "2026-05-11T08:41:51.226Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -42589,15 +42685,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -42695,6 +42782,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -42702,7 +42798,7 @@
       "name": "test-repo",
       "fullName": "rajbos/test-repo",
       "pushedAt": "2023-01-05T18:13:06Z",
-      "collectedAt": "2026-05-10T20:22:23.152Z",
+      "collectedAt": "2026-05-11T08:41:52.638Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -42727,15 +42823,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -42827,6 +42914,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -42840,7 +42936,7 @@
       "name": "tfsec-sarif-action",
       "fullName": "rajbos/tfsec-sarif-action",
       "pushedAt": "2023-07-17T14:46:28Z",
-      "collectedAt": "2026-05-10T20:22:23.717Z",
+      "collectedAt": "2026-05-11T08:41:53.287Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -42864,15 +42960,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -42965,6 +43052,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -42978,7 +43074,7 @@
       "name": "training-manual",
       "fullName": "rajbos/training-manual",
       "pushedAt": "2024-02-05T16:53:38Z",
-      "collectedAt": "2026-05-10T20:22:24.669Z",
+      "collectedAt": "2026-05-11T08:41:54.253Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -43002,15 +43098,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -43103,6 +43190,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -43116,7 +43212,7 @@
       "name": "trivy-action",
       "fullName": "rajbos/trivy-action",
       "pushedAt": "2025-02-10T22:13:37Z",
-      "collectedAt": "2026-05-10T20:22:25.665Z",
+      "collectedAt": "2026-05-11T08:41:55.224Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -43140,15 +43236,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -43247,6 +43334,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -43254,7 +43350,7 @@
       "name": "typescript-demo",
       "fullName": "rajbos/typescript-demo",
       "pushedAt": "2023-10-19T02:13:23Z",
-      "collectedAt": "2026-05-10T20:22:28.899Z",
+      "collectedAt": "2026-05-11T08:41:58.744Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -43279,15 +43375,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -43385,6 +43472,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -43392,7 +43488,7 @@
       "name": "vscode-github-ratelimit",
       "fullName": "rajbos/vscode-github-ratelimit",
       "pushedAt": "2026-01-03T17:05:44Z",
-      "collectedAt": "2026-05-10T20:22:29.895Z",
+      "collectedAt": "2026-05-11T08:41:59.983Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -43447,15 +43543,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -43553,6 +43640,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -43560,7 +43656,7 @@
       "name": "VSTSClient",
       "fullName": "rajbos/VSTSClient",
       "pushedAt": "2021-04-22T09:27:30Z",
-      "collectedAt": "2026-05-10T20:22:30.772Z",
+      "collectedAt": "2026-05-11T08:42:01.041Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -43585,15 +43681,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -43685,6 +43772,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -43698,7 +43794,7 @@
       "name": "webdis-fork",
       "fullName": "rajbos/webdis-fork",
       "pushedAt": "2024-02-05T16:52:08Z",
-      "collectedAt": "2026-05-10T20:22:31.434Z",
+      "collectedAt": "2026-05-11T08:42:01.608Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -43722,15 +43818,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -43823,6 +43910,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -43836,7 +43932,7 @@
       "name": "WebGoat.Net-Test",
       "fullName": "rajbos/WebGoat.Net-Test",
       "pushedAt": "2023-10-07T10:10:59Z",
-      "collectedAt": "2026-05-10T20:22:32.663Z",
+      "collectedAt": "2026-05-11T08:42:02.949Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -43860,15 +43956,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -43967,6 +44054,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -43974,7 +44070,7 @@
       "name": "WebGoat.NETCore",
       "fullName": "rajbos/WebGoat.NETCore",
       "pushedAt": "2024-10-09T07:49:26Z",
-      "collectedAt": "2026-05-10T20:22:33.518Z",
+      "collectedAt": "2026-05-11T08:42:03.773Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -43999,15 +44095,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -44105,6 +44192,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -44112,7 +44208,7 @@
       "name": "workflow-composition",
       "fullName": "rajbos/workflow-composition",
       "pushedAt": "2023-09-13T13:20:26Z",
-      "collectedAt": "2026-05-10T20:22:34.811Z",
+      "collectedAt": "2026-05-11T08:42:05.155Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -44137,15 +44233,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -44243,6 +44330,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -44250,7 +44346,7 @@
       "name": "TailWind",
       "fullName": "renevanosnabrugge/TailWind",
       "pushedAt": "2022-10-28T12:04:18Z",
-      "collectedAt": "2026-05-10T20:22:35.770Z",
+      "collectedAt": "2026-05-11T08:42:06.391Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -44275,15 +44371,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -44381,6 +44468,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -44388,7 +44484,7 @@
       "name": "demo-actions",
       "fullName": "rob-demo/demo-actions",
       "pushedAt": "2023-07-07T11:08:52Z",
-      "collectedAt": "2026-05-10T20:22:36.852Z",
+      "collectedAt": "2026-05-11T08:42:07.577Z",
       "issues": {
         "open": 6,
         "closed": 5
@@ -44413,15 +44509,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -44519,6 +44606,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -44526,7 +44622,7 @@
       "name": "techhub",
       "fullName": "techhubms/techhub",
       "pushedAt": "2026-05-10T14:26:10Z",
-      "collectedAt": "2026-05-10T20:23:19.681Z",
+      "collectedAt": "2026-05-11T08:42:46.089Z",
       "issues": {
         "open": 22,
         "closed": 131
@@ -46854,15 +46950,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 5,
-          "prsMerged": 2,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 428,
-          "linesDeleted": 1
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 9,
           "prsMerged": 3,
@@ -46960,6 +47047,15 @@
           "issuesClosed": 3,
           "linesAdded": 10626,
           "linesDeleted": 9892
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -46967,7 +47063,7 @@
       "name": "gh-developer-caption-this",
       "fullName": "UncleBats/gh-developer-caption-this",
       "pushedAt": "2024-04-05T04:29:17Z",
-      "collectedAt": "2026-05-10T20:23:21.064Z",
+      "collectedAt": "2026-05-11T08:42:47.711Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -46992,15 +47088,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -47098,6 +47185,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -47105,7 +47201,7 @@
       "name": "Anythink-Market-dedwkp0p",
       "fullName": "Wilcolab/Anythink-Market-dedwkp0p",
       "pushedAt": "2024-10-30T15:18:38Z",
-      "collectedAt": "2026-05-10T20:23:22.568Z",
+      "collectedAt": "2026-05-11T08:42:49.422Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -47130,15 +47226,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -47236,6 +47323,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -47243,7 +47339,7 @@
       "name": "doepicshit",
       "fullName": "xebia/doepicshit",
       "pushedAt": "2026-05-05T00:02:10Z",
-      "collectedAt": "2026-05-10T20:23:27.248Z",
+      "collectedAt": "2026-05-11T08:42:53.881Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -47382,15 +47478,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 1,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 1,
           "prsMerged": 0,
@@ -47488,6 +47575,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -47495,7 +47591,7 @@
       "name": "github-copilot-premium-reqs-usage",
       "fullName": "xebia/github-copilot-premium-reqs-usage",
       "pushedAt": "2026-05-10T08:47:05Z",
-      "collectedAt": "2026-05-10T20:23:49.220Z",
+      "collectedAt": "2026-05-11T08:43:17.694Z",
       "issues": {
         "open": 1,
         "closed": 28
@@ -49152,15 +49248,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 1,
-          "prsMerged": 1,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 3,
-          "linesDeleted": 3
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 2,
           "prsMerged": 0,
@@ -49258,6 +49345,15 @@
           "issuesClosed": 0,
           "linesAdded": 513,
           "linesDeleted": 170
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -49265,7 +49361,7 @@
       "name": "github-copilot-updates",
       "fullName": "xebia/github-copilot-updates",
       "pushedAt": "2025-07-14T08:12:06Z",
-      "collectedAt": "2026-05-10T20:23:58.746Z",
+      "collectedAt": "2026-05-11T08:43:27.497Z",
       "issues": {
         "open": 17,
         "closed": 18
@@ -49470,15 +49566,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -49576,6 +49663,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -49583,7 +49679,7 @@
       "name": "github-governance-references",
       "fullName": "xebia/github-governance-references",
       "pushedAt": "2026-04-10T12:45:47Z",
-      "collectedAt": "2026-05-10T20:24:00.202Z",
+      "collectedAt": "2026-05-11T08:43:29.331Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -49637,15 +49733,6 @@
       "contributorCount": 1,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -49744,6 +49831,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -49751,7 +49847,7 @@
       "name": "octocat",
       "fullName": "xebia/octocat",
       "pushedAt": "2025-07-18T16:14:25Z",
-      "collectedAt": "2026-05-10T20:24:01.565Z",
+      "collectedAt": "2026-05-11T08:43:30.501Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -49775,15 +49871,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -49876,6 +49963,15 @@
         },
         {
           "week": "2026-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
           "prsOpened": 0,
           "prsMerged": 0,
           "issuesOpened": 0,
@@ -49889,7 +49985,7 @@
       "name": "GDBC2018-Challenges",
       "fullName": "XpiritBV/GDBC2018-Challenges",
       "pushedAt": "2018-06-21T02:31:07Z",
-      "collectedAt": "2026-05-10T20:24:03.151Z",
+      "collectedAt": "2026-05-11T08:43:31.602Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -49913,15 +50009,6 @@
       "contributorCount": 0,
       "dependentCount": 0,
       "weeklyTrends": [
-        {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
         {
           "week": "2026-W09",
           "prsOpened": 0,
@@ -50020,6 +50107,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -50027,7 +50123,7 @@
       "name": "LeaderboardsGlobalDevopsBootcamp",
       "fullName": "XpiritBV/LeaderboardsGlobalDevopsBootcamp",
       "pushedAt": "2022-12-08T00:56:12Z",
-      "collectedAt": "2026-05-10T20:24:04.943Z",
+      "collectedAt": "2026-05-11T08:43:33.705Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -50052,15 +50148,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -50158,6 +50245,15 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     },
@@ -50165,7 +50261,7 @@
       "name": "legitify-scan",
       "fullName": "XpiritUSA/legitify-scan",
       "pushedAt": "2023-05-04T12:28:25Z",
-      "collectedAt": "2026-05-10T20:24:05.853Z",
+      "collectedAt": "2026-05-11T08:43:34.882Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -50190,15 +50286,6 @@
       "dependentCount": 0,
       "weeklyTrends": [
         {
-          "week": "2026-W08",
-          "prsOpened": 0,
-          "prsMerged": 0,
-          "issuesOpened": 0,
-          "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
-        },
-        {
           "week": "2026-W09",
           "prsOpened": 0,
           "prsMerged": 0,
@@ -50296,20 +50383,20 @@
           "issuesClosed": 0,
           "linesAdded": 0,
           "linesDeleted": 0
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
         }
       ]
     }
   ],
   "weeklyTrends": [
-    {
-      "week": "2026-W08",
-      "prsOpened": 95,
-      "prsMerged": 90,
-      "issuesOpened": 12,
-      "issuesClosed": 27,
-      "linesAdded": 46042,
-      "linesDeleted": 33913
-    },
     {
       "week": "2026-W09",
       "prsOpened": 134,
@@ -50402,12 +50489,21 @@
     },
     {
       "week": "2026-W19",
-      "prsOpened": 93,
-      "prsMerged": 103,
+      "prsOpened": 95,
+      "prsMerged": 104,
       "issuesOpened": 22,
       "issuesClosed": 19,
-      "linesAdded": 23661,
-      "linesDeleted": 13400
+      "linesAdded": 23755,
+      "linesDeleted": 13411
+    },
+    {
+      "week": "2026-W20",
+      "prsOpened": 7,
+      "prsMerged": 7,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 20,
+      "linesDeleted": 14
     }
   ]
 }
