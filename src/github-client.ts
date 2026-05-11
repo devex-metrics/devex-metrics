@@ -189,7 +189,7 @@ export async function getAgentOctokit(): Promise<Octokit | null> {
   if (_agentOctokit) return _agentOctokit;
 
   const token =
-    process.env.COPILOT_AGENT_TOKEN ?? process.env.GITHUB_TOKEN;
+    process.env.COPILOT_AGENT_TOKEN || process.env.GITHUB_TOKEN;
   if (!token) {
     return null;
   }
