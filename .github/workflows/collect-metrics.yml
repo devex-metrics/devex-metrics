@@ -91,12 +91,11 @@ jobs:
       - name: Collect metrics
         if: github.event_name != 'push'
         env:
-          GITHUB_TOKEN: ${{ secrets.METRICS_GITHUB_TOKEN }}
           APP_ID: ${{ vars.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
           # Fine-grained PAT with "Agent tasks" repo permission.
           # GitHub App installation tokens are not supported for this API.
-          COPILOT_AGENT_TOKEN: ${{ secrets.METRICS_GITHUB_TOKEN }}
+          COPILOT_AGENT_TOKEN: ${{ secrets.COPILOT_AGENT_TOKEN }}
           FORCE_REFRESH: ${{ github.event.inputs.force_refresh || 'false' }}
         run: |
           OWNER="${{ github.event.inputs.owner || 'rajbos' }}"
