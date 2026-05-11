@@ -1041,9 +1041,9 @@ function renderDeliveryCharts(){
       data:{labels:agentRepoNames,datasets:[
         {label:"Completed",data:agentRepoNames.map(function(n){return agentByRepo[n].completed||0;}),backgroundColor:cssColors.ok,borderRadius:2},
         {label:"Failed",data:agentRepoNames.map(function(n){return agentByRepo[n].failed||0;}),backgroundColor:cssColors.err,borderRadius:2},
-        {label:"Other",data:agentRepoNames.map(function(n){
-          var r=agentByRepo[n];return Math.max(0,r.totalTasks-(r.completed||0)-(r.failed||0));
-        }),backgroundColor:cssColors.muted,borderRadius:2}]},
+        {label:"Cancelled",data:agentRepoNames.map(function(n){return agentByRepo[n].cancelled||0;}),backgroundColor:cssColors.warn,borderRadius:2},
+        {label:"Timed Out",data:agentRepoNames.map(function(n){return agentByRepo[n].timedOut||0;}),backgroundColor:cssColors.muted,borderRadius:2},
+        {label:"Active",data:agentRepoNames.map(function(n){return agentByRepo[n].active||0;}),backgroundColor:cssColors.accent,borderRadius:2}]},
       options:{indexAxis:"y",responsive:true,maintainAspectRatio:true,
         scales:{x:{stacked:true,grid:{display:false},beginAtZero:true},y:{stacked:true,grid:{display:false}}},
         plugins:{legend:{position:"top",align:"end"}}}});
