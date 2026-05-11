@@ -22,9 +22,10 @@ const TERMINAL_STATES = new Set([
 
 /**
  * API version header required by the Copilot Agent Tasks endpoint.
- * Based on the observed header used by `gh api` in production scripts.
+ * The agent tasks API was introduced in version 2026-03-10; using an older
+ * version header causes the endpoint to return 404.
  */
-const AGENT_API_VERSION = "2022-11-28";
+const AGENT_API_VERSION = "2026-03-10";
 
 // Typed wrapper for calling non-catalogued Octokit endpoints.
 type OctokitLike = { request: (url: string, opts?: Record<string, unknown>) => Promise<{ data: unknown }> };
@@ -41,9 +42,8 @@ function asAnyRequest(
 interface RawArtifact {
   type: string;
   data: {
-    global_id?: string;
-    head_ref?: string;
-    base_ref?: string;
+    /** PR number for "pull" artifacts — returned directly by the API. */
+    id?: number;
   };
 }
 
@@ -120,43 +120,6 @@ function parseSession(raw: RawSession): CopilotAgentSession {
         ? Math.round(rawDuration * 100) / 100
         : undefined,
   };
-}
-
-// ── PR number resolution ──────────────────────────────────────────────────────
-
-/**
- * Resolve GraphQL node IDs to PR numbers via batched alias query.
- * Up to 50 IDs are resolved per request to stay within query-size limits.
- * Returns an empty map on any GraphQL failure.
- */
-async function resolvePrNumbers(
-  octokit: NonNullable<Awaited<ReturnType<typeof getAgentOctokit>>>,
-  globalIds: string[],
-): Promise<Map<string, number>> {
-  const map = new Map<string, number>();
-  if (globalIds.length === 0) return map;
-
-  for (let i = 0; i < globalIds.length; i += 50) {
-    const batch = globalIds.slice(i, i + 50);
-    const aliases = batch
-      .map(
-        (id, j) =>
-          `pr${j}: node(id: ${JSON.stringify(id)}) { ... on PullRequest { number } }`,
-      )
-      .join("\n");
-    try {
-      const result = await octokit.graphql<
-        Record<string, { number: number } | null>
-      >(`{ ${aliases} }`);
-      batch.forEach((id, j) => {
-        const node = result[`pr${j}`];
-        if (node?.number) map.set(id, node.number);
-      });
-    } catch {
-      // GraphQL failure — skip PR resolution for this batch
-    }
-  }
-  return map;
 }
 
 // ── Metric aggregation ────────────────────────────────────────────────────────
@@ -324,22 +287,7 @@ export async function collectCopilotAgentMetrics(
     throw err;
   }
 
-  // ── 2. Resolve PR global IDs for new tasks ────────────────────────────────
-  const newGlobalIds: string[] = [];
-  for (const t of rawTasks) {
-    if (cachedTerminalIds.has(t.id)) continue;
-    for (const artifact of t.artifacts ?? []) {
-      if (artifact.type === "pull" && artifact.data.global_id) {
-        newGlobalIds.push(artifact.data.global_id);
-      }
-    }
-  }
-  const prMap = await resolvePrNumbers(
-    octokit,
-    [...new Set(newGlobalIds)],
-  );
-
-  // ── 3. Fetch task details for tasks not already in terminal cache ─────────
+  // ── 2. Fetch task details for tasks not already in terminal cache ─────────
   const newTerminalTasks: CopilotAgentTask[] = [];
   const newActiveTasks: CopilotAgentTask[] = [];
 
@@ -362,9 +310,10 @@ export async function collectCopilotAgentMetrics(
       // Detail fetch failed — proceed with list-level data only
     }
 
+    // The API returns PR numbers directly as artifact.data.id.
     const prNumbers = (rawTask.artifacts ?? [])
-      .filter((a) => a.type === "pull" && a.data.global_id)
-      .map((a) => prMap.get(a.data.global_id!) ?? 0)
+      .filter((a) => a.type === "pull" && a.data.id)
+      .map((a) => a.data.id!)
       .filter((n) => n > 0);
 
     const task: CopilotAgentTask = {
@@ -385,7 +334,7 @@ export async function collectCopilotAgentMetrics(
     }
   }
 
-  // ── 4. Merge and persist cache ────────────────────────────────────────────
+  // ── 3. Merge and persist cache ────────────────────────────────────────────
   const updatedCache: CopilotAgentRepoCache = {
     schemaVersion: AGENT_CACHE_SCHEMA_VERSION,
     owner,
@@ -398,7 +347,7 @@ export async function collectCopilotAgentMetrics(
   };
   saveAgentCache(owner, repo, updatedCache);
 
-  // ── 5. Compute metrics over all tasks in the window ───────────────────────
+  // ── 4. Compute metrics over all tasks in the window ───────────────────────
   // Terminal tasks from the cache may predate the current window; filter them
   // so metrics reflect only the requested time range.
   const windowStart = since ? new Date(since).getTime() : 0;

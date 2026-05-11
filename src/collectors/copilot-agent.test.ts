@@ -54,7 +54,6 @@ function makeTaskDetailResponse(task: object) {
 function makeMockOctokit(
   tasks: object[],
   taskDetail: object | null = null,
-  graphqlResult: object | null = null,
 ): Octokit {
   const requestMock = vi.fn().mockImplementation((url: string) => {
     if (url.includes("/tasks/") && !url.endsWith("/tasks")) {
@@ -65,9 +64,7 @@ function makeMockOctokit(
     return Promise.resolve(makeRawApiResponse(tasks));
   });
 
-  const graphqlMock = vi.fn().mockResolvedValue(graphqlResult ?? {});
-
-  return { request: requestMock, graphql: graphqlMock } as unknown as Octokit;
+  return { request: requestMock } as unknown as Octokit;
 }
 
 // ── Unit: detectSessionSource ─────────────────────────────────────────────────
@@ -277,7 +274,6 @@ describe("collectCopilotAgentMetrics", () => {
   it("returns null on 404 (endpoint not enabled)", async () => {
     const octokit = {
       request: vi.fn().mockRejectedValue({ status: 404 }),
-      graphql: vi.fn(),
     } as unknown as Octokit;
     setAgentOctokit(octokit);
 
@@ -289,7 +285,6 @@ describe("collectCopilotAgentMetrics", () => {
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     const octokit = {
       request: vi.fn().mockRejectedValue({ status: 403 }),
-      graphql: vi.fn(),
     } as unknown as Octokit;
     setAgentOctokit(octokit);
 
@@ -304,7 +299,6 @@ describe("collectCopilotAgentMetrics", () => {
       request: vi
         .fn()
         .mockRejectedValue(new Error("unexpected network failure")),
-      graphql: vi.fn(),
     } as unknown as Octokit;
     setAgentOctokit(octokit);
 
@@ -323,7 +317,7 @@ describe("collectCopilotAgentMetrics", () => {
       updated_at: recentDate,
       html_url: "https://github.com/owner/repo/tasks/task-1",
       session_count: 1,
-      artifacts: [{ type: "pull", data: { global_id: "gid-42" } }],
+      artifacts: [{ type: "pull", data: { id: 42 } }],
     };
     const rawDetail = {
       ...rawTask,
@@ -344,7 +338,6 @@ describe("collectCopilotAgentMetrics", () => {
     const octokit = makeMockOctokit(
       [rawTask],
       rawDetail,
-      { pr0: { number: 42 } }, // GraphQL resolves gid-42 → PR #42
     );
     setAgentOctokit(octokit);
 
@@ -385,7 +378,6 @@ describe("collectCopilotAgentMetrics", () => {
     const requestMock = vi.fn().mockResolvedValue(makeRawApiResponse([rawTask]));
     const octokit = {
       request: requestMock,
-      graphql: vi.fn(),
     } as unknown as Octokit;
     setAgentOctokit(octokit);
 
@@ -563,7 +555,6 @@ describe("collectCopilotAgentMetrics", () => {
 
     const octokit = {
       request: requestMock,
-      graphql: vi.fn().mockResolvedValue({}),
     } as unknown as Octokit;
     setAgentOctokit(octokit);
 
