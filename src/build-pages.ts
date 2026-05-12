@@ -339,6 +339,7 @@ function buildDashboardHtml(
   }));
 
   const chartPayload = JSON.stringify({
+    owner: data.owner,
     issues: { open: totals.openIssues, closed: totals.closedIssues },
     prs: {
       open: totals.openPRs,
@@ -1046,7 +1047,14 @@ function renderDeliveryCharts(){
         {label:"Active",data:agentRepoNames.map(function(n){return agentByRepo[n].active||0;}),backgroundColor:cssColors.accent,borderRadius:2}]},
       options:{indexAxis:"y",responsive:true,maintainAspectRatio:true,
         scales:{x:{stacked:true,grid:{display:false},beginAtZero:true},y:{stacked:true,grid:{display:false}}},
-        plugins:{legend:{position:"top",align:"end"}}}});
+        plugins:{legend:{position:"top",align:"end"}},
+        onClick:function(e,elements){
+          if(elements.length>0){
+            var n=agentRepoNames[elements[0].index];
+            window.open("https://github.com/"+(CHART_DATA.owner||"")+"/"+n+"/issues?q=is:open","_blank","noopener,noreferrer");
+          }
+        },
+        onHover:function(e,elements){e.chart.canvas.style.cursor=elements.length>0?"pointer":"default";}}});
   }
 }
 function setupFilter(){

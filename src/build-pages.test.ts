@@ -882,6 +882,13 @@ describe("build-pages", () => {
     expect(html).toContain('"repo-with-agent"');
     expect(html).toContain('"totalTasks":7');
 
+    // CHART_DATA should include owner for constructing GitHub task URLs
+    expect(html).toContain('"owner":"test-pages-owner"');
+
+    // Chart click handler should navigate to open issues for the repo
+    expect(html).toContain("/issues?q=is:open");
+    expect(html).toContain("CHART_DATA.owner");
+
     // Extended detail fields should be present for repo with agent data
     expect(html).toContain("Cancelled");
     expect(html).toContain("Timed out");
