@@ -1,4 +1,5 @@
-import { getAgentOctokit } from "../github-client.js";
+import { getAgentOctokit, getOctokit } from "../github-client.js";
+import type { Octokit } from "@octokit/rest";
 import {
   loadAgentCache,
   saveAgentCache,
@@ -201,7 +202,102 @@ export function computeAgentMetrics(
     avgCompletedSessionHours,
     lastTaskAt,
     agentCreatedPRs: prSet.size,
+    agentActionsMinutes: 0,
   };
+}
+
+// ── Actions minutes collection ────────────────────────────────────────────────
+
+/**
+ * Try to obtain an Octokit for standard REST calls (pulls, checks).
+ * Falls back to the agent Octokit when the regular one is unavailable
+ * (e.g. only COPILOT_AGENT_TOKEN is configured, not GITHUB_TOKEN).
+ */
+async function getRestOctokit(): Promise<Octokit | null> {
+  try {
+    return await getOctokit();
+  } catch {
+    return getAgentOctokit();
+  }
+}
+
+/**
+ * Collect GitHub Actions check-run minutes for a set of agent-created PRs.
+ *
+ * Only fetches data for PR numbers not already in `cachedMinutes`.
+ * Only persists results for closed/merged PRs — open PRs are left uncached
+ * so they are refreshed on the next collection run.
+ * Failures (inaccessible PR or check-run API) are silently skipped and left
+ * absent from the cache so they can be retried later.
+ *
+ * Returns:
+ * - `updatedCache`: entries safe to persist (closed PRs only).
+ * - `allMinutes`: all computed entries including open PRs (for this run only).
+ */
+export async function collectActionsMinutesForPRs(
+  owner: string,
+  repo: string,
+  prNumbers: Set<number>,
+  cachedMinutes: Record<string, number>,
+): Promise<{
+  updatedCache: Record<string, number>;
+  allMinutes: Record<string, number>;
+}> {
+  const empty = { updatedCache: { ...cachedMinutes }, allMinutes: { ...cachedMinutes } };
+  if (prNumbers.size === 0) return empty;
+
+  const octokit = await getRestOctokit();
+  if (!octokit) return empty;
+
+  const updatedCache: Record<string, number> = { ...cachedMinutes };
+  const allMinutes: Record<string, number> = { ...cachedMinutes };
+
+  for (const prNumber of prNumbers) {
+    const key = String(prNumber);
+    if (key in cachedMinutes) continue; // already have stable data
+
+    let prState: string;
+    let headSha: string;
+    try {
+      const { data: pr } = await octokit.rest.pulls.get({
+        owner,
+        repo,
+        pull_number: prNumber,
+      });
+      prState = pr.state; // "open" or "closed" (closed includes merged)
+      headSha = pr.head.sha;
+    } catch {
+      continue; // PR not accessible — skip silently
+    }
+
+    let minutes = 0;
+    try {
+      const { data: checkRuns } = await octokit.rest.checks.listForRef({
+        owner,
+        repo,
+        ref: headSha,
+        per_page: 100,
+      });
+      for (const run of checkRuns.check_runs) {
+        if (run.started_at && run.completed_at) {
+          const start = new Date(run.started_at).getTime();
+          const end = new Date(run.completed_at).getTime();
+          minutes += (end - start) / 60000;
+        }
+      }
+    } catch {
+      // Check-run API not accessible — leave as 0 for this PR
+    }
+
+    const rounded = Math.round(minutes * 100) / 100;
+    allMinutes[key] = rounded;
+    // Only persist to cache for closed/merged PRs (immutable data)
+    if (prState === "closed") {
+      updatedCache[key] = rounded;
+    }
+  }
+
+  return { updatedCache, allMinutes };
 }
 
 // ── Main collector ────────────────────────────────────────────────────────────
@@ -334,29 +430,53 @@ export async function collectCopilotAgentMetrics(
     }
   }
 
-  // ── 3. Merge and persist cache ────────────────────────────────────────────
+  // ── 3. Build merged task lists (before saving cache) ─────────────────────
+  const updatedTerminal = [...cache.terminalTasks, ...newTerminalTasks];
+  const updatedActive = newActiveTasks;
+
+  // ── 4. Compute metrics over all tasks in the window ───────────────────────
+  const windowStart = since ? new Date(since).getTime() : 0;
+  const allTasksInWindow = [...updatedTerminal, ...updatedActive].filter(
+    (t) => windowStart === 0 || new Date(t.createdAt).getTime() >= windowStart,
+  );
+
+  // ── 5. Collect GitHub Actions minutes for agent-created PRs ───────────────
+  const agentPRNumbers = new Set<number>();
+  for (const task of allTasksInWindow) {
+    for (const prNum of task.prNumbers) agentPRNumbers.add(prNum);
+  }
+  const { updatedCache: prMinutesCache, allMinutes: prMinutes } =
+    await collectActionsMinutesForPRs(
+      owner,
+      repo,
+      agentPRNumbers,
+      cache.perPRActionsMinutes ?? {},
+    );
+
+  // ── 6. Persist cache ──────────────────────────────────────────────────────
   const updatedCache: CopilotAgentRepoCache = {
     schemaVersion: AGENT_CACHE_SCHEMA_VERSION,
     owner,
     repo,
     activeRefreshedAt: new Date().toISOString(),
     // Terminal tasks are append-only; never removed from cache.
-    terminalTasks: [...cache.terminalTasks, ...newTerminalTasks],
+    terminalTasks: updatedTerminal,
     // Active tasks are replaced entirely with the latest API response.
-    activeTasks: newActiveTasks,
+    activeTasks: updatedActive,
+    perPRActionsMinutes: prMinutesCache,
   };
   saveAgentCache(owner, repo, updatedCache);
 
-  // ── 4. Compute metrics over all tasks in the window ───────────────────────
-  // Terminal tasks from the cache may predate the current window; filter them
-  // so metrics reflect only the requested time range.
-  const windowStart = since ? new Date(since).getTime() : 0;
-  const allTasksInWindow = [
-    ...updatedCache.terminalTasks,
-    ...updatedCache.activeTasks,
-  ].filter(
-    (t) => windowStart === 0 || new Date(t.createdAt).getTime() >= windowStart,
-  );
+  // ── 7. Compute and return metrics ─────────────────────────────────────────
+  const agentActionsMinutes =
+    Math.round(
+      [...agentPRNumbers].reduce(
+        (sum, n) => sum + (prMinutes[String(n)] ?? 0),
+        0,
+      ) * 100,
+    ) / 100;
 
-  return computeAgentMetrics(allTasksInWindow);
+  const metrics = computeAgentMetrics(allTasksInWindow);
+  metrics.agentActionsMinutes = agentActionsMinutes;
+  return metrics;
 }

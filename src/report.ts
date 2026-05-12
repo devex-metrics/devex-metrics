@@ -54,6 +54,9 @@ export function generateReport(metrics: OrgMetrics): string {
     if (agentTotals.agentCreatedPRs > 0) {
       lines.push(`| PRs created by agent | ${agentTotals.agentCreatedPRs} |`);
     }
+    if (agentTotals.agentActionsMinutes > 0) {
+      lines.push(`| Agent PR Actions minutes | ${agentTotals.agentActionsMinutes.toFixed(1)} |`);
+    }
   }
 
   // Median cycle time
@@ -109,6 +112,8 @@ export function generateReport(metrics: OrgMetrics): string {
         lines.push(`| Avg session duration | ${formatDuration(am.avgCompletedSessionHours)} |`);
       if (am.agentCreatedPRs > 0)
         lines.push(`| PRs created | ${am.agentCreatedPRs} |`);
+      if (am.agentActionsMinutes > 0)
+        lines.push(`| Actions minutes (agent PRs) | ${am.agentActionsMinutes.toFixed(1)} |`);
       lines.push("");
     }
 
@@ -190,7 +195,7 @@ function aggregateAgentMetrics(repos: RepoMetrics[]): CopilotAgentMetrics {
   let totalTasks = 0, completedTasks = 0, failedTasks = 0, cancelledTasks = 0,
     timedOutTasks = 0, activeTasksCount = 0, totalSessions = 0,
     cloudAgentSessions = 0, cliRemoteSessions = 0, totalCreditsUsed = 0,
-    agentCreatedPRs = 0;
+    agentCreatedPRs = 0, agentActionsMinutes = 0;
 
   for (const r of repos) {
     if (!r.copilotAgentMetrics) continue;
@@ -206,6 +211,7 @@ function aggregateAgentMetrics(repos: RepoMetrics[]): CopilotAgentMetrics {
     cliRemoteSessions += a.cliRemoteSessions;
     totalCreditsUsed += a.totalCreditsUsed;
     agentCreatedPRs += a.agentCreatedPRs;
+    agentActionsMinutes += a.agentActionsMinutes ?? 0;
   }
   return {
     totalTasks,
@@ -219,6 +225,7 @@ function aggregateAgentMetrics(repos: RepoMetrics[]): CopilotAgentMetrics {
     cliRemoteSessions,
     totalCreditsUsed: Math.round(totalCreditsUsed * 100) / 100,
     agentCreatedPRs,
+    agentActionsMinutes: Math.round(agentActionsMinutes * 100) / 100,
   };
 }
 

@@ -3,10 +3,13 @@ import {
   detectSessionSource,
   computeAgentMetrics,
   collectCopilotAgentMetrics,
+  collectActionsMinutesForPRs,
 } from "./copilot-agent.js";
 import {
   setAgentOctokit,
   resetAgentOctokit,
+  setOctokit,
+  resetOctokit,
 } from "../github-client.js";
 import { loadAgentCache, saveAgentCache } from "../agent-cache.js";
 import type { CopilotAgentTask, CopilotAgentRepoCache } from "../types.js";
@@ -24,6 +27,7 @@ const mockSaveAgentCache = vi.mocked(saveAgentCache);
 
 afterEach(() => {
   resetAgentOctokit();
+  resetOctokit();
   vi.clearAllMocks();
 });
 
@@ -103,6 +107,7 @@ describe("computeAgentMetrics", () => {
     expect(result.totalSessions).toBe(0);
     expect(result.totalCreditsUsed).toBe(0);
     expect(result.agentCreatedPRs).toBe(0);
+    expect(result.agentActionsMinutes).toBe(0);
     expect(result.avgCompletedSessionHours).toBeUndefined();
     expect(result.lastTaskAt).toBeUndefined();
   });
@@ -335,11 +340,32 @@ describe("collectCopilotAgentMetrics", () => {
       ],
     };
 
-    const octokit = makeMockOctokit(
-      [rawTask],
-      rawDetail,
-    );
+    const octokit = makeMockOctokit([rawTask], rawDetail);
     setAgentOctokit(octokit);
+
+    // Mock the regular octokit for PR/check API calls
+    const regularOctokit = {
+      rest: {
+        pulls: {
+          get: vi.fn().mockResolvedValue({
+            data: { state: "closed", head: { sha: "abc123" } },
+          }),
+        },
+        checks: {
+          listForRef: vi.fn().mockResolvedValue({
+            data: {
+              check_runs: [
+                {
+                  started_at: "2024-01-10T10:00:00Z",
+                  completed_at: "2024-01-10T10:05:00Z", // 5 minutes
+                },
+              ],
+            },
+          }),
+        },
+      },
+    } as unknown as Octokit;
+    setOctokit(regularOctokit);
 
     const result = await collectCopilotAgentMetrics("owner", "repo");
     expect(result).not.toBeNull();
@@ -350,6 +376,7 @@ describe("collectCopilotAgentMetrics", () => {
     expect(result!.totalCreditsUsed).toBe(8);
     expect(result!.agentCreatedPRs).toBe(1);
     expect(result!.avgCompletedSessionHours).toBeCloseTo(0.5, 1);
+    expect(result!.agentActionsMinutes).toBe(5);
   });
 
   it("skips detail fetch for already-cached terminal tasks", async () => {
@@ -561,5 +588,177 @@ describe("collectCopilotAgentMetrics", () => {
     const result = await collectCopilotAgentMetrics("owner", "repo");
     // 100 (page1) + 1 (page2) tasks fetched
     expect(result!.totalTasks).toBe(101);
+  });
+});
+
+// ── Unit: collectActionsMinutesForPRs ─────────────────────────────────────────
+
+describe("collectActionsMinutesForPRs", () => {
+  it("returns empty maps when prNumbers is empty", async () => {
+    const result = await collectActionsMinutesForPRs("owner", "repo", new Set(), {});
+    expect(result.updatedCache).toEqual({});
+    expect(result.allMinutes).toEqual({});
+  });
+
+  it("returns cached values without calling API when all PRs are already cached", async () => {
+    const cached = { "42": 5.0 };
+    const result = await collectActionsMinutesForPRs(
+      "owner", "repo", new Set([42]), cached,
+    );
+    expect(result.allMinutes["42"]).toBe(5.0);
+    // No octokit calls since all PRs are cached
+  });
+
+  it("fetches and computes minutes for a closed PR and adds to cache", async () => {
+    const mockOctokit = {
+      rest: {
+        pulls: {
+          get: vi.fn().mockResolvedValue({
+            data: { state: "closed", head: { sha: "sha-abc" } },
+          }),
+        },
+        checks: {
+          listForRef: vi.fn().mockResolvedValue({
+            data: {
+              check_runs: [
+                {
+                  started_at: "2024-01-10T10:00:00Z",
+                  completed_at: "2024-01-10T10:10:00Z", // 10 minutes
+                },
+                {
+                  started_at: "2024-01-10T11:00:00Z",
+                  completed_at: "2024-01-10T11:05:00Z", // 5 minutes
+                },
+              ],
+            },
+          }),
+        },
+      },
+    } as unknown as Octokit;
+    setOctokit(mockOctokit);
+
+    const result = await collectActionsMinutesForPRs(
+      "owner", "repo", new Set([99]), {},
+    );
+
+    expect(result.allMinutes["99"]).toBe(15);
+    // Closed PR should be persisted to updatedCache
+    expect(result.updatedCache["99"]).toBe(15);
+  });
+
+  it("does not persist to cache for open (active) PRs", async () => {
+    const mockOctokit = {
+      rest: {
+        pulls: {
+          get: vi.fn().mockResolvedValue({
+            data: { state: "open", head: { sha: "sha-open" } },
+          }),
+        },
+        checks: {
+          listForRef: vi.fn().mockResolvedValue({
+            data: {
+              check_runs: [
+                {
+                  started_at: "2024-01-10T10:00:00Z",
+                  completed_at: "2024-01-10T10:03:00Z", // 3 minutes
+                },
+              ],
+            },
+          }),
+        },
+      },
+    } as unknown as Octokit;
+    setOctokit(mockOctokit);
+
+    const result = await collectActionsMinutesForPRs(
+      "owner", "repo", new Set([77]), {},
+    );
+
+    // Minutes are computed for this run
+    expect(result.allMinutes["77"]).toBe(3);
+    // But NOT persisted to cache (PR still open)
+    expect(result.updatedCache["77"]).toBeUndefined();
+  });
+
+  it("skips inaccessible PRs silently", async () => {
+    const mockOctokit = {
+      rest: {
+        pulls: {
+          get: vi.fn().mockRejectedValue({ status: 404 }),
+        },
+        checks: { listForRef: vi.fn() },
+      },
+    } as unknown as Octokit;
+    setOctokit(mockOctokit);
+
+    const result = await collectActionsMinutesForPRs(
+      "owner", "repo", new Set([55]), {},
+    );
+
+    expect(result.allMinutes["55"]).toBeUndefined();
+    expect(result.updatedCache["55"]).toBeUndefined();
+  });
+
+  it("returns cached data when no octokit is available", async () => {
+    // No octokit set — getOctokit() will throw, getAgentOctokit() returns null
+    const origToken = process.env.GITHUB_TOKEN;
+    const origAgentToken = process.env.COPILOT_AGENT_TOKEN;
+    delete process.env.GITHUB_TOKEN;
+    delete process.env.COPILOT_AGENT_TOKEN;
+
+    try {
+      const cached = { "10": 2.5 };
+      const result = await collectActionsMinutesForPRs(
+        "owner", "repo", new Set([10, 20]), cached,
+      );
+      // Returns existing cached data unchanged
+      expect(result.allMinutes["10"]).toBe(2.5);
+      expect(result.allMinutes["20"]).toBeUndefined();
+    } finally {
+      if (origToken !== undefined) process.env.GITHUB_TOKEN = origToken;
+      if (origAgentToken !== undefined) process.env.COPILOT_AGENT_TOKEN = origAgentToken;
+    }
+  });
+
+  it("persists closed-PR minutes to cache across collectCopilotAgentMetrics runs", async () => {
+    const recentDate = new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString();
+    const rawTask = {
+      id: "task-cache-test",
+      name: "Caching test",
+      state: "completed",
+      created_at: recentDate,
+      updated_at: recentDate,
+      html_url: "https://github.com/owner/repo/tasks/task-cache-test",
+      session_count: 0,
+      artifacts: [{ type: "pull", data: { id: 101 } }],
+    };
+
+    const agentOctokit = makeMockOctokit([rawTask], { ...rawTask, sessions: [] });
+    setAgentOctokit(agentOctokit);
+
+    const pullsGetMock = vi.fn().mockResolvedValue({
+      data: { state: "closed", head: { sha: "sha-101" } },
+    });
+    const checksListMock = vi.fn().mockResolvedValue({
+      data: {
+        check_runs: [
+          { started_at: "2024-01-10T10:00:00Z", completed_at: "2024-01-10T10:08:00Z" },
+        ],
+      },
+    });
+    setOctokit({
+      rest: { pulls: { get: pullsGetMock }, checks: { listForRef: checksListMock } },
+    } as unknown as Octokit);
+
+    await collectCopilotAgentMetrics("owner", "repo");
+
+    // Cache save should include perPRActionsMinutes for PR 101
+    expect(mockSaveAgentCache).toHaveBeenCalledWith(
+      "owner",
+      "repo",
+      expect.objectContaining({
+        perPRActionsMinutes: expect.objectContaining({ "101": 8 }),
+      }),
+    );
   });
 });

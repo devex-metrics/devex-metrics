@@ -266,11 +266,11 @@ function buildDashboardHtml(
   // Aggregate Copilot agent metrics
   let agentTotalTasks = 0, agentCompleted = 0, agentFailed = 0, agentCancelled = 0,
     agentTimedOut = 0, agentActive = 0, agentTotalSessions = 0, agentCloudSessions = 0,
-    agentCliSessions = 0, agentCredits = 0, agentPRs = 0;
+    agentCliSessions = 0, agentCredits = 0, agentPRs = 0, agentActionsMinutes = 0;
   const agentByRepo: Record<string, {
     totalTasks: number; completed: number; failed: number;
     cancelled: number; timedOut: number; active: number;
-    sessions: number; credits: number; agentPRs: number;
+    sessions: number; credits: number; agentPRs: number; actionsMinutes: number;
   }> = {};
   for (const r of data.repos) {
     const a = r.copilotAgentMetrics;
@@ -286,6 +286,7 @@ function buildDashboardHtml(
     agentCliSessions += a.cliRemoteSessions;
     agentCredits += a.totalCreditsUsed;
     agentPRs += a.agentCreatedPRs;
+    agentActionsMinutes += a.agentActionsMinutes ?? 0;
     agentByRepo[r.name] = {
       totalTasks: a.totalTasks,
       completed: a.completedTasks,
@@ -296,6 +297,7 @@ function buildDashboardHtml(
       sessions: a.totalSessions,
       credits: a.totalCreditsUsed,
       agentPRs: a.agentCreatedPRs,
+      actionsMinutes: a.agentActionsMinutes ?? 0,
     };
   }
 
@@ -390,6 +392,7 @@ function buildDashboardHtml(
       cliSessions: agentCliSessions,
       totalCredits: Math.round(agentCredits * 100) / 100,
       agentPRs,
+      totalActionsMinutes: Math.round(agentActionsMinutes * 100) / 100,
       byRepo: agentByRepo,
     },
     collectedAt: data.collectedAt,
@@ -676,6 +679,7 @@ function buildRepoRow(repo: RepoMetrics): string {
         (repo.copilotAgentMetrics.totalCreditsUsed > 0 ? `<div class="dr"><dt>Credits</dt><dd>${repo.copilotAgentMetrics.totalCreditsUsed.toFixed(1)}</dd></div>` : "") +
         (repo.copilotAgentMetrics.avgCompletedSessionHours != null ? `<div class="dr"><dt>Avg&nbsp;duration</dt><dd>${formatDurationHtml(repo.copilotAgentMetrics.avgCompletedSessionHours)}</dd></div>` : "") +
         (repo.copilotAgentMetrics.agentCreatedPRs > 0 ? `<div class="dr"><dt>PRs created</dt><dd>${repo.copilotAgentMetrics.agentCreatedPRs}</dd></div>` : "") +
+        ((repo.copilotAgentMetrics.agentActionsMinutes ?? 0) > 0 ? `<div class="dr"><dt>Actions&nbsp;min</dt><dd>${(repo.copilotAgentMetrics.agentActionsMinutes ?? 0).toFixed(1)}</dd></div>` : "") +
         `</dl></div>`
       : "") +
     `</div>` +
