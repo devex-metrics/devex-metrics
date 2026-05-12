@@ -256,6 +256,8 @@ export interface CopilotAgentMetrics {
   lastTaskAt?: string;
   /** Number of distinct PRs produced by agent tasks. */
   agentCreatedPRs: number;
+  /** Total GitHub Actions check-run minutes consumed on PRs created by agent tasks. */
+  agentActionsMinutes: number;
 }
 
 /** Shape of the per-repo agent cache file (`data/agents-{owner}-{repo}.json`). */
@@ -275,4 +277,9 @@ export interface CopilotAgentRepoCache {
   terminalTasks: CopilotAgentTask[];
   /** Tasks in active states — replaced on each fresh collection. */
   activeTasks: CopilotAgentTask[];
+  /**
+   * Cached GitHub Actions check-run minutes per PR number (string key).
+   * Only closed/merged PRs are cached here; open PRs are refetched each run.
+   */
+  perPRActionsMinutes?: Record<string, number>;
 }
