@@ -25,6 +25,7 @@ function makePRNode(overrides: Partial<GraphQLPRNode> = {}): GraphQLPRNode {
     comments: { totalCount: 0 },
     reviewThreads: { totalCount: 0 },
     reviews: { nodes: [] },
+    mergeCommit: null,
     ...overrides,
   };
 }

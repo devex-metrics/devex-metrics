@@ -21,7 +21,8 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
  *   6 — add copilotAgentMetrics to RepoMetrics (Copilot agent task/session
  *       counts, credit usage, and PR correlation)
  *   7 — add aiAuthorType to MergedPRSummary and PullRequestDetail; extend
- *       isCopilotAuthored to cover all AI tools (copilot, claude, codex)
+ *       isCopilotAuthored to cover all AI tools (copilot, claude, codex) via
+ *       PR author login AND merge-commit Co-authored-by trailers
  */
 export const CURRENT_SCHEMA_VERSION = 7;
 

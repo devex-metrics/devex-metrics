@@ -25,9 +25,43 @@ function getAIAuthorType(
 }
 
 /**
- * Return true when the login belongs to the Copilot bot account specifically
- * (used for Copilot Review detection, which remains Copilot-only).
+ * Parse `Co-authored-by:` trailers in a commit message and return the AI tool
+ * type if one is found, or null for a fully human commit.
+ *
+ * Matches:
+ *  - `copilot-swe-agent[bot]` or `+Copilot@users.noreply.github.com` → "copilot"
+ *  - `claude[bot]`  → "claude"
+ *  - `codex[bot]`   → "codex"
  */
+export function parseAICoAuthorType(
+  message: string,
+): "copilot" | "claude" | "codex" | null {
+  let found: "copilot" | "claude" | "codex" | null = null;
+  for (const line of message.split("\n")) {
+    const lower = line.toLowerCase().trim();
+    if (!lower.startsWith("co-authored-by:")) continue;
+    if (lower.includes("copilot") || lower.includes("+copilot@")) return "copilot";
+    if (lower.includes("claude[bot]") && found === null) found = "claude";
+    else if (lower.includes("codex[bot]") && found === null) found = "codex";
+  }
+  return found;
+}
+
+/**
+ * Identify which AI tool authored or co-authored a PR.
+ * First checks the PR author login; falls back to merge-commit co-authored-by
+ * if a commit message is provided.
+ */
+function resolveAIType(
+  login: string,
+  typeHint: string | undefined,
+  mergeCommitMessage?: string | null,
+): "copilot" | "claude" | "codex" | null {
+  const fromAuthor = getAIAuthorType(login, typeHint);
+  if (fromAuthor !== null) return fromAuthor;
+  if (mergeCommitMessage) return parseAICoAuthorType(mergeCommitMessage);
+  return null;
+}
 function isCopilotUser(login: string, typeHint?: string): boolean {
   const lower = login.toLowerCase();
   return lower === "copilot[bot]" || (lower === "copilot" && typeHint === "Bot");
@@ -191,7 +225,20 @@ export async function collectPullRequestDetails(
       }
 
       const authorLogin = pr.user?.login ?? "unknown";
-      const aiType = getAIAuthorType(authorLogin, pr.user?.type);
+
+      // Check merge commit message for AI co-author trailers
+      let mergeCommitMessage: string | null = null;
+      if (detail.merge_commit_sha) {
+        try {
+          const { data: mergeCommit } = await octokit.rest.git.getCommit({
+            owner, repo, commit_sha: detail.merge_commit_sha,
+          });
+          mergeCommitMessage = mergeCommit.message;
+        } catch {
+          // Merge commit may not be accessible; co-author check skipped
+        }
+      }
+      const aiType = resolveAIType(authorLogin, pr.user?.type, mergeCommitMessage);
 
       details.push({
         number: pr.number,
@@ -312,7 +359,7 @@ export function buildMergedPRTimeline(nodes: GraphQLPRNode[]): MergedPRSummary[]
     if (node.state !== "MERGED" || !node.mergedAt) continue;
     const authorLogin = node.author?.login ?? "unknown";
     const isBot = node.author?.__typename === "Bot" || isBotLogin(authorLogin);
-    const aiType = getAIAuthorType(authorLogin, node.author?.__typename);
+    const aiType = resolveAIType(authorLogin, node.author?.__typename, node.mergeCommit?.message);
     timeline.push({
       number: node.number,
       createdAt: node.createdAt,
@@ -378,7 +425,7 @@ export async function collectPullRequestDetailsFromNodes(
     const hasCopilotReview = reviewerLogins.some(
       (l) => l.toLowerCase() === "copilot[bot]" || l.toLowerCase() === "copilot"
     );
-    const aiType = getAIAuthorType(authorLogin, node.author?.__typename);
+    const aiType = resolveAIType(authorLogin, node.author?.__typename, node.mergeCommit?.message);
 
     details.push({
       number: node.number,
