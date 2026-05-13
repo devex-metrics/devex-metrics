@@ -81,8 +81,10 @@ export interface PullRequestDetail {
   createdAt: string;
   /** GitHub login of the PR author. */
   author: string;
-  /** True when the PR was authored by copilot[bot] (Copilot Cloud Agent). */
+  /** True when the PR was authored by any AI tool (Copilot, Claude, or Codex). */
   isCopilotAuthored: boolean;
+  /** Which AI tool authored this PR ('copilot', 'claude', or 'codex'); undefined for human/other-bot authors. */
+  aiAuthorType?: "copilot" | "claude" | "codex";
   /** True when the PR received a review from copilot[bot] (Copilot Review). */
   hasCopilotReview: boolean;
   linesAdded: number;
@@ -109,8 +111,10 @@ export interface MergedPRSummary {
   author: string;
   /** True when PR author is a bot (dependabot[bot], copilot[bot], etc.). */
   isBotAuthor: boolean;
-  /** True when PR was authored by copilot[bot] (Copilot Cloud Agent). */
+  /** True when PR was authored by any AI tool (Copilot, Claude, or Codex). */
   isCopilotAuthored: boolean;
+  /** Which AI tool authored this PR ('copilot', 'claude', or 'codex'); undefined for human/other-bot authors. */
+  aiAuthorType?: "copilot" | "claude" | "codex";
   /** Hours from PR created to PR merged. */
   timeToMergeHours: number;
   /** Issue numbers referenced via "Fixes #N" / "Closes #N" in the PR body. */
@@ -128,7 +132,7 @@ export interface MergedPRSummary {
 
 /** Per-repo Copilot adoption summary. */
 export interface CopilotAdoption {
-  /** Number of merged PRs authored by copilot[bot]. */
+  /** Number of merged PRs authored by any AI tool (Copilot, Claude, or Codex). */
   copilotAuthoredPRs: number;
   /** Number of detailed PRs that received a Copilot review. */
   copilotReviewedPRs: number;

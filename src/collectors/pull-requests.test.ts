@@ -379,6 +379,7 @@ describe("collectPullRequestDetails", () => {
     const result = await collectPullRequestDetails("owner", "repo");
     expect(result).toHaveLength(1);
     expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("copilot");
     expect(result[0].hasCopilotReview).toBe(true);
     expect(result[0].author).toBe("copilot[bot]");
   });
@@ -503,11 +504,14 @@ describe("collectMergedPRTimeline", () => {
     const copilotSweEntry = result.find((e) => e.number === 12)!;
     expect(dependabotEntry.isBotAuthor).toBe(true);
     expect(dependabotEntry.isCopilotAuthored).toBe(false);
+    expect(dependabotEntry.aiAuthorType).toBeUndefined();
     expect(copilotEntry.isBotAuthor).toBe(true);
     expect(copilotEntry.isCopilotAuthored).toBe(true);
+    expect(copilotEntry.aiAuthorType).toBe("copilot");
     // Copilot coding agent (copilot-swe-agent) uses "Copilot" login with type "Bot"
     expect(copilotSweEntry.isBotAuthor).toBe(true);
     expect(copilotSweEntry.isCopilotAuthored).toBe(true);
+    expect(copilotSweEntry.aiAuthorType).toBe("copilot");
   });
 
   it("returns sorted by mergedAt descending", async () => {
@@ -690,6 +694,7 @@ describe("buildMergedPRTimeline", () => {
     const result = buildMergedPRTimeline([node]);
     expect(result[0].isBotAuthor).toBe(true);
     expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("copilot");
   });
 
   it("detects Copilot coding agent (login 'Copilot', __typename 'Bot') as isCopilotAuthored", () => {
@@ -699,6 +704,27 @@ describe("buildMergedPRTimeline", () => {
     const result = buildMergedPRTimeline([node]);
     expect(result[0].isBotAuthor).toBe(true);
     expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("copilot");
+  });
+
+  it("detects claude[bot] author as isCopilotAuthored with aiAuthorType 'claude'", () => {
+    const node = makePRNode({
+      author: { login: "claude[bot]", __typename: "Bot" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isBotAuthor).toBe(true);
+    expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("claude");
+  });
+
+  it("detects codex[bot] author as isCopilotAuthored with aiAuthorType 'codex'", () => {
+    const node = makePRNode({
+      author: { login: "codex[bot]", __typename: "Bot" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isBotAuthor).toBe(true);
+    expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("codex");
   });
 
   it("detects bot by __typename Bot", () => {
@@ -708,6 +734,7 @@ describe("buildMergedPRTimeline", () => {
     const result = buildMergedPRTimeline([node]);
     expect(result[0].isBotAuthor).toBe(true);
     expect(result[0].isCopilotAuthored).toBe(false);
+    expect(result[0].aiAuthorType).toBeUndefined();
   });
 
   it("handles null author as 'unknown'", () => {
