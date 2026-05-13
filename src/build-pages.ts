@@ -232,6 +232,7 @@ function buildDashboardHtml(
         author: p.author,
         isBotAuthor: p.isBotAuthor,
         isCopilotAuthored: p.isCopilotAuthored,
+        aiAuthorType: p.aiAuthorType,
         timeToMergeHours: p.timeToMergeHours,
         linesAdded: p.linesAdded,
         linesDeleted: p.linesDeleted,
@@ -246,6 +247,7 @@ function buildDashboardHtml(
         author: pr.author,
         isBotAuthor: false,
         isCopilotAuthored: pr.isCopilotAuthored,
+        aiAuthorType: pr.aiAuthorType,
         timeToMergeHours: pr.timeToMergeHours ?? 0,
         linesAdded: pr.linesAdded,
         linesDeleted: pr.linesDeleted,
@@ -261,6 +263,14 @@ function buildDashboardHtml(
       copilotTotalMerged += r.copilotAdoption.totalMergedPRs;
       copilotTotalDetailed += r.copilotAdoption.totalDetailedPRs;
     }
+  }
+
+  // AI author breakdown by tool (computed from the full merged-PR timeline)
+  const aiByType = { copilot: 0, claude: 0, codex: 0 };
+  for (const p of allPRDetails) {
+    if (p.aiAuthorType === "copilot") aiByType.copilot++;
+    else if (p.aiAuthorType === "claude") aiByType.claude++;
+    else if (p.aiAuthorType === "codex") aiByType.codex++;
   }
 
   // Aggregate Copilot agent metrics
@@ -379,6 +389,7 @@ function buildDashboardHtml(
       reviewed: copilotReviewed,
       totalMerged: copilotTotalMerged,
       totalDetailed: copilotTotalDetailed,
+      byType: aiByType,
     },
     copilotAgent: {
       totalTasks: agentTotalTasks,
@@ -479,8 +490,8 @@ function buildDashboardHtml(
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x1F916;</div>
       <div class="kpi-val" id="kpiCopilotVal">${copilotTotalMerged > 0 ? ((copilotAuthored / copilotTotalMerged) * 100).toFixed(1) + '%' : '–'}</div>
-      <div class="kpi-lbl" id="kpiCopilotLbl">Copilot PRs</div>
-      <div class="kpi-sub" id="kpiCopilotSub">${copilotAuthored} authored &middot; ${copilotReviewed} reviewed</div>
+      <div class="kpi-lbl" id="kpiCopilotLbl">AI PRs</div>
+      <div class="kpi-sub" id="kpiCopilotSub">${copilotAuthored} AI-authored &middot; ${copilotReviewed} reviewed</div>
     </div>
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x1F6E0;&#xFE0F;</div>
@@ -511,7 +522,8 @@ function buildDashboardHtml(
   <section class="charts" aria-label="Delivery metric charts">
     <div class="card card-chart card-wide"><h2>PR Cycle Time (weekly median, hours)</h2><canvas id="chartCycleTime"></canvas></div>
     <div class="card card-chart card-wide"><h2>Actor Breakdown (PRs merged per week)</h2><canvas id="chartActorBreakdown"></canvas></div>
-    <div class="card card-chart"><h2>Copilot Adoption</h2><canvas id="chartCopilotAdoption"></canvas></div>
+    <div class="card card-chart"><h2>AI Adoption</h2><canvas id="chartCopilotAdoption"></canvas></div>
+    <div class="card card-chart"><h2>AI Author Breakdown</h2><canvas id="chartAIAuthorBreakdown"></canvas></div>
     <div class="card card-chart"><h2>Issue &rarr; PR Lead Time</h2><canvas id="chartLeadTime"></canvas></div>
   </section>
 
@@ -1001,15 +1013,26 @@ function renderDeliveryCharts(){
         scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:cssColors.border}}},
         plugins:{legend:{position:"top",align:"end"}}}});
   }
-  // Copilot adoption doughnut
+  // AI adoption doughnut
   var cop=CHART_DATA.copilot||{};
   if(cop.totalMerged>0){
     var dOpts2={cutout:"62%",plugins:{legend:{position:"bottom"}},responsive:true,maintainAspectRatio:true};
     charts.copilotAdoption=new Chart(document.getElementById("chartCopilotAdoption"),{type:"doughnut",
-      data:{labels:["Copilot-authored","Human-authored"],
+      data:{labels:["AI-authored","Human-authored"],
         datasets:[{data:[cop.authored,cop.totalMerged-cop.authored],
           backgroundColor:[cssColors.purple||"#8250df",cssColors.accent],borderWidth:0,hoverOffset:6}]},
       options:dOpts2});
+  }
+  // AI author breakdown doughnut (Copilot vs Claude vs Codex)
+  var aiByType=cop.byType||{};
+  var aiTotal=(aiByType.copilot||0)+(aiByType.claude||0)+(aiByType.codex||0);
+  if(aiTotal>0){
+    var dOpts3={cutout:"62%",plugins:{legend:{position:"bottom"}},responsive:true,maintainAspectRatio:true};
+    charts.aiAuthorBreakdown=new Chart(document.getElementById("chartAIAuthorBreakdown"),{type:"doughnut",
+      data:{labels:["Copilot","Claude","Codex"],
+        datasets:[{data:[aiByType.copilot||0,aiByType.claude||0,aiByType.codex||0],
+          backgroundColor:[cssColors.purple||"#8250df","#da3f85","#0099e5"],borderWidth:0,hoverOffset:6}]},
+      options:dOpts3});
   }
   // Issue lead time scatter
   var lts=CHART_DATA.allIssueLeadTimes||[];
@@ -1392,7 +1415,10 @@ function applyFilter(period){
   var cop;
   if(repoFiltered){
     var copAuthored=allPRBase.filter(function(p){return p.isCopilotAuthored;}).length;
-    cop={authored:copAuthored,totalMerged:allPRBase.length,reviewed:null};
+    var btCopilot=allPRBase.filter(function(p){return p.aiAuthorType==='copilot';}).length;
+    var btClaude=allPRBase.filter(function(p){return p.aiAuthorType==='claude';}).length;
+    var btCodex=allPRBase.filter(function(p){return p.aiAuthorType==='codex';}).length;
+    cop={authored:copAuthored,totalMerged:allPRBase.length,reviewed:null,byType:{copilot:btCopilot,claude:btClaude,codex:btCodex}};
   }else{
     cop=CHART_DATA.copilot||{};
   }
@@ -1400,12 +1426,17 @@ function applyFilter(period){
   var copilotSub=document.getElementById("kpiCopilotSub");
   if(copilotVal){copilotVal.textContent=cop.totalMerged>0?(cop.authored/cop.totalMerged*100).toFixed(1)+"%":"\u2013";}
   if(copilotSub){
-    if(repoFiltered)copilotSub.textContent=(cop.authored||0)+" Copilot-authored";
-    else copilotSub.textContent=(cop.authored||0)+" authored \u00B7 "+(cop.reviewed||0)+" reviewed";
+    if(repoFiltered)copilotSub.textContent=(cop.authored||0)+" AI-authored";
+    else copilotSub.textContent=(cop.authored||0)+" AI-authored \u00B7 "+(cop.reviewed||0)+" reviewed";
   }
   if(charts.copilotAdoption&&cop.totalMerged>0){
     charts.copilotAdoption.data.datasets[0].data=[cop.authored,cop.totalMerged-cop.authored];
     charts.copilotAdoption.update();
+  }
+  if(charts.aiAuthorBreakdown){
+    var bt2=cop.byType||{};
+    charts.aiAuthorBreakdown.data.datasets[0].data=[bt2.copilot||0,bt2.claude||0,bt2.codex||0];
+    charts.aiAuthorBreakdown.update();
   }
 
   // ── Cycle time KPI ──

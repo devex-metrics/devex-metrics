@@ -9,11 +9,59 @@ import type {
 import type { GraphQLRepoData, GraphQLPRNode } from "./repo-graphql.js";
 
 /**
- * Return true when the login belongs to a Copilot bot account.
- * Handles both the legacy `copilot[bot]` review-bot login and the newer
- * Copilot coding agent (copilot-swe-agent), which uses the login `"Copilot"`
- * with user.type / __typename `"Bot"`.
+ * Identify which AI tool authored a PR.
+ * Handles Copilot (`copilot[bot]` / `Copilot` Bot), Claude (`claude[bot]`),
+ * and Codex (`codex[bot]`). Returns null for humans and other bots.
  */
+function getAIAuthorType(
+  login: string,
+  typeHint?: string,
+): "copilot" | "claude" | "codex" | null {
+  const lower = login.toLowerCase();
+  if (lower === "copilot[bot]" || (lower === "copilot" && typeHint === "Bot")) return "copilot";
+  if (lower === "claude[bot]") return "claude";
+  if (lower === "codex[bot]") return "codex";
+  return null;
+}
+
+/**
+ * Parse `Co-authored-by:` trailers in a commit message and return the AI tool
+ * type if one is found, or null for a fully human commit.
+ *
+ * Matches:
+ *  - `copilot-swe-agent[bot]` or `+Copilot@users.noreply.github.com` → "copilot"
+ *  - `claude[bot]`  → "claude"
+ *  - `codex[bot]`   → "codex"
+ */
+export function parseAICoAuthorType(
+  message: string,
+): "copilot" | "claude" | "codex" | null {
+  let found: "copilot" | "claude" | "codex" | null = null;
+  for (const line of message.split("\n")) {
+    const lower = line.toLowerCase().trim();
+    if (!lower.startsWith("co-authored-by:")) continue;
+    if (lower.includes("copilot") || lower.includes("+copilot@")) return "copilot";
+    if (lower.includes("claude[bot]") && found === null) found = "claude";
+    else if (lower.includes("codex[bot]") && found === null) found = "codex";
+  }
+  return found;
+}
+
+/**
+ * Identify which AI tool authored or co-authored a PR.
+ * First checks the PR author login; falls back to merge-commit co-authored-by
+ * if a commit message is provided.
+ */
+function resolveAIType(
+  login: string,
+  typeHint: string | undefined,
+  mergeCommitMessage?: string | null,
+): "copilot" | "claude" | "codex" | null {
+  const fromAuthor = getAIAuthorType(login, typeHint);
+  if (fromAuthor !== null) return fromAuthor;
+  if (mergeCommitMessage) return parseAICoAuthorType(mergeCommitMessage);
+  return null;
+}
 function isCopilotUser(login: string, typeHint?: string): boolean {
   const lower = login.toLowerCase();
   return lower === "copilot[bot]" || (lower === "copilot" && typeHint === "Bot");
@@ -177,7 +225,20 @@ export async function collectPullRequestDetails(
       }
 
       const authorLogin = pr.user?.login ?? "unknown";
-      const isCopilotAuthored = isCopilotUser(authorLogin, pr.user?.type);
+
+      // Check merge commit message for AI co-author trailers
+      let mergeCommitMessage: string | null = null;
+      if (detail.merge_commit_sha) {
+        try {
+          const { data: mergeCommit } = await octokit.rest.git.getCommit({
+            owner, repo, commit_sha: detail.merge_commit_sha,
+          });
+          mergeCommitMessage = mergeCommit.message;
+        } catch {
+          // Merge commit may not be accessible; co-author check skipped
+        }
+      }
+      const aiType = resolveAIType(authorLogin, pr.user?.type, mergeCommitMessage);
 
       details.push({
         number: pr.number,
@@ -185,7 +246,8 @@ export async function collectPullRequestDetails(
         state: pr.merged_at ? "merged" : "closed",
         createdAt: pr.created_at,
         author: authorLogin,
-        isCopilotAuthored,
+        isCopilotAuthored: aiType !== null,
+        aiAuthorType: aiType ?? undefined,
         hasCopilotReview,
         linesAdded: detail.additions,
         linesDeleted: detail.deletions,
@@ -234,13 +296,15 @@ export async function collectMergedPRTimeline(
       for (const pr of res.data) {
         if (!pr.merged_at) continue;
         const authorLogin = pr.user?.login ?? "unknown";
+        const aiType = getAIAuthorType(authorLogin, pr.user?.type);
         timeline.push({
           number: pr.number,
           createdAt: pr.created_at,
           mergedAt: pr.merged_at,
           author: authorLogin,
           isBotAuthor: pr.user?.type === "Bot" || isBotLogin(authorLogin),
-          isCopilotAuthored: isCopilotUser(authorLogin, pr.user?.type),
+          isCopilotAuthored: aiType !== null,
+          aiAuthorType: aiType ?? undefined,
           timeToMergeHours:
             Math.round(hoursBetween(pr.created_at, pr.merged_at) * 100) / 100,
           closesIssues: parseIssueRefs(pr.body),
@@ -295,13 +359,15 @@ export function buildMergedPRTimeline(nodes: GraphQLPRNode[]): MergedPRSummary[]
     if (node.state !== "MERGED" || !node.mergedAt) continue;
     const authorLogin = node.author?.login ?? "unknown";
     const isBot = node.author?.__typename === "Bot" || isBotLogin(authorLogin);
+    const aiType = resolveAIType(authorLogin, node.author?.__typename, node.mergeCommit?.message);
     timeline.push({
       number: node.number,
       createdAt: node.createdAt,
       mergedAt: node.mergedAt,
       author: authorLogin,
       isBotAuthor: isBot,
-      isCopilotAuthored: isCopilotUser(authorLogin, node.author?.__typename),
+      isCopilotAuthored: aiType !== null,
+      aiAuthorType: aiType ?? undefined,
       timeToMergeHours:
         Math.round(hoursBetween(node.createdAt, node.mergedAt) * 100) / 100,
       closesIssues: parseIssueRefs(node.body),
@@ -359,6 +425,7 @@ export async function collectPullRequestDetailsFromNodes(
     const hasCopilotReview = reviewerLogins.some(
       (l) => l.toLowerCase() === "copilot[bot]" || l.toLowerCase() === "copilot"
     );
+    const aiType = resolveAIType(authorLogin, node.author?.__typename, node.mergeCommit?.message);
 
     details.push({
       number: node.number,
@@ -366,7 +433,8 @@ export async function collectPullRequestDetailsFromNodes(
       state: "merged",
       createdAt: node.createdAt,
       author: authorLogin,
-      isCopilotAuthored: isCopilotUser(authorLogin, node.author?.__typename),
+      isCopilotAuthored: aiType !== null,
+      aiAuthorType: aiType ?? undefined,
       hasCopilotReview,
       linesAdded: node.additions,
       linesDeleted: node.deletions,

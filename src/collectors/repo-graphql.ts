@@ -21,6 +21,8 @@ export interface GraphQLPRNode {
   /** Inline review comment threads (maps to REST `review_comments` count). */
   reviewThreads: { totalCount: number };
   reviews: { nodes: Array<{ author: { login: string } | null }> };
+  /** Merge commit for MERGED PRs — null for CLOSED/OPEN PRs. */
+  mergeCommit: { message: string } | null;
 }
 
 /** Aggregated repository data returned from the GraphQL query. */
@@ -86,6 +88,7 @@ const REPO_DATA_QUERY = `
           reviews(first: 100) {
             nodes { author { login } }
           }
+          mergeCommit { message }
         }
       }
     }

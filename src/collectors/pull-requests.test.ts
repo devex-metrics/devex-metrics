@@ -7,6 +7,7 @@ import {
   collectMergedPRTimeline,
   computeCopilotAdoption,
   parseIssueRefs,
+  parseAICoAuthorType,
 } from "./pull-requests.js";
 
 /** Build a fake Octokit whose pulls.list returns controlled data. */
@@ -155,6 +156,7 @@ type PRDetail = {
   review_comments: number;
   commits: number;
   head: { sha: string };
+  merge_commit_sha?: string | null;
 };
 type CheckRun = { started_at: string | null; completed_at: string | null };
 type Review = { user?: { login: string } | null; state: string };
@@ -167,11 +169,13 @@ function buildDetailsOctokit(opts: {
   listError?: { status: number };
   checksThrow?: boolean;
   reviewsThrow?: boolean;
+  mergeCommitMessages?: Map<string, string>;
 }): Octokit {
   const prs = opts.prs ?? [];
   const details = opts.details ?? new Map<number, PRDetail>();
   const checkRuns = opts.checkRuns ?? new Map<string, CheckRun[]>();
   const reviews = opts.reviews ?? new Map<number, Review[]>();
+  const mergeCommitMessages = opts.mergeCommitMessages ?? new Map<string, string>();
 
   return {
     rest: {
@@ -202,6 +206,13 @@ function buildDetailsOctokit(opts: {
         listForRef: async ({ ref }: { ref: string }) => {
           if (opts.checksThrow) throw new Error("No check runs");
           return { data: { check_runs: checkRuns.get(ref) ?? [] } };
+        },
+      },
+      git: {
+        getCommit: async ({ commit_sha }: { commit_sha: string }) => {
+          const msg = mergeCommitMessages.get(commit_sha);
+          if (msg === undefined) throw Object.assign(new Error("Not found"), { status: 404 });
+          return { data: { message: msg } };
         },
       },
     },
@@ -379,8 +390,37 @@ describe("collectPullRequestDetails", () => {
     const result = await collectPullRequestDetails("owner", "repo");
     expect(result).toHaveLength(1);
     expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("copilot");
     expect(result[0].hasCopilotReview).toBe(true);
     expect(result[0].author).toBe("copilot[bot]");
+  });
+
+  it("detects AI via merge commit co-authored-by for human-authored PR (REST path)", async () => {
+    const mergeCommitSha = "merge-abc";
+    setOctokit(
+      buildDetailsOctokit({
+        prs: [{
+          number: 5,
+          title: "Human-authored but AI-assisted",
+          merged_at: "2026-03-02T00:00:00Z",
+          created_at: "2026-03-01T00:00:00Z",
+          user: { login: "alice", type: "User" },
+        }],
+        details: new Map([[5, {
+          additions: 10, deletions: 2, comments: 0, review_comments: 0, commits: 1,
+          head: { sha: "head-sha" }, merge_commit_sha: mergeCommitSha,
+        }]]),
+        mergeCommitMessages: new Map([
+          [mergeCommitSha, "Human-authored but AI-assisted\n\nCo-authored-by: copilot-swe-agent[bot] <198982749+Copilot@users.noreply.github.com>"],
+        ]),
+      })
+    );
+
+    const result = await collectPullRequestDetails("owner", "repo");
+    expect(result).toHaveLength(1);
+    expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("copilot");
+    expect(result[0].author).toBe("alice");
   });
 });
 
@@ -412,6 +452,72 @@ describe("parseIssueRefs", () => {
   it("ignores non-matching text", () => {
     expect(parseIssueRefs("This PR adds feature #99")).toEqual([]);
     expect(parseIssueRefs("See issue #5 for details")).toEqual([]);
+  });
+});
+
+// ── parseAICoAuthorType ───────────────────────────────────────────────────────
+
+describe("parseAICoAuthorType", () => {
+  const COPILOT_SQUASH = `Add friendly name (#873)
+* feat: add feature
+
+Agent-Logs-Url: https://example.com
+
+Co-authored-by: rajbos <6085745+rajbos@users.noreply.github.com>
+
+---------
+
+Co-authored-by: copilot-swe-agent[bot] <198982749+Copilot@users.noreply.github.com>
+Co-authored-by: rajbos <6085745+rajbos@users.noreply.github.com>`;
+
+  it("detects copilot-swe-agent[bot] co-author (real squash merge format)", () => {
+    expect(parseAICoAuthorType(COPILOT_SQUASH)).toBe("copilot");
+  });
+
+  it("detects +Copilot@users.noreply.github.com email variant", () => {
+    expect(parseAICoAuthorType(
+      "fix\n\nCo-authored-by: GitHub Copilot <123+Copilot@users.noreply.github.com>"
+    )).toBe("copilot");
+  });
+
+  it("detects copilot[bot] co-author", () => {
+    expect(parseAICoAuthorType(
+      "fix\n\nCo-authored-by: copilot[bot] <copilot[bot]@users.noreply.github.com>"
+    )).toBe("copilot");
+  });
+
+  it("detects claude[bot] co-author", () => {
+    expect(parseAICoAuthorType(
+      "fix\n\nCo-authored-by: claude[bot] <claude[bot]@users.noreply.github.com>"
+    )).toBe("claude");
+  });
+
+  it("detects codex[bot] co-author", () => {
+    expect(parseAICoAuthorType(
+      "fix\n\nCo-authored-by: codex[bot] <codex[bot]@users.noreply.github.com>"
+    )).toBe("codex");
+  });
+
+  it("returns null when no AI co-authors are present", () => {
+    expect(parseAICoAuthorType(
+      "fix\n\nCo-authored-by: alice <alice@example.com>"
+    )).toBeNull();
+  });
+
+  it("returns null for empty message", () => {
+    expect(parseAICoAuthorType("")).toBeNull();
+  });
+
+  it("is case-insensitive", () => {
+    expect(parseAICoAuthorType(
+      "fix\n\nCo-Authored-By: Claude[Bot] <claude[bot]@example.com>"
+    )).toBe("claude");
+  });
+
+  it("prioritises copilot over claude when both are present", () => {
+    expect(parseAICoAuthorType(
+      "fix\n\nCo-authored-by: claude[bot] <>\nCo-authored-by: copilot-swe-agent[bot] <>"
+    )).toBe("copilot");
   });
 });
 
@@ -503,11 +609,14 @@ describe("collectMergedPRTimeline", () => {
     const copilotSweEntry = result.find((e) => e.number === 12)!;
     expect(dependabotEntry.isBotAuthor).toBe(true);
     expect(dependabotEntry.isCopilotAuthored).toBe(false);
+    expect(dependabotEntry.aiAuthorType).toBeUndefined();
     expect(copilotEntry.isBotAuthor).toBe(true);
     expect(copilotEntry.isCopilotAuthored).toBe(true);
+    expect(copilotEntry.aiAuthorType).toBe("copilot");
     // Copilot coding agent (copilot-swe-agent) uses "Copilot" login with type "Bot"
     expect(copilotSweEntry.isBotAuthor).toBe(true);
     expect(copilotSweEntry.isCopilotAuthored).toBe(true);
+    expect(copilotSweEntry.aiAuthorType).toBe("copilot");
   });
 
   it("returns sorted by mergedAt descending", async () => {
@@ -651,6 +760,7 @@ function makePRNode(overrides: Partial<GraphQLPRNode> = {}): GraphQLPRNode {
     comments: { totalCount: 1 },
     reviewThreads: { totalCount: 1 },
     reviews: { nodes: [] },
+    mergeCommit: null,
     ...overrides,
   };
 }
@@ -690,6 +800,7 @@ describe("buildMergedPRTimeline", () => {
     const result = buildMergedPRTimeline([node]);
     expect(result[0].isBotAuthor).toBe(true);
     expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("copilot");
   });
 
   it("detects Copilot coding agent (login 'Copilot', __typename 'Bot') as isCopilotAuthored", () => {
@@ -699,6 +810,67 @@ describe("buildMergedPRTimeline", () => {
     const result = buildMergedPRTimeline([node]);
     expect(result[0].isBotAuthor).toBe(true);
     expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("copilot");
+  });
+
+  it("detects claude[bot] author as isCopilotAuthored with aiAuthorType 'claude'", () => {
+    const node = makePRNode({
+      author: { login: "claude[bot]", __typename: "Bot" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isBotAuthor).toBe(true);
+    expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("claude");
+  });
+
+  it("detects codex[bot] author as isCopilotAuthored with aiAuthorType 'codex'", () => {
+    const node = makePRNode({
+      author: { login: "codex[bot]", __typename: "Bot" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isBotAuthor).toBe(true);
+    expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("codex");
+  });
+
+  it("detects AI via merge commit co-authored-by when PR author is human", () => {
+    const node = makePRNode({
+      author: { login: "alice", __typename: "User" },
+      mergeCommit: { message: "feat: add thing\n\nCo-authored-by: copilot-swe-agent[bot] <198982749+Copilot@users.noreply.github.com>" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("copilot");
+  });
+
+  it("detects claude[bot] via merge commit co-authored-by", () => {
+    const node = makePRNode({
+      author: { login: "alice", __typename: "User" },
+      mergeCommit: { message: "feat\n\nCo-authored-by: claude[bot] <claude[bot]@noreply>" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("claude");
+  });
+
+  it("does not mark AI when merge commit has only human co-authors", () => {
+    const node = makePRNode({
+      author: { login: "alice", __typename: "User" },
+      mergeCommit: { message: "feat\n\nCo-authored-by: bob <bob@example.com>" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isCopilotAuthored).toBe(false);
+    expect(result[0].aiAuthorType).toBeUndefined();
+  });
+
+  it("prefers PR author type over merge commit co-author type", () => {
+    const node = makePRNode({
+      author: { login: "copilot[bot]", __typename: "Bot" },
+      mergeCommit: { message: "feat\n\nCo-authored-by: claude[bot] <claude[bot]@noreply>" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("copilot");
   });
 
   it("detects bot by __typename Bot", () => {
@@ -708,6 +880,7 @@ describe("buildMergedPRTimeline", () => {
     const result = buildMergedPRTimeline([node]);
     expect(result[0].isBotAuthor).toBe(true);
     expect(result[0].isCopilotAuthored).toBe(false);
+    expect(result[0].aiAuthorType).toBeUndefined();
   });
 
   it("handles null author as 'unknown'", () => {
