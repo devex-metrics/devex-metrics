@@ -19,7 +19,7 @@ export interface OrgMetrics {
   repoCount: number;
   /** Per-repo metrics. */
   repos: RepoMetrics[];
-  /** Weekly activity trends aggregated across all repos (last ~12 weeks). */
+  /** Weekly activity trends aggregated across all repos (last ~2 years). */
   weeklyTrends?: WeeklyTrendPoint[];
 }
 
@@ -33,7 +33,7 @@ export interface RepoMetrics {
   collectedAt?: string;
   /** Issue counts by state. */
   issues: IssueCounts;
-  /** Weekly activity trends for this repository (last ~12 weeks). */
+  /** Weekly activity trends for this repository (last ~2 years). */
   weeklyTrends?: WeeklyTrendPoint[];
   /** Pull request counts by state. */
   pullRequests: PullRequestCounts;

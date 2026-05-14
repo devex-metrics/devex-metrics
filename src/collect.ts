@@ -174,7 +174,7 @@ export async function collect(
       const slash = r.fullName.indexOf("/");
       return { owner: r.fullName.slice(0, slash), name: r.name };
     });
-    const result = await collectWeeklyTrends(trendRepos, 12, 200, prDataByRepo);
+    const result = await collectWeeklyTrends(trendRepos, 104, 200, prDataByRepo);
     weeklyTrends = result.orgTrends;
     for (const repo of repos) {
       repo.weeklyTrends = result.repoTrends.get(repo.fullName) ?? [];

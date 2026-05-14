@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 7,
+  "schemaVersion": 8,
   "owner": "rajbos",
   "ownerType": "user",
   "collectedAt": "2026-05-14T08:45:37.611Z",
@@ -4598,7 +4598,7 @@
       "name": "azure-devops-extension-action",
       "fullName": "jessehouwing/azure-devops-extension-action",
       "pushedAt": "2020-12-09T18:50:18Z",
-      "collectedAt": "2026-05-14T08:33:07.140Z",
+      "collectedAt": "2026-05-14T08:33:07.14Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -5012,7 +5012,7 @@
       "name": "MondrianMuse",
       "fullName": "MatthijsvdVeer/MondrianMuse",
       "pushedAt": "2026-04-07T07:58:06Z",
-      "collectedAt": "2026-05-14T08:33:20.760Z",
+      "collectedAt": "2026-05-14T08:33:20.76Z",
       "issues": {
         "open": 8,
         "closed": 102
@@ -7580,7 +7580,7 @@
       "name": "lfs-warning",
       "fullName": "ppremk/lfs-warning",
       "pushedAt": "2024-09-07T09:39:08Z",
-      "collectedAt": "2026-05-14T08:33:54.810Z",
+      "collectedAt": "2026-05-14T08:33:54.81Z",
       "issues": {
         "open": 4,
         "closed": 13
@@ -21854,7 +21854,7 @@
       "name": "centralPackageVersioningSample",
       "fullName": "rajbos/centralPackageVersioningSample",
       "pushedAt": "2026-04-14T08:24:56Z",
-      "collectedAt": "2026-05-14T08:36:50.420Z",
+      "collectedAt": "2026-05-14T08:36:50.42Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23812,7 +23812,7 @@
       "name": "demo",
       "fullName": "rajbos/demo",
       "pushedAt": "2023-02-15T15:47:32Z",
-      "collectedAt": "2026-05-14T08:37:33.340Z",
+      "collectedAt": "2026-05-14T08:37:33.34Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -23964,7 +23964,7 @@
       "name": "demo-actions",
       "fullName": "rajbos/demo-actions",
       "pushedAt": "2026-04-08T14:45:37Z",
-      "collectedAt": "2026-05-14T08:37:42.490Z",
+      "collectedAt": "2026-05-14T08:37:42.49Z",
       "issues": {
         "open": 6,
         "closed": 22
@@ -25028,7 +25028,7 @@
       "name": "demo-wiki",
       "fullName": "rajbos/demo-wiki",
       "pushedAt": "2023-01-16T10:15:38Z",
-      "collectedAt": "2026-05-14T08:37:52.650Z",
+      "collectedAt": "2026-05-14T08:37:52.65Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -26548,7 +26548,7 @@
       "name": "eco-ci-activity-checker",
       "fullName": "rajbos/eco-ci-activity-checker",
       "pushedAt": "2023-04-09T00:04:04Z",
-      "collectedAt": "2026-05-14T08:38:17.360Z",
+      "collectedAt": "2026-05-14T08:38:17.36Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -27722,7 +27722,7 @@
       "name": "gh-developer-games",
       "fullName": "rajbos/gh-developer-games",
       "pushedAt": "2023-01-17T10:29:15Z",
-      "collectedAt": "2026-05-14T08:38:27.910Z",
+      "collectedAt": "2026-05-14T08:38:27.91Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -29430,7 +29430,7 @@
       "name": "giphy-action",
       "fullName": "rajbos/giphy-action",
       "pushedAt": "2023-05-13T22:02:46Z",
-      "collectedAt": "2026-05-14T08:38:45.760Z",
+      "collectedAt": "2026-05-14T08:38:45.76Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -38669,7 +38669,7 @@
       "name": "mcp-servers",
       "fullName": "rajbos/mcp-servers",
       "pushedAt": "2025-03-27T13:42:05Z",
-      "collectedAt": "2026-05-14T08:40:28.790Z",
+      "collectedAt": "2026-05-14T08:40:28.79Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -38821,7 +38821,7 @@
       "name": "melos-action",
       "fullName": "rajbos/melos-action",
       "pushedAt": "2024-04-26T12:36:37Z",
-      "collectedAt": "2026-05-14T08:40:29.810Z",
+      "collectedAt": "2026-05-14T08:40:29.81Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -38973,7 +38973,7 @@
       "name": "microsoft-learn",
       "fullName": "rajbos/microsoft-learn",
       "pushedAt": "2022-10-25T20:25:46Z",
-      "collectedAt": "2026-05-14T08:40:30.860Z",
+      "collectedAt": "2026-05-14T08:40:30.86Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -44135,7 +44135,7 @@
       "name": "Stryker.MultipleProjectRunner",
       "fullName": "rajbos/Stryker.MultipleProjectRunner",
       "pushedAt": "2023-12-20T13:29:35Z",
-      "collectedAt": "2026-05-14T08:41:33.630Z",
+      "collectedAt": "2026-05-14T08:41:33.63Z",
       "issues": {
         "open": 0,
         "closed": 4
@@ -44591,7 +44591,7 @@
       "name": "teams-automation",
       "fullName": "rajbos/teams-automation",
       "pushedAt": "2025-09-06T08:30:58Z",
-      "collectedAt": "2026-05-14T08:41:37.640Z",
+      "collectedAt": "2026-05-14T08:41:37.64Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -52353,7 +52353,7 @@
       "name": "GDBC2018-Challenges",
       "fullName": "XpiritBV/GDBC2018-Challenges",
       "pushedAt": "2018-06-21T02:31:07Z",
-      "collectedAt": "2026-05-14T08:44:04.240Z",
+      "collectedAt": "2026-05-14T08:44:04.24Z",
       "issues": {
         "open": 1,
         "closed": 0

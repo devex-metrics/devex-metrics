@@ -122,7 +122,7 @@ export async function collectRepoGraphQL(
   maxPages = 10
 ): Promise<GraphQLRepoData | null> {
   const octokit = await getOctokit();
-  const cutoff = new Date(Date.now() - 395 * 24 * 60 * 60 * 1000); // ~13 months
+  const cutoff = new Date(Date.now() - 730 * 24 * 60 * 60 * 1000); // ~2 years
 
   let cursor: string | null = null;
   let firstPage = true;

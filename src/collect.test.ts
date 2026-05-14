@@ -182,6 +182,20 @@ describe("collect", () => {
     expect(result.repos[0].weeklyTrends).toHaveLength(1);
   });
 
+  it("calls collectWeeklyTrends with 104 weeks to support multi-year trend history", async () => {
+    setupDefaultMocks();
+    vi.mocked(collectRepos).mockResolvedValue([{ name: "r", fullName: "owner/r", pushedAt: "" }]);
+
+    await collect("owner", "org");
+
+    expect(collectWeeklyTrends).toHaveBeenCalledWith(
+      expect.any(Array),
+      104,
+      expect.any(Number),
+      expect.any(Map)
+    );
+  });
+
   it("skips trend recollection when all repos already have per-repo weeklyTrends", async () => {
     setupDefaultMocks();
     const repoWithTrends = {
