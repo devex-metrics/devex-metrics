@@ -1049,12 +1049,37 @@ function renderDeliveryCharts(){
         scales:{x:{stacked:true,grid:{display:false},beginAtZero:true},y:{stacked:true,grid:{display:false}}},
         plugins:{legend:{position:"top",align:"end"}},
         onClick:function(e,elements){
+          var repoName=null;
           if(elements.length>0){
-            var n=agentRepoNames[elements[0].index];
-            window.open("https://github.com/"+(CHART_DATA.owner||"")+"/"+n+"/issues?q=is:open","_blank","noopener,noreferrer");
+            repoName=agentRepoNames[elements[0].index];
+          } else if(e.native){
+            var yAxis=e.chart.scales.y;
+            var rect=e.chart.canvas.getBoundingClientRect();
+            var cx=e.native.clientX-rect.left;
+            var cy=e.native.clientY-rect.top;
+            if(cx<yAxis.right){
+              for(var i=0;i<agentRepoNames.length;i++){
+                if(Math.abs(cy-yAxis.getPixelForTick(i))<15){repoName=agentRepoNames[i];break;}
+              }
+            }
           }
+          if(repoName){window.open("https://github.com/"+(CHART_DATA.owner||"")+"/"+repoName+"/agents","_blank","noopener,noreferrer");}
         },
-        onHover:function(e,elements){e.chart.canvas.style.cursor=elements.length>0?"pointer":"default";}}});
+        onHover:function(e,elements){
+          var cursor="default";
+          if(elements.length>0){cursor="pointer";}
+          else if(e.native){
+            var yAxis=e.chart.scales.y;
+            var rect=e.chart.canvas.getBoundingClientRect();
+            var cx=e.native.clientX-rect.left;
+            var cy=e.native.clientY-rect.top;
+            if(cx<yAxis.right){
+              for(var i=0;i<agentRepoNames.length;i++){
+                if(Math.abs(cy-yAxis.getPixelForTick(i))<15){cursor="pointer";break;}
+              }
+            }
+          }
+          e.chart.canvas.style.cursor=cursor;}}});
   }
 }
 function setupFilter(){

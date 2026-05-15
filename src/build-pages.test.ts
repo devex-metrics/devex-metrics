@@ -885,9 +885,11 @@ describe("build-pages", () => {
     // CHART_DATA should include owner for constructing GitHub task URLs
     expect(html).toContain('"owner":"test-pages-owner"');
 
-    // Chart click handler should navigate to open issues for the repo
-    expect(html).toContain("/issues?q=is:open");
+    // Chart click handler should navigate to /agents for the repo (bar click and label click)
+    expect(html).toContain("/agents");
     expect(html).toContain("CHART_DATA.owner");
+    // Y-axis label click detection should be present
+    expect(html).toContain("yAxis.getPixelForTick");
 
     // Extended detail fields should be present for repo with agent data
     expect(html).toContain("Cancelled");
