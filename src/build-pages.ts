@@ -416,6 +416,7 @@ function buildDashboardHtml(
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>DevEx Metrics &ndash; ${escapeHtml(data.owner)}</title>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
   <style>${getCSS()}</style>
 </head>
 <body>
@@ -975,6 +976,70 @@ function renderCharts(){
 function getISOWeek(d){var date=new Date(d);date.setUTCDate(date.getUTCDate()+4-(date.getUTCDay()||7));var y=date.getUTCFullYear();var jan1=new Date(Date.UTC(y,0,1));var wn=Math.ceil(((date.getTime()-jan1.getTime())/86400000+1)/7);return y+"-W"+(wn<10?"0":"")+wn;}
 function medianOf(arr){if(!arr.length)return 0;var s=arr.slice().sort(function(a,b){return a-b;});var m=Math.floor(s.length/2);return s.length%2?s[m]:(s[m-1]+s[m])/2;}
 function fmtDur(h){if(h<1)return Math.round(h*60)+"m";if(h<24)return h.toFixed(1)+"h";return(h/24).toFixed(1)+"d";}
+/**
+ * Build Chart.js annotation plugin config with vertical lines at year
+ * boundaries and centered year labels between them.
+ * @param labels Array of ISO week labels ("YYYY-Www") currently displayed.
+ * @returns annotation plugin options object (empty when <2 years spanned).
+ */
+function yearBoundaryAnnotations(labels){
+  if(!labels||labels.length<2)return {};
+  // Determine the set of distinct years present in the labels.
+  var years=[];
+  labels.forEach(function(lbl){
+    var y=parseInt(lbl.slice(0,4),10);
+    if(years.indexOf(y)===-1)years.push(y);
+  });
+  years.sort();
+  if(years.length<2)return {};
+  // For each year boundary, find the index of the first week of the new year.
+  var annotations={};
+  for(var i=1;i<years.length;i++){
+    var yearStr=String(years[i]);
+    var boundaryLabel=yearStr+"-W01";
+    var idx=labels.indexOf(boundaryLabel);
+    // If W01 is not in the data, find the first label that belongs to this year.
+    if(idx===-1){
+      for(var j=0;j<labels.length;j++){
+        if(labels[j].slice(0,4)===yearStr){idx=j;break;}
+      }
+    }
+    if(idx>0){
+      annotations["yearLine"+i]={
+        type:"line",
+        xMin:idx-0.5,xMax:idx-0.5,
+        borderColor:cssColors.muted||"#888",
+        borderWidth:1,
+        borderDash:[4,4]
+      };
+    }
+  }
+  // Add year label in the center of each year's range.
+  for(var k=0;k<years.length;k++){
+    var yStr=String(years[k]);
+    var first=-1,last=-1;
+    for(var m=0;m<labels.length;m++){
+      if(labels[m].slice(0,4)===yStr){
+        if(first===-1)first=m;
+        last=m;
+      }
+    }
+    if(first!==-1){
+      var center=(first+last)/2;
+      annotations["yearLabel"+k]={
+        type:"label",
+        xValue:center,
+        yValue:0,
+        yAdjust:-12,
+        content:[yStr],
+        color:cssColors.muted||"#888",
+        font:{size:11,weight:"bold"},
+        position:"start"
+      };
+    }
+  }
+  return {annotation:{annotations:annotations}};
+}
 function renderDeliveryCharts(){
   var lineOpts={responsive:true,maintainAspectRatio:true,
     scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:cssColors.border}}},
@@ -1281,22 +1346,28 @@ function applyFilter(period){
 
   // PR trends: hide "Opened" only when repo-filtered without per-repo trend data
   if(charts.prTrends){
-    charts.prTrends.data.labels=prTrendsPeriod.map(function(t){return t.week;});
+    var prTrendLabels=prTrendsPeriod.map(function(t){return t.week;});
+    charts.prTrends.data.labels=prTrendLabels;
     charts.prTrends.data.datasets[0].data=prTrendsPeriod.map(function(t){return t.prsOpened;});
     charts.prTrends.data.datasets[1].data=prTrendsPeriod.map(function(t){return t.prsMerged;});
     charts.prTrends.setDatasetVisibility(0,!repoFiltered||allSelectedHaveRepoTrends);
+    charts.prTrends.options.plugins=Object.assign({},charts.prTrends.options.plugins,yearBoundaryAnnotations(prTrendLabels));
     charts.prTrends.update();
   }
   if(charts.issueTrends){
-    charts.issueTrends.data.labels=issueTrendsPeriod.map(function(t){return t.week;});
+    var issueTrendLabels=issueTrendsPeriod.map(function(t){return t.week;});
+    charts.issueTrends.data.labels=issueTrendLabels;
     charts.issueTrends.data.datasets[0].data=issueTrendsPeriod.map(function(t){return t.issuesOpened;});
     charts.issueTrends.data.datasets[1].data=issueTrendsPeriod.map(function(t){return t.issuesClosed;});
+    charts.issueTrends.options.plugins=Object.assign({},charts.issueTrends.options.plugins,yearBoundaryAnnotations(issueTrendLabels));
     charts.issueTrends.update();
   }
   if(charts.prSizeTrends){
-    charts.prSizeTrends.data.labels=prTrendsPeriod.map(function(t){return t.week;});
+    var prSizeLabels=prTrendsPeriod.map(function(t){return t.week;});
+    charts.prSizeTrends.data.labels=prSizeLabels;
     charts.prSizeTrends.data.datasets[0].data=prTrendsPeriod.map(function(t){return t.linesAdded;});
     charts.prSizeTrends.data.datasets[1].data=prTrendsPeriod.map(function(t){return t.linesDeleted;});
+    charts.prSizeTrends.options.plugins=Object.assign({},charts.prSizeTrends.options.plugins,yearBoundaryAnnotations(prSizeLabels));
     charts.prSizeTrends.update();
   }
 
@@ -1452,6 +1523,7 @@ function applyFilter(period){
     var ctWeeks=Object.keys(weekCT).sort();
     charts.cycleTime.data.labels=ctWeeks;
     charts.cycleTime.data.datasets[0].data=ctWeeks.map(function(w){return Math.round(medianOf(weekCT[w])*10)/10;});
+    charts.cycleTime.options.plugins=Object.assign({},charts.cycleTime.options.plugins,yearBoundaryAnnotations(ctWeeks));
     charts.cycleTime.update();
   }
   if(charts.actorBreakdown){
@@ -1470,6 +1542,7 @@ function applyFilter(period){
     charts.actorBreakdown.data.datasets[1].data=aW.map(function(w){return wA[w].copilot;});
     charts.actorBreakdown.data.datasets[2].data=aW.map(function(w){return wA[w].dependabot;});
     charts.actorBreakdown.data.datasets[3].data=aW.map(function(w){return wA[w].otherBot;});
+    charts.actorBreakdown.options.plugins=Object.assign({},charts.actorBreakdown.options.plugins,yearBoundaryAnnotations(aW));
     charts.actorBreakdown.update();
   }
 
@@ -1480,6 +1553,7 @@ function applyFilter(period){
     var copWeeks2=Object.keys(wCopPR2).sort();
     charts.copilotPRTrend.data.labels=copWeeks2;
     charts.copilotPRTrend.data.datasets[0].data=copWeeks2.map(function(w){return wCopPR2[w];});
+    charts.copilotPRTrend.options.plugins=Object.assign({},charts.copilotPRTrend.options.plugins,yearBoundaryAnnotations(copWeeks2));
     charts.copilotPRTrend.update();
   }
 
