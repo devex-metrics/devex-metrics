@@ -10,8 +10,9 @@ import type { GraphQLRepoData, GraphQLPRNode } from "./repo-graphql.js";
 
 /**
  * Identify which AI tool authored a PR.
- * Handles Copilot (`copilot[bot]` / `Copilot` Bot), Claude (`claude[bot]`),
- * and Codex (`codex[bot]`). Returns null for humans and other bots.
+ * Handles Copilot (`copilot[bot]` / `Copilot` Bot), Claude (`claude[bot]` /
+ * `claude[agent]`), and Codex (`codex[bot]` / `codex[agent]`).
+ * Returns null for humans and other bots.
  */
 function getAIAuthorType(
   login: string,
@@ -19,8 +20,8 @@ function getAIAuthorType(
 ): "copilot" | "claude" | "codex" | null {
   const lower = login.toLowerCase();
   if (lower === "copilot[bot]" || (lower === "copilot" && typeHint === "Bot")) return "copilot";
-  if (lower === "claude[bot]") return "claude";
-  if (lower === "codex[bot]") return "codex";
+  if (lower === "claude[bot]" || lower === "claude[agent]") return "claude";
+  if (lower === "codex[bot]" || lower === "codex[agent]") return "codex";
   return null;
 }
 
@@ -30,8 +31,8 @@ function getAIAuthorType(
  *
  * Matches:
  *  - `copilot-swe-agent[bot]` or `+Copilot@users.noreply.github.com` → "copilot"
- *  - `claude[bot]`  → "claude"
- *  - `codex[bot]`   → "codex"
+ *  - `claude[bot]` or `claude[agent]`  → "claude"
+ *  - `codex[bot]` or `codex[agent]`    → "codex"
  */
 export function parseAICoAuthorType(
   message: string,
@@ -41,8 +42,8 @@ export function parseAICoAuthorType(
     const lower = line.toLowerCase().trim();
     if (!lower.startsWith("co-authored-by:")) continue;
     if (lower.includes("copilot") || lower.includes("+copilot@")) return "copilot";
-    if (lower.includes("claude[bot]") && found === null) found = "claude";
-    else if (lower.includes("codex[bot]") && found === null) found = "codex";
+    if ((lower.includes("claude[bot]") || lower.includes("claude[agent]")) && found === null) found = "claude";
+    else if ((lower.includes("codex[bot]") || lower.includes("codex[agent]")) && found === null) found = "codex";
   }
   return found;
 }
@@ -83,7 +84,7 @@ export function parseIssueRefs(body: string | null | undefined): number[] {
 }
 
 function isBotLogin(login: string): boolean {
-  return login.endsWith("[bot]");
+  return login.endsWith("[bot]") || login.endsWith("[agent]");
 }
 
 function hoursBetween(a: string, b: string): number {

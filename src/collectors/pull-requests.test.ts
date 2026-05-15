@@ -492,9 +492,21 @@ Co-authored-by: rajbos <6085745+rajbos@users.noreply.github.com>`;
     )).toBe("claude");
   });
 
+  it("detects claude[agent] co-author", () => {
+    expect(parseAICoAuthorType(
+      "fix\n\nCo-authored-by: claude[agent] <claude[agent]@users.noreply.github.com>"
+    )).toBe("claude");
+  });
+
   it("detects codex[bot] co-author", () => {
     expect(parseAICoAuthorType(
       "fix\n\nCo-authored-by: codex[bot] <codex[bot]@users.noreply.github.com>"
+    )).toBe("codex");
+  });
+
+  it("detects codex[agent] co-author", () => {
+    expect(parseAICoAuthorType(
+      "fix\n\nCo-authored-by: codex[agent] <codex[agent]@users.noreply.github.com>"
     )).toBe("codex");
   });
 
@@ -823,9 +835,29 @@ describe("buildMergedPRTimeline", () => {
     expect(result[0].aiAuthorType).toBe("claude");
   });
 
+  it("detects claude[agent] author as isCopilotAuthored with aiAuthorType 'claude'", () => {
+    const node = makePRNode({
+      author: { login: "claude[agent]", __typename: "Bot" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isBotAuthor).toBe(true);
+    expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("claude");
+  });
+
   it("detects codex[bot] author as isCopilotAuthored with aiAuthorType 'codex'", () => {
     const node = makePRNode({
       author: { login: "codex[bot]", __typename: "Bot" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isBotAuthor).toBe(true);
+    expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("codex");
+  });
+
+  it("detects codex[agent] author as isCopilotAuthored with aiAuthorType 'codex'", () => {
+    const node = makePRNode({
+      author: { login: "codex[agent]", __typename: "Bot" },
     });
     const result = buildMergedPRTimeline([node]);
     expect(result[0].isBotAuthor).toBe(true);
