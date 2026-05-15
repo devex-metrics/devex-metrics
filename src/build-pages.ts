@@ -149,7 +149,7 @@ function formatDurationHtml(hours: number): string {
   if (hours < 1) return `${Math.round(hours * 60)}min`;
   if (hours < 24) return `${hours.toFixed(1)}hr`;
   const days = hours / 24;
-  return `${days.toFixed(1)}d`;
+  return `${days.toFixed(1)}days`;
 }
 
 /** Mirrors the client-side weekToDate() — returns the Monday of the given ISO week. */

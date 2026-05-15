@@ -690,8 +690,8 @@ describe("build-pages", () => {
     expect(document.getElementById("kpiPRVal")?.textContent).toBe("2");
     expect(document.getElementById("kpiPRSub")?.textContent).toBe("6 opened");
 
-    // 30d cycle time: median([24, 48]) = 36h → formats as "1.5d" (36 ≥ 24h)
-    expect(document.getElementById("kpiCycleVal")?.textContent).toBe("1.5d");
+    // 30d cycle time: median([24, 48]) = 36h → formats as "1.5days" (36 ≥ 24h)
+    expect(document.getElementById("kpiCycleVal")?.textContent).toBe("1.5days");
 
     // Sanity-check: all-time values must NOT appear in these elements
     expect(document.getElementById("kpiIssueVal")?.textContent).not.toBe("15");
