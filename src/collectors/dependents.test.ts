@@ -39,7 +39,18 @@ function dependentsHtmlSameLine(count: string): string {
 }
 
 const LOGIN_HTML = `<html><body><form action="/session"><input type="submit"></form></body></html>`;
-const LOGIN_REDIRECT_HTML = `<html><body><a href="/login?return_to=%2Fowner%2Frepo">Sign in</a></body></html>`;
+
+/** Simulates the unauthenticated GitHub page: "Sign in" nav link present, but valid dependency data also present. */
+function unauthPageHtml(count: string): string {
+  return `<html><body>
+    <a href="/login?return_to=%2Fowner%2Frepo%2Fnetwork%2Fdependents">Sign in</a>
+    <a class="btn-link selected" href="/owner/repo/network/dependents?dependent_type=REPOSITORY">
+      <svg><path d="M0"></path></svg>
+      ${count}
+      Repositories
+    </a>
+  </body></html>`;
+}
 
 describe("collectDependentCount", () => {
   afterEach(() => {
@@ -117,14 +128,14 @@ describe("collectDependentCount", () => {
     expect(await collectDependentCount("owner", "repo")).toBe(0);
   });
 
-  it("returns 0 when page contains a login redirect link", async () => {
+  it("parses count even when a /login?return_to= link appears in the page header (unauthenticated public repo)", async () => {
     setOctokit(buildMockOctokit({ fork: false }));
     vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
-      text: () => Promise.resolve(LOGIN_REDIRECT_HTML),
+      text: () => Promise.resolve(unauthPageHtml("7")),
     } as Response);
 
-    expect(await collectDependentCount("owner", "repo")).toBe(0);
+    expect(await collectDependentCount("owner", "repo")).toBe(7);
   });
 
   it("returns 0 when HTML contains no matching dependents pattern", async () => {

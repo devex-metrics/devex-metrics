@@ -45,7 +45,10 @@ export async function collectDependentCount(
     const html = await response.text();
 
     // Guard against being redirected to a login page.
-    if (html.includes('action="/session"') || html.includes("/login?return_to=")) {
+    // Note: unauthenticated requests to public repos include a "Sign in" link
+    // in the header with `/login?return_to=` — that is NOT a redirect; only a
+    // real login form page carries `action="/session"`.
+    if (html.includes('action="/session"')) {
       return 0;
     }
 
