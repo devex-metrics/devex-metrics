@@ -146,8 +146,8 @@ function computeMedian(values: number[]): number {
 }
 
 function formatDurationHtml(hours: number): string {
-  if (hours < 1) return `${Math.round(hours * 60)}m`;
-  if (hours < 24) return `${hours.toFixed(1)}h`;
+  if (hours < 1) return `${Math.round(hours * 60)}min`;
+  if (hours < 24) return `${hours.toFixed(1)}hr`;
   const days = hours / 24;
   return `${days.toFixed(1)}d`;
 }
