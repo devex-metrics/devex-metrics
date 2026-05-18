@@ -415,8 +415,8 @@ function buildDashboardHtml(
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>DevEx Metrics &ndash; ${escapeHtml(data.owner)}</title>
-  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>${getCSS()}</style>
 </head>
 <body>
