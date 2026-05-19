@@ -1,0 +1,76 @@
+name: Deploy Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/build-pages.ts"
+      - "src/report.ts"
+      - "src/types.ts"
+      - ".github/workflows/deploy-pages.yml"
+  workflow_dispatch:
+    inputs:
+      owner:
+        description: "GitHub org or user to build pages for"
+        required: false
+        default: "rajbos"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Get today's date
+        id: date
+        run: echo "date=$(date -u +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      - name: Restore data cache
+        uses: actions/cache@v5
+        with:
+          path: data
+          key: metrics-data-${{ github.repository_owner }}-${{ steps.date.outputs.date }}
+
+      - name: Restore agent data cache
+        uses: actions/cache@v5
+        with:
+          path: data/agents-*.json
+          key: agent-data-${{ github.repository_owner }}-${{ steps.date.outputs.date }}
+          restore-keys: |
+            agent-data-${{ github.repository_owner }}-
+
+      - name: Build pages site
+        run: |
+          OWNER="${{ github.event.inputs.owner || 'rajbos' }}"
+          mkdir -p _site
+          node dist/build-pages.js "$OWNER"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

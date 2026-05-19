@@ -1,11 +1,6 @@
 name: Collect DevEx Metrics
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/collect-metrics.yml"
-      - "src/**"
   schedule:
     # Run daily at 06:00 UTC
     - cron: "0 6 * * *"
@@ -76,20 +71,14 @@ jobs:
           restore-keys: |
             agent-data-${{ github.repository_owner }}-
 
-      # Collection is only needed for scheduled runs and manual dispatches.
-      # Push-triggered runs rebuild the pages from existing fixture/cache data so
-      # that a same-day fixture (collected with older code) is never used to skip
-      # a fresh collection that would include new fields like mergedPRDates.
       - name: Generate GitHub App token
         id: app-token
-        if: github.event_name != 'push'
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
           client-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: Collect metrics
-        if: github.event_name != 'push'
         env:
           APP_ID: ${{ vars.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
@@ -104,7 +93,6 @@ jobs:
 
       - name: Create PR for updated fixture data
         id: create-pr
-        if: github.event_name != 'push'
         uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ steps.app-token.outputs.token }}
@@ -116,14 +104,14 @@ jobs:
           delete-branch: true
 
       - name: Enable auto-merge on fixture data PR
-        if: github.event_name != 'push' && (steps.create-pr.outputs.pull-request-operation == 'created' || steps.create-pr.outputs.pull-request-operation == 'updated')
+        if: steps.create-pr.outputs.pull-request-operation == 'created' || steps.create-pr.outputs.pull-request-operation == 'updated'
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: gh pr merge --auto --squash "${{ steps.create-pr.outputs.pull-request-url }}"
 
       # actions/cache@v5 automatically saves the data/ folder at job end.
 
-      # Build the GitHub Pages site from the report
+      # Build the GitHub Pages site from the collected data and deploy.
       - name: Build pages site
         run: |
           OWNER="${{ github.event.inputs.owner || 'rajbos' }}"
