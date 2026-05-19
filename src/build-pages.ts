@@ -1376,7 +1376,7 @@ function applyFilter(period){
     charts.prTrends.data.datasets[0].data=prTrendsPeriod.map(function(t){return t.prsOpened;});
     charts.prTrends.data.datasets[1].data=prTrendsPeriod.map(function(t){return t.prsMerged;});
     charts.prTrends.setDatasetVisibility(0,!repoFiltered||allSelectedHaveRepoTrends);
-    charts.prTrends.options.plugins=Object.assign({},charts.prTrends.options.plugins,yearBoundaryAnnotations(prTrendLabels));
+    charts.prTrends.options.plugins.annotation=(yearBoundaryAnnotations(prTrendLabels).annotation||{annotations:{}});
     charts.prTrends.update();
   }
   if(charts.issueTrends){
@@ -1384,7 +1384,7 @@ function applyFilter(period){
     charts.issueTrends.data.labels=issueTrendLabels;
     charts.issueTrends.data.datasets[0].data=issueTrendsPeriod.map(function(t){return t.issuesOpened;});
     charts.issueTrends.data.datasets[1].data=issueTrendsPeriod.map(function(t){return t.issuesClosed;});
-    charts.issueTrends.options.plugins=Object.assign({},charts.issueTrends.options.plugins,yearBoundaryAnnotations(issueTrendLabels));
+    charts.issueTrends.options.plugins.annotation=(yearBoundaryAnnotations(issueTrendLabels).annotation||{annotations:{}});
     charts.issueTrends.update();
   }
   if(charts.prSizeTrends){
@@ -1392,7 +1392,7 @@ function applyFilter(period){
     charts.prSizeTrends.data.labels=prSizeLabels;
     charts.prSizeTrends.data.datasets[0].data=prTrendsPeriod.map(function(t){return t.linesAdded;});
     charts.prSizeTrends.data.datasets[1].data=prTrendsPeriod.map(function(t){return t.linesDeleted;});
-    charts.prSizeTrends.options.plugins=Object.assign({},charts.prSizeTrends.options.plugins,yearBoundaryAnnotations(prSizeLabels));
+    charts.prSizeTrends.options.plugins.annotation=(yearBoundaryAnnotations(prSizeLabels).annotation||{annotations:{}});
     charts.prSizeTrends.update();
   }
 
@@ -1548,7 +1548,7 @@ function applyFilter(period){
     var ctWeeks=Object.keys(weekCT).sort();
     charts.cycleTime.data.labels=ctWeeks;
     charts.cycleTime.data.datasets[0].data=ctWeeks.map(function(w){return Math.round(medianOf(weekCT[w])*10)/10;});
-    charts.cycleTime.options.plugins=Object.assign({},charts.cycleTime.options.plugins,yearBoundaryAnnotations(ctWeeks));
+    charts.cycleTime.options.plugins.annotation=(yearBoundaryAnnotations(ctWeeks).annotation||{annotations:{}});
     charts.cycleTime.update();
   }
   if(charts.actorBreakdown){
@@ -1567,7 +1567,7 @@ function applyFilter(period){
     charts.actorBreakdown.data.datasets[1].data=aW.map(function(w){return wA[w].copilot;});
     charts.actorBreakdown.data.datasets[2].data=aW.map(function(w){return wA[w].dependabot;});
     charts.actorBreakdown.data.datasets[3].data=aW.map(function(w){return wA[w].otherBot;});
-    charts.actorBreakdown.options.plugins=Object.assign({},charts.actorBreakdown.options.plugins,yearBoundaryAnnotations(aW));
+    charts.actorBreakdown.options.plugins.annotation=(yearBoundaryAnnotations(aW).annotation||{annotations:{}});
     charts.actorBreakdown.update();
   }
 
@@ -1578,7 +1578,7 @@ function applyFilter(period){
     var copWeeks2=Object.keys(wCopPR2).sort();
     charts.copilotPRTrend.data.labels=copWeeks2;
     charts.copilotPRTrend.data.datasets[0].data=copWeeks2.map(function(w){return wCopPR2[w];});
-    charts.copilotPRTrend.options.plugins=Object.assign({},charts.copilotPRTrend.options.plugins,yearBoundaryAnnotations(copWeeks2));
+    charts.copilotPRTrend.options.plugins.annotation=(yearBoundaryAnnotations(copWeeks2).annotation||{annotations:{}});
     charts.copilotPRTrend.update();
   }
 
