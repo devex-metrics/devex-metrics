@@ -510,6 +510,18 @@ Co-authored-by: rajbos <6085745+rajbos@users.noreply.github.com>`;
     )).toBe("codex");
   });
 
+  it("detects anthropic-code-agent co-author", () => {
+    expect(parseAICoAuthorType(
+      "fix\n\nCo-authored-by: anthropic-code-agent <anthropic-code-agent@users.noreply.github.com>"
+    )).toBe("claude");
+  });
+
+  it("detects openai-code-agent co-author", () => {
+    expect(parseAICoAuthorType(
+      "fix\n\nCo-authored-by: openai-code-agent <openai-code-agent@users.noreply.github.com>"
+    )).toBe("codex");
+  });
+
   it("returns null when no AI co-authors are present", () => {
     expect(parseAICoAuthorType(
       "fix\n\nCo-authored-by: alice <alice@example.com>"
@@ -612,13 +624,37 @@ describe("collectMergedPRTimeline", () => {
         user: { login: "Copilot", type: "Bot" },
         body: null,
       },
+      {
+        number: 13,
+        created_at: "2026-01-01T00:00:00Z",
+        merged_at: "2026-01-04T01:00:00Z",
+        user: { login: "copilot-swe-agent", type: "User" },
+        body: null,
+      },
+      {
+        number: 14,
+        created_at: "2026-01-01T00:00:00Z",
+        merged_at: "2026-01-05T01:00:00Z",
+        user: { login: "anthropic-code-agent", type: "User" },
+        body: null,
+      },
+      {
+        number: 15,
+        created_at: "2026-01-01T00:00:00Z",
+        merged_at: "2026-01-06T01:00:00Z",
+        user: { login: "openai-code-agent", type: "User" },
+        body: null,
+      },
     ]]));
 
     const result = await collectMergedPRTimeline("owner", "repo");
-    expect(result).toHaveLength(3);
+    expect(result).toHaveLength(6);
     const copilotEntry = result.find((e) => e.number === 11)!;
     const dependabotEntry = result.find((e) => e.number === 10)!;
     const copilotSweEntry = result.find((e) => e.number === 12)!;
+    const copilotSweAgentEntry = result.find((e) => e.number === 13)!;
+    const claudeEntry = result.find((e) => e.number === 14)!;
+    const codexEntry = result.find((e) => e.number === 15)!;
     expect(dependabotEntry.isBotAuthor).toBe(true);
     expect(dependabotEntry.isCopilotAuthored).toBe(false);
     expect(dependabotEntry.aiAuthorType).toBeUndefined();
@@ -629,6 +665,18 @@ describe("collectMergedPRTimeline", () => {
     expect(copilotSweEntry.isBotAuthor).toBe(true);
     expect(copilotSweEntry.isCopilotAuthored).toBe(true);
     expect(copilotSweEntry.aiAuthorType).toBe("copilot");
+    // copilot-swe-agent direct login
+    expect(copilotSweAgentEntry.isBotAuthor).toBe(true);
+    expect(copilotSweAgentEntry.isCopilotAuthored).toBe(true);
+    expect(copilotSweAgentEntry.aiAuthorType).toBe("copilot");
+    // anthropic-code-agent → claude
+    expect(claudeEntry.isBotAuthor).toBe(true);
+    expect(claudeEntry.isCopilotAuthored).toBe(true);
+    expect(claudeEntry.aiAuthorType).toBe("claude");
+    // openai-code-agent → codex
+    expect(codexEntry.isBotAuthor).toBe(true);
+    expect(codexEntry.isCopilotAuthored).toBe(true);
+    expect(codexEntry.aiAuthorType).toBe("codex");
   });
 
   it("returns sorted by mergedAt descending", async () => {
@@ -858,6 +906,36 @@ describe("buildMergedPRTimeline", () => {
   it("detects codex[agent] author as isCopilotAuthored with aiAuthorType 'codex'", () => {
     const node = makePRNode({
       author: { login: "codex[agent]", __typename: "Bot" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isBotAuthor).toBe(true);
+    expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("codex");
+  });
+
+  it("detects copilot-swe-agent login as isCopilotAuthored with aiAuthorType 'copilot'", () => {
+    const node = makePRNode({
+      author: { login: "copilot-swe-agent", __typename: "User" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isBotAuthor).toBe(true);
+    expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("copilot");
+  });
+
+  it("detects anthropic-code-agent login as isCopilotAuthored with aiAuthorType 'claude'", () => {
+    const node = makePRNode({
+      author: { login: "anthropic-code-agent", __typename: "User" },
+    });
+    const result = buildMergedPRTimeline([node]);
+    expect(result[0].isBotAuthor).toBe(true);
+    expect(result[0].isCopilotAuthored).toBe(true);
+    expect(result[0].aiAuthorType).toBe("claude");
+  });
+
+  it("detects openai-code-agent login as isCopilotAuthored with aiAuthorType 'codex'", () => {
+    const node = makePRNode({
+      author: { login: "openai-code-agent", __typename: "User" },
     });
     const result = buildMergedPRTimeline([node]);
     expect(result[0].isBotAuthor).toBe(true);
