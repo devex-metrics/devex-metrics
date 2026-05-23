@@ -21,7 +21,7 @@ function makePRNode(overrides: Partial<GraphQLPRNode> = {}): GraphQLPRNode {
     author: { login: "alice", __typename: "User" },
     additions: 10,
     deletions: 5,
-    commits: { totalCount: 1 },
+    commits: { totalCount: 1, nodes: [] },
     comments: { totalCount: 0 },
     reviewThreads: { totalCount: 0 },
     reviews: { nodes: [] },

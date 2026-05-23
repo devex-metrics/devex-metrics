@@ -1,5 +1,13 @@
 import { getOctokit } from "../github-client.js";
 
+/** One author entry from a `Commit.authors` GraphQL connection node. */
+export interface CommitAuthorNode {
+  /** Raw email from the git trailer or commit signature. */
+  email: string;
+  /** Resolved GitHub user, or null when the email is not linked to an account. */
+  user: { login: string; __typename: string } | null;
+}
+
 /** A single PR node returned by the GraphQL query. */
 export interface GraphQLPRNode {
   number: number;
@@ -16,7 +24,21 @@ export interface GraphQLPRNode {
   author: { login: string; __typename: string } | null;
   additions: number;
   deletions: number;
-  commits: { totalCount: number };
+  /**
+   * Commit count (totalCount) plus up to 10 commit nodes whose authors
+   * (primary + `Co-authored-by:` co-authors, resolved server-side by GitHub)
+   * are used for AI co-authorship detection on non-squash merges.
+   */
+  commits: {
+    totalCount: number;
+    nodes: Array<{
+      commit: {
+        authors: {
+          nodes: CommitAuthorNode[];
+        };
+      };
+    }>;
+  };
   comments: { totalCount: number };
   /** Inline review comment threads (maps to REST `review_comments` count). */
   reviewThreads: { totalCount: number };
@@ -82,7 +104,16 @@ const REPO_DATA_QUERY = `
           author { login __typename }
           additions
           deletions
-          commits(first: 1) { totalCount }
+          commits(first: 10) {
+            totalCount
+            nodes {
+              commit {
+                authors(first: 10) {
+                  nodes { email user { login __typename } }
+                }
+              }
+            }
+          }
           comments(first: 1) { totalCount }
           reviewThreads(first: 1) { totalCount }
           reviews(first: 100) {

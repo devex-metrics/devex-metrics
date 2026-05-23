@@ -27,8 +27,12 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
  *       (~2 years) so the dashboard "This Year" and "All Time" filters show
  *       real historical data; also extends GraphQL PR node cutoff from
  *       ~13 months to ~2 years so PR trends match the wider window
+ *   9 — extend AI authorship detection to individual commit authors (GraphQL
+ *       `Commit.authors` resolves Co-authored-by trailers server-side) and PR
+ *       body signatures; fixes early-return bug in resolveAIType that skipped
+ *       commit/body checks when a merge commit was present but had no AI trailer
  */
-export const CURRENT_SCHEMA_VERSION = 8;
+export const CURRENT_SCHEMA_VERSION = 9;
 
 function cacheFilePath(owner: string): string {
   return path.join(DATA_DIR, `${owner}.json`);
