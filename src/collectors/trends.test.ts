@@ -411,7 +411,7 @@ function makeGraphQLPRNode(overrides: Partial<GraphQLPRNode> = {}): GraphQLPRNod
     author: { login: "alice", __typename: "User" },
     additions: 0,
     deletions: 0,
-    commits: { totalCount: 1 },
+    commits: { totalCount: 1, nodes: [] },
     comments: { totalCount: 0 },
     reviewThreads: { totalCount: 0 },
     reviews: { nodes: [] },
