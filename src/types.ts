@@ -136,10 +136,12 @@ export interface CopilotAdoption {
   copilotAuthoredPRs: number;
   /** Number of detailed PRs that received a Copilot review. */
   copilotReviewedPRs: number;
-  /** Total merged PRs in the timeline (denominator for authored %). */
+  /** Total merged PRs in the timeline (includes bots; denominator for raw counts). */
   totalMergedPRs: number;
   /** Total detailed PRs sampled (denominator for reviewed %). */
   totalDetailedPRs: number;
+  /** Merged PRs authored by humans (excludes all bots and AI tools). Denominator for AI adoption %. */
+  humanMergedPRs: number;
 }
 
 /** Lead-time data for an issue resolved by a merged PR. */

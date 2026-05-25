@@ -31,8 +31,10 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
  *       `Commit.authors` resolves Co-authored-by trailers server-side) and PR
  *       body signatures; fixes early-return bug in resolveAIType that skipped
  *       commit/body checks when a merge commit was present but had no AI trailer
+ *  10 — add humanMergedPRs to CopilotAdoption so the AI Adoption chart counts
+ *       only human-vs-AI (excluding Dependabot/other bots from the denominator)
  */
-export const CURRENT_SCHEMA_VERSION = 9;
+export const CURRENT_SCHEMA_VERSION = 10;
 
 function cacheFilePath(owner: string): string {
   return path.join(DATA_DIR, `${owner}.json`);

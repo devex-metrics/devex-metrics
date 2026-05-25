@@ -179,6 +179,7 @@ function aggregateCopilot(repos: RepoMetrics[]): CopilotAdoption {
   let copilotReviewedPRs = 0;
   let totalMergedPRs = 0;
   let totalDetailedPRs = 0;
+  let humanMergedPRs = 0;
 
   for (const r of repos) {
     if (r.copilotAdoption) {
@@ -186,9 +187,10 @@ function aggregateCopilot(repos: RepoMetrics[]): CopilotAdoption {
       copilotReviewedPRs += r.copilotAdoption.copilotReviewedPRs;
       totalMergedPRs += r.copilotAdoption.totalMergedPRs;
       totalDetailedPRs += r.copilotAdoption.totalDetailedPRs;
+      humanMergedPRs += r.copilotAdoption.humanMergedPRs ?? (r.copilotAdoption.totalMergedPRs - r.copilotAdoption.copilotAuthoredPRs);
     }
   }
-  return { copilotAuthoredPRs, copilotReviewedPRs, totalMergedPRs, totalDetailedPRs };
+  return { copilotAuthoredPRs, copilotReviewedPRs, totalMergedPRs, totalDetailedPRs, humanMergedPRs };
 }
 
 function aggregateAgentMetrics(repos: RepoMetrics[]): CopilotAgentMetrics {

@@ -840,6 +840,7 @@ describe("computeCopilotAdoption", () => {
       copilotReviewedPRs: 1,
       totalMergedPRs: 3,
       totalDetailedPRs: 2,
+      humanMergedPRs: 1,
     });
   });
 
@@ -850,6 +851,7 @@ describe("computeCopilotAdoption", () => {
       copilotReviewedPRs: 0,
       totalMergedPRs: 0,
       totalDetailedPRs: 0,
+      humanMergedPRs: 0,
     });
   });
 });
