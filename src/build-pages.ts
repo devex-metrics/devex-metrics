@@ -255,13 +255,14 @@ function buildDashboardHtml(
   });
 
   // Aggregate Copilot adoption
-  let copilotAuthored = 0, copilotReviewed = 0, copilotTotalMerged = 0, copilotTotalDetailed = 0;
+  let copilotAuthored = 0, copilotReviewed = 0, copilotTotalMerged = 0, copilotTotalDetailed = 0, copilotHumanMerged = 0;
   for (const r of data.repos) {
     if (r.copilotAdoption) {
       copilotAuthored += r.copilotAdoption.copilotAuthoredPRs;
       copilotReviewed += r.copilotAdoption.copilotReviewedPRs;
       copilotTotalMerged += r.copilotAdoption.totalMergedPRs;
       copilotTotalDetailed += r.copilotAdoption.totalDetailedPRs;
+      copilotHumanMerged += r.copilotAdoption.humanMergedPRs ?? (r.copilotAdoption.totalMergedPRs - r.copilotAdoption.copilotAuthoredPRs);
     }
   }
 
@@ -388,6 +389,7 @@ function buildDashboardHtml(
       authored: copilotAuthored,
       reviewed: copilotReviewed,
       totalMerged: copilotTotalMerged,
+      humanMerged: copilotHumanMerged,
       totalDetailed: copilotTotalDetailed,
       byType: aiByType,
     },
@@ -1080,11 +1082,12 @@ function renderDeliveryCharts(){
   }
   // AI adoption doughnut
   var cop=CHART_DATA.copilot||{};
-  if(cop.totalMerged>0){
+  var copAdoptionHuman=cop.humanMerged!==undefined?cop.humanMerged:(cop.totalMerged-cop.authored);
+  if((cop.authored+copAdoptionHuman)>0){
     var dOpts2={cutout:"62%",plugins:{legend:{position:"bottom"}},responsive:true,maintainAspectRatio:true};
     charts.copilotAdoption=new Chart(document.getElementById("chartCopilotAdoption"),{type:"doughnut",
       data:{labels:["AI-authored","Human-authored"],
-        datasets:[{data:[cop.authored,cop.totalMerged-cop.authored],
+        datasets:[{data:[cop.authored,copAdoptionHuman],
           backgroundColor:[cssColors.purple||"#8250df",cssColors.accent],borderWidth:0,hoverOffset:6}]},
       options:dOpts2});
   }
@@ -1511,22 +1514,25 @@ function applyFilter(period){
   var cop;
   if(repoFiltered){
     var copAuthored=allPRBase.filter(function(p){return p.isCopilotAuthored;}).length;
+    var humanOnly=allPRBase.filter(function(p){return !p.isBotAuthor&&!p.isCopilotAuthored;}).length;
     var btCopilot=allPRBase.filter(function(p){return p.aiAuthorType==='copilot';}).length;
     var btClaude=allPRBase.filter(function(p){return p.aiAuthorType==='claude';}).length;
     var btCodex=allPRBase.filter(function(p){return p.aiAuthorType==='codex';}).length;
-    cop={authored:copAuthored,totalMerged:allPRBase.length,reviewed:null,byType:{copilot:btCopilot,claude:btClaude,codex:btCodex}};
+    cop={authored:copAuthored,totalMerged:allPRBase.length,humanMerged:humanOnly,reviewed:null,byType:{copilot:btCopilot,claude:btClaude,codex:btCodex}};
   }else{
     cop=CHART_DATA.copilot||{};
   }
+  var adoptionHuman=cop.humanMerged!==undefined?cop.humanMerged:(cop.totalMerged-cop.authored);
+  var adoptionTotal=cop.authored+adoptionHuman;
   var copilotVal=document.getElementById("kpiCopilotVal");
   var copilotSub=document.getElementById("kpiCopilotSub");
-  if(copilotVal){copilotVal.textContent=cop.totalMerged>0?(cop.authored/cop.totalMerged*100).toFixed(1)+"%":"\u2013";}
+  if(copilotVal){copilotVal.textContent=adoptionTotal>0?(cop.authored/adoptionTotal*100).toFixed(1)+"%":"\u2013";}
   if(copilotSub){
     if(repoFiltered)copilotSub.textContent=(cop.authored||0)+" AI-authored";
     else copilotSub.textContent=(cop.authored||0)+" AI-authored \u00B7 "+(cop.reviewed||0)+" reviewed";
   }
-  if(charts.copilotAdoption&&cop.totalMerged>0){
-    charts.copilotAdoption.data.datasets[0].data=[cop.authored,cop.totalMerged-cop.authored];
+  if(charts.copilotAdoption&&adoptionTotal>0){
+    charts.copilotAdoption.data.datasets[0].data=[cop.authored,adoptionHuman];
     charts.copilotAdoption.update();
   }
   if(charts.aiAuthorBreakdown){

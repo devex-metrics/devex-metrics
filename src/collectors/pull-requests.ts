@@ -418,6 +418,7 @@ export function computeCopilotAdoption(
     copilotReviewedPRs: details.filter((p) => p.hasCopilotReview).length,
     totalMergedPRs: timeline.length,
     totalDetailedPRs: details.length,
+    humanMergedPRs: timeline.filter((p) => !p.isBotAuthor && !p.isCopilotAuthored).length,
   };
 }
 
