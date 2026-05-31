@@ -33,12 +33,10 @@ export function generateReport(metrics: OrgMetrics): string {
   // Copilot adoption summary
   const copilotTotals = aggregateCopilot(metrics.repos);
   if (copilotTotals.totalMergedPRs > 0) {
-    const authoredPct = ((copilotTotals.copilotAuthoredPRs / copilotTotals.totalMergedPRs) * 100).toFixed(1);
-    lines.push(`| Copilot-authored PRs | ${copilotTotals.copilotAuthoredPRs} (${authoredPct}%) |`);
+    lines.push(`| Copilot-authored PRs | ${copilotTotals.copilotAuthoredPRs} (${pct(copilotTotals.copilotAuthoredPRs, copilotTotals.totalMergedPRs)}%) |`);
   }
   if (copilotTotals.totalDetailedPRs > 0) {
-    const reviewedPct = ((copilotTotals.copilotReviewedPRs / copilotTotals.totalDetailedPRs) * 100).toFixed(1);
-    lines.push(`| Copilot-reviewed PRs | ${copilotTotals.copilotReviewedPRs} (${reviewedPct}%) |`);
+    lines.push(`| Copilot-reviewed PRs | ${copilotTotals.copilotReviewedPRs} (${pct(copilotTotals.copilotReviewedPRs, copilotTotals.totalDetailedPRs)}%) |`);
   }
 
   // Copilot agent tasks summary
@@ -48,15 +46,9 @@ export function generateReport(metrics: OrgMetrics): string {
     lines.push(`| Agent tasks completed | ${agentTotals.completedTasks} |`);
     lines.push(`| Agent tasks failed | ${agentTotals.failedTasks} |`);
     lines.push(`| Agent sessions | ${agentTotals.totalSessions} (${agentTotals.cloudAgentSessions} cloud / ${agentTotals.cliRemoteSessions} CLI) |`);
-    if (agentTotals.totalCreditsUsed > 0) {
-      lines.push(`| Agent credits used | ${agentTotals.totalCreditsUsed.toFixed(1)} |`);
-    }
-    if (agentTotals.agentCreatedPRs > 0) {
-      lines.push(`| PRs created by agent | ${agentTotals.agentCreatedPRs} |`);
-    }
-    if (agentTotals.agentActionsMinutes > 0) {
-      lines.push(`| Agent PR Actions minutes | ${agentTotals.agentActionsMinutes.toFixed(1)} |`);
-    }
+    pushIf(lines, agentTotals.totalCreditsUsed > 0, () => `| Agent credits used | ${agentTotals.totalCreditsUsed.toFixed(1)} |`);
+    pushIf(lines, agentTotals.agentCreatedPRs > 0, () => `| PRs created by agent | ${agentTotals.agentCreatedPRs} |`);
+    pushIf(lines, agentTotals.agentActionsMinutes > 0, () => `| Agent PR Actions minutes | ${agentTotals.agentActionsMinutes.toFixed(1)} |`);
   }
 
   // Median cycle time
@@ -100,20 +92,16 @@ export function generateReport(metrics: OrgMetrics): string {
       lines.push(`| ------ | ----- |`);
       lines.push(`| Total tasks | ${am.totalTasks} |`);
       lines.push(`| Completed | ${am.completedTasks} |`);
-      if (am.failedTasks > 0) lines.push(`| Failed | ${am.failedTasks} |`);
-      if (am.cancelledTasks > 0) lines.push(`| Cancelled | ${am.cancelledTasks} |`);
-      if (am.activeTasksCount > 0) lines.push(`| Active | ${am.activeTasksCount} |`);
+      pushIf(lines, am.failedTasks > 0, () => `| Failed | ${am.failedTasks} |`);
+      pushIf(lines, am.cancelledTasks > 0, () => `| Cancelled | ${am.cancelledTasks} |`);
+      pushIf(lines, am.activeTasksCount > 0, () => `| Active | ${am.activeTasksCount} |`);
       lines.push(`| Sessions | ${am.totalSessions} |`);
-      if (am.cloudAgentSessions > 0)
-        lines.push(`| Cloud agent sessions | ${am.cloudAgentSessions} |`);
-      if (am.totalCreditsUsed > 0)
-        lines.push(`| Credits used | ${am.totalCreditsUsed.toFixed(1)} |`);
+      pushIf(lines, am.cloudAgentSessions > 0, () => `| Cloud agent sessions | ${am.cloudAgentSessions} |`);
+      pushIf(lines, am.totalCreditsUsed > 0, () => `| Credits used | ${am.totalCreditsUsed.toFixed(1)} |`);
       if (am.avgCompletedSessionHours !== undefined)
         lines.push(`| Avg session duration | ${formatDuration(am.avgCompletedSessionHours)} |`);
-      if (am.agentCreatedPRs > 0)
-        lines.push(`| PRs created | ${am.agentCreatedPRs} |`);
-      if (am.agentActionsMinutes > 0)
-        lines.push(`| Actions minutes (agent PRs) | ${am.agentActionsMinutes.toFixed(1)} |`);
+      pushIf(lines, am.agentCreatedPRs > 0, () => `| PRs created | ${am.agentCreatedPRs} |`);
+      pushIf(lines, am.agentActionsMinutes > 0, () => `| Actions minutes (agent PRs) | ${am.agentActionsMinutes.toFixed(1)} |`);
       lines.push("");
     }
 
@@ -144,6 +132,16 @@ export function generateReport(metrics: OrgMetrics): string {
 }
 
 /* ---- helpers ---- */
+
+/** Append a line to `lines` only when `condition` is truthy. The line is built lazily so its expression is not evaluated when skipped. */
+function pushIf(lines: string[], condition: boolean, line: () => string): void {
+  if (condition) lines.push(line());
+}
+
+/** Format a part/total ratio as a one-decimal percentage string (without the `%`). */
+function pct(part: number, total: number): string {
+  return ((part / total) * 100).toFixed(1);
+}
 
 function aggregate(repos: RepoMetrics[]) {
   let openIssues = 0;
@@ -231,7 +229,8 @@ function aggregateAgentMetrics(repos: RepoMetrics[]): CopilotAgentMetrics {
   };
 }
 
-function median(values: number[]): number {  if (values.length === 0) return 0;
+function median(values: number[]): number {
+  if (values.length === 0) return 0;
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
   return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
