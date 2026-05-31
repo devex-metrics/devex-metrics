@@ -197,9 +197,9 @@ export function buildDashboardHtml(
     })),
   );
 
-  // Median cycle time (all-time)
+  // Median cycle time (all-time) — computed for completeness; 30-day median used in HTML.
   const cycleTimes = allPRDetails.map((p) => p.timeToMergeHours).filter((h) => h > 0);
-  const medianCycleHrs = computeMedian(cycleTimes);
+  const _medianCycleHrs = computeMedian(cycleTimes);
 
   // Pre-compute 30-day initial values so the HTML is already correct for the
   // default "Last 30 Days" filter, preventing a visible flicker on page load.

@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { setOctokit, resetOctokit } from "../github-client.js";
-import { Octokit } from "@octokit/rest";
+import type { Octokit } from "@octokit/rest";
 import {
   collectPullRequestCounts,
   collectPullRequestDetails,
@@ -28,7 +28,7 @@ function buildMockOctokit(opts: {
   const mock = {
     rest: {
       pulls: {
-        list: ({ state, per_page }: { state: string; per_page: number }) => {
+        list: ({ state, per_page: _per_page }: { state: string; per_page: number }) => {
           if (state === "open") {
             return fakeListResponse(opts.openPrsTotal);
           }

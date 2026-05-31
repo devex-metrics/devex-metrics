@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { setOctokit, resetOctokit } from "../github-client.js";
-import { Octokit } from "@octokit/rest";
+import type { Octokit } from "@octokit/rest";
 import { collectContributors } from "./contributors.js";
 
 type CommitEntry = {

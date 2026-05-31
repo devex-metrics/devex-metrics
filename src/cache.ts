@@ -108,7 +108,8 @@ export function loadRawCache(owner: string): OrgMetrics | null {
   if (!fs.existsSync(filePath)) return null;
   try {
     const raw = fs.readFileSync(filePath, "utf-8");
-    const envelope: CacheEnvelope = JSON.parse(raw);
+    // JSON.parse returns any; we validate schemaVersion below before trusting the shape
+    const envelope = JSON.parse(raw) as CacheEnvelope;
     const data = envelope.data ?? null;
     if (data?.schemaVersion !== CURRENT_SCHEMA_VERSION) return null;
     return data;
@@ -135,7 +136,8 @@ export function loadCache(owner: string): OrgMetrics | null {
   }
   try {
     const raw = fs.readFileSync(filePath, "utf-8");
-    const envelope: CacheEnvelope = JSON.parse(raw);
+    // JSON.parse returns any; we validate schemaVersion and date below before trusting the shape
+    const envelope = JSON.parse(raw) as CacheEnvelope;
     if (
       envelope.date === todayDateString() &&
       envelope.data.weeklyTrends !== undefined &&

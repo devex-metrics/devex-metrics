@@ -33,7 +33,7 @@ type OctokitLike = { request: (url: string, opts?: Record<string, unknown>) => P
 function asAnyRequest(
   octokit: NonNullable<Awaited<ReturnType<typeof getAgentOctokit>>>,
 ): OctokitLike {
-  return octokit as unknown as OctokitLike;
+  return octokit;
 }
 
 // ── Raw API shapes ────────────────────────────────────────────────────────────
@@ -326,7 +326,7 @@ export async function collectCopilotAgentMetrics(
   repo: string,
   daysBack = 30,
 ): Promise<CopilotAgentMetrics | null> {
-  const octokit = await getAgentOctokit();
+  const octokit = getAgentOctokit();
   if (!octokit) return null;
 
   // Load per-repo agent cache (or start fresh).

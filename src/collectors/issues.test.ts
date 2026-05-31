@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { setOctokit, resetOctokit } from "../github-client.js";
-import { Octokit } from "@octokit/rest";
+import type { Octokit } from "@octokit/rest";
 import { collectIssueCounts, collectIssueLeadTimes } from "./issues.js";
 import type { MergedPRSummary } from "../types.js";
 

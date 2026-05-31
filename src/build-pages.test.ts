@@ -4,7 +4,7 @@ import * as path from "node:path";
 import { execFileSync } from "node:child_process";
 import { JSDOM } from "jsdom";
 import { CURRENT_SCHEMA_VERSION } from "./cache.js";
-import type { CacheEnvelope } from "./types.js";
+import type { CacheEnvelope, WeeklyTrendPoint } from "./types.js";
 
 describe("build-pages", () => {
   const dataDir = path.resolve(process.cwd(), "data");
@@ -442,7 +442,7 @@ describe("build-pages", () => {
           },
         ],
         weeklyTrends: [
-          { week: "2026-W10", prsOpened: 2, prsMerged: 1, issuesOpened: 3, issuesClosed: 2 } as unknown as import("./types.js").WeeklyTrendPoint,
+          { week: "2026-W10", prsOpened: 2, prsMerged: 1, issuesOpened: 3, issuesClosed: 2 } as unknown as WeeklyTrendPoint,
         ],
       },
     };
