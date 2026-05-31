@@ -15,10 +15,8 @@ on:
         required: false
         default: "rajbos"
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+# Deny all permissions by default; each job grants only what it needs.
+permissions: {}
 
 concurrency:
   group: pages
@@ -27,6 +25,13 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      # actions/checkout requires read access to the repository.
+      contents: read
+      # actions/deploy-pages authenticates via OIDC — requires id-token write.
+      id-token: write
+      # Required to publish artifacts to GitHub Pages.
+      pages: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

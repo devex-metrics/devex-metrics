@@ -20,11 +20,8 @@ on:
         default: false
         type: boolean
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-  pull-requests: write
+# Deny all permissions by default; each job grants only what it needs.
+permissions: {}
 
 concurrency:
   group: pages
@@ -33,6 +30,9 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
+    permissions:
+      # actions/checkout requires read access to the repository.
+      contents: read
     steps:
       - uses: actions/checkout@v6
 
@@ -126,6 +126,11 @@ jobs:
   deploy:
     needs: collect
     runs-on: ubuntu-latest
+    permissions:
+      # actions/deploy-pages authenticates via OIDC — requires id-token write.
+      id-token: write
+      # Required to publish artifacts to GitHub Pages.
+      pages: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
