@@ -53,7 +53,7 @@ async function main(): Promise<void> {
   console.log(`  git commit -m "chore: update ${owner} fixture data"`);
 }
 
-main().catch((err) => {
+main().catch((err: unknown) => {
   console.error(err);
   process.exit(1);
 });
