@@ -162,6 +162,120 @@ describe("generateReport", () => {
     expect(posNewer).toBeLessThan(posOlder);
   });
 
+  it("should include Copilot agent metrics in the summary and per-repo sections", () => {
+    const metrics: OrgMetrics = {
+      owner: "test-org",
+      ownerType: "org",
+      collectedAt: "2026-03-28T12:00:00Z",
+      repoCount: 1,
+      repos: [
+        {
+          name: "agent-repo",
+          fullName: "test-org/agent-repo",
+          issues: { open: 0, closed: 0 },
+          pullRequests: { open: 0, closed: 0, merged: 0 },
+          pullRequestDetails: [],
+          committerCount: 0,
+          reviewerCount: 0,
+          contributorCount: 0,
+          dependentCount: 0,
+          copilotAgentMetrics: {
+            totalTasks: 10,
+            completedTasks: 6,
+            failedTasks: 2,
+            cancelledTasks: 1,
+            timedOutTasks: 0,
+            activeTasksCount: 1,
+            totalSessions: 12,
+            cloudAgentSessions: 8,
+            cliRemoteSessions: 4,
+            totalCreditsUsed: 42.5,
+            avgCompletedSessionHours: 1.5,
+            agentCreatedPRs: 5,
+            agentActionsMinutes: 33.25,
+          },
+        },
+      ],
+    };
+    const report = generateReport(metrics);
+
+    // Summary block
+    expect(report).toContain("Copilot agent tasks | 10");
+    expect(report).toContain("Agent tasks completed | 6");
+    expect(report).toContain("Agent tasks failed | 2");
+    expect(report).toContain("Agent sessions | 12 (8 cloud / 4 CLI)");
+    expect(report).toContain("Agent credits used | 42.5");
+    expect(report).toContain("PRs created by agent | 5");
+    expect(report).toContain("Agent PR Actions minutes | 33.3");
+
+    // Per-repo block
+    expect(report).toContain("**Copilot Agent (30-day window)**");
+    expect(report).toContain("| Total tasks | 10 |");
+    expect(report).toContain("| Completed | 6 |");
+    expect(report).toContain("| Failed | 2 |");
+    expect(report).toContain("| Cancelled | 1 |");
+    expect(report).toContain("| Active | 1 |");
+    expect(report).toContain("| Sessions | 12 |");
+    expect(report).toContain("| Cloud agent sessions | 8 |");
+    expect(report).toContain("| Credits used | 42.5 |");
+    expect(report).toContain("| Avg session duration | 1.5h |");
+    expect(report).toContain("| PRs created | 5 |");
+    expect(report).toContain("| Actions minutes (agent PRs) | 33.3 |");
+  });
+
+  it("should omit optional agent rows when their values are zero or undefined", () => {
+    const metrics: OrgMetrics = {
+      owner: "test-org",
+      ownerType: "org",
+      collectedAt: "2026-03-28T12:00:00Z",
+      repoCount: 1,
+      repos: [
+        {
+          name: "agent-repo",
+          fullName: "test-org/agent-repo",
+          issues: { open: 0, closed: 0 },
+          pullRequests: { open: 0, closed: 0, merged: 0 },
+          pullRequestDetails: [],
+          committerCount: 0,
+          reviewerCount: 0,
+          contributorCount: 0,
+          dependentCount: 0,
+          copilotAgentMetrics: {
+            totalTasks: 3,
+            completedTasks: 3,
+            failedTasks: 0,
+            cancelledTasks: 0,
+            timedOutTasks: 0,
+            activeTasksCount: 0,
+            totalSessions: 3,
+            cloudAgentSessions: 0,
+            cliRemoteSessions: 3,
+            totalCreditsUsed: 0,
+            agentCreatedPRs: 0,
+            agentActionsMinutes: 0,
+          },
+        },
+      ],
+    };
+    const report = generateReport(metrics);
+
+    // Required rows still present
+    expect(report).toContain("Copilot agent tasks | 3");
+    expect(report).toContain("| Total tasks | 3 |");
+    // Optional rows omitted
+    expect(report).not.toContain("Agent credits used");
+    expect(report).not.toContain("PRs created by agent");
+    expect(report).not.toContain("Agent PR Actions minutes");
+    expect(report).not.toContain("| Failed |");
+    expect(report).not.toContain("| Cancelled |");
+    expect(report).not.toContain("| Active |");
+    expect(report).not.toContain("| Cloud agent sessions |");
+    expect(report).not.toContain("| Credits used |");
+    expect(report).not.toContain("| Avg session duration |");
+    expect(report).not.toContain("| PRs created |");
+    expect(report).not.toContain("| Actions minutes (agent PRs) |");
+  });
+
   it("should place PRs without mergedAt after those with mergedAt", () => {
     const metrics: OrgMetrics = {
       owner: "test-org",
