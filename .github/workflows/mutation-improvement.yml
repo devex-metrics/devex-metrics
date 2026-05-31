@@ -1,0 +1,38 @@
+name: Weekly Mutation Improvement
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Every Monday at 09:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: mutation-improvement
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  mutation-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Run mutation tests
+        run: npm run mutation:ci
+
+      - name: Create or update improvement issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/mutation-improvement-issue.mjs
