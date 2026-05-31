@@ -46,9 +46,9 @@ export function generateReport(metrics: OrgMetrics): string {
     lines.push(`| Agent tasks completed | ${agentTotals.completedTasks} |`);
     lines.push(`| Agent tasks failed | ${agentTotals.failedTasks} |`);
     lines.push(`| Agent sessions | ${agentTotals.totalSessions} (${agentTotals.cloudAgentSessions} cloud / ${agentTotals.cliRemoteSessions} CLI) |`);
-    pushIf(lines, agentTotals.totalCreditsUsed > 0, `| Agent credits used | ${agentTotals.totalCreditsUsed.toFixed(1)} |`);
-    pushIf(lines, agentTotals.agentCreatedPRs > 0, `| PRs created by agent | ${agentTotals.agentCreatedPRs} |`);
-    pushIf(lines, agentTotals.agentActionsMinutes > 0, `| Agent PR Actions minutes | ${agentTotals.agentActionsMinutes.toFixed(1)} |`);
+    pushIf(lines, agentTotals.totalCreditsUsed > 0, () => `| Agent credits used | ${agentTotals.totalCreditsUsed.toFixed(1)} |`);
+    pushIf(lines, agentTotals.agentCreatedPRs > 0, () => `| PRs created by agent | ${agentTotals.agentCreatedPRs} |`);
+    pushIf(lines, agentTotals.agentActionsMinutes > 0, () => `| Agent PR Actions minutes | ${agentTotals.agentActionsMinutes.toFixed(1)} |`);
   }
 
   // Median cycle time
@@ -92,16 +92,16 @@ export function generateReport(metrics: OrgMetrics): string {
       lines.push(`| ------ | ----- |`);
       lines.push(`| Total tasks | ${am.totalTasks} |`);
       lines.push(`| Completed | ${am.completedTasks} |`);
-      pushIf(lines, am.failedTasks > 0, `| Failed | ${am.failedTasks} |`);
-      pushIf(lines, am.cancelledTasks > 0, `| Cancelled | ${am.cancelledTasks} |`);
-      pushIf(lines, am.activeTasksCount > 0, `| Active | ${am.activeTasksCount} |`);
+      pushIf(lines, am.failedTasks > 0, () => `| Failed | ${am.failedTasks} |`);
+      pushIf(lines, am.cancelledTasks > 0, () => `| Cancelled | ${am.cancelledTasks} |`);
+      pushIf(lines, am.activeTasksCount > 0, () => `| Active | ${am.activeTasksCount} |`);
       lines.push(`| Sessions | ${am.totalSessions} |`);
-      pushIf(lines, am.cloudAgentSessions > 0, `| Cloud agent sessions | ${am.cloudAgentSessions} |`);
-      pushIf(lines, am.totalCreditsUsed > 0, `| Credits used | ${am.totalCreditsUsed.toFixed(1)} |`);
+      pushIf(lines, am.cloudAgentSessions > 0, () => `| Cloud agent sessions | ${am.cloudAgentSessions} |`);
+      pushIf(lines, am.totalCreditsUsed > 0, () => `| Credits used | ${am.totalCreditsUsed.toFixed(1)} |`);
       if (am.avgCompletedSessionHours !== undefined)
         lines.push(`| Avg session duration | ${formatDuration(am.avgCompletedSessionHours)} |`);
-      pushIf(lines, am.agentCreatedPRs > 0, `| PRs created | ${am.agentCreatedPRs} |`);
-      pushIf(lines, am.agentActionsMinutes > 0, `| Actions minutes (agent PRs) | ${am.agentActionsMinutes.toFixed(1)} |`);
+      pushIf(lines, am.agentCreatedPRs > 0, () => `| PRs created | ${am.agentCreatedPRs} |`);
+      pushIf(lines, am.agentActionsMinutes > 0, () => `| Actions minutes (agent PRs) | ${am.agentActionsMinutes.toFixed(1)} |`);
       lines.push("");
     }
 
@@ -133,9 +133,9 @@ export function generateReport(metrics: OrgMetrics): string {
 
 /* ---- helpers ---- */
 
-/** Append `line` to `lines` only when `condition` is truthy. */
-function pushIf(lines: string[], condition: boolean, line: string): void {
-  if (condition) lines.push(line);
+/** Append a line to `lines` only when `condition` is truthy. The line is built lazily so its expression is not evaluated when skipped. */
+function pushIf(lines: string[], condition: boolean, line: () => string): void {
+  if (condition) lines.push(line());
 }
 
 /** Format a part/total ratio as a one-decimal percentage string (without the `%`). */

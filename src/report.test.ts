@@ -276,6 +276,52 @@ describe("generateReport", () => {
     expect(report).not.toContain("| Actions minutes (agent PRs) |");
   });
 
+  it("should not throw when optional numeric agent fields are undefined", () => {
+    const metrics: OrgMetrics = {
+      owner: "test-org",
+      ownerType: "org",
+      collectedAt: "2026-03-28T12:00:00Z",
+      repoCount: 1,
+      repos: [
+        {
+          name: "agent-repo",
+          fullName: "test-org/agent-repo",
+          issues: { open: 0, closed: 0 },
+          pullRequests: { open: 0, closed: 0, merged: 0 },
+          pullRequestDetails: [],
+          committerCount: 0,
+          reviewerCount: 0,
+          contributorCount: 0,
+          dependentCount: 0,
+          // agentActionsMinutes intentionally omitted to mirror real cached data
+          copilotAgentMetrics: {
+            totalTasks: 5,
+            completedTasks: 3,
+            failedTasks: 1,
+            cancelledTasks: 0,
+            timedOutTasks: 0,
+            activeTasksCount: 1,
+            totalSessions: 8,
+            cloudAgentSessions: 6,
+            cliRemoteSessions: 2,
+            totalCreditsUsed: 12.5,
+            avgCompletedSessionHours: 0.75,
+            agentCreatedPRs: 3,
+          } as OrgMetrics["repos"][number]["copilotAgentMetrics"],
+        },
+      ],
+    };
+
+    let report = "";
+    expect(() => {
+      report = generateReport(metrics);
+    }).not.toThrow();
+    // The actions-minutes row must be skipped, not rendered as "NaN" or "undefined"
+    expect(report).not.toContain("Actions minutes (agent PRs)");
+    expect(report).not.toContain("Agent PR Actions minutes");
+    expect(report).toContain("| Total tasks | 5 |");
+  });
+
   it("should place PRs without mergedAt after those with mergedAt", () => {
     const metrics: OrgMetrics = {
       owner: "test-org",
