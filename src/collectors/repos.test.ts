@@ -1,6 +1,6 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { setOctokit, resetOctokit } from "../github-client.js";
-import { Octokit } from "@octokit/rest";
+import type { Octokit } from "@octokit/rest";
 import { collectRepos } from "./repos.js";
 
 type RepoPage = Array<{ name: string; full_name: string; pushed_at: string | null }>;

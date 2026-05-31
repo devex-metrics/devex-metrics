@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { setOctokit, resetOctokit } from "../github-client.js";
-import { Octokit } from "@octokit/rest";
+import type { Octokit } from "@octokit/rest";
 import { collectDependentCount } from "./dependents.js";
 
 function buildMockOctokit(opts: { fork: boolean; throws?: boolean }) {

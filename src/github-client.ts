@@ -185,7 +185,7 @@ let _agentOctokit: Octokit | undefined;
  * Returns `null` (silently) when no suitable token is configured so callers
  * can skip agent metric collection without a hard failure.
  */
-export async function getAgentOctokit(): Promise<Octokit | null> {
+export function getAgentOctokit(): Octokit | null {
   if (_agentOctokit) return _agentOctokit;
 
   const token =
