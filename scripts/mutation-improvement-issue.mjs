@@ -12,8 +12,10 @@
  *   - Findings present       → create a new issue (assigned to copilot) or
  *                              update the body of an existing open one
  */
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, writeFileSync } from "node:fs";
 import { execSync } from "node:child_process";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const REPORT_PATH = "reports/mutation/mutation.json";
 const ISSUE_LABEL = "mutation-improvement";
@@ -177,15 +179,18 @@ Open a PR with the improved tests once the mutation score has improved.`;
 
 // ── 7. Create or update the issue ─────────────────────────────────────────────
 
+const bodyFile = join(tmpdir(), `mutation-body-${Date.now()}.md`);
+writeFileSync(bodyFile, body);
+
 if (existingIssueNumber) {
   execSync(
-    `gh issue edit ${existingIssueNumber} --body ${JSON.stringify(body)}`,
+    `gh issue edit ${existingIssueNumber} --body-file ${bodyFile}`,
     { stdio: "inherit" }
   );
   console.log(`Updated issue #${existingIssueNumber} with latest findings`);
 } else {
   execSync(
-    `gh issue create --title "test: improve mutation test coverage" --label "${ISSUE_LABEL}" --assignee "copilot" --body ${JSON.stringify(body)}`,
+    `gh issue create --title "test: improve mutation test coverage" --label "${ISSUE_LABEL}" --assignee "copilot" --body-file ${bodyFile}`,
     { stdio: "inherit" }
   );
   console.log("Created new improvement issue and assigned to Copilot");
