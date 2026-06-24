@@ -53,7 +53,7 @@ jobs:
       # Key includes the date so stale data from previous days is never restored.
       - name: Restore data cache
         id: cache-data
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: data
           key: metrics-data-${{ github.repository_owner }}-${{ steps.date.outputs.date }}
@@ -64,7 +64,7 @@ jobs:
       # a new key each day; the prefix restore-key picks up the most recent
       # prior cache when today's key has no entry yet.
       - name: Restore agent data cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: data/agents-*.json
           key: agent-data-${{ github.repository_owner }}-${{ steps.date.outputs.date }}
@@ -109,7 +109,7 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: gh pr merge --auto --squash "${{ steps.create-pr.outputs.pull-request-url }}"
 
-      # actions/cache@v5 automatically saves the data/ folder at job end.
+      # actions/cache@v6 automatically saves the data/ folder at job end.
 
       # Build the GitHub Pages site from the collected data and deploy.
       - name: Build pages site
