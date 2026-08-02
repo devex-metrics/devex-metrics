@@ -2,14 +2,14 @@
   "schemaVersion": 10,
   "owner": "rajbos",
   "ownerType": "user",
-  "collectedAt": "2026-08-01T08:30:36.201Z",
+  "collectedAt": "2026-08-02T08:30:58.326Z",
   "repoCount": 147,
   "repos": [
     {
       "name": "docker-action-demo",
       "fullName": "devops-actions/docker-action-demo",
       "pushedAt": "2026-05-23T20:10:17Z",
-      "collectedAt": "2026-08-01T08:10:09.071Z",
+      "collectedAt": "2026-08-02T08:11:30.900Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -976,7 +976,7 @@
       "name": "issue-comment-tag",
       "fullName": "devops-actions/issue-comment-tag",
       "pushedAt": "2026-08-01T01:37:44Z",
-      "collectedAt": "2026-08-01T08:10:33.318Z",
+      "collectedAt": "2026-08-02T08:11:55.217Z",
       "issues": {
         "open": 0,
         "closed": 12
@@ -3894,18 +3894,50 @@
     {
       "name": "load-available-actions",
       "fullName": "devops-actions/load-available-actions",
-      "pushedAt": "2026-07-29T17:06:35Z",
-      "collectedAt": "2026-08-01T08:10:57.938Z",
+      "pushedAt": "2026-08-01T17:07:18Z",
+      "collectedAt": "2026-08-02T08:12:20.281Z",
       "issues": {
         "open": 3,
         "closed": 37
       },
       "pullRequests": {
-        "open": 0,
+        "open": 4,
         "closed": 68,
-        "merged": 581
+        "merged": 583
       },
       "pullRequestDetails": [
+        {
+          "number": 692,
+          "title": "chore(deps-dev): bump the development-dependencies group with 6 updates",
+          "state": "merged",
+          "createdAt": "2026-08-01T17:03:37Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 205,
+          "linesDeleted": 181,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 14.98,
+          "timeToMergeHours": 0.06,
+          "mergedAt": "2026-08-01T17:07:17Z"
+        },
+        {
+          "number": 693,
+          "title": "chore(deps): bump the all-in-one group with 2 updates",
+          "state": "merged",
+          "createdAt": "2026-08-01T17:03:55Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 15,
+          "linesDeleted": 15,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 12.15,
+          "timeToMergeHours": 0.02,
+          "mergedAt": "2026-08-01T17:05:14Z"
+        },
         {
           "number": 691,
           "title": "chore(deps-dev): bump eslint to 10.7.0 and eslint-plugin-github to 6.1.1",
@@ -4037,42 +4069,33 @@
           "actionsMinutes": 27.52,
           "timeToMergeHours": 3.25,
           "mergedAt": "2026-07-01T20:18:37Z"
-        },
-        {
-          "number": 685,
-          "title": "chore: bump secure-inputs reusable workflow pin",
-          "state": "merged",
-          "createdAt": "2026-07-01T19:52:56Z",
-          "author": "rajbos",
-          "isCopilotAuthored": true,
-          "aiAuthorType": "copilot",
-          "hasCopilotReview": false,
-          "linesAdded": 1,
-          "linesDeleted": 1,
-          "commentCount": 2,
-          "commitCount": 2,
-          "actionsMinutes": 21.98,
-          "timeToMergeHours": 0.28,
-          "mergedAt": "2026-07-01T20:09:32Z"
-        },
-        {
-          "number": 683,
-          "title": "chore(deps-dev): bump the development-dependencies group with 5 updates",
-          "state": "merged",
-          "createdAt": "2026-07-01T17:03:43Z",
-          "author": "dependabot",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 59,
-          "linesDeleted": 59,
-          "commentCount": 2,
-          "commitCount": 1,
-          "actionsMinutes": 10.47,
-          "timeToMergeHours": 0.01,
-          "mergedAt": "2026-07-01T17:04:27Z"
         }
       ],
       "mergedPRTimeline": [
+        {
+          "number": 692,
+          "createdAt": "2026-08-01T17:03:37Z",
+          "mergedAt": "2026-08-01T17:07:17Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": [],
+          "linesAdded": 205,
+          "linesDeleted": 181
+        },
+        {
+          "number": 693,
+          "createdAt": "2026-08-01T17:03:55Z",
+          "mergedAt": "2026-08-01T17:05:14Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": [],
+          "linesAdded": 15,
+          "linesDeleted": 15
+        },
         {
           "number": 691,
           "createdAt": "2026-07-24T11:47:21Z",
@@ -6096,84 +6119,12 @@
           "closesIssues": [],
           "linesAdded": 287,
           "linesDeleted": 287
-        },
-        {
-          "number": 488,
-          "createdAt": "2024-08-01T17:39:09Z",
-          "mergedAt": "2024-08-01T17:41:38Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.04,
-          "closesIssues": [],
-          "linesAdded": 15,
-          "linesDeleted": 15
-        },
-        {
-          "number": 487,
-          "createdAt": "2024-08-01T17:05:16Z",
-          "mergedAt": "2024-08-01T17:11:13Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.1,
-          "closesIssues": [],
-          "linesAdded": 16,
-          "linesDeleted": 16
-        },
-        {
-          "number": 483,
-          "createdAt": "2024-08-01T17:04:27Z",
-          "mergedAt": "2024-08-01T17:07:55Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.06,
-          "closesIssues": [],
-          "linesAdded": 8,
-          "linesDeleted": 8
-        },
-        {
-          "number": 484,
-          "createdAt": "2024-08-01T17:04:41Z",
-          "mergedAt": "2024-08-01T17:07:37Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.05,
-          "closesIssues": [],
-          "linesAdded": 8,
-          "linesDeleted": 8
-        },
-        {
-          "number": 485,
-          "createdAt": "2024-08-01T17:04:48Z",
-          "mergedAt": "2024-08-01T17:07:23Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.04,
-          "closesIssues": [],
-          "linesAdded": 381,
-          "linesDeleted": 681
-        },
-        {
-          "number": 486,
-          "createdAt": "2024-08-01T17:05:11Z",
-          "mergedAt": "2024-08-01T17:06:43Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.03,
-          "closesIssues": [],
-          "linesAdded": 264,
-          "linesDeleted": 62
         }
       ],
       "copilotAdoption": {
         "copilotAuthoredPRs": 38,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 171,
+        "totalMergedPRs": 167,
         "totalDetailedPRs": 10,
         "humanMergedPRs": 22
       },
@@ -7134,12 +7085,12 @@
         },
         {
           "week": "2026-W31",
-          "prsOpened": 0,
-          "prsMerged": 0,
+          "prsOpened": 2,
+          "prsMerged": 2,
           "issuesOpened": 0,
           "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
+          "linesAdded": 220,
+          "linesDeleted": 196
         }
       ]
     },
@@ -7147,7 +7098,7 @@
       "name": "load-used-actions",
       "fullName": "devops-actions/load-used-actions",
       "pushedAt": "2026-08-01T07:27:33Z",
-      "collectedAt": "2026-08-01T08:11:21.326Z",
+      "collectedAt": "2026-08-02T08:12:42.703Z",
       "issues": {
         "open": 1,
         "closed": 14
@@ -10408,7 +10359,7 @@
       "name": "partner-actions",
       "fullName": "github-technology-partners/partner-actions",
       "pushedAt": "2024-06-24T17:45:02Z",
-      "collectedAt": "2026-08-01T08:11:24.848Z",
+      "collectedAt": "2026-08-02T08:12:46.544Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -11405,7 +11356,7 @@
       "name": "octogotchi",
       "fullName": "marcduiker/octogotchi",
       "pushedAt": "2021-04-09T20:43:11Z",
-      "collectedAt": "2026-08-01T08:11:26.236Z",
+      "collectedAt": "2026-08-02T08:12:47.935Z",
       "issues": {
         "open": 1,
         "closed": 3
@@ -12372,7 +12323,7 @@
       "name": "octogotchi-backend",
       "fullName": "marcduiker/octogotchi-backend",
       "pushedAt": "2021-04-29T21:52:12Z",
-      "collectedAt": "2026-08-01T08:11:27.749Z",
+      "collectedAt": "2026-08-02T08:12:50.370Z",
       "issues": {
         "open": 2,
         "closed": 3
@@ -13339,7 +13290,7 @@
       "name": "MondrianMuse",
       "fullName": "MatthijsvdVeer/MondrianMuse",
       "pushedAt": "2026-04-07T07:58:06Z",
-      "collectedAt": "2026-08-01T08:11:36.777Z",
+      "collectedAt": "2026-08-02T08:12:59.505Z",
       "issues": {
         "open": 8,
         "closed": 102
@@ -15205,7 +15156,7 @@
       "name": "mcp-security-scans",
       "fullName": "mcp-research/mcp-security-scans",
       "pushedAt": "2026-07-24T18:33:01Z",
-      "collectedAt": "2026-08-01T08:12:00.798Z",
+      "collectedAt": "2026-08-02T08:13:23.347Z",
       "issues": {
         "open": 4,
         "closed": 83
@@ -18006,7 +17957,7 @@
       "name": "copilot-custom-extension",
       "fullName": "molson504x/copilot-custom-extension",
       "pushedAt": "2025-11-16T05:21:22Z",
-      "collectedAt": "2026-08-01T08:12:02.048Z",
+      "collectedAt": "2026-08-02T08:13:25.259Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -18973,7 +18924,7 @@
       "name": "lfs-warning",
       "fullName": "ppremk/lfs-warning",
       "pushedAt": "2024-09-07T09:39:08Z",
-      "collectedAt": "2026-08-01T08:12:08.220Z",
+      "collectedAt": "2026-08-02T08:13:31.692Z",
       "issues": {
         "open": 4,
         "closed": 13
@@ -19940,7 +19891,7 @@
       "name": "ActionsFundamentals",
       "fullName": "ps-actions-sandbox/ActionsFundamentals",
       "pushedAt": "2025-08-13T09:24:28Z",
-      "collectedAt": "2026-08-01T08:12:14.342Z",
+      "collectedAt": "2026-08-02T08:13:37.544Z",
       "issues": {
         "open": 4,
         "closed": 10
@@ -20907,7 +20858,7 @@
       "name": ".github",
       "fullName": "rajbos/.github",
       "pushedAt": "2024-04-27T10:59:56Z",
-      "collectedAt": "2026-08-01T08:12:15.378Z",
+      "collectedAt": "2026-08-02T08:13:38.698Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -21888,7 +21839,7 @@
       "name": "acp-editor-demo",
       "fullName": "rajbos/acp-editor-demo",
       "pushedAt": "2026-01-26T08:46:03Z",
-      "collectedAt": "2026-08-01T08:12:16.530Z",
+      "collectedAt": "2026-08-02T08:13:39.803Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -22869,7 +22820,7 @@
       "name": "actions-load-test",
       "fullName": "rajbos/actions-load-test",
       "pushedAt": "2022-09-09T21:31:11Z",
-      "collectedAt": "2026-08-01T08:12:17.985Z",
+      "collectedAt": "2026-08-02T08:13:41.122Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -23850,7 +23801,7 @@
       "name": "actions-marketplace",
       "fullName": "rajbos/actions-marketplace",
       "pushedAt": "2026-07-31T00:54:55Z",
-      "collectedAt": "2026-08-01T08:12:29.504Z",
+      "collectedAt": "2026-08-02T08:13:52.306Z",
       "issues": {
         "open": 9,
         "closed": 14
@@ -25573,14 +25524,14 @@
     {
       "name": "actions-marketplace-checks",
       "fullName": "rajbos/actions-marketplace-checks",
-      "pushedAt": "2026-07-30T15:51:34Z",
-      "collectedAt": "2026-08-01T08:13:24.610Z",
+      "pushedAt": "2026-08-01T20:42:35Z",
+      "collectedAt": "2026-08-02T08:14:38.190Z",
       "issues": {
         "open": 2,
         "closed": 18
       },
       "pullRequests": {
-        "open": 0,
+        "open": 1,
         "closed": 8,
         "merged": 219
       },
@@ -25639,7 +25590,8 @@
           "state": "merged",
           "createdAt": "2026-07-30T10:07:48Z",
           "author": "rajbos",
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "hasCopilotReview": false,
           "linesAdded": 780,
           "linesDeleted": 0,
@@ -25687,7 +25639,8 @@
           "state": "merged",
           "createdAt": "2026-07-26T20:27:27Z",
           "author": "rajbos",
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "hasCopilotReview": false,
           "linesAdded": 495,
           "linesDeleted": 42,
@@ -25719,7 +25672,8 @@
           "state": "merged",
           "createdAt": "2026-07-26T18:09:54Z",
           "author": "rajbos",
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "hasCopilotReview": false,
           "linesAdded": 8,
           "linesDeleted": 3,
@@ -25755,7 +25709,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0.11,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 416,
+          "linesDeleted": 71
         },
         {
           "number": 249,
@@ -25765,7 +25721,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 1.9,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 667,
+          "linesDeleted": 56
         },
         {
           "number": 250,
@@ -25775,7 +25733,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 1.74,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 507,
+          "linesDeleted": 75
         },
         {
           "number": 248,
@@ -25783,9 +25743,12 @@
           "mergedAt": "2026-07-30T10:08:34Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 0.01,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 780,
+          "linesDeleted": 0
         },
         {
           "number": 245,
@@ -25795,7 +25758,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 15.13,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 533,
+          "linesDeleted": 10
         },
         {
           "number": 244,
@@ -25805,7 +25770,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0.07,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 95,
+          "linesDeleted": 19
         },
         {
           "number": 243,
@@ -25813,9 +25780,12 @@
           "mergedAt": "2026-07-26T20:55:51Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 0.47,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 495,
+          "linesDeleted": 42
         },
         {
           "number": 242,
@@ -25825,7 +25795,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0.2,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 617,
+          "linesDeleted": 90
         },
         {
           "number": 241,
@@ -25833,9 +25805,12 @@
           "mergedAt": "2026-07-26T18:11:49Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 0.03,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 8,
+          "linesDeleted": 3
         },
         {
           "number": 240,
@@ -25845,7 +25820,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0.39,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 52,
+          "linesDeleted": 0
         },
         {
           "number": 239,
@@ -25853,19 +25830,24 @@
           "mergedAt": "2026-07-22T22:14:17Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 0.36,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 190,
+          "linesDeleted": 1
         },
         {
           "number": 237,
           "createdAt": "2026-07-01T20:42:38Z",
           "mergedAt": "2026-07-20T20:45:21Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 456.05,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 24,
+          "linesDeleted": 24
         },
         {
           "number": 238,
@@ -25875,17 +25857,21 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0.33,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 44,
+          "linesDeleted": 0
         },
         {
           "number": 236,
           "createdAt": "2026-06-03T07:33:17Z",
           "mergedAt": "2026-06-07T13:16:07Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 101.71,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 1
         },
         {
           "number": 234,
@@ -25893,9 +25879,12 @@
           "mergedAt": "2026-05-25T19:55:58Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 54.59,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 11,
+          "linesDeleted": 0
         },
         {
           "number": 235,
@@ -25903,9 +25892,12 @@
           "mergedAt": "2026-05-25T19:53:55Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 12.98,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 11,
+          "linesDeleted": 11
         },
         {
           "number": 233,
@@ -25913,9 +25905,12 @@
           "mergedAt": "2026-05-23T13:26:39Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 0.66,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 110,
+          "linesDeleted": 286
         },
         {
           "number": 232,
@@ -25923,9 +25918,12 @@
           "mergedAt": "2026-05-23T10:06:06Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 0.46,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 1
         },
         {
           "number": 231,
@@ -25933,9 +25931,12 @@
           "mergedAt": "2026-05-22T22:06:20Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 2.12,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 16,
+          "linesDeleted": 2
         },
         {
           "number": 230,
@@ -25943,9 +25944,12 @@
           "mergedAt": "2026-05-17T20:51:00Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 0.33,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 3,
+          "linesDeleted": 2
         },
         {
           "number": 229,
@@ -25953,9 +25957,12 @@
           "mergedAt": "2026-05-17T20:13:09Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 0.63,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 276,
+          "linesDeleted": 5
         },
         {
           "number": 228,
@@ -25963,103 +25970,126 @@
           "mergedAt": "2026-05-06T18:51:30Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 0.45,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 37,
+          "linesDeleted": 1
         },
         {
           "number": 225,
           "createdAt": "2026-04-02T01:19:24Z",
           "mergedAt": "2026-05-05T14:45:48Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 805.44,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 1
         },
         {
           "number": 227,
           "createdAt": "2026-04-04T15:25:28Z",
           "mergedAt": "2026-04-04T17:49:02Z",
-          "author": "Claude",
+          "author": "anthropic-code-agent",
           "isBotAuthor": true,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "claude",
           "timeToMergeHours": 2.39,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 11,
+          "linesDeleted": 1
         },
         {
           "number": 224,
           "createdAt": "2026-03-22T14:56:20Z",
           "mergedAt": "2026-03-22T15:16:23Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.33,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 10,
+          "linesDeleted": 13
         },
         {
           "number": 223,
           "createdAt": "2026-03-21T09:39:29Z",
           "mergedAt": "2026-03-22T14:53:47Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 29.24,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 241,
+          "linesDeleted": 5
         },
         {
           "number": 220,
           "createdAt": "2026-03-01T20:42:43Z",
           "mergedAt": "2026-03-07T18:05:22Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 141.38,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 32,
+          "linesDeleted": 9
         },
         {
           "number": 219,
           "createdAt": "2026-03-01T20:42:36Z",
           "mergedAt": "2026-03-07T17:44:03Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 141.02,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 1
         },
         {
           "number": 218,
           "createdAt": "2026-03-01T20:42:33Z",
           "mergedAt": "2026-03-07T16:27:54Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 139.76,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 16,
+          "linesDeleted": 16
         },
         {
           "number": 221,
           "createdAt": "2026-03-07T14:32:34Z",
           "mergedAt": "2026-03-07T16:27:00Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.91,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 24,
+          "linesDeleted": 1
         },
         {
           "number": 222,
           "createdAt": "2026-03-07T14:36:54Z",
           "mergedAt": "2026-03-07T16:06:37Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.5,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 284,
+          "linesDeleted": 0
         },
         {
           "number": 216,
@@ -26069,117 +26099,139 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 146.34,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 3,
+          "linesDeleted": 3
         },
         {
           "number": 217,
           "createdAt": "2026-02-22T20:35:25Z",
           "mergedAt": "2026-02-22T20:44:57Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.16,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 162,
+          "linesDeleted": 5
         },
         {
           "number": 214,
           "createdAt": "2026-02-16T08:09:05Z",
           "mergedAt": "2026-02-16T18:36:05Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 10.45,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 101,
+          "linesDeleted": 2
         },
         {
           "number": 215,
           "createdAt": "2026-02-16T08:11:13Z",
           "mergedAt": "2026-02-16T12:53:41Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 4.71,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 7,
+          "linesDeleted": 17
         },
         {
           "number": 213,
           "createdAt": "2026-02-15T14:47:57Z",
           "mergedAt": "2026-02-15T20:52:40Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 6.08,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 35,
+          "linesDeleted": 11
         },
         {
           "number": 212,
           "createdAt": "2026-02-15T14:42:53Z",
           "mergedAt": "2026-02-15T15:14:08Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.52,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 5,
+          "linesDeleted": 5
         },
         {
           "number": 211,
           "createdAt": "2026-02-15T14:12:52Z",
           "mergedAt": "2026-02-15T14:22:36Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.16,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 25,
+          "linesDeleted": 0
         },
         {
           "number": 209,
           "createdAt": "2026-02-13T08:54:46Z",
           "mergedAt": "2026-02-15T14:10:57Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 53.27,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 322,
+          "linesDeleted": 60
         },
         {
           "number": 210,
           "createdAt": "2026-02-14T21:39:03Z",
           "mergedAt": "2026-02-14T22:24:54Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.76,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 23,
+          "linesDeleted": 23
         },
         {
           "number": 208,
           "createdAt": "2026-02-12T22:38:45Z",
           "mergedAt": "2026-02-13T08:29:15Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 9.84,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 238,
+          "linesDeleted": 8
         },
         {
           "number": 207,
           "createdAt": "2026-02-12T21:34:17Z",
           "mergedAt": "2026-02-12T22:14:44Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.67,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 203,
+          "linesDeleted": 8
         },
         {
           "number": 206,
@@ -26189,169 +26241,201 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0.21,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 0
         },
         {
           "number": 205,
           "createdAt": "2026-02-12T18:29:35Z",
           "mergedAt": "2026-02-12T18:44:28Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.25,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 84,
+          "linesDeleted": 4
         },
         {
           "number": 202,
           "createdAt": "2026-02-08T16:15:47Z",
           "mergedAt": "2026-02-09T21:26:47Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 29.18,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 459,
+          "linesDeleted": 0
         },
         {
           "number": 204,
           "createdAt": "2026-02-09T21:09:33Z",
           "mergedAt": "2026-02-09T21:25:33Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.27,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 41,
+          "linesDeleted": 14
         },
         {
           "number": 203,
           "createdAt": "2026-02-08T20:41:59Z",
           "mergedAt": "2026-02-08T20:57:29Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.26,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 158,
+          "linesDeleted": 7
         },
         {
           "number": 201,
           "createdAt": "2026-02-08T16:04:42Z",
           "mergedAt": "2026-02-08T16:20:19Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.26,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 2,
+          "linesDeleted": 0
         },
         {
           "number": 200,
           "createdAt": "2026-02-08T14:28:41Z",
           "mergedAt": "2026-02-08T14:57:00Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.47,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 382,
+          "linesDeleted": 23
         },
         {
           "number": 199,
           "createdAt": "2026-02-07T22:14:15Z",
           "mergedAt": "2026-02-07T22:50:06Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.6,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 21,
+          "linesDeleted": 1
         },
         {
           "number": 198,
           "createdAt": "2026-02-06T17:00:50Z",
           "mergedAt": "2026-02-06T17:14:38Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.23,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 287,
+          "linesDeleted": 4
         },
         {
           "number": 193,
           "createdAt": "2026-01-25T22:13:36Z",
           "mergedAt": "2026-02-05T14:48:47Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 256.59,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 595,
+          "linesDeleted": 26
         },
         {
           "number": 197,
           "createdAt": "2026-02-02T17:58:04Z",
           "mergedAt": "2026-02-02T20:02:53Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 2.08,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 10,
+          "linesDeleted": 1
         },
         {
           "number": 194,
           "createdAt": "2026-02-01T20:42:46Z",
           "mergedAt": "2026-02-02T20:01:48Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 23.32,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 1
         },
         {
           "number": 195,
           "createdAt": "2026-02-01T20:42:52Z",
           "mergedAt": "2026-02-02T18:10:23Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 21.46,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 4,
+          "linesDeleted": 4
         },
         {
           "number": 196,
           "createdAt": "2026-02-01T20:42:59Z",
           "mergedAt": "2026-02-02T17:58:15Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 21.25,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 3,
+          "linesDeleted": 3
         },
         {
           "number": 192,
           "createdAt": "2026-01-25T20:23:52Z",
           "mergedAt": "2026-01-25T21:09:16Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.76,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 20,
+          "linesDeleted": 5
         },
         {
           "number": 188,
           "createdAt": "2026-01-12T21:17:03Z",
           "mergedAt": "2026-01-25T19:28:59Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 310.2,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 469,
+          "linesDeleted": 36
         },
         {
           "number": 189,
@@ -26361,62 +26445,74 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 234.37,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 1
         },
         {
           "number": 190,
           "createdAt": "2026-01-22T18:51:31Z",
           "mergedAt": "2026-01-25T15:29:58Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 68.64,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 602,
+          "linesDeleted": 46
         },
         {
           "number": 187,
           "createdAt": "2026-01-12T17:18:56Z",
           "mergedAt": "2026-01-12T21:08:28Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 3.83,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 2,
+          "linesDeleted": 2
         },
         {
           "number": 186,
           "createdAt": "2026-01-10T22:11:43Z",
           "mergedAt": "2026-01-12T21:07:52Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 46.94,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 391,
+          "linesDeleted": 75
         },
         {
           "number": 185,
           "createdAt": "2026-01-10T22:08:56Z",
           "mergedAt": "2026-01-10T22:34:15Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.42,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 154,
+          "linesDeleted": 18
         },
         {
           "number": 184,
           "createdAt": "2026-01-10T21:06:45Z",
           "mergedAt": "2026-01-10T21:46:08Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.66,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 69,
+          "linesDeleted": 17
         },
         {
           "number": 180,
@@ -26424,9 +26520,12 @@
           "mergedAt": "2026-01-10T21:01:12Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 4.26,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 64,
+          "linesDeleted": 240
         },
         {
           "number": 176,
@@ -26434,64 +26533,77 @@
           "mergedAt": "2026-01-10T20:15:49Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 6.1,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 75,
+          "linesDeleted": 9
         },
         {
           "number": 183,
           "createdAt": "2026-01-10T19:30:58Z",
           "mergedAt": "2026-01-10T19:45:48Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.25,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 3,
+          "linesDeleted": 1
         },
         {
           "number": 181,
           "createdAt": "2026-01-10T17:29:53Z",
           "mergedAt": "2026-01-10T19:29:03Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.99,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 41,
+          "linesDeleted": 18
         },
         {
           "number": 182,
           "createdAt": "2026-01-10T19:05:19Z",
           "mergedAt": "2026-01-10T19:27:51Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.38,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 37,
+          "linesDeleted": 5
         },
         {
           "number": 179,
           "createdAt": "2026-01-10T16:39:12Z",
           "mergedAt": "2026-01-10T17:25:49Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.78,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 519,
+          "linesDeleted": 2
         },
         {
           "number": 178,
           "createdAt": "2026-01-10T14:35:47Z",
           "mergedAt": "2026-01-10T16:21:05Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.76,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 104,
+          "linesDeleted": 0
         },
         {
           "number": 177,
@@ -26501,29 +26613,35 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 1.77,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 320,
+          "linesDeleted": 11
         },
         {
           "number": 174,
           "createdAt": "2026-01-10T13:50:43Z",
           "mergedAt": "2026-01-10T14:26:41Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.6,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 363,
+          "linesDeleted": 59
         },
         {
           "number": 175,
           "createdAt": "2026-01-10T14:02:52Z",
           "mergedAt": "2026-01-10T14:10:55Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.13,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 40,
+          "linesDeleted": 14
         },
         {
           "number": 173,
@@ -26533,7 +26651,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 1.36,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 64,
+          "linesDeleted": 25
         },
         {
           "number": 172,
@@ -26543,7 +26663,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 22.3,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1257,
+          "linesDeleted": 267
         },
         {
           "number": 171,
@@ -26553,29 +26675,35 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 8,
+          "linesDeleted": 1
         },
         {
           "number": 169,
           "createdAt": "2026-01-04T19:56:31Z",
           "mergedAt": "2026-01-04T22:00:14Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 2.06,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 174,
+          "linesDeleted": 0
         },
         {
           "number": 162,
           "createdAt": "2026-01-03T12:48:52Z",
           "mergedAt": "2026-01-04T21:59:28Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 33.18,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 70,
+          "linesDeleted": 28
         },
         {
           "number": 170,
@@ -26585,7 +26713,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0.12,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 22,
+          "linesDeleted": 2
         },
         {
           "number": 168,
@@ -26595,7 +26725,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 185,
+          "linesDeleted": 123
         },
         {
           "number": 167,
@@ -26605,29 +26737,35 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 15.38,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1287,
+          "linesDeleted": 369
         },
         {
           "number": 166,
           "createdAt": "2026-01-03T22:29:14Z",
           "mergedAt": "2026-01-03T22:38:45Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.16,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 21,
+          "linesDeleted": 0
         },
         {
           "number": 165,
           "createdAt": "2026-01-03T21:43:57Z",
           "mergedAt": "2026-01-03T22:20:41Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.61,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 480,
+          "linesDeleted": 0
         },
         {
           "number": 163,
@@ -26635,9 +26773,12 @@
           "mergedAt": "2026-01-03T16:18:47Z",
           "author": "rajbos",
           "isBotAuthor": false,
-          "isCopilotAuthored": false,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
           "timeToMergeHours": 0.1,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 156,
+          "linesDeleted": 34
         },
         {
           "number": 161,
@@ -26647,70 +26788,84 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 0,
+          "linesDeleted": 0
         },
         {
           "number": 160,
           "createdAt": "2026-01-01T20:02:20Z",
           "mergedAt": "2026-01-01T22:25:31Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 2.39,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 11,
+          "linesDeleted": 11
         },
         {
           "number": 159,
           "createdAt": "2026-01-01T20:02:13Z",
           "mergedAt": "2026-01-01T22:25:17Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 2.38,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 14,
+          "linesDeleted": 14
         },
         {
           "number": 158,
           "createdAt": "2026-01-01T20:02:06Z",
           "mergedAt": "2026-01-01T22:25:01Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 2.38,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 1
         },
         {
           "number": 157,
           "createdAt": "2026-01-01T15:09:25Z",
           "mergedAt": "2026-01-01T15:28:19Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.32,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 436,
+          "linesDeleted": 4
         },
         {
           "number": 154,
           "createdAt": "2025-12-31T18:01:05Z",
           "mergedAt": "2026-01-01T14:44:00Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 20.72,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 457,
+          "linesDeleted": 0
         },
         {
           "number": 156,
           "createdAt": "2025-12-31T19:49:13Z",
           "mergedAt": "2025-12-31T20:20:01Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.51,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 52,
+          "linesDeleted": 3
         },
         {
           "number": 155,
@@ -26720,51 +26875,61 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0.21,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 13,
+          "linesDeleted": 5
         },
         {
           "number": 153,
           "createdAt": "2025-12-31T16:54:18Z",
           "mergedAt": "2025-12-31T17:15:39Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.36,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 107,
+          "linesDeleted": 0
         },
         {
           "number": 152,
           "createdAt": "2025-12-31T16:49:26Z",
           "mergedAt": "2025-12-31T17:09:53Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.34,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 146,
+          "linesDeleted": 4
         },
         {
           "number": 150,
           "createdAt": "2025-12-31T16:36:21Z",
           "mergedAt": "2025-12-31T16:50:21Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.23,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 99,
+          "linesDeleted": 0
         },
         {
           "number": 148,
           "createdAt": "2025-12-31T16:06:35Z",
           "mergedAt": "2025-12-31T16:29:31Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.38,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 71,
+          "linesDeleted": 3
         },
         {
           "number": 149,
@@ -26774,73 +26939,87 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 79,
+          "linesDeleted": 29
         },
         {
           "number": 147,
           "createdAt": "2025-12-31T13:44:48Z",
           "mergedAt": "2025-12-31T16:04:02Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 2.32,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 50,
+          "linesDeleted": 24
         },
         {
           "number": 146,
           "createdAt": "2025-12-30T20:03:23Z",
           "mergedAt": "2025-12-31T13:35:24Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 17.53,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 184,
+          "linesDeleted": 7
         },
         {
           "number": 140,
           "createdAt": "2025-12-30T14:58:37Z",
           "mergedAt": "2025-12-30T17:25:13Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 2.44,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 95,
+          "linesDeleted": 95
         },
         {
           "number": 142,
           "createdAt": "2025-12-30T15:02:58Z",
           "mergedAt": "2025-12-30T17:24:53Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 2.37,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 627,
+          "linesDeleted": 1
         },
         {
           "number": 141,
           "createdAt": "2025-12-30T15:01:16Z",
           "mergedAt": "2025-12-30T16:51:45Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.84,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 433,
+          "linesDeleted": 0
         },
         {
           "number": 143,
           "createdAt": "2025-12-30T15:05:20Z",
           "mergedAt": "2025-12-30T16:49:43Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.74,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 156,
+          "linesDeleted": 6
         },
         {
           "number": 145,
@@ -26850,7 +27029,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0.01,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 20,
+          "linesDeleted": 2
         },
         {
           "number": 144,
@@ -26860,7 +27041,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 1.39,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 209,
+          "linesDeleted": 19
         },
         {
           "number": 139,
@@ -26870,7 +27053,9 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 6,
+          "linesDeleted": 6
         },
         {
           "number": 138,
@@ -26880,18 +27065,22 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0.01,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 35,
+          "linesDeleted": 35
         },
         {
           "number": 136,
           "createdAt": "2025-12-30T10:34:44Z",
           "mergedAt": "2025-12-30T14:44:26Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 4.16,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 681,
+          "linesDeleted": 0
         },
         {
           "number": 137,
@@ -26901,557 +27090,659 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0.01,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 61,
+          "linesDeleted": 38
         },
         {
           "number": 134,
           "createdAt": "2025-12-29T21:50:58Z",
           "mergedAt": "2025-12-30T10:34:08Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 12.72,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1188,
+          "linesDeleted": 15
         },
         {
           "number": 135,
           "createdAt": "2025-12-29T22:19:38Z",
           "mergedAt": "2025-12-29T22:33:45Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.24,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 49,
+          "linesDeleted": 10
         },
         {
           "number": 133,
           "createdAt": "2025-12-29T21:46:37Z",
           "mergedAt": "2025-12-29T22:15:07Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.48,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 183,
+          "linesDeleted": 16
         },
         {
           "number": 131,
           "createdAt": "2025-12-29T21:21:57Z",
           "mergedAt": "2025-12-29T21:43:37Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.36,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 16,
+          "linesDeleted": 2
         },
         {
           "number": 132,
           "createdAt": "2025-12-29T21:22:38Z",
           "mergedAt": "2025-12-29T21:40:30Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.3,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 2,
+          "linesDeleted": 1
         },
         {
           "number": 129,
           "createdAt": "2025-12-29T19:58:11Z",
           "mergedAt": "2025-12-29T21:27:42Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.49,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 733,
+          "linesDeleted": 0
         },
         {
           "number": 128,
           "createdAt": "2025-12-29T19:32:07Z",
           "mergedAt": "2025-12-29T21:21:49Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.83,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1084,
+          "linesDeleted": 59
         },
         {
           "number": 126,
           "createdAt": "2025-12-29T19:26:59Z",
           "mergedAt": "2025-12-29T20:54:21Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.46,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 7,
+          "linesDeleted": 11
         },
         {
           "number": 130,
           "createdAt": "2025-12-29T20:02:24Z",
           "mergedAt": "2025-12-29T20:13:56Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.19,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 15,
+          "linesDeleted": 2
         },
         {
           "number": 127,
           "createdAt": "2025-12-29T19:30:13Z",
           "mergedAt": "2025-12-29T20:06:44Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.61,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 12,
+          "linesDeleted": 12
         },
         {
           "number": 125,
           "createdAt": "2025-12-28T19:59:38Z",
           "mergedAt": "2025-12-28T20:12:49Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.22,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 205,
+          "linesDeleted": 10
         },
         {
           "number": 118,
           "createdAt": "2025-12-28T17:03:10Z",
           "mergedAt": "2025-12-28T19:58:54Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 2.93,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 91,
+          "linesDeleted": 2
         },
         {
           "number": 123,
           "createdAt": "2025-12-28T19:14:27Z",
           "mergedAt": "2025-12-28T19:31:03Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.28,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 170,
+          "linesDeleted": 22
         },
         {
           "number": 122,
           "createdAt": "2025-12-28T18:48:52Z",
           "mergedAt": "2025-12-28T19:06:25Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.29,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 161,
+          "linesDeleted": 13
         },
         {
           "number": 121,
           "createdAt": "2025-12-28T17:50:06Z",
           "mergedAt": "2025-12-28T18:55:44Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.09,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 230,
+          "linesDeleted": 7
         },
         {
           "number": 120,
           "createdAt": "2025-12-28T17:34:01Z",
           "mergedAt": "2025-12-28T18:39:44Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.1,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 162,
+          "linesDeleted": 4
         },
         {
           "number": 119,
           "createdAt": "2025-12-28T17:20:26Z",
           "mergedAt": "2025-12-28T17:49:08Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.48,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 106,
+          "linesDeleted": 16
         },
         {
           "number": 117,
           "createdAt": "2025-12-28T16:01:37Z",
           "mergedAt": "2025-12-28T16:48:24Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.78,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 105,
+          "linesDeleted": 25
         },
         {
           "number": 116,
           "createdAt": "2025-12-28T15:44:28Z",
           "mergedAt": "2025-12-28T16:02:32Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.3,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 308,
+          "linesDeleted": 0
         },
         {
           "number": 115,
           "createdAt": "2025-12-28T15:38:59Z",
           "mergedAt": "2025-12-28T15:58:28Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.32,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 807,
+          "linesDeleted": 1
         },
         {
           "number": 114,
           "createdAt": "2025-12-28T15:15:50Z",
           "mergedAt": "2025-12-28T15:37:08Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.36,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 255,
+          "linesDeleted": 5
         },
         {
           "number": 113,
           "createdAt": "2025-12-28T11:39:15Z",
           "mergedAt": "2025-12-28T15:04:12Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 3.42,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 364,
+          "linesDeleted": 30
         },
         {
           "number": 112,
           "createdAt": "2025-12-27T22:02:28Z",
           "mergedAt": "2025-12-27T23:02:26Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 111,
+          "linesDeleted": 7
         },
         {
           "number": 111,
           "createdAt": "2025-12-27T21:40:12Z",
           "mergedAt": "2025-12-27T22:01:03Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.35,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 108,
+          "linesDeleted": 27
         },
         {
           "number": 110,
           "createdAt": "2025-12-27T21:04:38Z",
           "mergedAt": "2025-12-27T21:21:03Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.27,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 161,
+          "linesDeleted": 2
         },
         {
           "number": 109,
           "createdAt": "2025-12-27T20:53:01Z",
           "mergedAt": "2025-12-27T21:00:46Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.13,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 0
         },
         {
           "number": 108,
           "createdAt": "2025-12-27T19:07:54Z",
           "mergedAt": "2025-12-27T20:49:16Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.69,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 71,
+          "linesDeleted": 4
         },
         {
           "number": 107,
           "createdAt": "2025-12-27T16:12:51Z",
           "mergedAt": "2025-12-27T17:35:42Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.38,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 171,
+          "linesDeleted": 4
         },
         {
           "number": 105,
           "createdAt": "2025-12-25T11:18:51Z",
           "mergedAt": "2025-12-25T22:18:33Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 11,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 126,
+          "linesDeleted": 3
         },
         {
           "number": 106,
           "createdAt": "2025-12-25T11:20:37Z",
           "mergedAt": "2025-12-25T11:41:10Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.34,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 140,
+          "linesDeleted": 9
         },
         {
           "number": 104,
           "createdAt": "2025-12-25T11:15:35Z",
           "mergedAt": "2025-12-25T11:34:03Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.31,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 205,
+          "linesDeleted": 8
         },
         {
           "number": 103,
           "createdAt": "2025-12-25T11:01:26Z",
           "mergedAt": "2025-12-25T11:12:33Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.19,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 220,
+          "linesDeleted": 2
         },
         {
           "number": 102,
           "createdAt": "2025-12-22T12:46:06Z",
           "mergedAt": "2025-12-25T10:57:30Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 70.19,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 182,
+          "linesDeleted": 5
         },
         {
           "number": 101,
           "createdAt": "2025-12-21T21:01:04Z",
           "mergedAt": "2025-12-22T12:44:02Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 15.72,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 229,
+          "linesDeleted": 0
         },
         {
           "number": 100,
           "createdAt": "2025-12-21T17:36:25Z",
           "mergedAt": "2025-12-21T20:57:52Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 3.36,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 47,
+          "linesDeleted": 13
         },
         {
           "number": 99,
           "createdAt": "2025-12-21T17:06:37Z",
           "mergedAt": "2025-12-21T17:29:21Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.38,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 123,
+          "linesDeleted": 11
         },
         {
           "number": 98,
           "createdAt": "2025-12-20T13:50:24Z",
           "mergedAt": "2025-12-20T14:50:14Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 238,
+          "linesDeleted": 0
         },
         {
           "number": 97,
           "createdAt": "2025-12-20T11:55:10Z",
           "mergedAt": "2025-12-20T13:47:16Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.87,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 397,
+          "linesDeleted": 24
         },
         {
           "number": 96,
           "createdAt": "2025-12-19T14:27:39Z",
           "mergedAt": "2025-12-19T15:26:11Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.98,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 85,
+          "linesDeleted": 0
         },
         {
           "number": 94,
           "createdAt": "2025-12-17T22:17:53Z",
           "mergedAt": "2025-12-17T22:42:11Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.41,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 65,
+          "linesDeleted": 16
         },
         {
           "number": 93,
           "createdAt": "2025-12-16T21:22:11Z",
           "mergedAt": "2025-12-16T22:31:35Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.16,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 106,
+          "linesDeleted": 39
         },
         {
           "number": 92,
           "createdAt": "2025-12-16T14:55:31Z",
           "mergedAt": "2025-12-16T17:40:11Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 2.74,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 16,
+          "linesDeleted": 2
         },
         {
           "number": 90,
           "createdAt": "2025-12-16T11:24:35Z",
           "mergedAt": "2025-12-16T15:36:12Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 4.19,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 53,
+          "linesDeleted": 24
         },
         {
           "number": 91,
           "createdAt": "2025-12-16T14:47:05Z",
           "mergedAt": "2025-12-16T14:53:23Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.11,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 9,
+          "linesDeleted": 1
         },
         {
           "number": 89,
           "createdAt": "2025-12-16T10:12:07Z",
           "mergedAt": "2025-12-16T11:24:58Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.21,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 478,
+          "linesDeleted": 3
         },
         {
           "number": 88,
           "createdAt": "2025-12-15T18:34:38Z",
           "mergedAt": "2025-12-15T18:57:55Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.39,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 208,
+          "linesDeleted": 3
         },
         {
           "number": 87,
           "createdAt": "2025-12-11T21:55:34Z",
           "mergedAt": "2025-12-11T22:14:05Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.31,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 98,
+          "linesDeleted": 6
         },
         {
           "number": 85,
           "createdAt": "2025-12-11T21:26:48Z",
           "mergedAt": "2025-12-11T21:57:07Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.51,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 2,
+          "linesDeleted": 2
         },
         {
           "number": 86,
           "createdAt": "2025-12-11T21:35:20Z",
           "mergedAt": "2025-12-11T21:56:30Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.35,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 361,
+          "linesDeleted": 28
         },
         {
           "number": 84,
           "createdAt": "2025-12-11T21:20:49Z",
           "mergedAt": "2025-12-11T21:53:10Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.54,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 272,
+          "linesDeleted": 6
         },
         {
           "number": 80,
@@ -27461,161 +27752,191 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 53.94,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 531,
+          "linesDeleted": 168
         },
         {
           "number": 83,
           "createdAt": "2025-12-10T20:16:00Z",
           "mergedAt": "2025-12-10T21:07:00Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.85,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 10,
+          "linesDeleted": 8
         },
         {
           "number": 82,
           "createdAt": "2025-12-08T20:27:11Z",
           "mergedAt": "2025-12-08T21:25:15Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.97,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 4,
+          "linesDeleted": 0
         },
         {
           "number": 81,
           "createdAt": "2025-12-08T17:08:36Z",
           "mergedAt": "2025-12-08T17:39:24Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.51,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 6,
+          "linesDeleted": 4
         },
         {
           "number": 79,
           "createdAt": "2025-12-06T22:27:50Z",
           "mergedAt": "2025-12-06T22:42:59Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.25,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 178,
+          "linesDeleted": 2
         },
         {
           "number": 78,
           "createdAt": "2025-12-06T22:24:32Z",
           "mergedAt": "2025-12-06T22:38:27Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.23,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 62,
+          "linesDeleted": 5
         },
         {
           "number": 31,
           "createdAt": "2025-10-30T18:49:21Z",
           "mergedAt": "2025-12-06T22:20:29Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 891.52,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 458,
+          "linesDeleted": 0
         },
         {
           "number": 76,
           "createdAt": "2025-12-06T18:35:51Z",
           "mergedAt": "2025-12-06T22:15:14Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 3.66,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1128,
+          "linesDeleted": 64
         },
         {
           "number": 77,
           "createdAt": "2025-12-06T18:44:00Z",
           "mergedAt": "2025-12-06T19:23:34Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.66,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 97,
+          "linesDeleted": 9
         },
         {
           "number": 72,
           "createdAt": "2025-12-06T12:18:10Z",
           "mergedAt": "2025-12-06T18:09:08Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 5.85,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 8,
+          "linesDeleted": 4
         },
         {
           "number": 75,
           "createdAt": "2025-12-06T16:31:36Z",
           "mergedAt": "2025-12-06T17:49:46Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.3,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 5,
+          "linesDeleted": 0
         },
         {
           "number": 74,
           "createdAt": "2025-12-06T13:52:44Z",
           "mergedAt": "2025-12-06T16:29:56Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 2.62,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 109,
+          "linesDeleted": 3
         },
         {
           "number": 73,
           "createdAt": "2025-12-06T13:02:40Z",
           "mergedAt": "2025-12-06T16:21:18Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 3.31,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 147,
+          "linesDeleted": 4
         },
         {
           "number": 68,
           "createdAt": "2025-12-05T23:17:14Z",
           "mergedAt": "2025-12-06T12:42:08Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 13.42,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1058,
+          "linesDeleted": 39
         },
         {
           "number": 70,
           "createdAt": "2025-12-06T11:13:52Z",
           "mergedAt": "2025-12-06T11:53:50Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.67,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 55,
+          "linesDeleted": 12
         },
         {
           "number": 71,
@@ -27625,492 +27946,472 @@
           "isBotAuthor": false,
           "isCopilotAuthored": false,
           "timeToMergeHours": 0,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 3,
+          "linesDeleted": 0
         },
         {
           "number": 69,
           "createdAt": "2025-12-06T11:03:57Z",
           "mergedAt": "2025-12-06T11:15:06Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.19,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 4,
+          "linesDeleted": 3
         },
         {
           "number": 66,
           "createdAt": "2025-12-05T18:10:26Z",
           "mergedAt": "2025-12-05T23:33:50Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 5.39,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 6,
+          "linesDeleted": 0
         },
         {
           "number": 67,
           "createdAt": "2025-12-05T18:13:19Z",
           "mergedAt": "2025-12-05T23:18:42Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 5.09,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1,
+          "linesDeleted": 1
         },
         {
           "number": 65,
           "createdAt": "2025-12-04T21:25:12Z",
           "mergedAt": "2025-12-05T07:09:19Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 9.74,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 314,
+          "linesDeleted": 1
         },
         {
           "number": 64,
           "createdAt": "2025-12-04T17:10:46Z",
           "mergedAt": "2025-12-04T17:22:39Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.2,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 103,
+          "linesDeleted": 1
         },
         {
           "number": 63,
           "createdAt": "2025-12-04T16:54:20Z",
           "mergedAt": "2025-12-04T17:02:52Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.14,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 33,
+          "linesDeleted": 27
         },
         {
           "number": 62,
           "createdAt": "2025-12-04T16:22:25Z",
           "mergedAt": "2025-12-04T16:48:28Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.43,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 224,
+          "linesDeleted": 18
         },
         {
           "number": 61,
           "createdAt": "2025-12-04T08:09:28Z",
           "mergedAt": "2025-12-04T08:25:44Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.27,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 19,
+          "linesDeleted": 3
         },
         {
           "number": 60,
           "createdAt": "2025-12-04T07:57:02Z",
           "mergedAt": "2025-12-04T08:24:49Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.46,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 151,
+          "linesDeleted": 2
         },
         {
           "number": 59,
           "createdAt": "2025-12-04T06:53:11Z",
           "mergedAt": "2025-12-04T07:53:29Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 211,
+          "linesDeleted": 0
         },
         {
           "number": 58,
           "createdAt": "2025-12-03T21:31:43Z",
           "mergedAt": "2025-12-04T06:49:10Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 9.29,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 31,
+          "linesDeleted": 36
         },
         {
           "number": 55,
           "createdAt": "2025-12-02T20:00:16Z",
           "mergedAt": "2025-12-03T21:32:39Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 25.54,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 34,
+          "linesDeleted": 1
         },
         {
           "number": 57,
           "createdAt": "2025-12-03T07:02:03Z",
           "mergedAt": "2025-12-03T12:00:11Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 4.97,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 157,
+          "linesDeleted": 15
         },
         {
           "number": 53,
           "createdAt": "2025-12-01T23:10:05Z",
           "mergedAt": "2025-12-02T20:04:01Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 20.9,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 10,
+          "linesDeleted": 10
         },
         {
           "number": 49,
           "createdAt": "2025-11-29T20:44:47Z",
           "mergedAt": "2025-12-02T20:02:07Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 71.29,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 1318,
+          "linesDeleted": 1260605
         },
         {
           "number": 50,
           "createdAt": "2025-11-29T20:46:34Z",
           "mergedAt": "2025-11-29T21:14:44Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.47,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 25,
+          "linesDeleted": 1
         },
         {
           "number": 52,
           "createdAt": "2025-11-29T21:00:14Z",
           "mergedAt": "2025-11-29T21:11:53Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.19,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 241,
+          "linesDeleted": 0
         },
         {
           "number": 48,
           "createdAt": "2025-11-29T20:23:06Z",
           "mergedAt": "2025-11-29T20:33:37Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.18,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 106,
+          "linesDeleted": 0
         },
         {
           "number": 46,
           "createdAt": "2025-11-29T19:57:19Z",
           "mergedAt": "2025-11-29T20:31:40Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.57,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 94,
+          "linesDeleted": 3
         },
         {
           "number": 47,
           "createdAt": "2025-11-29T20:09:43Z",
           "mergedAt": "2025-11-29T20:19:46Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.17,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 38,
+          "linesDeleted": 3
         },
         {
           "number": 44,
           "createdAt": "2025-11-29T19:46:02Z",
           "mergedAt": "2025-11-29T20:08:43Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.38,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 8,
+          "linesDeleted": 8
         },
         {
           "number": 45,
           "createdAt": "2025-11-29T19:49:23Z",
           "mergedAt": "2025-11-29T19:57:52Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.14,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 11,
+          "linesDeleted": 1
         },
         {
           "number": 43,
           "createdAt": "2025-11-29T19:24:02Z",
           "mergedAt": "2025-11-29T19:42:11Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.3,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 374,
+          "linesDeleted": 51
         },
         {
           "number": 42,
           "createdAt": "2025-11-29T10:02:58Z",
           "mergedAt": "2025-11-29T10:17:12Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.24,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 12,
+          "linesDeleted": 8
         },
         {
           "number": 41,
           "createdAt": "2025-11-28T14:03:08Z",
           "mergedAt": "2025-11-28T16:02:36Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.99,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 15,
+          "linesDeleted": 5
         },
         {
           "number": 39,
           "createdAt": "2025-11-24T09:21:42Z",
           "mergedAt": "2025-11-27T13:10:14Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 75.81,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 5,
+          "linesDeleted": 5
         },
         {
           "number": 37,
           "createdAt": "2025-11-23T22:26:40Z",
           "mergedAt": "2025-11-23T22:38:27Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.2,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 4,
+          "linesDeleted": 0
         },
         {
           "number": 36,
           "createdAt": "2025-11-23T20:57:37Z",
           "mergedAt": "2025-11-23T22:02:15Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 1.08,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 361,
+          "linesDeleted": 0
         },
         {
           "number": 32,
           "createdAt": "2025-11-01T20:01:34Z",
           "mergedAt": "2025-11-22T10:35:09Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 494.56,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 3,
+          "linesDeleted": 3
         },
         {
           "number": 33,
           "createdAt": "2025-11-09T19:45:02Z",
           "mergedAt": "2025-11-09T20:00:56Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.27,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 100,
+          "linesDeleted": 22
         },
         {
           "number": 30,
           "createdAt": "2025-10-27T01:30:24Z",
           "mergedAt": "2025-10-27T02:02:12Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.53,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 103,
+          "linesDeleted": 0
         },
         {
           "number": 29,
           "createdAt": "2025-10-27T00:24:37Z",
           "mergedAt": "2025-10-27T00:47:07Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.38,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 130,
+          "linesDeleted": 0
         },
         {
           "number": 28,
           "createdAt": "2025-10-27T00:15:46Z",
           "mergedAt": "2025-10-27T00:24:05Z",
-          "author": "Copilot",
+          "author": "copilot-swe-agent",
           "isBotAuthor": true,
           "isCopilotAuthored": true,
           "aiAuthorType": "copilot",
           "timeToMergeHours": 0.14,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 4,
+          "linesDeleted": 4
         },
         {
           "number": 26,
           "createdAt": "2025-09-02T12:55:48Z",
           "mergedAt": "2025-10-27T00:07:03Z",
-          "author": "dependabot[bot]",
+          "author": "dependabot",
           "isBotAuthor": true,
           "isCopilotAuthored": false,
           "timeToMergeHours": 1307.19,
-          "closesIssues": []
-        },
-        {
-          "number": 23,
-          "createdAt": "2024-04-27T17:05:42Z",
-          "mergedAt": "2024-04-27T17:16:43Z",
-          "author": "rajbos",
-          "isBotAuthor": false,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.18,
-          "closesIssues": []
-        },
-        {
-          "number": 22,
-          "createdAt": "2024-04-27T16:02:39Z",
-          "mergedAt": "2024-04-27T16:02:48Z",
-          "author": "rajbos",
-          "isBotAuthor": false,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0,
-          "closesIssues": []
-        },
-        {
-          "number": 21,
-          "createdAt": "2024-03-01T20:03:34Z",
-          "mergedAt": "2024-03-02T19:30:25Z",
-          "author": "dependabot[bot]",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 23.45,
-          "closesIssues": []
-        },
-        {
-          "number": 20,
-          "createdAt": "2024-01-01T20:57:35Z",
-          "mergedAt": "2024-01-05T21:02:30Z",
-          "author": "dependabot[bot]",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 96.08,
-          "closesIssues": []
-        },
-        {
-          "number": 19,
-          "createdAt": "2023-10-30T13:19:06Z",
-          "mergedAt": "2023-10-30T13:19:12Z",
-          "author": "rajbos",
-          "isBotAuthor": false,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0,
-          "closesIssues": []
-        },
-        {
-          "number": 17,
-          "createdAt": "2023-10-01T20:35:29Z",
-          "mergedAt": "2023-10-02T07:00:09Z",
-          "author": "dependabot[bot]",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 10.41,
-          "closesIssues": []
-        },
-        {
-          "number": 16,
-          "createdAt": "2023-02-03T22:08:48Z",
-          "mergedAt": "2023-02-03T22:10:39Z",
-          "author": "dependabot[bot]",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.03,
-          "closesIssues": []
-        },
-        {
-          "number": 15,
-          "createdAt": "2023-01-24T07:35:57Z",
-          "mergedAt": "2023-01-24T07:39:19Z",
-          "author": "rajbos",
-          "isBotAuthor": false,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.06,
-          "closesIssues": []
-        },
-        {
-          "number": 1,
-          "createdAt": "2022-09-05T19:33:14Z",
-          "mergedAt": "2022-09-05T19:33:46Z",
-          "author": "rajbos",
-          "isBotAuthor": false,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.01,
-          "closesIssues": []
+          "closesIssues": [],
+          "linesAdded": 8,
+          "linesDeleted": 8
         }
       ],
       "copilotAdoption": {
-        "copilotAuthoredPRs": 151,
+        "copilotAuthoredPRs": 168,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 219,
+        "totalMergedPRs": 210,
         "totalDetailedPRs": 10,
-        "humanMergedPRs": 48
+        "humanMergedPRs": 28
       },
       "issueLeadTimes": [],
       "committerCount": 2,
-      "reviewerCount": 2,
-      "contributorCount": 3,
+      "reviewerCount": 3,
+      "contributorCount": 4,
       "dependentCount": 0,
       "copilotAgentMetrics": {
-        "totalTasks": 37,
+        "totalTasks": 36,
         "completedTasks": 0,
         "failedTasks": 0,
         "cancelledTasks": 1,
         "timedOutTasks": 0,
-        "activeTasksCount": 36,
-        "totalSessions": 37,
+        "activeTasksCount": 35,
+        "totalSessions": 36,
         "cloudAgentSessions": 0,
-        "cliRemoteSessions": 37,
+        "cliRemoteSessions": 36,
         "totalCreditsUsed": 0,
         "lastTaskAt": "2026-07-31T10:08:40.421571654Z",
         "agentCreatedPRs": 0,
@@ -28699,8 +29000,8 @@
           "prsMerged": 4,
           "issuesOpened": 1,
           "issuesClosed": 2,
-          "linesAdded": 237,
-          "linesDeleted": 4
+          "linesAdded": 245,
+          "linesDeleted": 12
         },
         {
           "week": "2025-W45",
@@ -28726,8 +29027,8 @@
           "prsMerged": 3,
           "issuesOpened": 0,
           "issuesClosed": 1,
-          "linesAdded": 365,
-          "linesDeleted": 0
+          "linesAdded": 368,
+          "linesDeleted": 3
         },
         {
           "week": "2025-W48",
@@ -28735,8 +29036,8 @@
           "prsMerged": 11,
           "issuesOpened": 2,
           "issuesClosed": 2,
-          "linesAdded": 372,
-          "linesDeleted": 1
+          "linesAdded": 929,
+          "linesDeleted": 85
         },
         {
           "week": "2025-W49",
@@ -29059,7 +29360,7 @@
       "name": "actions-permissions",
       "fullName": "rajbos/actions-permissions",
       "pushedAt": "2023-07-24T15:08:46Z",
-      "collectedAt": "2026-08-01T08:13:25.477Z",
+      "collectedAt": "2026-08-02T08:14:39.122Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -30040,7 +30341,7 @@
       "name": "actions-testing",
       "fullName": "rajbos/actions-testing",
       "pushedAt": "2021-01-27T19:00:39Z",
-      "collectedAt": "2026-08-01T08:13:26.783Z",
+      "collectedAt": "2026-08-02T08:14:40.446Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -31021,7 +31322,7 @@
       "name": "actions-testing-grounds",
       "fullName": "rajbos/actions-testing-grounds",
       "pushedAt": "2021-09-12T14:17:37Z",
-      "collectedAt": "2026-08-01T08:13:27.928Z",
+      "collectedAt": "2026-08-02T08:14:41.598Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -32002,7 +32303,7 @@
       "name": "actions-usage",
       "fullName": "rajbos/actions-usage",
       "pushedAt": "2023-07-30T10:42:05Z",
-      "collectedAt": "2026-08-01T08:13:28.861Z",
+      "collectedAt": "2026-08-02T08:14:42.517Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -32982,8 +33283,8 @@
     {
       "name": "ai-engineering-fluency",
       "fullName": "rajbos/ai-engineering-fluency",
-      "pushedAt": "2026-08-01T03:00:29Z",
-      "collectedAt": "2026-08-01T08:17:32.564Z",
+      "pushedAt": "2026-08-01T08:58:27Z",
+      "collectedAt": "2026-08-02T08:18:46.744Z",
       "issues": {
         "open": 7,
         "closed": 259
@@ -46822,15 +47123,15 @@
       "contributorCount": 12,
       "dependentCount": 0,
       "copilotAgentMetrics": {
-        "totalTasks": 163,
+        "totalTasks": 160,
         "completedTasks": 4,
         "failedTasks": 0,
         "cancelledTasks": 2,
         "timedOutTasks": 0,
-        "activeTasksCount": 157,
-        "totalSessions": 164,
+        "activeTasksCount": 154,
+        "totalSessions": 161,
         "cloudAgentSessions": 5,
-        "cliRemoteSessions": 159,
+        "cliRemoteSessions": 156,
         "totalCreditsUsed": 0,
         "avgCompletedSessionHours": 0.07,
         "lastTaskAt": "2026-07-31T13:22:27.403374686Z",
@@ -47780,7 +48081,7 @@
       "name": "arm.chocolateyserver",
       "fullName": "rajbos/arm.chocolateyserver",
       "pushedAt": "2018-07-24T10:01:38Z",
-      "collectedAt": "2026-08-01T08:17:33.888Z",
+      "collectedAt": "2026-08-02T08:18:48.644Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -48761,7 +49062,7 @@
       "name": "authority-contribution-scraper",
       "fullName": "rajbos/authority-contribution-scraper",
       "pushedAt": "2026-07-08T12:53:27Z",
-      "collectedAt": "2026-08-01T08:17:34.860Z",
+      "collectedAt": "2026-08-02T08:18:49.623Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -49742,7 +50043,7 @@
       "name": "azure-openai-service-proxy",
       "fullName": "rajbos/azure-openai-service-proxy",
       "pushedAt": "2025-12-08T16:22:02Z",
-      "collectedAt": "2026-08-01T08:17:35.656Z",
+      "collectedAt": "2026-08-02T08:18:51.146Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -50723,7 +51024,7 @@
       "name": "Azure-scripts",
       "fullName": "rajbos/Azure-scripts",
       "pushedAt": "2018-11-08T10:06:52Z",
-      "collectedAt": "2026-08-01T08:17:37.027Z",
+      "collectedAt": "2026-08-02T08:18:52.380Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -51704,7 +52005,7 @@
       "name": "centralPackageVersioningSample",
       "fullName": "rajbos/centralPackageVersioningSample",
       "pushedAt": "2026-04-14T08:24:56Z",
-      "collectedAt": "2026-08-01T08:17:37.900Z",
+      "collectedAt": "2026-08-02T08:18:53.304Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -52685,7 +52986,7 @@
       "name": "check-dependabot",
       "fullName": "rajbos/check-dependabot",
       "pushedAt": "2023-02-05T20:17:41Z",
-      "collectedAt": "2026-08-01T08:17:38.870Z",
+      "collectedAt": "2026-08-02T08:18:54.287Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -53666,7 +53967,7 @@
       "name": "CleanupCopilotLicenses",
       "fullName": "rajbos/CleanupCopilotLicenses",
       "pushedAt": "2024-04-16T01:28:42Z",
-      "collectedAt": "2026-08-01T08:17:39.874Z",
+      "collectedAt": "2026-08-02T08:18:55.237Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -54647,7 +54948,7 @@
       "name": "cli",
       "fullName": "rajbos/cli",
       "pushedAt": "2023-02-05T20:15:52Z",
-      "collectedAt": "2026-08-01T08:17:40.887Z",
+      "collectedAt": "2026-08-02T08:18:56.324Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -55628,7 +55929,7 @@
       "name": "codespaces-models",
       "fullName": "rajbos/codespaces-models",
       "pushedAt": "2024-09-22T21:31:55Z",
-      "collectedAt": "2026-08-01T08:17:41.739Z",
+      "collectedAt": "2026-08-02T08:18:57.189Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -56609,7 +56910,7 @@
       "name": "CodeToCloud-Student",
       "fullName": "rajbos/CodeToCloud-Student",
       "pushedAt": "2022-03-31T12:57:57Z",
-      "collectedAt": "2026-08-01T08:17:42.882Z",
+      "collectedAt": "2026-08-02T08:18:58.292Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -57590,7 +57891,7 @@
       "name": "container-scan",
       "fullName": "rajbos/container-scan",
       "pushedAt": "2025-01-05T17:19:59Z",
-      "collectedAt": "2026-08-01T08:17:43.868Z",
+      "collectedAt": "2026-08-02T08:18:59.266Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -58571,7 +58872,7 @@
       "name": "continuous-compliance-action",
       "fullName": "rajbos/continuous-compliance-action",
       "pushedAt": "2023-03-21T13:27:07Z",
-      "collectedAt": "2026-08-01T08:17:44.941Z",
+      "collectedAt": "2026-08-02T08:19:00.253Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -59552,7 +59853,7 @@
       "name": "Copilot-App-demo",
       "fullName": "rajbos/Copilot-App-demo",
       "pushedAt": "2026-07-30T08:38:37Z",
-      "collectedAt": "2026-08-01T08:17:48.065Z",
+      "collectedAt": "2026-08-02T08:19:03.151Z",
       "issues": {
         "open": 6,
         "closed": 0
@@ -60566,7 +60867,7 @@
       "name": "copilot-custom-agents",
       "fullName": "rajbos/copilot-custom-agents",
       "pushedAt": "2025-11-23T21:34:41Z",
-      "collectedAt": "2026-08-01T08:17:49.169Z",
+      "collectedAt": "2026-08-02T08:19:04.635Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -61547,7 +61848,7 @@
       "name": "copilot-usage-advanced-dashboard",
       "fullName": "rajbos/copilot-usage-advanced-dashboard",
       "pushedAt": "2026-02-04T15:52:29Z",
-      "collectedAt": "2026-08-01T08:17:49.976Z",
+      "collectedAt": "2026-08-02T08:19:05.554Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -62528,7 +62829,7 @@
       "name": "create-github-app-from-manifest",
       "fullName": "rajbos/create-github-app-from-manifest",
       "pushedAt": "2026-05-23T12:26:00Z",
-      "collectedAt": "2026-08-01T08:17:55.519Z",
+      "collectedAt": "2026-08-02T08:19:11.256Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -63795,7 +64096,7 @@
       "name": "demo",
       "fullName": "rajbos/demo",
       "pushedAt": "2023-02-15T15:47:32Z",
-      "collectedAt": "2026-08-01T08:17:56.523Z",
+      "collectedAt": "2026-08-02T08:19:12.411Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -64776,7 +65077,7 @@
       "name": "demo-actions",
       "fullName": "rajbos/demo-actions",
       "pushedAt": "2026-04-08T14:45:37Z",
-      "collectedAt": "2026-08-01T08:18:04.946Z",
+      "collectedAt": "2026-08-02T08:19:20.780Z",
       "issues": {
         "open": 6,
         "closed": 22
@@ -65757,7 +66058,7 @@
       "name": "demo-javascript-action",
       "fullName": "rajbos/demo-javascript-action",
       "pushedAt": "2024-06-17T06:44:23Z",
-      "collectedAt": "2026-08-01T08:18:21.015Z",
+      "collectedAt": "2026-08-02T08:19:22.828Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -66738,7 +67039,7 @@
       "name": "Demo-Pages",
       "fullName": "rajbos/Demo-Pages",
       "pushedAt": "2021-10-25T18:51:45Z",
-      "collectedAt": "2026-08-01T08:18:22.186Z",
+      "collectedAt": "2026-08-02T08:19:23.940Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -67719,7 +68020,7 @@
       "name": "demo-repo",
       "fullName": "rajbos/demo-repo",
       "pushedAt": "2025-05-08T12:03:02Z",
-      "collectedAt": "2026-08-01T08:18:23.624Z",
+      "collectedAt": "2026-08-02T08:19:25.002Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -68700,7 +69001,7 @@
       "name": "demo-repo-monday",
       "fullName": "rajbos/demo-repo-monday",
       "pushedAt": "2023-03-27T08:28:13Z",
-      "collectedAt": "2026-08-01T08:18:24.778Z",
+      "collectedAt": "2026-08-02T08:19:35.240Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -69681,7 +69982,7 @@
       "name": "demo-training",
       "fullName": "rajbos/demo-training",
       "pushedAt": "2022-03-07T10:23:23Z",
-      "collectedAt": "2026-08-01T08:18:25.818Z",
+      "collectedAt": "2026-08-02T08:19:36.601Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -70662,7 +70963,7 @@
       "name": "demo-webgoat",
       "fullName": "rajbos/demo-webgoat",
       "pushedAt": "2024-10-18T08:00:35Z",
-      "collectedAt": "2026-08-01T08:18:27.143Z",
+      "collectedAt": "2026-08-02T08:19:38.050Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -71643,7 +71944,7 @@
       "name": "demo-wiki",
       "fullName": "rajbos/demo-wiki",
       "pushedAt": "2023-01-16T10:15:38Z",
-      "collectedAt": "2026-08-01T08:18:28.258Z",
+      "collectedAt": "2026-08-02T08:19:39.319Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -72624,7 +72925,7 @@
       "name": "dependency-review-action",
       "fullName": "rajbos/dependency-review-action",
       "pushedAt": "2023-10-16T15:00:40Z",
-      "collectedAt": "2026-08-01T08:18:29.092Z",
+      "collectedAt": "2026-08-02T08:19:40.178Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -73605,7 +73906,7 @@
       "name": "dependency-updates",
       "fullName": "rajbos/dependency-updates",
       "pushedAt": "2022-05-24T21:18:27Z",
-      "collectedAt": "2026-08-01T08:18:31.442Z",
+      "collectedAt": "2026-08-02T08:19:42.480Z",
       "issues": {
         "open": 2,
         "closed": 3
@@ -74586,7 +74887,7 @@
       "name": "DevTrainingDemo",
       "fullName": "rajbos/DevTrainingDemo",
       "pushedAt": "2022-06-08T09:11:40Z",
-      "collectedAt": "2026-08-01T08:18:32.449Z",
+      "collectedAt": "2026-08-02T08:19:43.678Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -75567,7 +75868,7 @@
       "name": "dind-rootless-runner",
       "fullName": "rajbos/dind-rootless-runner",
       "pushedAt": "2021-10-12T08:03:09Z",
-      "collectedAt": "2026-08-01T08:18:33.441Z",
+      "collectedAt": "2026-08-02T08:19:44.882Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -76548,7 +76849,7 @@
       "name": "dind-secure",
       "fullName": "rajbos/dind-secure",
       "pushedAt": "2021-06-09T14:36:08Z",
-      "collectedAt": "2026-08-01T08:18:34.666Z",
+      "collectedAt": "2026-08-02T08:19:45.982Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -77529,7 +77830,7 @@
       "name": "docker-test",
       "fullName": "rajbos/docker-test",
       "pushedAt": "2023-03-30T12:58:01Z",
-      "collectedAt": "2026-08-01T08:18:37.052Z",
+      "collectedAt": "2026-08-02T08:19:48.502Z",
       "issues": {
         "open": 0,
         "closed": 1
@@ -78510,7 +78811,7 @@
       "name": "doom-sharp",
       "fullName": "rajbos/doom-sharp",
       "pushedAt": "2023-09-21T17:29:40Z",
-      "collectedAt": "2026-08-01T08:18:37.892Z",
+      "collectedAt": "2026-08-02T08:19:49.401Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -79491,7 +79792,7 @@
       "name": "dotnetcore-angular",
       "fullName": "rajbos/dotnetcore-angular",
       "pushedAt": "2019-10-26T19:29:04Z",
-      "collectedAt": "2026-08-01T08:18:39.318Z",
+      "collectedAt": "2026-08-02T08:19:50.629Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -80472,7 +80773,7 @@
       "name": "dotnetcore-webapp",
       "fullName": "rajbos/dotnetcore-webapp",
       "pushedAt": "2024-07-07T15:29:19Z",
-      "collectedAt": "2026-08-01T08:18:48.436Z",
+      "collectedAt": "2026-08-02T08:19:59.515Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -81453,7 +81754,7 @@
       "name": "eco-ci-activity-checker",
       "fullName": "rajbos/eco-ci-activity-checker",
       "pushedAt": "2023-04-09T00:04:04Z",
-      "collectedAt": "2026-08-01T08:18:49.328Z",
+      "collectedAt": "2026-08-02T08:20:00.493Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -82434,7 +82735,7 @@
       "name": "eco-ci-energy-estimation",
       "fullName": "rajbos/eco-ci-energy-estimation",
       "pushedAt": "2023-06-08T21:22:02Z",
-      "collectedAt": "2026-08-01T08:18:50.259Z",
+      "collectedAt": "2026-08-02T08:20:01.435Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -83415,7 +83716,7 @@
       "name": "find-action-used",
       "fullName": "rajbos/find-action-used",
       "pushedAt": "2024-11-08T07:43:21Z",
-      "collectedAt": "2026-08-01T08:18:51.517Z",
+      "collectedAt": "2026-08-02T08:20:02.730Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -84396,7 +84697,7 @@
       "name": "game-center",
       "fullName": "rajbos/game-center",
       "pushedAt": "2026-08-01T07:25:41Z",
-      "collectedAt": "2026-08-01T08:19:09.603Z",
+      "collectedAt": "2026-08-02T08:20:22.079Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -84923,15 +85224,15 @@
       "contributorCount": 4,
       "dependentCount": 0,
       "copilotAgentMetrics": {
-        "totalTasks": 38,
+        "totalTasks": 36,
         "completedTasks": 0,
         "failedTasks": 0,
         "cancelledTasks": 0,
         "timedOutTasks": 0,
-        "activeTasksCount": 38,
-        "totalSessions": 38,
+        "activeTasksCount": 36,
+        "totalSessions": 36,
         "cloudAgentSessions": 0,
-        "cliRemoteSessions": 38,
+        "cliRemoteSessions": 36,
         "totalCreditsUsed": 0,
         "lastTaskAt": "2026-07-31T10:08:17.08155408Z",
         "agentCreatedPRs": 0,
@@ -85880,7 +86181,7 @@
       "name": "get-organization-repositories-fork",
       "fullName": "rajbos/get-organization-repositories-fork",
       "pushedAt": "2023-02-05T20:20:43Z",
-      "collectedAt": "2026-08-01T08:19:10.452Z",
+      "collectedAt": "2026-08-02T08:20:23.086Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -86861,7 +87162,7 @@
       "name": "gh-developer-games",
       "fullName": "rajbos/gh-developer-games",
       "pushedAt": "2023-01-17T10:29:15Z",
-      "collectedAt": "2026-08-01T08:19:11.486Z",
+      "collectedAt": "2026-08-02T08:20:24.002Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -87842,7 +88143,7 @@
       "name": "ghas-mcp-server",
       "fullName": "rajbos/ghas-mcp-server",
       "pushedAt": "2025-05-21T15:43:10Z",
-      "collectedAt": "2026-08-01T08:19:22.347Z",
+      "collectedAt": "2026-08-02T08:20:27.861Z",
       "issues": {
         "open": 4,
         "closed": 0
@@ -89049,7 +89350,7 @@
       "name": "GHAzDo-widget",
       "fullName": "rajbos/GHAzDo-widget",
       "pushedAt": "2026-08-01T04:09:44Z",
-      "collectedAt": "2026-08-01T08:19:53.715Z",
+      "collectedAt": "2026-08-02T08:20:58.168Z",
       "issues": {
         "open": 5,
         "closed": 18
@@ -90700,15 +91001,15 @@
       "contributorCount": 4,
       "dependentCount": 0,
       "copilotAgentMetrics": {
-        "totalTasks": 32,
+        "totalTasks": 31,
         "completedTasks": 0,
         "failedTasks": 0,
         "cancelledTasks": 0,
         "timedOutTasks": 0,
-        "activeTasksCount": 32,
-        "totalSessions": 32,
+        "activeTasksCount": 31,
+        "totalSessions": 31,
         "cloudAgentSessions": 0,
-        "cliRemoteSessions": 32,
+        "cliRemoteSessions": 31,
         "totalCreditsUsed": 0,
         "lastTaskAt": "2026-07-31T10:08:56.63925004Z",
         "agentCreatedPRs": 0,
@@ -91657,7 +91958,7 @@
       "name": "giphy-action",
       "fullName": "rajbos/giphy-action",
       "pushedAt": "2023-05-13T22:02:46Z",
-      "collectedAt": "2026-08-01T08:19:54.673Z",
+      "collectedAt": "2026-08-02T08:20:59.175Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -92638,7 +92939,7 @@
       "name": "github-action-composite-message",
       "fullName": "rajbos/github-action-composite-message",
       "pushedAt": "2021-09-12T14:23:58Z",
-      "collectedAt": "2026-08-01T08:19:55.903Z",
+      "collectedAt": "2026-08-02T08:21:00.419Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -93619,7 +93920,7 @@
       "name": "github-actions-requests",
       "fullName": "rajbos/github-actions-requests",
       "pushedAt": "2024-09-03T21:00:19Z",
-      "collectedAt": "2026-08-01T08:19:58.587Z",
+      "collectedAt": "2026-08-02T08:21:03.299Z",
       "issues": {
         "open": 19,
         "closed": 8
@@ -94599,18 +94900,34 @@
     {
       "name": "github-azure-devops-marketplace-extension-news",
       "fullName": "rajbos/github-azure-devops-marketplace-extension-news",
-      "pushedAt": "2026-07-30T14:57:51Z",
-      "collectedAt": "2026-08-01T08:20:37.884Z",
+      "pushedAt": "2026-08-01T08:41:49Z",
+      "collectedAt": "2026-08-02T08:21:52.168Z",
       "issues": {
         "open": 0,
         "closed": 7
       },
       "pullRequests": {
-        "open": 2,
+        "open": 5,
         "closed": 72,
-        "merged": 284
+        "merged": 285
       },
       "pullRequestDetails": [
+        {
+          "number": 367,
+          "title": "chore(deps): bump the all-in-one group with 4 updates",
+          "state": "merged",
+          "createdAt": "2026-08-01T08:37:50Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 12,
+          "linesDeleted": 12,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 94.33,
+          "timeToMergeHours": 0.04,
+          "mergedAt": "2026-08-01T08:40:02Z"
+        },
         {
           "number": 366,
           "title": "Use GitHub API for version checks on known actions to cut marketplace page loads",
@@ -94756,25 +95073,21 @@
           "actionsMinutes": 202.5,
           "timeToMergeHours": 265.74,
           "mergedAt": "2026-07-12T10:18:21Z"
-        },
-        {
-          "number": 357,
-          "title": "chore(deps): bump actions/checkout from 6 to 7",
-          "state": "merged",
-          "createdAt": "2026-07-01T08:34:02Z",
-          "author": "dependabot",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 13,
-          "linesDeleted": 13,
-          "commentCount": 0,
-          "commitCount": 1,
-          "actionsMinutes": 177.8,
-          "timeToMergeHours": 265.66,
-          "mergedAt": "2026-07-12T10:13:42Z"
         }
       ],
       "mergedPRTimeline": [
+        {
+          "number": 367,
+          "createdAt": "2026-08-01T08:37:50Z",
+          "mergedAt": "2026-08-01T08:40:02Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.04,
+          "closesIssues": [],
+          "linesAdded": 12,
+          "linesDeleted": 12
+        },
         {
           "number": 366,
           "createdAt": "2026-07-30T12:59:20Z",
@@ -96375,60 +96688,12 @@
           "closesIssues": [],
           "linesAdded": 11,
           "linesDeleted": 11
-        },
-        {
-          "number": 207,
-          "createdAt": "2024-08-01T08:39:20Z",
-          "mergedAt": "2024-08-01T08:41:56Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.04,
-          "closesIssues": [],
-          "linesAdded": 14,
-          "linesDeleted": 14
-        },
-        {
-          "number": 206,
-          "createdAt": "2024-08-01T08:30:24Z",
-          "mergedAt": "2024-08-01T08:33:11Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.05,
-          "closesIssues": [],
-          "linesAdded": 1,
-          "linesDeleted": 1
-        },
-        {
-          "number": 205,
-          "createdAt": "2024-08-01T08:29:18Z",
-          "mergedAt": "2024-08-01T08:31:57Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.04,
-          "closesIssues": [],
-          "linesAdded": 1,
-          "linesDeleted": 1
-        },
-        {
-          "number": 204,
-          "createdAt": "2024-08-01T08:27:55Z",
-          "mergedAt": "2024-08-01T08:30:41Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.05,
-          "closesIssues": [],
-          "linesAdded": 5,
-          "linesDeleted": 5
         }
       ],
       "copilotAdoption": {
         "copilotAuthoredPRs": 29,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 135,
+        "totalMergedPRs": 132,
         "totalDetailedPRs": 10,
         "humanMergedPRs": 19
       },
@@ -96438,15 +96703,15 @@
       "contributorCount": 7,
       "dependentCount": 0,
       "copilotAgentMetrics": {
-        "totalTasks": 38,
+        "totalTasks": 36,
         "completedTasks": 0,
         "failedTasks": 0,
         "cancelledTasks": 0,
         "timedOutTasks": 0,
-        "activeTasksCount": 38,
-        "totalSessions": 38,
+        "activeTasksCount": 36,
+        "totalSessions": 36,
         "cloudAgentSessions": 0,
-        "cliRemoteSessions": 38,
+        "cliRemoteSessions": 36,
         "totalCreditsUsed": 0,
         "lastTaskAt": "2026-07-31T10:09:03.524940671Z",
         "agentCreatedPRs": 0,
@@ -97382,12 +97647,12 @@
         },
         {
           "week": "2026-W31",
-          "prsOpened": 1,
-          "prsMerged": 1,
+          "prsOpened": 2,
+          "prsMerged": 2,
           "issuesOpened": 0,
           "issuesClosed": 0,
-          "linesAdded": 662,
-          "linesDeleted": 23
+          "linesAdded": 674,
+          "linesDeleted": 35
         }
       ]
     },
@@ -97395,7 +97660,7 @@
       "name": "github-composite-action-goodbye",
       "fullName": "rajbos/github-composite-action-goodbye",
       "pushedAt": "2021-09-12T14:25:11Z",
-      "collectedAt": "2026-08-01T08:20:39.077Z",
+      "collectedAt": "2026-08-02T08:21:53.561Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -98376,7 +98641,7 @@
       "name": "github-config-as-code",
       "fullName": "rajbos/github-config-as-code",
       "pushedAt": "2023-06-07T15:24:41Z",
-      "collectedAt": "2026-08-01T08:20:40.172Z",
+      "collectedAt": "2026-08-02T08:21:54.774Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -99357,7 +99622,7 @@
       "name": "github-copilot-game-dev",
       "fullName": "rajbos/github-copilot-game-dev",
       "pushedAt": "2026-04-01T09:55:18Z",
-      "collectedAt": "2026-08-01T08:20:41.141Z",
+      "collectedAt": "2026-08-02T08:21:56.027Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -100337,8 +100602,8 @@
     {
       "name": "github-copilot-model-notifier",
       "fullName": "rajbos/github-copilot-model-notifier",
-      "pushedAt": "2026-07-31T09:01:50Z",
-      "collectedAt": "2026-08-01T08:21:31.478Z",
+      "pushedAt": "2026-08-01T08:47:41Z",
+      "collectedAt": "2026-08-02T08:22:13.447Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -100705,15 +100970,15 @@
       "contributorCount": 3,
       "dependentCount": 0,
       "copilotAgentMetrics": {
-        "totalTasks": 37,
+        "totalTasks": 35,
         "completedTasks": 0,
         "failedTasks": 0,
         "cancelledTasks": 1,
         "timedOutTasks": 0,
-        "activeTasksCount": 36,
-        "totalSessions": 37,
+        "activeTasksCount": 34,
+        "totalSessions": 35,
         "cloudAgentSessions": 0,
-        "cliRemoteSessions": 37,
+        "cliRemoteSessions": 35,
         "totalCreditsUsed": 0,
         "lastTaskAt": "2026-07-31T10:08:33.276557357Z",
         "agentCreatedPRs": 0,
@@ -101662,7 +101927,7 @@
       "name": "github-copilot-premium-reqs-usage-fork",
       "fullName": "rajbos/github-copilot-premium-reqs-usage-fork",
       "pushedAt": "2026-04-20T07:27:21Z",
-      "collectedAt": "2026-08-01T08:21:40.192Z",
+      "collectedAt": "2026-08-02T08:22:21.935Z",
       "issues": {
         "open": 1,
         "closed": 19
@@ -103159,7 +103424,7 @@
       "name": "github-fork-updater",
       "fullName": "rajbos/github-fork-updater",
       "pushedAt": "2026-08-01T00:04:59Z",
-      "collectedAt": "2026-08-01T08:22:06.030Z",
+      "collectedAt": "2026-08-02T08:22:58.629Z",
       "issues": {
         "open": 52,
         "closed": 83
@@ -103859,15 +104124,15 @@
       "contributorCount": 2,
       "dependentCount": 0,
       "copilotAgentMetrics": {
-        "totalTasks": 37,
+        "totalTasks": 36,
         "completedTasks": 0,
         "failedTasks": 0,
         "cancelledTasks": 0,
         "timedOutTasks": 0,
-        "activeTasksCount": 37,
-        "totalSessions": 37,
+        "activeTasksCount": 36,
+        "totalSessions": 36,
         "cloudAgentSessions": 0,
-        "cliRemoteSessions": 37,
+        "cliRemoteSessions": 36,
         "totalCreditsUsed": 0,
         "lastTaskAt": "2026-07-31T10:09:05.272120006Z",
         "agentCreatedPRs": 0,
@@ -104816,7 +105081,7 @@
       "name": "github-graphql-examples",
       "fullName": "rajbos/github-graphql-examples",
       "pushedAt": "2022-11-28T22:28:51Z",
-      "collectedAt": "2026-08-01T08:22:07.282Z",
+      "collectedAt": "2026-08-02T08:22:59.927Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -105797,7 +106062,7 @@
       "name": "github-mcp-server",
       "fullName": "rajbos/github-mcp-server",
       "pushedAt": "2025-05-13T18:59:47Z",
-      "collectedAt": "2026-08-01T08:22:08.140Z",
+      "collectedAt": "2026-08-02T08:23:00.825Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -106778,7 +107043,7 @@
       "name": "github-models-example",
       "fullName": "rajbos/github-models-example",
       "pushedAt": "2024-10-13T15:22:28Z",
-      "collectedAt": "2026-08-01T08:22:25.529Z",
+      "collectedAt": "2026-08-02T08:23:02.062Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -107759,7 +108024,7 @@
       "name": "github-org-information",
       "fullName": "rajbos/github-org-information",
       "pushedAt": "2023-06-08T20:48:09Z",
-      "collectedAt": "2026-08-01T08:22:27.001Z",
+      "collectedAt": "2026-08-02T08:23:03.323Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -108739,8 +109004,8 @@
     {
       "name": "GitHub-ratelimit-research",
       "fullName": "rajbos/GitHub-ratelimit-research",
-      "pushedAt": "2026-08-01T07:54:53Z",
-      "collectedAt": "2026-08-01T08:22:45.704Z",
+      "pushedAt": "2026-08-02T07:56:30Z",
+      "collectedAt": "2026-08-02T08:23:52.525Z",
       "issues": {
         "open": 1,
         "closed": 45
@@ -109227,15 +109492,15 @@
       "contributorCount": 2,
       "dependentCount": 0,
       "copilotAgentMetrics": {
-        "totalTasks": 35,
+        "totalTasks": 34,
         "completedTasks": 0,
         "failedTasks": 0,
         "cancelledTasks": 0,
         "timedOutTasks": 0,
-        "activeTasksCount": 35,
-        "totalSessions": 35,
+        "activeTasksCount": 34,
+        "totalSessions": 34,
         "cloudAgentSessions": 0,
-        "cliRemoteSessions": 35,
+        "cliRemoteSessions": 34,
         "totalCreditsUsed": 0,
         "lastTaskAt": "2026-07-31T10:08:51.958985859Z",
         "agentCreatedPRs": 0,
@@ -110184,7 +110449,7 @@
       "name": "github-secure-code-game",
       "fullName": "rajbos/github-secure-code-game",
       "pushedAt": "2023-07-20T17:58:55Z",
-      "collectedAt": "2026-08-01T08:22:46.903Z",
+      "collectedAt": "2026-08-02T08:23:53.962Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -111165,7 +111430,7 @@
       "name": "github-upload-action",
       "fullName": "rajbos/github-upload-action",
       "pushedAt": "2021-11-29T16:22:30Z",
-      "collectedAt": "2026-08-01T08:22:47.670Z",
+      "collectedAt": "2026-08-02T08:23:54.932Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -112146,7 +112411,7 @@
       "name": "GitHubBootcamp",
       "fullName": "rajbos/GitHubBootcamp",
       "pushedAt": "2022-06-17T14:57:02Z",
-      "collectedAt": "2026-08-01T08:22:48.772Z",
+      "collectedAt": "2026-08-02T08:23:55.801Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -113127,7 +113392,7 @@
       "name": "Goat-test",
       "fullName": "rajbos/Goat-test",
       "pushedAt": "2023-10-07T10:11:36Z",
-      "collectedAt": "2026-08-01T08:22:49.891Z",
+      "collectedAt": "2026-08-02T08:23:57.041Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -114108,7 +114373,7 @@
       "name": "greenframe-action",
       "fullName": "rajbos/greenframe-action",
       "pushedAt": "2023-04-08T21:12:31Z",
-      "collectedAt": "2026-08-01T08:22:50.640Z",
+      "collectedAt": "2026-08-02T08:23:57.943Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -115089,7 +115354,7 @@
       "name": "ha-config",
       "fullName": "rajbos/ha-config",
       "pushedAt": "2019-01-27T10:48:16Z",
-      "collectedAt": "2026-08-01T08:22:51.959Z",
+      "collectedAt": "2026-08-02T08:23:59.249Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -116070,7 +116335,7 @@
       "name": "hol-demo",
       "fullName": "rajbos/hol-demo",
       "pushedAt": "2022-09-06T15:17:57Z",
-      "collectedAt": "2026-08-01T08:22:53.204Z",
+      "collectedAt": "2026-08-02T08:24:00.599Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -117051,7 +117316,7 @@
       "name": "home-automation",
       "fullName": "rajbos/home-automation",
       "pushedAt": "2022-03-25T14:54:30Z",
-      "collectedAt": "2026-08-01T08:22:54.240Z",
+      "collectedAt": "2026-08-02T08:24:01.820Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -118032,7 +118297,7 @@
       "name": "html-timer",
       "fullName": "rajbos/html-timer",
       "pushedAt": "2024-12-01T21:42:34Z",
-      "collectedAt": "2026-08-01T08:22:55.738Z",
+      "collectedAt": "2026-08-02T08:24:03.696Z",
       "issues": {
         "open": 2,
         "closed": 2
@@ -119013,7 +119278,7 @@
       "name": "issue-labeler",
       "fullName": "rajbos/issue-labeler",
       "pushedAt": "2023-06-29T08:42:00Z",
-      "collectedAt": "2026-08-01T08:22:56.504Z",
+      "collectedAt": "2026-08-02T08:24:04.507Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -119994,7 +120259,7 @@
       "name": "Jarvis",
       "fullName": "rajbos/Jarvis",
       "pushedAt": "2026-07-29T02:05:52Z",
-      "collectedAt": "2026-08-01T08:23:35.157Z",
+      "collectedAt": "2026-08-02T08:24:37.245Z",
       "issues": {
         "open": 0,
         "closed": 62
@@ -122054,15 +122319,15 @@
       "contributorCount": 6,
       "dependentCount": 0,
       "copilotAgentMetrics": {
-        "totalTasks": 37,
+        "totalTasks": 36,
         "completedTasks": 1,
         "failedTasks": 0,
         "cancelledTasks": 0,
         "timedOutTasks": 0,
-        "activeTasksCount": 36,
-        "totalSessions": 37,
+        "activeTasksCount": 35,
+        "totalSessions": 36,
         "cloudAgentSessions": 1,
-        "cliRemoteSessions": 36,
+        "cliRemoteSessions": 35,
         "totalCreditsUsed": 0,
         "avgCompletedSessionHours": 0.06,
         "lastTaskAt": "2026-07-31T10:08:11.001843369Z",
@@ -123012,7 +123277,7 @@
       "name": "juice-shop",
       "fullName": "rajbos/juice-shop",
       "pushedAt": "2023-02-15T07:27:33Z",
-      "collectedAt": "2026-08-01T08:23:35.995Z",
+      "collectedAt": "2026-08-02T08:24:38.161Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -123993,7 +124258,7 @@
       "name": "kvm",
       "fullName": "rajbos/kvm",
       "pushedAt": "2021-03-15T15:16:08Z",
-      "collectedAt": "2026-08-01T08:23:37.193Z",
+      "collectedAt": "2026-08-02T08:24:39.336Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -124974,7 +125239,7 @@
       "name": "legitify",
       "fullName": "rajbos/legitify",
       "pushedAt": "2025-01-05T17:20:31Z",
-      "collectedAt": "2026-08-01T08:23:38.031Z",
+      "collectedAt": "2026-08-02T08:24:40.226Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -125955,7 +126220,7 @@
       "name": "local-setup",
       "fullName": "rajbos/local-setup",
       "pushedAt": "2025-12-20T11:46:04Z",
-      "collectedAt": "2026-08-01T08:23:40.758Z",
+      "collectedAt": "2026-08-02T08:24:43.015Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -127058,7 +127323,7 @@
       "name": "mcp-agents-hub",
       "fullName": "rajbos/mcp-agents-hub",
       "pushedAt": "2026-04-20T07:29:27Z",
-      "collectedAt": "2026-08-01T08:23:41.598Z",
+      "collectedAt": "2026-08-02T08:24:43.884Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -128039,7 +128304,7 @@
       "name": "mcp-registry-demo",
       "fullName": "rajbos/mcp-registry-demo",
       "pushedAt": "2026-03-28T20:24:33Z",
-      "collectedAt": "2026-08-01T08:23:46.577Z",
+      "collectedAt": "2026-08-02T08:24:48.866Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -129346,7 +129611,7 @@
       "name": "mcp-servers",
       "fullName": "rajbos/mcp-servers",
       "pushedAt": "2025-03-27T13:42:05Z",
-      "collectedAt": "2026-08-01T08:23:47.335Z",
+      "collectedAt": "2026-08-02T08:24:49.677Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -130327,7 +130592,7 @@
       "name": "melos-action",
       "fullName": "rajbos/melos-action",
       "pushedAt": "2024-04-26T12:36:37Z",
-      "collectedAt": "2026-08-01T08:23:48.344Z",
+      "collectedAt": "2026-08-02T08:24:50.717Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -131308,7 +131573,7 @@
       "name": "microsoft-learn",
       "fullName": "rajbos/microsoft-learn",
       "pushedAt": "2022-10-25T20:25:46Z",
-      "collectedAt": "2026-08-01T08:23:49.402Z",
+      "collectedAt": "2026-08-02T08:24:51.747Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -132289,7 +132554,7 @@
       "name": "microsoft-todo-mcp-server",
       "fullName": "rajbos/microsoft-todo-mcp-server",
       "pushedAt": "2026-04-11T15:06:10Z",
-      "collectedAt": "2026-08-01T08:23:50.747Z",
+      "collectedAt": "2026-08-02T08:24:53.198Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -133300,7 +133565,7 @@
       "name": "modern-development",
       "fullName": "rajbos/modern-development",
       "pushedAt": "2023-04-21T00:45:05Z",
-      "collectedAt": "2026-08-01T08:23:52.000Z",
+      "collectedAt": "2026-08-02T08:24:54.649Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -134281,7 +134546,7 @@
       "name": "NuGetDefense.Core",
       "fullName": "rajbos/NuGetDefense.Core",
       "pushedAt": "2021-07-27T18:25:03Z",
-      "collectedAt": "2026-08-01T08:23:52.787Z",
+      "collectedAt": "2026-08-02T08:24:55.571Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -135262,7 +135527,7 @@
       "name": "openssf-scorecard-monitor",
       "fullName": "rajbos/openssf-scorecard-monitor",
       "pushedAt": "2026-04-23T07:20:19Z",
-      "collectedAt": "2026-08-01T08:23:54.527Z",
+      "collectedAt": "2026-08-02T08:24:57.320Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -136275,7 +136540,7 @@
       "name": "pages-test",
       "fullName": "rajbos/pages-test",
       "pushedAt": "2022-02-07T20:33:42Z",
-      "collectedAt": "2026-08-01T08:23:55.569Z",
+      "collectedAt": "2026-08-02T08:24:58.490Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -137256,7 +137521,7 @@
       "name": "pipelines",
       "fullName": "rajbos/pipelines",
       "pushedAt": "2023-02-20T03:59:19Z",
-      "collectedAt": "2026-08-01T08:24:03.323Z",
+      "collectedAt": "2026-08-02T08:25:07.424Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -138237,7 +138502,7 @@
       "name": "pr-template-test",
       "fullName": "rajbos/pr-template-test",
       "pushedAt": "2022-11-30T21:10:28Z",
-      "collectedAt": "2026-08-01T08:24:07.170Z",
+      "collectedAt": "2026-08-02T08:25:08.914Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -139218,7 +139483,7 @@
       "name": "PS-NetworkAnalyzer",
       "fullName": "rajbos/PS-NetworkAnalyzer",
       "pushedAt": "2025-12-21T20:57:04Z",
-      "collectedAt": "2026-08-01T08:24:10.101Z",
+      "collectedAt": "2026-08-02T08:25:11.710Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -140321,7 +140586,7 @@
       "name": "PublicGitHubActionsTest",
       "fullName": "rajbos/PublicGitHubActionsTest",
       "pushedAt": "2022-02-18T14:54:25Z",
-      "collectedAt": "2026-08-01T08:24:10.885Z",
+      "collectedAt": "2026-08-02T08:25:12.549Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -141302,7 +141567,7 @@
       "name": "rajbos",
       "fullName": "rajbos/rajbos",
       "pushedAt": "2026-07-31T07:23:45Z",
-      "collectedAt": "2026-08-01T08:24:44.039Z",
+      "collectedAt": "2026-08-02T08:25:46.395Z",
       "issues": {
         "open": 0,
         "closed": 29
@@ -143069,15 +143334,15 @@
       "contributorCount": 5,
       "dependentCount": 0,
       "copilotAgentMetrics": {
-        "totalTasks": 37,
+        "totalTasks": 36,
         "completedTasks": 0,
         "failedTasks": 0,
         "cancelledTasks": 0,
         "timedOutTasks": 0,
-        "activeTasksCount": 37,
-        "totalSessions": 37,
+        "activeTasksCount": 36,
+        "totalSessions": 36,
         "cloudAgentSessions": 0,
-        "cliRemoteSessions": 37,
+        "cliRemoteSessions": 36,
         "totalCreditsUsed": 0,
         "lastTaskAt": "2026-07-31T10:09:27.978774477Z",
         "agentCreatedPRs": 0,
@@ -144026,7 +144291,7 @@
       "name": "rajbos.github.io",
       "fullName": "rajbos/rajbos.github.io",
       "pushedAt": "2026-07-27T06:34:30Z",
-      "collectedAt": "2026-08-01T08:25:39.649Z",
+      "collectedAt": "2026-08-02T08:26:09.595Z",
       "issues": {
         "open": 0,
         "closed": 2
@@ -144825,15 +145090,15 @@
       "contributorCount": 3,
       "dependentCount": 0,
       "copilotAgentMetrics": {
-        "totalTasks": 39,
+        "totalTasks": 37,
         "completedTasks": 0,
         "failedTasks": 0,
         "cancelledTasks": 0,
         "timedOutTasks": 0,
-        "activeTasksCount": 39,
-        "totalSessions": 39,
+        "activeTasksCount": 37,
+        "totalSessions": 37,
         "cloudAgentSessions": 0,
-        "cliRemoteSessions": 39,
+        "cliRemoteSessions": 37,
         "totalCreditsUsed": 0,
         "lastTaskAt": "2026-07-31T10:08:45.546987262Z",
         "agentCreatedPRs": 0,
@@ -145782,7 +146047,7 @@
       "name": "runner-tests",
       "fullName": "rajbos/runner-tests",
       "pushedAt": "2023-07-08T15:04:33Z",
-      "collectedAt": "2026-08-01T08:25:41.108Z",
+      "collectedAt": "2026-08-02T08:26:11.170Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -146763,7 +147028,7 @@
       "name": "sample-app-aoai-chatGPT",
       "fullName": "rajbos/sample-app-aoai-chatGPT",
       "pushedAt": "2024-09-27T13:39:08Z",
-      "collectedAt": "2026-08-01T08:25:41.994Z",
+      "collectedAt": "2026-08-02T08:26:12.098Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -147744,7 +148009,7 @@
       "name": "scorecard-action",
       "fullName": "rajbos/scorecard-action",
       "pushedAt": "2023-11-17T07:04:21Z",
-      "collectedAt": "2026-08-01T08:25:42.939Z",
+      "collectedAt": "2026-08-02T08:26:13.093Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -148725,7 +148990,7 @@
       "name": "scorecard-ghes",
       "fullName": "rajbos/scorecard-ghes",
       "pushedAt": "2023-05-26T19:41:22Z",
-      "collectedAt": "2026-08-01T08:25:44.393Z",
+      "collectedAt": "2026-08-02T08:26:14.425Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -149706,7 +149971,7 @@
       "name": "scorecard-webapp",
       "fullName": "rajbos/scorecard-webapp",
       "pushedAt": "2023-07-11T08:40:16Z",
-      "collectedAt": "2026-08-01T08:25:45.248Z",
+      "collectedAt": "2026-08-02T08:26:15.357Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -150687,7 +150952,7 @@
       "name": "secret-scanning-custom-patterns",
       "fullName": "rajbos/secret-scanning-custom-patterns",
       "pushedAt": "2023-07-17T13:23:57Z",
-      "collectedAt": "2026-08-01T08:25:46.277Z",
+      "collectedAt": "2026-08-02T08:26:16.328Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -151668,7 +151933,7 @@
       "name": "security-demo",
       "fullName": "rajbos/security-demo",
       "pushedAt": "2022-03-05T09:36:07Z",
-      "collectedAt": "2026-08-01T08:25:47.624Z",
+      "collectedAt": "2026-08-02T08:26:17.664Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -152649,7 +152914,7 @@
       "name": "SonarQube-AzureAppService",
       "fullName": "rajbos/SonarQube-AzureAppService",
       "pushedAt": "2024-10-14T14:25:11Z",
-      "collectedAt": "2026-08-01T08:25:48.413Z",
+      "collectedAt": "2026-08-02T08:26:18.559Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -153630,7 +153895,7 @@
       "name": "Stryker.MultipleProjectRunner",
       "fullName": "rajbos/Stryker.MultipleProjectRunner",
       "pushedAt": "2023-12-20T13:29:35Z",
-      "collectedAt": "2026-08-01T08:25:50.149Z",
+      "collectedAt": "2026-08-02T08:26:20.122Z",
       "issues": {
         "open": 0,
         "closed": 4
@@ -154611,7 +154876,7 @@
       "name": "tag-npm-version",
       "fullName": "rajbos/tag-npm-version",
       "pushedAt": "2025-12-08T12:22:32Z",
-      "collectedAt": "2026-08-01T08:25:51.383Z",
+      "collectedAt": "2026-08-02T08:26:21.379Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -155592,7 +155857,7 @@
       "name": "TailwindTraders",
       "fullName": "rajbos/TailwindTraders",
       "pushedAt": "2021-05-20T17:44:45Z",
-      "collectedAt": "2026-08-01T08:25:52.201Z",
+      "collectedAt": "2026-08-02T08:26:22.160Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -156573,7 +156838,7 @@
       "name": "teams-automation",
       "fullName": "rajbos/teams-automation",
       "pushedAt": "2025-09-06T08:30:58Z",
-      "collectedAt": "2026-08-01T08:25:54.064Z",
+      "collectedAt": "2026-08-02T08:26:24.055Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -157584,7 +157849,7 @@
       "name": "test-repo",
       "fullName": "rajbos/test-repo",
       "pushedAt": "2023-01-05T18:13:06Z",
-      "collectedAt": "2026-08-01T08:25:55.653Z",
+      "collectedAt": "2026-08-02T08:26:25.594Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -158565,7 +158830,7 @@
       "name": "tfsec-sarif-action",
       "fullName": "rajbos/tfsec-sarif-action",
       "pushedAt": "2023-07-17T14:46:28Z",
-      "collectedAt": "2026-08-01T08:25:56.593Z",
+      "collectedAt": "2026-08-02T08:26:26.478Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -159546,7 +159811,7 @@
       "name": "training-manual",
       "fullName": "rajbos/training-manual",
       "pushedAt": "2024-02-05T16:53:38Z",
-      "collectedAt": "2026-08-01T08:25:57.529Z",
+      "collectedAt": "2026-08-02T08:26:27.372Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -160527,7 +160792,7 @@
       "name": "trivy-action",
       "fullName": "rajbos/trivy-action",
       "pushedAt": "2026-07-08T17:29:56Z",
-      "collectedAt": "2026-08-01T08:25:58.549Z",
+      "collectedAt": "2026-08-02T08:26:28.471Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -161508,7 +161773,7 @@
       "name": "typescript-demo",
       "fullName": "rajbos/typescript-demo",
       "pushedAt": "2023-10-19T02:13:23Z",
-      "collectedAt": "2026-08-01T08:26:02.394Z",
+      "collectedAt": "2026-08-02T08:26:32.317Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -162489,7 +162754,7 @@
       "name": "vscode-github-ratelimit",
       "fullName": "rajbos/vscode-github-ratelimit",
       "pushedAt": "2026-01-03T17:05:44Z",
-      "collectedAt": "2026-08-01T08:26:03.676Z",
+      "collectedAt": "2026-08-02T08:26:33.705Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -163502,7 +163767,7 @@
       "name": "VSTSClient",
       "fullName": "rajbos/VSTSClient",
       "pushedAt": "2021-04-22T09:27:30Z",
-      "collectedAt": "2026-08-01T08:26:04.816Z",
+      "collectedAt": "2026-08-02T08:26:34.823Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -164483,7 +164748,7 @@
       "name": "webdis-fork",
       "fullName": "rajbos/webdis-fork",
       "pushedAt": "2024-02-05T16:52:08Z",
-      "collectedAt": "2026-08-01T08:26:05.618Z",
+      "collectedAt": "2026-08-02T08:26:35.673Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -165464,7 +165729,7 @@
       "name": "WebGoat.Net-Test",
       "fullName": "rajbos/WebGoat.Net-Test",
       "pushedAt": "2023-10-07T10:10:59Z",
-      "collectedAt": "2026-08-01T08:26:06.733Z",
+      "collectedAt": "2026-08-02T08:26:36.827Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -166445,7 +166710,7 @@
       "name": "WebGoat.NETCore",
       "fullName": "rajbos/WebGoat.NETCore",
       "pushedAt": "2024-10-09T07:49:26Z",
-      "collectedAt": "2026-08-01T08:26:07.878Z",
+      "collectedAt": "2026-08-02T08:26:37.968Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -167426,7 +167691,7 @@
       "name": "workflow-composition",
       "fullName": "rajbos/workflow-composition",
       "pushedAt": "2023-09-13T13:20:26Z",
-      "collectedAt": "2026-08-01T08:26:09.093Z",
+      "collectedAt": "2026-08-02T08:26:58.185Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -168407,7 +168672,7 @@
       "name": "TailWind",
       "fullName": "renevanosnabrugge/TailWind",
       "pushedAt": "2022-10-28T12:04:18Z",
-      "collectedAt": "2026-08-01T08:26:10.528Z",
+      "collectedAt": "2026-08-02T08:26:59.548Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -169374,7 +169639,7 @@
       "name": "demo-actions",
       "fullName": "rob-demo/demo-actions",
       "pushedAt": "2023-07-07T11:08:52Z",
-      "collectedAt": "2026-08-01T08:26:11.791Z",
+      "collectedAt": "2026-08-02T08:27:00.870Z",
       "issues": {
         "open": 6,
         "closed": 5
@@ -170341,7 +170606,7 @@
       "name": "commitstory",
       "fullName": "santoshyadavdev/commitstory",
       "pushedAt": "2026-07-22T16:08:23Z",
-      "collectedAt": "2026-08-01T08:26:20.085Z",
+      "collectedAt": "2026-08-02T08:27:09.164Z",
       "issues": {
         "open": 3,
         "closed": 17
@@ -171973,7 +172238,7 @@
       "name": "techhub",
       "fullName": "techhubms/techhub",
       "pushedAt": "2026-07-29T10:07:35Z",
-      "collectedAt": "2026-08-01T08:27:21.888Z",
+      "collectedAt": "2026-08-02T08:29:07.142Z",
       "issues": {
         "open": 14,
         "closed": 154
@@ -176361,7 +176626,7 @@
       "name": "gh-developer-caption-this",
       "fullName": "UncleBats/gh-developer-caption-this",
       "pushedAt": "2024-04-05T04:29:17Z",
-      "collectedAt": "2026-08-01T08:27:23.328Z",
+      "collectedAt": "2026-08-02T08:29:08.635Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -177328,7 +177593,7 @@
       "name": "Anythink-Market-dedwkp0p",
       "fullName": "Wilcolab/Anythink-Market-dedwkp0p",
       "pushedAt": "2024-10-30T15:18:38Z",
-      "collectedAt": "2026-08-01T08:27:26.315Z",
+      "collectedAt": "2026-08-02T08:29:11.587Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -178437,7 +178702,7 @@
       "name": "doepicshit",
       "fullName": "xebia/doepicshit",
       "pushedAt": "2026-06-22T20:03:01Z",
-      "collectedAt": "2026-08-01T08:27:31.239Z",
+      "collectedAt": "2026-08-02T08:29:16.883Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -179546,7 +179811,7 @@
       "name": "github-copilot-premium-reqs-usage",
       "fullName": "xebia/github-copilot-premium-reqs-usage",
       "pushedAt": "2026-07-28T08:47:06Z",
-      "collectedAt": "2026-08-01T08:27:55.923Z",
+      "collectedAt": "2026-08-02T08:29:41.128Z",
       "issues": {
         "open": 1,
         "closed": 28
@@ -182630,7 +182895,7 @@
       "name": "github-copilot-updates",
       "fullName": "xebia/github-copilot-updates",
       "pushedAt": "2025-07-14T08:12:06Z",
-      "collectedAt": "2026-08-01T08:28:05.421Z",
+      "collectedAt": "2026-08-02T08:29:50.998Z",
       "issues": {
         "open": 17,
         "closed": 18
@@ -184171,7 +184436,7 @@
       "name": "github-governance-references",
       "fullName": "xebia/github-governance-references",
       "pushedAt": "2026-04-10T12:45:47Z",
-      "collectedAt": "2026-08-01T08:28:06.944Z",
+      "collectedAt": "2026-08-02T08:29:52.539Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -185170,7 +185435,7 @@
       "name": "octocat",
       "fullName": "xebia/octocat",
       "pushedAt": "2025-07-18T16:14:25Z",
-      "collectedAt": "2026-08-01T08:28:08.006Z",
+      "collectedAt": "2026-08-02T08:29:53.722Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -186137,7 +186402,7 @@
       "name": "GDBC2018-Challenges",
       "fullName": "XpiritBV/GDBC2018-Challenges",
       "pushedAt": "2018-06-21T02:31:07Z",
-      "collectedAt": "2026-08-01T08:28:09.226Z",
+      "collectedAt": "2026-08-02T08:29:54.876Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -187104,7 +187369,7 @@
       "name": "LeaderboardsGlobalDevopsBootcamp",
       "fullName": "XpiritBV/LeaderboardsGlobalDevopsBootcamp",
       "pushedAt": "2022-12-08T00:56:12Z",
-      "collectedAt": "2026-08-01T08:28:11.225Z",
+      "collectedAt": "2026-08-02T08:29:57.001Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -188071,7 +188336,7 @@
       "name": "legitify-scan",
       "fullName": "XpiritUSA/legitify-scan",
       "pushedAt": "2023-05-04T12:28:25Z",
-      "collectedAt": "2026-08-01T08:28:12.662Z",
+      "collectedAt": "2026-08-02T08:29:58.127Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -189618,8 +189883,8 @@
       "prsMerged": 30,
       "issuesOpened": 6,
       "issuesClosed": 4,
-      "linesAdded": 2132,
-      "linesDeleted": 1058
+      "linesAdded": 2140,
+      "linesDeleted": 1066
     },
     {
       "week": "2025-W45",
@@ -189645,8 +189910,8 @@
       "prsMerged": 27,
       "issuesOpened": 2,
       "issuesClosed": 4,
-      "linesAdded": 91982,
-      "linesDeleted": 84354
+      "linesAdded": 91985,
+      "linesDeleted": 84357
     },
     {
       "week": "2025-W48",
@@ -189654,8 +189919,8 @@
       "prsMerged": 18,
       "issuesOpened": 3,
       "issuesClosed": 3,
-      "linesAdded": 1918,
-      "linesDeleted": 149
+      "linesAdded": 2475,
+      "linesDeleted": 233
     },
     {
       "week": "2025-W49",
@@ -189965,12 +190230,12 @@
     },
     {
       "week": "2026-W31",
-      "prsOpened": 65,
-      "prsMerged": 62,
+      "prsOpened": 68,
+      "prsMerged": 65,
       "issuesOpened": 22,
       "issuesClosed": 13,
-      "linesAdded": 24953,
-      "linesDeleted": 98661
+      "linesAdded": 25185,
+      "linesDeleted": 98869
     }
   ]
 }
