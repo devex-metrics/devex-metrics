@@ -286,3 +286,273 @@ describe("compactRollup", () => {
     expect(dates).toEqual([...dates].sort());
   });
 });
+
+// ── Backfill watermarks and rollup recomputation ─────────────────────────────
+
+import {
+  appendEventRows,
+  loadBackfillState,
+  saveBackfillState,
+  recomputeRollupFromEvents,
+  mergeReconstructed,
+  backfillPath,
+  isMergedEvent,
+} from "./history.js";
+import type { EventRow } from "./history.js";
+
+function event(number: number, mergedAt: string, extra: Partial<EventRow> = {}): EventRow {
+  return {
+    v: 1,
+    scope: "acme",
+    repo: "acme/api",
+    number,
+    state: "merged",
+    author: "alice",
+    isBot: false,
+    createdAt: new Date(Date.parse(mergedAt) - 2 * DAY).toISOString(),
+    mergedAt,
+    timeToMergeHours: 48,
+    linesAdded: 10,
+    linesDeleted: 5,
+    ...extra,
+  };
+}
+
+describe("backfill watermarks", () => {
+  it("returns an empty state when no file exists", () => {
+    expect(loadBackfillState(dir, "acme")).toEqual({ v: 1, scope: "acme", repos: {} });
+  });
+
+  it("round-trips a saved state", () => {
+    saveBackfillState(dir, {
+      v: 1,
+      scope: "acme",
+      repos: {
+        "acme/api": {
+          cursor: "abc",
+          complete: false,
+          pagesFetched: 3,
+          prsSeen: 300,
+          updatedAt: "2026-08-30T00:00:00Z",
+        },
+      },
+    });
+    expect(loadBackfillState(dir, "acme").repos["acme/api"].cursor).toBe("abc");
+  });
+
+  it("starts over rather than throwing on a corrupt file", () => {
+    const file = backfillPath(dir, "acme");
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, "{not json");
+    expect(loadBackfillState(dir, "acme").repos).toEqual({});
+  });
+
+  it("discards a state written by an incompatible schema version", () => {
+    const file = backfillPath(dir, "acme");
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, JSON.stringify({ v: 999, scope: "acme", repos: { x: {} } }));
+    expect(loadBackfillState(dir, "acme").repos).toEqual({});
+  });
+});
+
+describe("appendEventRows", () => {
+  it("appends new rows and reports how many were already present", () => {
+    expect(appendEventRows(dir, "acme", [event(1, "2026-08-20T00:00:00Z")])).toEqual({
+      appended: 1,
+      alreadyPresent: 0,
+    });
+    const second = appendEventRows(dir, "acme", [
+      event(1, "2026-08-20T00:00:00Z"),
+      event(2, "2026-08-21T00:00:00Z"),
+    ]);
+    expect(second.appended).toBe(1);
+    expect(second.alreadyPresent).toBe(1);
+  });
+
+  it("deduplicates within a single batch", () => {
+    const result = appendEventRows(dir, "acme", [
+      event(1, "2026-08-20T00:00:00Z"),
+      event(1, "2026-08-20T00:00:00Z"),
+    ]);
+    expect(result.appended).toBe(1);
+  });
+
+  it("keeps the first row for a pull request, not the last", () => {
+    appendEventRows(dir, "acme", [
+      event(1, "2026-08-20T00:00:00Z", { aiAuthorType: "copilot" }),
+    ]);
+    appendEventRows(dir, "acme", [event(1, "2026-08-20T00:00:00Z")]);
+    const stored = loadEvents(dir, "acme");
+    expect(stored).toHaveLength(1);
+    expect(stored[0].aiAuthorType).toBe("copilot");
+  });
+});
+
+describe("recomputeRollupFromEvents", () => {
+  const now = Date.parse("2026-08-30T00:00:00Z");
+
+  it("returns nothing when there are no merged events", () => {
+    expect(recomputeRollupFromEvents([], "acme", now)).toEqual([]);
+    expect(
+      recomputeRollupFromEvents(
+        [event(1, "2026-08-01T00:00:00Z", { state: "closed", mergedAt: undefined })],
+        "acme",
+        now
+      )
+    ).toEqual([]);
+  });
+
+  it("reaches back to the oldest merged pull request", () => {
+    const rows = recomputeRollupFromEvents(
+      [event(1, "2019-03-04T00:00:00Z"), event(2, "2026-08-20T00:00:00Z")],
+      "acme",
+      now
+    );
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows[0].date < "2019-04-01").toBe(true);
+  });
+
+  it("marks every row as reconstructed", () => {
+    const rows = recomputeRollupFromEvents([event(1, "2026-08-20T00:00:00Z")], "acme", now);
+    expect(rows.every((r) => r.reconstructed === true)).toBe(true);
+  });
+
+  it("leaves point-in-time fields at zero rather than inventing them", () => {
+    const rows = recomputeRollupFromEvents([event(1, "2026-08-20T00:00:00Z")], "acme", now);
+    expect(rows[0].committers).toBe(0);
+    expect(rows[0].reviewers).toBe(0);
+    expect(rows[0].dependents).toBe(0);
+    expect(rows[0].agentTasks).toBe(0);
+  });
+
+  it("emits an org row alongside the repo rows", () => {
+    const rows = recomputeRollupFromEvents(
+      [
+        event(1, "2026-08-20T00:00:00Z"),
+        event(2, "2026-08-20T00:00:00Z", { repo: "acme/web" }),
+      ],
+      "acme",
+      now
+    );
+    const week = rows.filter((r) => r.date === rows[rows.length - 1].date);
+    expect(week.some((r) => r.repo === "*")).toBe(true);
+    expect(week.find((r) => r.repo === "*")!.mergedPRs30d).toBe(2);
+  });
+
+  it("omits repos with no merges in a window rather than writing zero rows", () => {
+    const rows = recomputeRollupFromEvents(
+      [event(1, "2019-03-04T00:00:00Z"), event(2, "2026-08-20T00:00:00Z")],
+      "acme",
+      now
+    );
+    // Years separate the two merges; the quiet weeks in between produce no rows.
+    const dates = new Set(rows.map((r) => r.date));
+    expect(dates.size).toBeLessThan(20);
+  });
+
+  it("computes cycle-time quantiles over the trailing window", () => {
+    const rows = recomputeRollupFromEvents(
+      [
+        event(1, "2026-08-20T00:00:00Z", { timeToMergeHours: 10 }),
+        event(2, "2026-08-21T00:00:00Z", { timeToMergeHours: 20 }),
+        event(3, "2026-08-22T00:00:00Z", { timeToMergeHours: 90 }),
+      ],
+      "acme",
+      now
+    );
+    const last = rows.filter((r) => r.repo === "acme/api").pop()!;
+    expect(last.cycleP50).toBe(20);
+    expect(last.cycleP90).toBeGreaterThan(20);
+  });
+
+  it("separates AI-authored from human pull requests", () => {
+    const rows = recomputeRollupFromEvents(
+      [
+        event(1, "2026-08-20T00:00:00Z", { aiAuthorType: "copilot" }),
+        event(2, "2026-08-21T00:00:00Z"),
+        event(3, "2026-08-22T00:00:00Z", { isBot: true }),
+      ],
+      "acme",
+      now
+    );
+    const last = rows.filter((r) => r.repo === "acme/api").pop()!;
+    expect(last.aiPRs30d).toBe(1);
+    expect(last.humanPRs30d).toBe(1);
+  });
+});
+
+describe("mergeReconstructed", () => {
+  function row(date: string, repoName: string, reconstructed?: boolean): RollupRow {
+    return {
+      ...buildRollupRows(metrics([repo(repoName, [])]), date)[0],
+      ...(reconstructed ? { reconstructed: true } : {}),
+    };
+  }
+
+  it("keeps observed rows and fills only uncollected dates", () => {
+    const merged = mergeReconstructed(
+      [row("2026-08-30", "acme/api")],
+      [row("2026-08-30", "acme/api", true), row("2020-01-05", "acme/api", true)]
+    );
+    expect(merged).toHaveLength(2);
+    expect(merged.find((r) => r.date === "2026-08-30")!.reconstructed).toBeUndefined();
+    expect(merged.find((r) => r.date === "2020-01-05")!.reconstructed).toBe(true);
+  });
+
+  it("replaces previously reconstructed rows rather than accumulating them", () => {
+    const first = mergeReconstructed([], [row("2020-01-05", "acme/api", true)]);
+    const second = mergeReconstructed(first, [row("2020-01-05", "acme/api", true)]);
+    expect(second).toHaveLength(1);
+  });
+
+  it("returns rows sorted by date", () => {
+    const merged = mergeReconstructed(
+      [row("2026-08-30", "acme/api")],
+      [row("2020-01-05", "acme/api", true), row("2023-06-04", "acme/api", true)]
+    );
+    const dates = merged.map((r) => r.date);
+    expect(dates).toEqual([...dates].sort());
+  });
+});
+
+describe("isMergedEvent", () => {
+  it("accepts a row that declares itself merged", () => {
+    expect(isMergedEvent(event(1, "2026-08-20T00:00:00Z"))).toBe(true);
+  });
+
+  it("rejects a row that declares itself closed", () => {
+    expect(
+      isMergedEvent(
+        event(1, "2026-08-20T00:00:00Z", { state: "closed", mergedAt: undefined })
+      )
+    ).toBe(false);
+  });
+
+  it("treats a pre-`state` row with a merge timestamp as merged", () => {
+    // The stream is append-only, so rows written before `state` existed persist
+    // forever; dropping them would silently discard the early history.
+    const legacy = { ...event(1, "2026-08-20T00:00:00Z") } as Partial<EventRow>;
+    delete legacy.state;
+    expect(isMergedEvent(legacy as EventRow)).toBe(true);
+  });
+
+  it("treats a pre-`state` row with no merge timestamp as not merged", () => {
+    const legacy = { ...event(1, "2026-08-20T00:00:00Z") } as Partial<EventRow>;
+    delete legacy.state;
+    delete legacy.mergedAt;
+    expect(isMergedEvent(legacy as EventRow)).toBe(false);
+  });
+
+  it("recomputes rollups from a stream of pre-`state` rows", () => {
+    const legacy = [event(1, "2026-08-20T00:00:00Z"), event(2, "2026-08-21T00:00:00Z")].map(
+      (e) => {
+        const copy = { ...e } as Partial<EventRow>;
+        delete copy.state;
+        return copy as EventRow;
+      }
+    );
+    const rows = recomputeRollupFromEvents(legacy, "acme", Date.parse("2026-08-30T00:00:00Z"));
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.some((r) => r.mergedPRs30d === 2)).toBe(true);
+  });
+});

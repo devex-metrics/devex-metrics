@@ -88,6 +88,28 @@ export interface FeatureFlags {
   copilotAgent: boolean;
 }
 
+/**
+ * Progressive historical backfill.
+ *
+ * The daily collection stops at a two-year cutoff to stay cheap. The backfill
+ * walks each repository from its first pull request forward, a bounded number
+ * of pages per run, until the whole history is in the event stream.
+ */
+export interface BackfillConfig {
+  /** Whether to spend any budget on historical crawling. */
+  enabled: boolean;
+  /** Maximum GraphQL pages to fetch per run, across all repositories. */
+  pagesPerRun: number;
+  /** Maximum pages one repository may take per run, so none starves the rest. */
+  maxPagesPerRepo: number;
+  /**
+   * Rebuild historical rollup rows from the event stream after crawling.
+   * Cheap (no API calls) but rewrites the rollup file, so it can be turned off
+   * for a run that only needs to advance the crawl.
+   */
+  recomputeRollups: boolean;
+}
+
 /** Collection tuning. */
 export interface CollectionConfig {
   /** Weeks of weekly-trend history to build. */
@@ -97,6 +119,7 @@ export interface CollectionConfig {
   /** Hours before a per-repo cache entry is considered stale. */
   maxRepoAgeHours: number;
   features: FeatureFlags;
+  backfill: BackfillConfig;
 }
 
 /** Long-term history store settings. */
@@ -144,6 +167,12 @@ export function defaultConfig(): DevexConfig {
       maxPRPages: 10,
       maxRepoAgeHours: 8,
       features: { dependents: false, copilotAgent: true },
+      backfill: {
+        enabled: true,
+        pagesPerRun: 200,
+        maxPagesPerRepo: 20,
+        recomputeRollups: true,
+      },
     },
     history: { enabled: true, dir: "data/history" },
   };
@@ -233,9 +262,10 @@ function mergePartial(target: DevexConfig, partial: Partial<DevexConfig>): void 
   if (partial.branding) Object.assign(target.branding, partial.branding);
   if (partial.repos) Object.assign(target.repos, partial.repos);
   if (partial.collection) {
-    const { features, ...rest } = partial.collection;
+    const { features, backfill, ...rest } = partial.collection;
     Object.assign(target.collection, rest);
     if (features) Object.assign(target.collection.features, features);
+    if (backfill) Object.assign(target.collection.backfill, backfill);
   }
   if (partial.history) Object.assign(target.history, partial.history);
   if (partial.team) {
@@ -279,6 +309,11 @@ function applyEnv(config: DevexConfig, env: Env): void {
   assign(config.collection, "maxRepoAgeHours", int(env, "DEVEX_MAX_REPO_AGE_HOURS"));
   assign(config.collection.features, "dependents", bool(env, "DEVEX_FEATURE_DEPENDENTS"));
   assign(config.collection.features, "copilotAgent", bool(env, "DEVEX_FEATURE_COPILOT_AGENT"));
+
+  assign(config.collection.backfill, "enabled", bool(env, "DEVEX_BACKFILL_ENABLED"));
+  assign(config.collection.backfill, "pagesPerRun", int(env, "DEVEX_BACKFILL_PAGES_PER_RUN"));
+  assign(config.collection.backfill, "maxPagesPerRepo", int(env, "DEVEX_BACKFILL_MAX_PAGES_PER_REPO"));
+  assign(config.collection.backfill, "recomputeRollups", bool(env, "DEVEX_BACKFILL_RECOMPUTE"));
 
   assign(config.history, "enabled", bool(env, "DEVEX_HISTORY_ENABLED"));
   assign(config.history, "dir", str(env, "DEVEX_HISTORY_DIR"));

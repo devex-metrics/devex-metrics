@@ -53,6 +53,12 @@
     "features": {
       "dependents": false,
       "copilotAgent": true
+    },
+    "backfill": {
+      "enabled": true,
+      "pagesPerRun": 200,
+      "maxPagesPerRepo": 20,
+      "recomputeRollups": true
     }
   },
 

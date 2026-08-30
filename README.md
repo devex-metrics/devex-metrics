@@ -104,7 +104,20 @@ Nothing is committed to the default branch. Collected data lives on the
 or merged. The dashboard is published via GitHub Pages from an uploaded
 artifact, so no branch is served directly.
 
-### Seeding history from existing snapshots
+### Getting the full history
+
+The scheduled collection walks back two years to stay cheap. A background crawl
+then walks each repository forward from its first pull request, a bounded number
+of pages per run, until the whole history is in the event stream — and marks
+each repository complete so it is never crawled again.
+
+Everything derived from pull requests ends up reaching back to the repository's
+first one. Point-in-time figures (dependent counts, Copilot agent metrics,
+repository settings) cannot be recovered for past dates by any API, so
+reconstructed rows leave them empty rather than guessing. See
+[docs/CONFIGURATION.md](docs/CONFIGURATION.md#getting-the-full-history).
+
+### Seeding point-in-time history from existing snapshots
 
 If a deployment previously committed daily snapshot files, each of those commits
 is a daily observation — including rolling-window metrics the collector cannot
@@ -114,7 +127,7 @@ reconstruct retroactively. Replay them into the store with:
 node scripts/backfill-history.mjs data/<owner>.fixture.json .metrics-data/data
 ```
 
-or tick **backfill** when running the collect workflow manually. It is safe to
+or tick **replay_snapshots** when running the collect workflow manually. It is safe to
 re-run: a day already recorded is replaced rather than duplicated, and a pull
 request already in the event stream is never appended twice.
 

@@ -312,3 +312,133 @@ function hasGraphQLForbiddenError(err: unknown): boolean {
   }
   return false;
 }
+
+// ── Historical backfill ───────────────────────────────────────────────────────
+
+/**
+ * A pull request as returned by the lean historical query.
+ *
+ * The daily query carries nested commit and review-thread data for AI-authorship
+ * detection, which makes each page expensive. Walking a repository back to its
+ * first commit multiplies that cost by every page of its life, so the historical
+ * crawl asks only for facts that cannot be derived later — and skips commit-level
+ * AI detection entirely, which costs nothing real: Copilot, Claude and Codex did
+ * not exist before 2023, so PRs older than that are human-authored by definition.
+ */
+export interface HistoricalPRNode {
+  number: number;
+  state: "CLOSED" | "MERGED";
+  createdAt: string;
+  mergedAt: string | null;
+  closedAt: string | null;
+  author: { login: string; __typename: string } | null;
+  additions: number;
+  deletions: number;
+  body: string | null;
+  reviews: {
+    totalCount: number;
+    nodes: Array<{ submittedAt: string | null; author: { login: string } | null }>;
+  };
+}
+
+/** One page of the historical crawl. */
+export interface HistoricalPRPage {
+  nodes: HistoricalPRNode[];
+  hasNextPage: boolean;
+  endCursor: string | null;
+}
+
+/**
+ * Ordered CREATED_AT ascending on purpose: the crawl walks *forward* from the
+ * repository's first pull request, so the oldest history — the part that is
+ * missing — arrives first, and new pull requests are only ever appended beyond
+ * the stored cursor. A cursor saved today therefore stays valid tomorrow, which
+ * is what makes the crawl resumable across runs.
+ *
+ * Only the first review is needed per PR (`submittedAt` ascending gives the
+ * earliest), but the connection is fetched small rather than filtered so the
+ * reviewer set stays available for historical reviewer counts.
+ */
+const HISTORICAL_PR_QUERY = `
+  query HistoricalPRs($owner: String!, $name: String!, $cursor: String) {
+    repository(owner: $owner, name: $name) {
+      pullRequests(
+        first: 100
+        states: [CLOSED, MERGED]
+        orderBy: { field: CREATED_AT, direction: ASC }
+        after: $cursor
+      ) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          number
+          state
+          createdAt
+          mergedAt
+          closedAt
+          author { login __typename }
+          additions
+          deletions
+          body
+          reviews(first: 20) {
+            totalCount
+            nodes { submittedAt author { login } }
+          }
+        }
+      }
+    }
+  }
+`;
+
+interface HistoricalPageResponse {
+  repository: {
+    pullRequests: {
+      pageInfo: { hasNextPage: boolean; endCursor: string | null };
+      nodes: HistoricalPRNode[];
+    };
+  } | null;
+}
+
+/**
+ * Fetch one page of historical pull requests for `owner/repo`.
+ *
+ * Returns `null` when the repository is gone or inaccessible, or when GitHub
+ * keeps returning 5xx — the caller treats that as "skip this repo for now" and
+ * leaves the watermark untouched so the next run retries from the same place.
+ */
+export async function fetchHistoricalPRPage(
+  owner: string,
+  repo: string,
+  cursor: string | null
+): Promise<HistoricalPRPage | null> {
+  const octokit = await getOctokit();
+  let response: HistoricalPageResponse;
+  try {
+    response = await fetchGraphQLPage<HistoricalPageResponse>(
+      octokit,
+      HISTORICAL_PR_QUERY,
+      { owner, name: repo, cursor },
+      `${owner}/${repo}`
+    );
+  } catch (err: unknown) {
+    if (isGraphQLNotFoundOrForbidden(err)) {
+      if (hasGraphQLForbiddenError(err)) {
+        console.warn(`  ⚠ backfill: skipping ${owner}/${repo}: access denied (403)`);
+      }
+      return null;
+    }
+    if (isTransientServerError(err)) {
+      console.warn(`  ⚠ backfill: ${owner}/${repo} still failing after retries; will retry next run`);
+      return null;
+    }
+    throw err;
+  }
+
+  if (!response?.repository) return null;
+
+  const { nodes, pageInfo } = response.repository.pullRequests;
+  return {
+    nodes: nodes ?? [],
+    hasNextPage: pageInfo.hasNextPage,
+    endCursor: pageInfo.endCursor,
+  };
+}

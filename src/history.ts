@@ -29,6 +29,14 @@ export const HISTORY_SCHEMA_VERSION = 1;
 export interface RollupRow {
   v: number;
   date: string;
+  /**
+   * True when this row was derived from the event stream rather than observed
+   * at collection time. Reconstructed rows carry only PR-derived fields; the
+   * point-in-time ones (committers, reviewers, dependents, agent metrics) are
+   * left at zero because no historical API can recover them. Never present a
+   * reconstructed value as an observed one.
+   */
+  reconstructed?: boolean;
   scope: string;
   repo: string;
   isTeamRepo: boolean;
@@ -57,20 +65,43 @@ export interface RollupRow {
   agentCredits: number;
 }
 
-/** One merged pull request. Appended once and never rewritten. */
+/**
+ * One closed pull request. Appended once and never rewritten.
+ *
+ * This is the durable record: aggregates are derived from it, so a metric whose
+ * definition changes later can be recomputed across the whole history. Fields
+ * here should be raw facts, not judgements — `firstReviewAt` rather than a
+ * review-latency figure, so the definition of latency stays free to change.
+ */
 export interface EventRow {
   v: number;
   scope: string;
   repo: string;
   number: number;
+  /** Whether the PR was merged or closed without merging. */
+  state: "merged" | "closed";
   author: string;
   isBot: boolean;
   aiAuthorType?: "copilot" | "claude" | "codex";
   createdAt: string;
-  mergedAt: string;
-  timeToMergeHours: number;
+  /** Absent when the PR was closed without merging. */
+  mergedAt?: string;
+  /** When the PR was closed (equal to `mergedAt` for merged PRs). */
+  closedAt?: string;
+  /** Hours from created to merged. Absent when the PR was never merged. */
+  timeToMergeHours?: number;
   linesAdded?: number;
   linesDeleted?: number;
+  /** Number of reviews submitted on the PR. */
+  reviewCount?: number;
+  /**
+   * When the first review was submitted. The raw fact behind review latency —
+   * captured during the historical crawl so the metric can be built later
+   * without crawling the whole history again.
+   */
+  firstReviewAt?: string;
+  /** Distinct reviewer logins, for historical reviewer counts. */
+  reviewers?: string[];
 }
 
 function scopeDir(dir: string, scope: string): string {
@@ -254,11 +285,13 @@ export function buildEventRows(metrics: OrgMetrics): EventRow[] {
         scope: metrics.owner,
         repo: repo.fullName,
         number: pr.number,
+        state: "merged",
         author: pr.author,
         isBot: pr.isBotAuthor,
         aiAuthorType: pr.aiAuthorType,
         createdAt: pr.createdAt,
         mergedAt: pr.mergedAt,
+        closedAt: pr.mergedAt,
         timeToMergeHours: round(pr.timeToMergeHours),
         linesAdded: pr.linesAdded,
         linesDeleted: pr.linesDeleted,
@@ -300,15 +333,7 @@ export function appendRun(
   );
   writeNdjson(rollupFile, mergedRollup);
 
-  const eventsFile = eventsPath(dir, scope);
-  const existingEvents = readNdjson<EventRow>(eventsFile);
-  const seen = new Set(existingEvents.map((e) => `${e.repo}#${e.number}`));
-  const fresh = buildEventRows(metrics).filter((e) => !seen.has(`${e.repo}#${e.number}`));
-  if (fresh.length > 0) {
-    const body = fresh.map((r) => JSON.stringify(r)).join("\n");
-    fs.mkdirSync(path.dirname(eventsFile), { recursive: true });
-    fs.appendFileSync(eventsFile, `${body}\n`);
-  }
+  const appended = appendEventRows(dir, scope, buildEventRows(metrics));
 
   fs.mkdirSync(path.dirname(latestPath(dir, scope)), { recursive: true });
   fs.writeFileSync(latestPath(dir, scope), JSON.stringify(metrics, null, 2));
@@ -316,9 +341,48 @@ export function appendRun(
   return {
     rollupRowsWritten: newRollup.length,
     rollupRowsReplaced: existingRollup.length - keptRollup.length,
-    eventsAppended: fresh.length,
-    eventsAlreadyPresent: seen.size,
+    eventsAppended: appended.appended,
+    eventsAlreadyPresent: appended.alreadyPresent,
   };
+}
+
+/** What `appendEventRows` wrote. */
+export interface AppendEventsResult {
+  appended: number;
+  alreadyPresent: number;
+}
+
+/**
+ * Append event rows, skipping any pull request already in the stream.
+ *
+ * Deduplication is by `repo#number`, so a PR seen by both the daily collection
+ * and the historical crawl is stored once. The first writer wins: the daily
+ * path carries richer AI-authorship detection, so it is never overwritten by a
+ * leaner historical row for the same PR.
+ */
+export function appendEventRows(
+  dir: string,
+  scope: string,
+  rows: readonly EventRow[]
+): AppendEventsResult {
+  const eventsFile = eventsPath(dir, scope);
+  const existing = readNdjson<EventRow>(eventsFile);
+  const seen = new Set(existing.map((e) => `${e.repo}#${e.number}`));
+
+  const fresh: EventRow[] = [];
+  for (const row of rows) {
+    const key = `${row.repo}#${row.number}`;
+    if (seen.has(key)) continue;
+    seen.add(key); // guard against duplicates within `rows` itself
+    fresh.push(row);
+  }
+
+  if (fresh.length > 0) {
+    fs.mkdirSync(path.dirname(eventsFile), { recursive: true });
+    fs.appendFileSync(eventsFile, `${fresh.map((r) => JSON.stringify(r)).join("\n")}\n`);
+  }
+
+  return { appended: fresh.length, alreadyPresent: existing.length };
 }
 
 /** Read back the rollup stream for a scope. */
@@ -376,4 +440,277 @@ function isoWeek(date: string): string {
   const jan1 = new Date(Date.UTC(year, 0, 1));
   const week = Math.ceil(((d.getTime() - jan1.getTime()) / 86_400_000 + 1) / 7);
   return `${year}-W${String(week).padStart(2, "0")}`;
+}
+
+// ── Backfill watermarks ───────────────────────────────────────────────────────
+
+/** How far the historical crawl has walked through one repository. */
+export interface RepoWatermark {
+  /** GraphQL cursor to resume from. Null means "start at the first PR". */
+  cursor: string | null;
+  /** True once GitHub reported no further pages — the repo is fully crawled. */
+  complete: boolean;
+  /** Pages fetched across all runs, for cost reporting. */
+  pagesFetched: number;
+  /** Pull requests seen across all runs. */
+  prsSeen: number;
+  /** Creation date of the oldest PR seen so far. */
+  oldestCreatedAt?: string;
+  /** Creation date of the newest PR seen so far. */
+  newestCreatedAt?: string;
+  /** When this watermark was last advanced. */
+  updatedAt: string;
+}
+
+/** The per-scope watermark file. */
+export interface BackfillState {
+  v: number;
+  scope: string;
+  repos: Record<string, RepoWatermark>;
+}
+
+/** Path of the backfill watermark file for a scope. */
+export function backfillPath(dir: string, scope: string): string {
+  return path.join(scopeDir(dir, scope), "backfill.json");
+}
+
+/** Load the backfill watermarks, returning an empty state when absent. */
+export function loadBackfillState(dir: string, scope: string): BackfillState {
+  const filePath = backfillPath(dir, scope);
+  if (!fs.existsSync(filePath)) {
+    return { v: HISTORY_SCHEMA_VERSION, scope, repos: {} };
+  }
+  try {
+    const parsed = JSON.parse(fs.readFileSync(filePath, "utf-8")) as BackfillState;
+    if (parsed.v !== HISTORY_SCHEMA_VERSION || !parsed.repos) {
+      return { v: HISTORY_SCHEMA_VERSION, scope, repos: {} };
+    }
+    return parsed;
+  } catch {
+    // A corrupt watermark file costs a re-crawl, not data: events dedupe.
+    console.warn(`  ⚠ backfill: unreadable watermark file at ${filePath}; starting over`);
+    return { v: HISTORY_SCHEMA_VERSION, scope, repos: {} };
+  }
+}
+
+/** Persist the backfill watermarks. */
+export function saveBackfillState(dir: string, state: BackfillState): void {
+  const filePath = backfillPath(dir, state.scope);
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, JSON.stringify(state, null, 2));
+}
+
+// ── Rollup recomputation ──────────────────────────────────────────────────────
+
+/** ISO week label ("YYYY-Www") for a Date. */
+function isoWeekOf(date: Date): string {
+  const d = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  );
+  const dow = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dow);
+  const year = d.getUTCFullYear();
+  const jan1 = new Date(Date.UTC(year, 0, 1));
+  const week = Math.ceil(((d.getTime() - jan1.getTime()) / 86_400_000 + 1) / 7);
+  return `${year}-W${String(week).padStart(2, "0")}`;
+}
+
+/** The Sunday that ends the ISO week containing `date`, as YYYY-MM-DD. */
+function isoWeekEnd(date: Date): string {
+  const d = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  );
+  const dow = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + (7 - dow));
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Rebuild rollup rows for the whole history from the event stream.
+ *
+ * Observed rows are collected daily; reconstructed rows are emitted weekly,
+ * because daily granularity across years of history would multiply the file by
+ * the number of repositories for no analytical gain — and the store already
+ * compacts observed rows to weekly after 90 days.
+ *
+ * Each row uses the same trailing-30-day window as an observed row, evaluated
+ * at that week's end, so the two are directly comparable. A repository with no
+ * merged pull requests in a window produces no row.
+ *
+ * Only PR-derived fields are populated. Committer, reviewer, dependent and
+ * agent figures stay at zero: no GitHub API can report what they were on a past
+ * date, so inventing them would be worse than leaving them empty.
+ */
+/**
+ * Whether an event row represents a merged pull request.
+ *
+ * The event stream is append-only and never rewritten, so rows written by an
+ * older build outlive the schema that produced them. `state` was added after
+ * the first rows were written, and a row that predates it is merged exactly
+ * when it carries a merge timestamp — treating a missing field as "not merged"
+ * would silently discard the whole early history.
+ */
+export function isMergedEvent(event: EventRow): boolean {
+  if (event.state === "merged") return true;
+  if (event.state === undefined) return typeof event.mergedAt === "string";
+  return false;
+}
+
+export function recomputeRollupFromEvents(
+  events: readonly EventRow[],
+  scope: string,
+  now = Date.now()
+): RollupRow[] {
+  const merged = events.filter((e) => isMergedEvent(e) && e.mergedAt);
+  if (merged.length === 0) return [];
+
+  let oldest = Infinity;
+  for (const e of merged) {
+    const t = new Date(e.mergedAt as string).getTime();
+    if (Number.isFinite(t) && t < oldest) oldest = t;
+  }
+  if (!Number.isFinite(oldest)) return [];
+
+  // One evaluation point per ISO week from the first merge to now.
+  const weekEnds: string[] = [];
+  const seenWeeks = new Set<string>();
+  for (let t = oldest; t <= now; t += 7 * 24 * 60 * 60 * 1000) {
+    const label = isoWeekOf(new Date(t));
+    if (seenWeeks.has(label)) continue;
+    seenWeeks.add(label);
+    weekEnds.push(isoWeekEnd(new Date(t)));
+  }
+
+  // Bucket merges by repo once, so each week is a filter rather than a scan.
+  const byRepo = new Map<string, EventRow[]>();
+  for (const e of merged) {
+    const list = byRepo.get(e.repo);
+    if (list) list.push(e);
+    else byRepo.set(e.repo, [e]);
+  }
+
+  const rows: RollupRow[] = [];
+  const WINDOW = 30 * 24 * 60 * 60 * 1000;
+
+  for (const date of weekEnds) {
+    const end = new Date(`${date}T23:59:59Z`).getTime();
+    const start = end - WINDOW;
+
+    const orgCycles: number[] = [];
+    const orgSizes: number[] = [];
+    let orgAI = 0;
+    let orgHuman = 0;
+    let orgCount = 0;
+
+    for (const [repo, prs] of byRepo) {
+      const inWindow = prs.filter((e) => {
+        const t = new Date(e.mergedAt as string).getTime();
+        return t >= start && t <= end;
+      });
+      if (inWindow.length === 0) continue;
+
+      const cycles = inWindow
+        .map((e) => e.timeToMergeHours ?? 0)
+        .filter((h) => h > 0);
+      const sizes = inWindow
+        .map((e) => (e.linesAdded ?? 0) + (e.linesDeleted ?? 0))
+        .filter((n) => n > 0);
+      const ai = inWindow.filter((e) => e.aiAuthorType !== undefined).length;
+      const human = inWindow.filter(
+        (e) => !e.isBot && e.aiAuthorType === undefined
+      ).length;
+
+      const cq = quantiles(cycles);
+      const sq = quantiles(sizes);
+
+      rows.push({
+        v: HISTORY_SCHEMA_VERSION,
+        reconstructed: true,
+        date,
+        scope,
+        repo,
+        isTeamRepo: false,
+        openIssues: 0,
+        closedIssues: 0,
+        openPRs: 0,
+        mergedPRs: 0,
+        closedPRs: 0,
+        committers: 0,
+        reviewers: 0,
+        contributors: 0,
+        dependents: 0,
+        mergedPRs30d: inWindow.length,
+        cycleP50: round(cq.p50),
+        cycleP75: round(cq.p75),
+        cycleP90: round(cq.p90),
+        sizeP50: round(sq.p50),
+        sizeP75: round(sq.p75),
+        aiPRs30d: ai,
+        humanPRs30d: human,
+        agentTasks: 0,
+        agentCredits: 0,
+      });
+
+      orgCycles.push(...cycles);
+      orgSizes.push(...sizes);
+      orgAI += ai;
+      orgHuman += human;
+      orgCount += inWindow.length;
+    }
+
+    if (orgCount === 0) continue;
+    const ocq = quantiles(orgCycles);
+    const osq = quantiles(orgSizes);
+    rows.push({
+      v: HISTORY_SCHEMA_VERSION,
+      reconstructed: true,
+      date,
+      scope,
+      repo: "*",
+      isTeamRepo: false,
+      openIssues: 0,
+      closedIssues: 0,
+      openPRs: 0,
+      mergedPRs: 0,
+      closedPRs: 0,
+      committers: 0,
+      reviewers: 0,
+      contributors: 0,
+      dependents: 0,
+      mergedPRs30d: orgCount,
+      cycleP50: round(ocq.p50),
+      cycleP75: round(ocq.p75),
+      cycleP90: round(ocq.p90),
+      sizeP50: round(osq.p50),
+      sizeP75: round(osq.p75),
+      aiPRs30d: orgAI,
+      humanPRs30d: orgHuman,
+      agentTasks: 0,
+      agentCredits: 0,
+    });
+  }
+
+  return rows;
+}
+
+/**
+ * Merge reconstructed rows into the stored rollup, keeping observed data.
+ *
+ * An observed row always wins for its (date, repo): it carries the
+ * point-in-time fields that cannot be recovered. Reconstructed rows only fill
+ * dates that were never collected — which is to say, everything before this
+ * deployment started running.
+ */
+export function mergeReconstructed(
+  stored: readonly RollupRow[],
+  reconstructed: readonly RollupRow[]
+): RollupRow[] {
+  const observed = new Set(
+    stored.filter((r) => !r.reconstructed).map((r) => `${r.date}|${r.repo}`)
+  );
+  const kept = stored.filter((r) => !r.reconstructed);
+  const filled = reconstructed.filter((r) => !observed.has(`${r.date}|${r.repo}`));
+  return [...kept, ...filled].sort((a, b) =>
+    a.date === b.date ? a.repo.localeCompare(b.repo) : a.date.localeCompare(b.date)
+  );
 }
