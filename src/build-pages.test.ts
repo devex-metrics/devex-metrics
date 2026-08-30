@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { execFileSync } from "node:child_process";
-import { JSDOM } from "jsdom";
+import { JSDOM, VirtualConsole } from "jsdom";
 import { CURRENT_SCHEMA_VERSION } from "./cache.js";
 import type { CacheEnvelope, WeeklyTrendPoint } from "./types.js";
 
@@ -283,12 +283,24 @@ describe("build-pages", () => {
     expect(html).not.toContain('class="filter-btn active" data-period="all"');
   });
 
-  it("should call applyFilter on DOMContentLoaded with 30days default", () => {
+  it("should apply the filter from the URL on DOMContentLoaded, defaulting to 30days", () => {
     execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
       cwd: process.cwd(),
     });
     const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
-    expect(html).toContain('applyFilter("30days")');
+    expect(html).toContain("applyFilter(readStateFromUrl())");
+    // readStateFromUrl falls back to the 30-day view when no period is given.
+    expect(html).toContain('period="30days"');
+  });
+
+  it("should ship the share-link control and URL state helpers", () => {
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    expect(html).toContain('id="shareBtn"');
+    expect(html).toContain("function writeStateToUrl");
+    expect(html).toContain("window.history.replaceState");
   });
 
   it("should include KPI element IDs for dynamic filter updates", () => {
@@ -569,8 +581,18 @@ describe("build-pages", () => {
       };
       fs.writeFileSync(fixtureFile, JSON.stringify(fixtureData));
 
+      // Fixtures are opt-in: without the flag the build refuses rather than
+      // silently publishing data of unknown age.
+      expect(() =>
+        execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+          cwd: process.cwd(),
+          stdio: "pipe",
+        })
+      ).toThrow();
+
       execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
         cwd: process.cwd(),
+        env: { ...process.env, DEVEX_USE_FIXTURE: "1" },
       });
 
       const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
@@ -916,5 +938,314 @@ describe("build-pages", () => {
     expect(html).toContain('id="kpiAgentVal"');
     const dom = new JSDOM(html);
     expect(dom.window.document.getElementById("kpiAgentVal")?.textContent).toBe("–");
+  });
+});
+
+describe("build-pages · trial and branding", () => {
+  const dataDir = path.resolve(process.cwd(), "data");
+  const siteDir = path.resolve(process.cwd(), "_site");
+  const cacheFile = path.join(dataDir, "trial-owner.json");
+
+  function repoStub(name: string) {
+    return {
+      name,
+      fullName: `trial-owner/${name}`,
+      issues: { open: 1, closed: 1 },
+      pullRequests: { open: 0, closed: 0, merged: 1 },
+      pullRequestDetails: [],
+      mergedPRTimeline: [
+        {
+          number: 1,
+          createdAt: "2026-08-20T00:00:00Z",
+          mergedAt: "2026-08-22T00:00:00Z",
+          author: "alice",
+          isBotAuthor: false,
+          isCopilotAuthored: false,
+          timeToMergeHours: 48,
+          closesIssues: [],
+          linesAdded: 10,
+          linesDeleted: 2,
+        },
+      ],
+      committerCount: 1,
+      reviewerCount: 1,
+      contributorCount: 1,
+      dependentCount: 0,
+    };
+  }
+
+  beforeEach(() => {
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(
+      cacheFile,
+      JSON.stringify({
+        date: "2026-08-30",
+        data: {
+          schemaVersion: CURRENT_SCHEMA_VERSION,
+          owner: "trial-owner",
+          ownerType: "org",
+          collectedAt: "2026-08-30T00:00:00.000Z",
+          repoCount: 2,
+          repos: [repoStub("api"), repoStub("billing")],
+          weeklyTrends: [],
+        },
+      })
+    );
+  });
+
+  afterEach(() => {
+    if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
+  });
+
+  function build(extraEnv: Record<string, string>) {
+    execFileSync("node", ["dist/build-pages.js", "trial-owner"], {
+      cwd: process.cwd(),
+      env: { ...process.env, ...extraEnv },
+    });
+    return fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+  }
+
+  it("omits the trial panel when no trial is configured", () => {
+    const html = build({});
+    expect(html).not.toContain('<section class="trial"');
+    expect(html).not.toContain('class="trial-eyebrow"');
+  });
+
+  it("renders the trial panel from Actions variables alone", () => {
+    const html = build({
+      DEVEX_TRIAL_TITLE: "Trunk-based development",
+      DEVEX_TRIAL_START: "2026-05-01",
+      DEVEX_TRIAL_HYPOTHESIS: "Smaller PRs shorten review latency",
+      DEVEX_TEAM_NAME: "Team Alpha",
+      DEVEX_TEAM_REPOS: "trial-owner/api",
+    });
+    expect(html).toContain('<section class="trial"');
+    expect(html).toContain('<div class="trial-eyebrow">Improvement trial</div>');
+    expect(html).toContain("Trunk-based development");
+    expect(html).toContain("Smaller PRs shorten review latency");
+    expect(html).toContain("Team Alpha");
+    expect(html).toContain("started 2026-05-01");
+  });
+
+  it("scopes the team from the current config rather than the stored data", () => {
+    const html = build({
+      DEVEX_TEAM_NAME: "Team Alpha",
+      DEVEX_TEAM_REPOS: "trial-owner/api",
+    });
+    const payload = JSON.parse(
+      /CHART_DATA\s*=\s*(\{[\s\S]*?\});/.exec(html)![1]
+    );
+    expect(payload.teamRepos).toEqual(["api"]);
+    expect(payload.team.name).toBe("Team Alpha");
+  });
+
+  it("renders milestones when configured", () => {
+    const html = build({
+      DEVEX_TRIAL_TITLE: "Trunk-based development",
+      DEVEX_TRIAL_MILESTONES: "2026-05-15=Training complete",
+    });
+    expect(html).toContain("Training complete");
+    expect(html).toContain("2026-05-15");
+  });
+
+  it("applies configured branding to the title and attribution", () => {
+    const html = build({
+      DEVEX_TITLE: "Acme DevEx",
+      DEVEX_ATTRIBUTION: "Built by Acme Platform",
+      DEVEX_ATTRIBUTION_URL: "https://example.com/platform",
+    });
+    expect(html).toContain("<title>Acme DevEx &ndash; trial-owner</title>");
+    expect(html).toContain("Built by Acme Platform");
+    expect(html).toContain("https://example.com/platform");
+  });
+
+  it("keeps the default attribution when none is configured", () => {
+    const html = build({});
+    expect(html).toContain("Made with");
+    expect(html).toContain("rajbos");
+  });
+
+  it("offers the team scope toggle only when the team has repos", () => {
+    expect(build({})).not.toContain('data-scope="team"');
+    const withTeam = build({
+      DEVEX_TEAM_NAME: "Team Alpha",
+      DEVEX_TEAM_REPOS: "trial-owner/api",
+    });
+    expect(withTeam).toContain('data-scope="team"');
+  });
+});
+
+describe("build-pages · dashboard JS executes", () => {
+  const dataDir = path.resolve(process.cwd(), "data");
+  const siteDir = path.resolve(process.cwd(), "_site");
+  const cacheFile = path.join(dataDir, "js-owner.json");
+
+  beforeEach(() => {
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(
+      cacheFile,
+      JSON.stringify({
+        date: "2026-08-30",
+        data: {
+          schemaVersion: CURRENT_SCHEMA_VERSION,
+          owner: "js-owner",
+          ownerType: "org",
+          collectedAt: "2026-08-30T00:00:00.000Z",
+          repoCount: 2,
+          repos: ["api", "billing"].map((name, i) => ({
+            name,
+            fullName: `js-owner/${name}`,
+            issues: { open: 1, closed: 1 },
+            pullRequests: { open: 0, closed: 0, merged: 2 },
+            pullRequestDetails: [],
+            mergedPRTimeline: [
+              {
+                number: i * 10 + 1,
+                createdAt: "2026-08-20T00:00:00Z",
+                mergedAt: "2026-08-22T00:00:00Z",
+                author: "alice",
+                isBotAuthor: false,
+                isCopilotAuthored: i === 0,
+                aiAuthorType: i === 0 ? "copilot" : undefined,
+                timeToMergeHours: 48 * (i + 1),
+                closesIssues: [],
+                linesAdded: 10 * (i + 1),
+                linesDeleted: 2,
+              },
+            ],
+            weeklyTrends: [
+              {
+                week: "2026-W34",
+                prsOpened: 1,
+                prsMerged: 1,
+                issuesOpened: 1,
+                issuesClosed: 1,
+                linesAdded: 10,
+                linesDeleted: 2,
+              },
+            ],
+            committerCount: 1,
+            reviewerCount: 1,
+            contributorCount: 1,
+            dependentCount: 0,
+          })),
+          weeklyTrends: [
+            {
+              week: "2026-W34",
+              prsOpened: 2,
+              prsMerged: 2,
+              issuesOpened: 2,
+              issuesClosed: 2,
+              linesAdded: 30,
+              linesDeleted: 4,
+            },
+          ],
+        },
+      })
+    );
+  });
+
+  afterEach(() => {
+    if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
+  });
+
+  /** Load the built page in JSDOM and return it plus any script errors. */
+  function run(search = "", env: Record<string, string> = {}) {
+    execFileSync("node", ["dist/build-pages.js", "js-owner"], {
+      cwd: process.cwd(),
+      env: { ...process.env, ...env },
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+    const errors: string[] = [];
+    const dom = new JSDOM(html, {
+      runScripts: "dangerously",
+      url: `https://example.com/${search}`,
+      virtualConsole: new VirtualConsole().on("jsdomError", (e: Error) =>
+        errors.push(e.message)
+      ),
+    });
+    dom.window.document.dispatchEvent(
+      new dom.window.Event("DOMContentLoaded", { bubbles: true })
+    );
+    return { dom, errors };
+  }
+
+  it("runs the dashboard script without throwing", () => {
+    const { errors } = run("", {
+      DEVEX_TEAM_NAME: "Platform",
+      DEVEX_TEAM_REPOS: "js-owner/api",
+      DEVEX_TRIAL_TITLE: "Trunk-based development",
+      DEVEX_TRIAL_START: "2026-08-01",
+    });
+    expect(errors).toEqual([]);
+  });
+
+  it("fills the trial table with real numbers", () => {
+    const { dom, errors } = run("", {
+      DEVEX_TEAM_NAME: "Platform",
+      DEVEX_TEAM_REPOS: "js-owner/api",
+      DEVEX_TRIAL_TITLE: "Trunk-based development",
+    });
+    expect(errors).toEqual([]);
+    const baseline = dom.window.document.getElementById("trialBaseline-cycle");
+    const team = dom.window.document.getElementById("trialTeam-cycle");
+    // Both repos merged a PR, so the baseline has data; the team is api only.
+    expect(baseline?.textContent).not.toBe("–");
+    expect(team?.textContent).not.toBe("–");
+    expect(dom.window.document.getElementById("trialNote")?.textContent).toContain(
+      "Baseline n="
+    );
+  });
+
+  it("warns when the team sample is too small to read", () => {
+    const { dom } = run("", {
+      DEVEX_TEAM_NAME: "Platform",
+      DEVEX_TEAM_REPOS: "js-owner/api",
+      DEVEX_TRIAL_TITLE: "Trunk-based development",
+    });
+    expect(dom.window.document.getElementById("trialNote")?.textContent).toContain(
+      "Not enough team data yet"
+    );
+  });
+
+  it("restores the period and bot filter from the query string", () => {
+    const { dom, errors } = run("?period=all&bots=exclude");
+    expect(errors).toEqual([]);
+    const active = dom.window.document.querySelector(".filter-btn.active");
+    expect(active?.getAttribute("data-period")).toBe("all");
+    const botCb = dom.window.document.getElementById("excludeBots") as HTMLInputElement;
+    expect(botCb.checked).toBe(true);
+  });
+
+  it("restores a repo selection from the query string", () => {
+    const { dom, errors } = run("?repos=api");
+    expect(errors).toEqual([]);
+    expect(dom.window.document.getElementById("repoPickerLabel")?.textContent).toBe(
+      "1 repo"
+    );
+  });
+
+  it("ignores repo names in the URL that are no longer collected", () => {
+    const { dom, errors } = run("?repos=api,deleted-repo");
+    expect(errors).toEqual([]);
+    expect(dom.window.document.getElementById("repoPickerLabel")?.textContent).toBe(
+      "1 repo"
+    );
+  });
+
+  it("selects the team's repos when the URL asks for the team scope", () => {
+    const { dom, errors } = run("?scope=team", {
+      DEVEX_TEAM_NAME: "Platform",
+      DEVEX_TEAM_REPOS: "js-owner/api",
+    });
+    expect(errors).toEqual([]);
+    const teamBtn = dom.window.document.querySelector('.scope-btn[data-scope="team"]');
+    expect(teamBtn?.classList.contains("active")).toBe(true);
+  });
+
+  it("falls back to the 30-day view for an unknown period", () => {
+    const { dom } = run("?period=nonsense");
+    const active = dom.window.document.querySelector(".filter-btn.active");
+    expect(active?.getAttribute("data-period")).toBe("30days");
   });
 });

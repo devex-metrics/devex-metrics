@@ -11,3 +11,9 @@ data/*.json
 data/*.md
 !data/.gitkeep
 !data/*.fixture.json
+
+# Local deployment config (real deployments use Actions variables)
+devex.config.json
+
+# History store checkout (lives on the metrics-data branch)
+.metrics-data/

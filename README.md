@@ -31,7 +31,11 @@ Collects developer-experience metrics for a GitHub **organization** or **user** 
 | Copilot agent credits used | per repo |
 | PRs and Actions minutes from agent tasks | per repo |
 
-Data is cached as JSON in `data/<owner>.json` and only refreshed once per day.
+Data is collected once per day and appended to a long-term history store on the
+orphan `metrics-data` branch, so trends survive across runs and nothing is ever
+committed to the default branch. See
+[docs/CONFIGURATION.md](docs/CONFIGURATION.md) for deploying this against your
+own organisation.
 
 ## Quick start
 
@@ -47,9 +51,17 @@ GITHUB_TOKEN=ghp_xxx node dist/index.js <owner> [org|user]
 
 # Or run with a GitHub App
 APP_ID=12345 APP_PRIVATE_KEY="$(cat private-key.pem)" node dist/index.js <owner> [org|user]
+
+# Build the dashboard from whatever has been collected
+node dist/build-pages.js <owner>
 ```
 
-The report is written to `data/<owner>-report.md`.
+The report is written to `data/<owner>-report.md`, and the history store to
+`data/history/<owner>/` unless `DEVEX_HISTORY_DIR` says otherwise.
+
+Configuration comes from `DEVEX_*` environment variables — the same ones set as
+GitHub Actions variables in a real deployment. For local work you can instead
+copy `devex.config.example.json` to `devex.config.json` (gitignored).
 
 ## Running in GitHub Actions
 
@@ -58,7 +70,9 @@ A workflow is included at `.github/workflows/collect-metrics.yml`.
 ### Option A – Personal Access Token
 
 1. Create a **Personal Access Token** with `repo` and `read:org` scopes.
-2. Add it as a repository secret named `GITHUB_TOKEN` (or set the `GITHUB_TOKEN` environment variable locally).
+2. Add it as a repository secret. It cannot be called `GITHUB_TOKEN` — that name
+   is reserved by Actions — so use something like `METRICS_TOKEN` and map it to
+   the `GITHUB_TOKEN` environment variable in the workflow step.
 
 ### Option B – GitHub App (recommended)
 
@@ -75,22 +89,59 @@ The installation ID is retrieved automatically at runtime.
 
 1. Enable **GitHub Pages** in your repo settings (set source to *GitHub Actions*).
 2. Optionally add a **fine-grained PAT** as a repository secret named `COPILOT_AGENT_TOKEN` (with the "Copilot agent tasks" permission) to enable Copilot agent task metrics. GitHub App tokens are not supported for this API.
-3. The workflow runs daily at 06:00 UTC. It:
-   - Restores the previous day's cached data from `actions/cache`
-   - Collects only new / changed metrics (skips if cached data is still fresh)
-   - Saves the updated cache for the next run
+3. Configure the deployment with Actions **variables** — at minimum `DEVEX_OWNER`.
+   See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for the full list.
+4. The workflow runs daily at 06:00 UTC. It:
+   - Checks out the `metrics-data` branch (creating it on first run)
+   - Collects only new / changed metrics (per-repo cache entries stay valid for 8 hours)
+   - Appends a daily rollup and any new merged-PR events to the history store
+   - Pushes the updated store back to `metrics-data`
    - Builds an HTML dashboard and deploys it to GitHub Pages
-4. You can also trigger it manually via *Actions → Collect DevEx Metrics → Run workflow*.
+5. You can also trigger it manually via *Actions → Collect DevEx Metrics → Run workflow*.
 
-No data is committed to the main branch — the cache lives in GitHub Actions and the report is published via GitHub Pages.
+Nothing is committed to the default branch. Collected data lives on the
+`metrics-data` orphan branch, which is a data store only — never built, served,
+or merged. The dashboard is published via GitHub Pages from an uploaded
+artifact, so no branch is served directly.
+
+### Seeding history from existing snapshots
+
+If a deployment previously committed daily snapshot files, each of those commits
+is a daily observation — including rolling-window metrics the collector cannot
+reconstruct retroactively. Replay them into the store with:
+
+```bash
+node scripts/backfill-history.mjs data/<owner>.fixture.json .metrics-data/data
+```
+
+or tick **backfill** when running the collect workflow manually. It is safe to
+re-run: a day already recorded is replaced rather than duplicated, and a pull
+request already in the event stream is never appended twice.
+
+### Improvement trials
+
+Set `DEVEX_TEAM_REPOS` and `DEVEX_TRIAL_TITLE` (plus optionally
+`DEVEX_TRIAL_START`, `DEVEX_BASELINE_FROM` / `DEVEX_BASELINE_TO` and
+`DEVEX_TRIAL_MILESTONES`) and the dashboard grows a trial panel: the
+intervention title, the whole org as the baseline, the team's current numbers,
+and the difference between them. Durations are reported as median, p75 and p90
+with sample sizes, and the panel says so plainly when there is not yet enough
+team data to read a difference.
+
+Every dashboard view is addressable — the period, repository selection, scope
+and bot filter are held in the query string, and **Copy link** puts the current
+slice on the clipboard.
 
 ## Project structure
 
 ```
 src/
   index.ts              # CLI entry point, ESM re-export, & orchestrator
+  config.ts             # Deployment config from Actions variables / DEVEX_CONFIG
   build-pages.ts        # Generates HTML site for GitHub Pages
   collect.ts            # Core collection orchestrator (cache-aware, calls all collectors)
+  history.ts            # Append-only rollup + event store (metrics-data branch)
+  stats.ts              # Median / percentile helpers
   types.ts              # TypeScript interfaces
   github-client.ts      # Octokit singleton wrapper
   cache.ts              # JSON file-based daily cache
@@ -107,11 +158,19 @@ src/
     trends.ts           # Weekly activity trend aggregation
     repo-graphql.ts     # GraphQL-based merged PR timeline
     copilot-agent.ts    # Copilot coding agent task metrics
-data/                   # Local cache (gitignored; persisted via actions/cache in CI)
+data/                   # Local cache (gitignored)
+.metrics-data/          # History store checkout (gitignored; the metrics-data branch)
 _site/                  # Generated GitHub Pages site (gitignored)
+scripts/
+  metrics-data.sh       # Check out / publish the metrics-data branch
+  backfill-history.mjs  # Seed the history store from committed snapshots
+docs/
+  CONFIGURATION.md      # Every Actions variable, and how to scope a trial
 .github/workflows/
   ci.yml                # Build + test on PR / push to main
-  collect-metrics.yml   # Scheduled data collection + Pages deploy
+  collect-metrics.yml   # Scheduled data collection, then calls pages.yml
+  pages.yml             # Reusable: build the site from metrics-data and deploy
+  deploy-pages.yml      # Rebuild the site without re-collecting
 ```
 
 ## Testing

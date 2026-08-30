@@ -1,5 +1,6 @@
 import { collect } from "./collect.js";
 import { loadFixture, saveFixture } from "./cache.js";
+import { loadConfig, assertUsable } from "./config.js";
 
 /**
  * Collect metrics and save as a fixture file for local development.
@@ -15,13 +16,13 @@ import { loadFixture, saveFixture } from "./cache.js";
  *   git commit -m "chore: update <owner> fixture data"
  */
 async function main(): Promise<void> {
-  const owner = process.argv[2];
-  const ownerType = (process.argv[3] ?? "org") as "org" | "user";
-
-  if (!owner) {
-    console.error("Usage: save-fixture <owner> [org|user] [--force]");
-    process.exit(1);
-  }
+  const config = loadConfig();
+  if (process.argv[2]) config.owner = process.argv[2];
+  const argType = process.argv[3];
+  if (argType === "org" || argType === "user") config.ownerType = argType;
+  assertUsable(config);
+  const owner = config.owner;
+  const ownerType = config.ownerType;
 
   const forceRefresh =
     process.env.FORCE_REFRESH === "true" ||
@@ -44,7 +45,7 @@ async function main(): Promise<void> {
       ? `Fetching fresh metrics for ${owner} (forced)…`
       : `Fetching fresh metrics for ${owner} (no fixture for today yet)…`
   );
-  const metrics = await collect(owner, ownerType, { skipCache: true });
+  const metrics = await collect(owner, ownerType, { skipCache: true, config });
 
   saveFixture(owner, metrics);
 

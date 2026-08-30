@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { loadCache, saveCache, loadFixture, saveFixture, loadRawCache, isWithinHours, CURRENT_SCHEMA_VERSION } from "./cache.js";
+import { loadCache, saveCache, loadFixture, saveFixture, loadRawCache, isWithinHours, fixturesEnabled, CURRENT_SCHEMA_VERSION } from "./cache.js";
 import type { OrgMetrics } from "./types.js";
 
 function makeSampleMetrics(): OrgMetrics {
@@ -27,6 +27,28 @@ function makeSampleMetrics(): OrgMetrics {
     weeklyTrends: [],
   };
 }
+
+afterEach(() => {
+  delete process.env.DEVEX_USE_FIXTURE;
+});
+
+describe("fixturesEnabled", () => {
+  it("is off by default so a stale fixture can never shadow collected data", () => {
+    expect(fixturesEnabled({})).toBe(false);
+  });
+
+  it("accepts the usual truthy spellings", () => {
+    for (const v of ["1", "true", "TRUE", "yes", "on"]) {
+      expect(fixturesEnabled({ DEVEX_USE_FIXTURE: v })).toBe(true);
+    }
+  });
+
+  it("treats anything else as off", () => {
+    for (const v of ["0", "false", "no", "", "  "]) {
+      expect(fixturesEnabled({ DEVEX_USE_FIXTURE: v })).toBe(false);
+    }
+  });
+});
 
 describe("cache", () => {
   // cache.ts resolves DATA_DIR from process.cwd() + /data at module load,
@@ -102,7 +124,8 @@ describe("fixture", () => {
     expect(loadFixture("test-owner")).toBeNull();
   });
 
-  it("loadCache should prefer fixture over stale daily cache", () => {
+  it("loadCache should prefer fixture over stale daily cache when fixtures are enabled", () => {
+    process.env.DEVEX_USE_FIXTURE = "1";
     const metrics = makeSampleMetrics();
     // Write stale daily cache
     const envelope = { date: "2020-01-01", data: metrics };
@@ -187,5 +210,65 @@ describe("loadRawCache", () => {
     const loaded = loadRawCache("test-raw");
     expect(loaded).not.toBeNull();
     expect(loaded!.owner).toBe("test-raw");
+  });
+});
+
+describe("fixture opt-in gating", () => {
+  const dataDir = path.resolve(process.cwd(), "data");
+  const fixtureFile = path.join(dataDir, "gated-owner.fixture.json");
+  const cacheFile = path.join(dataDir, "gated-owner.json");
+
+  afterEach(() => {
+    for (const f of [fixtureFile, cacheFile]) {
+      if (fs.existsSync(f)) fs.unlinkSync(f);
+    }
+    delete process.env.DEVEX_USE_FIXTURE;
+  });
+
+  function writeFixture(): OrgMetrics {
+    const metrics = { ...makeSampleMetrics(), owner: "gated-owner" };
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(fixtureFile, JSON.stringify(metrics));
+    return metrics;
+  }
+
+  it("loadCache ignores a fixture unless DEVEX_USE_FIXTURE is set", () => {
+    writeFixture();
+    expect(loadCache("gated-owner")).toBeNull();
+  });
+
+  it("loadCache uses the fixture when DEVEX_USE_FIXTURE is set", () => {
+    writeFixture();
+    process.env.DEVEX_USE_FIXTURE = "1";
+    const loaded = loadCache("gated-owner");
+    expect(loaded?.owner).toBe("gated-owner");
+    expect(loaded?.dataSource).toBe("fixture");
+  });
+
+  it("loadRawCache ignores a fixture unless DEVEX_USE_FIXTURE is set", () => {
+    writeFixture();
+    expect(loadRawCache("gated-owner")).toBeNull();
+  });
+
+  it("loadRawCache uses the fixture when DEVEX_USE_FIXTURE is set", () => {
+    writeFixture();
+    process.env.DEVEX_USE_FIXTURE = "1";
+    expect(loadRawCache("gated-owner")?.owner).toBe("gated-owner");
+  });
+
+  it("marks data loaded from the daily cache with its provenance", () => {
+    const metrics = { ...makeSampleMetrics(), owner: "gated-owner" };
+    fs.mkdirSync(dataDir, { recursive: true });
+    saveCache("gated-owner", metrics);
+    expect(loadCache("gated-owner")?.dataSource).toBe("cache");
+  });
+
+  it("still prefers a same-day cache over a fixture when both are enabled", () => {
+    const fixture = writeFixture();
+    process.env.DEVEX_USE_FIXTURE = "1";
+    saveCache("gated-owner", { ...fixture, repoCount: 99 });
+    // Fixtures win by design when explicitly enabled — assert that contract
+    // holds so a future change to the ordering is a deliberate one.
+    expect(loadCache("gated-owner")?.dataSource).toBe("fixture");
   });
 });

@@ -1,0 +1,63 @@
+{
+  "$comment": [
+    "Example deployment configuration for devex-metrics.",
+    "You do NOT need to commit a copy of this file. In a real deployment every",
+    "value below is set as a GitHub Actions *variable* on the repository, so a",
+    "customer configures their deployment without editing any tracked file.",
+    "",
+    "Two ways to set it, and you can mix them:",
+    "  A. One variable named DEVEX_CONFIG holding this whole object as JSON.",
+    "  B. Discrete DEVEX_* variables (see the mapping against each field).",
+    "Discrete variables win over DEVEX_CONFIG, which wins over devex.config.json.",
+    "",
+    "Copy this file to devex.config.json for local development — it is gitignored."
+  ],
+
+  "owner": "rajbos",
+  "ownerType": "user",
+
+  "branding": {
+    "title": "DevEx Metrics",
+    "attribution": "Made with ❤️ by rajbos",
+    "attributionUrl": "https://github.com/rajbos"
+  },
+
+  "repos": {
+    "include": [],
+    "exclude": ["*-archive", "*-fork"],
+    "excludeArchived": true,
+    "excludeForks": false,
+    "maxIdleDays": 0
+  },
+
+  "team": {
+    "id": "team-alpha",
+    "name": "Team Alpha",
+    "repos": ["devex-*", "rajbos/some-repo"],
+    "discoverAll": true
+  },
+
+  "trial": {
+    "title": "Trunk-based development",
+    "hypothesis": "Smaller pull requests shorten review latency",
+    "interventionStart": "2026-05-01",
+    "baselineFrom": "2026-01-01",
+    "baselineTo": "2026-05-01",
+    "milestones": [{ "date": "2026-05-15", "label": "Training complete" }]
+  },
+
+  "collection": {
+    "historyWeeks": 104,
+    "maxPRPages": 10,
+    "maxRepoAgeHours": 8,
+    "features": {
+      "dependents": false,
+      "copilotAgent": true
+    }
+  },
+
+  "history": {
+    "enabled": true,
+    "dir": "data/history"
+  }
+}

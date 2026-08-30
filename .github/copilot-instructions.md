@@ -2,12 +2,14 @@
 
 ## Project overview
 
-**devex-metrics** collects Developer Experience metrics from the GitHub API for a GitHub organisation or user account and produces a Markdown report and an HTML dashboard deployed to GitHub Pages. No data is committed to the repository; collected data lives in `data/` (gitignored, persisted via `actions/cache` in CI).
+**devex-metrics** collects Developer Experience metrics from the GitHub API for a GitHub organisation or user account and produces a Markdown report and an HTML dashboard deployed to GitHub Pages. It is built to be deployed at customer sites: everything site-specific is configured through GitHub Actions variables (see `docs/CONFIGURATION.md`), never by editing tracked files.
+
+Nothing is committed to the default branch. Collected data is appended to an orphan `metrics-data` branch — a data store only, never built or served — and read back from there by the site build. `data/` remains a gitignored local scratch area.
 
 ## Tech stack
 
 - **Language**: TypeScript (strict mode, ES2022 target, Node16 module resolution)
-- **Runtime**: Node.js 20, ESM (`"type": "module"` in package.json)
+- **Runtime**: Node.js 22, ESM (`"type": "module"` in package.json). The version lives in `.nvmrc`; workflows read it via `node-version-file` — do not hard-code a version in a workflow.
 - **GitHub API**: `@octokit/rest` + `@octokit/auth-app` + `@octokit/plugin-throttling`
 - **Tests**: Vitest with globals enabled (`vitest.config.ts`)
 - **Build**: `tsc` → `dist/`
@@ -18,8 +20,11 @@
 ```
 src/
   index.ts              # CLI entry point & orchestrator
+  config.ts             # Deployment config: defaults < file < DEVEX_CONFIG < DEVEX_* vars
   build-pages.ts        # Generates static HTML for GitHub Pages
   collect.ts            # Core collection orchestrator (cache-aware, calls all collectors)
+  history.ts            # Append-only rollup + PR event store
+  stats.ts              # median / percentile / quantiles
   types.ts              # All shared TypeScript interfaces (source of truth)
   github-client.ts      # Octokit singleton (token or GitHub App auth)
   link-header.ts        # GitHub Link header pagination helper
@@ -35,11 +40,33 @@ src/
     dependents.ts       # Dependent repository count
     trends.ts           # Weekly activity trend aggregation
 data/                   # Local cache (gitignored)
+.metrics-data/          # Checkout of the metrics-data branch (gitignored)
 _site/                  # Generated GitHub Pages output (gitignored)
 .github/workflows/
   ci.yml                # Build + test on PR / push to main
-  collect-metrics.yml   # Scheduled data collection + Pages deploy
+  collect-metrics.yml   # Scheduled data collection, then calls pages.yml
+  pages.yml             # Reusable: build from metrics-data and deploy
+  deploy-pages.yml      # Rebuild the site without re-collecting
 ```
+
+## Configuration
+
+Never hard-code an owner, repo list, team, trial or branding string. Everything site-specific is resolved by `loadConfig()` in `src/config.ts` and reaches the code as a `DevexConfig`. Adding a setting means: add the field and its JSDoc, give it a default in `defaultConfig()`, map a `DEVEX_*` variable in `applyEnv()`, document it in `docs/CONFIGURATION.md`, show it in `devex.config.example.json`, and pass it through in the workflow `env:` blocks.
+
+Team membership and trial metadata are presentation concerns: `applyScope()` re-derives them at site-build time from the current configuration, so re-scoping a team or retitling a trial needs a Pages rebuild, not a re-collection.
+
+## History store
+
+`src/history.ts` writes three files per scope under the configured history dir:
+`rollup.ndjson` (one line per repo per day, replaced when a day is re-run),
+`events.ndjson` (one line per merged PR, appended once and never rewritten) and
+`latest.json` (the newest full snapshot). Prefer adding a raw fact to the event
+stream over adding a derived aggregate to the rollup — events can be recomputed
+into new metrics later, aggregates cannot.
+
+## Fixtures
+
+Committed fixtures are opt-in: `loadCache` / `loadRawCache` only consult them when `DEVEX_USE_FIXTURE` is set. They are for local development and offline demos, never a data source in CI — a fixture has no date restriction, so an unnoticed stale one would let a run "succeed" while publishing numbers of unknown age.
 
 ## Code conventions
 
@@ -132,7 +159,8 @@ Mutation testing is provided by [Stryker](https://stryker-mutator.io/) with the 
 ## GitHub Actions
 
 - **ci.yml**: runs `npm ci`, `npm run build`, `npm test` on every push/PR to `main`. A second `mutation` job (depends on `test`) runs Stryker and posts a step summary; it runs on every PR but does not block merging on score.
-- **collect-metrics.yml**: scheduled daily; restores cache, collects metrics, builds Pages, deploys. Does **not** commit to `main`.
+- **collect-metrics.yml**: scheduled daily; checks out `metrics-data`, collects metrics, appends to the history store, pushes it back, then calls `pages.yml`. Does **not** commit to `main`.
+- **pages.yml**: reusable (`workflow_call`); builds the site from the `metrics-data` checkout and deploys to Pages.
 - Always pin action versions to a full SHA or major-version tag.
 
 ## Auth

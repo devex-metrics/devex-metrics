@@ -7,15 +7,16 @@ on:
   workflow_dispatch:
     inputs:
       owner:
-        description: "GitHub org or user to collect metrics for"
+        description: "GitHub org or user to collect. Defaults to the DEVEX_OWNER variable."
         required: false
-        default: "rajbos"
       owner_type:
-        description: "org or user"
+        description: "org or user. Defaults to the DEVEX_OWNER_TYPE variable."
         required: false
-        default: "user"
-      force_refresh:
-        description: "Force fresh data collection even if today's fixture already exists"
+        type: choice
+        options: ["", "org", "user"]
+        default: ""
+      backfill:
+        description: "Seed the history store from committed fixture snapshots before collecting"
         required: false
         default: false
         type: boolean
@@ -35,10 +36,13 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The backfill replays the full commit history of the fixture file.
+          fetch-depth: ${{ inputs.backfill && 0 || 1 }}
 
       - uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version-file: ".nvmrc"
           cache: "npm"
 
       - run: npm ci
@@ -49,20 +53,9 @@ jobs:
         id: date
         run: echo "date=$(date -u +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
-      # Restore cached data from today's run (if any).
-      # Key includes the date so stale data from previous days is never restored.
-      - name: Restore data cache
-        id: cache-data
-        uses: actions/cache@v6
-        with:
-          path: data
-          key: metrics-data-${{ github.repository_owner }}-${{ steps.date.outputs.date }}
-
-      # Agent data is cached separately with a stable restore-key so terminal
-      # tasks (completed/failed/cancelled) persist across days without being
-      # re-fetched.  The exact key includes the date so updates are saved under
-      # a new key each day; the prefix restore-key picks up the most recent
-      # prior cache when today's key has no entry yet.
+      # Per-repo Copilot agent data is expensive to re-fetch and terminal tasks
+      # never change, so it stays in the Actions cache. The durable record lives
+      # on the metrics-data branch instead — the cache is only a speed-up.
       - name: Restore agent data cache
         uses: actions/cache@v6
         with:
@@ -78,6 +71,23 @@ jobs:
           client-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
+      # Append-only data store on an orphan branch. Nothing is ever committed
+      # to the default branch.
+      - name: Check out history store
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: scripts/metrics-data.sh checkout .metrics-data
+
+      - name: Backfill history from committed snapshots
+        if: inputs.backfill
+        run: |
+          FIXTURE="data/${{ inputs.owner || vars.DEVEX_OWNER }}.fixture.json"
+          if [ -f "$FIXTURE" ]; then
+            node scripts/backfill-history.mjs "$FIXTURE" .metrics-data/data
+          else
+            echo "No fixture at $FIXTURE — nothing to backfill."
+          fi
+
       - name: Collect metrics
         env:
           APP_ID: ${{ vars.APP_ID }}
@@ -85,56 +95,42 @@ jobs:
           # Fine-grained PAT with "Agent tasks" repo permission.
           # GitHub App installation tokens are not supported for this API.
           COPILOT_AGENT_TOKEN: ${{ secrets.COPILOT_AGENT_TOKEN }}
-          FORCE_REFRESH: ${{ github.event.inputs.force_refresh || 'false' }}
-        run: |
-          OWNER="${{ github.event.inputs.owner || 'rajbos' }}"
-          TYPE="${{ github.event.inputs.owner_type || 'user' }}"
-          node dist/save-fixture.js "$OWNER" "$TYPE"
+          DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
+          DEVEX_OWNER_TYPE: ${{ inputs.owner_type || vars.DEVEX_OWNER_TYPE }}
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+          DEVEX_REPOS_INCLUDE: ${{ vars.DEVEX_REPOS_INCLUDE }}
+          DEVEX_REPOS_EXCLUDE: ${{ vars.DEVEX_REPOS_EXCLUDE }}
+          DEVEX_EXCLUDE_ARCHIVED: ${{ vars.DEVEX_EXCLUDE_ARCHIVED }}
+          DEVEX_EXCLUDE_FORKS: ${{ vars.DEVEX_EXCLUDE_FORKS }}
+          DEVEX_MAX_IDLE_DAYS: ${{ vars.DEVEX_MAX_IDLE_DAYS }}
+          DEVEX_TEAM_REPOS: ${{ vars.DEVEX_TEAM_REPOS }}
+          DEVEX_TEAM_NAME: ${{ vars.DEVEX_TEAM_NAME }}
+          DEVEX_TEAM_ID: ${{ vars.DEVEX_TEAM_ID }}
+          DEVEX_DISCOVER_ALL: ${{ vars.DEVEX_DISCOVER_ALL }}
+          DEVEX_TRIAL_TITLE: ${{ vars.DEVEX_TRIAL_TITLE }}
+          DEVEX_TRIAL_HYPOTHESIS: ${{ vars.DEVEX_TRIAL_HYPOTHESIS }}
+          DEVEX_TRIAL_START: ${{ vars.DEVEX_TRIAL_START }}
+          DEVEX_BASELINE_FROM: ${{ vars.DEVEX_BASELINE_FROM }}
+          DEVEX_BASELINE_TO: ${{ vars.DEVEX_BASELINE_TO }}
+          DEVEX_TRIAL_MILESTONES: ${{ vars.DEVEX_TRIAL_MILESTONES }}
+          DEVEX_HISTORY_WEEKS: ${{ vars.DEVEX_HISTORY_WEEKS }}
+          DEVEX_MAX_PR_PAGES: ${{ vars.DEVEX_MAX_PR_PAGES }}
+          DEVEX_MAX_REPO_AGE_HOURS: ${{ vars.DEVEX_MAX_REPO_AGE_HOURS }}
+          DEVEX_FEATURE_DEPENDENTS: ${{ vars.DEVEX_FEATURE_DEPENDENTS }}
+          DEVEX_FEATURE_COPILOT_AGENT: ${{ vars.DEVEX_FEATURE_COPILOT_AGENT }}
+          DEVEX_HISTORY_DIR: .metrics-data/data
+        run: node dist/index.js
 
-      - name: Create PR for updated fixture data
-        id: create-pr
-        uses: peter-evans/create-pull-request@v8
-        with:
-          token: ${{ steps.app-token.outputs.token }}
-          commit-message: "chore: update ${{ github.event.inputs.owner || 'rajbos' }} fixture data"
-          branch: "chore/update-fixture-${{ github.event.inputs.owner || 'rajbos' }}"
-          title: "chore: update ${{ github.event.inputs.owner || 'rajbos' }} fixture data"
-          body: "Automated fixture data update from the collect-metrics workflow."
-          add-paths: "data/*.fixture.json"
-          delete-branch: true
-
-      - name: Enable auto-merge on fixture data PR
-        if: steps.create-pr.outputs.pull-request-operation == 'created' || steps.create-pr.outputs.pull-request-operation == 'updated'
+      - name: Publish history store
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: gh pr merge --auto --squash "${{ steps.create-pr.outputs.pull-request-url }}"
-
-      # actions/cache@v6 automatically saves the data/ folder at job end.
-
-      # Build the GitHub Pages site from the collected data and deploy.
-      - name: Build pages site
         run: |
-          OWNER="${{ github.event.inputs.owner || 'rajbos' }}"
-          mkdir -p _site
-          node dist/build-pages.js "$OWNER"
+          scripts/metrics-data.sh publish .metrics-data \
+            "data: ${{ inputs.owner || vars.DEVEX_OWNER }} ${{ steps.date.outputs.date }}"
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5.0.0
-        with:
-          path: _site
-
-  deploy:
+  pages:
     needs: collect
-    runs-on: ubuntu-latest
-    permissions:
-      # actions/deploy-pages authenticates via OIDC — requires id-token write.
-      id-token: write
-      # Required to publish artifacts to GitHub Pages.
-      pages: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+    uses: ./.github/workflows/pages.yml
+    secrets: inherit
+    with:
+      owner: ${{ inputs.owner }}

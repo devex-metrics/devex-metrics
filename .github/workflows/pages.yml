@@ -1,0 +1,90 @@
+name: Build and Deploy Pages
+
+# Reusable: builds the dashboard from the metrics-data history store and
+# publishes it to GitHub Pages. Called by collect-metrics.yml after a
+# collection, and by deploy-pages.yml when only the site code has changed.
+on:
+  workflow_call:
+    inputs:
+      owner:
+        description: "Owner to build the site for. Defaults to the DEVEX_OWNER variable."
+        required: false
+        type: string
+      history_branch:
+        description: "Branch holding the history store."
+        required: false
+        default: "metrics-data"
+        type: string
+
+permissions: {}
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      # actions/checkout requires read access to the repository.
+      contents: read
+      # actions/deploy-pages authenticates via OIDC — requires id-token write.
+      id-token: write
+      # Required to publish artifacts to GitHub Pages.
+      pages: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      # The history store is a data-only orphan branch; it is never built or
+      # served, only read here to find the newest snapshot.
+      - name: Check out history store
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: scripts/metrics-data.sh checkout .metrics-data "${{ inputs.history_branch }}"
+
+      - name: Build pages site
+        env:
+          DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
+          DEVEX_OWNER_TYPE: ${{ vars.DEVEX_OWNER_TYPE }}
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+          DEVEX_TITLE: ${{ vars.DEVEX_TITLE }}
+          DEVEX_ATTRIBUTION: ${{ vars.DEVEX_ATTRIBUTION }}
+          DEVEX_ATTRIBUTION_URL: ${{ vars.DEVEX_ATTRIBUTION_URL }}
+          DEVEX_TEAM_REPOS: ${{ vars.DEVEX_TEAM_REPOS }}
+          DEVEX_TEAM_NAME: ${{ vars.DEVEX_TEAM_NAME }}
+          DEVEX_TEAM_ID: ${{ vars.DEVEX_TEAM_ID }}
+          DEVEX_DISCOVER_ALL: ${{ vars.DEVEX_DISCOVER_ALL }}
+          DEVEX_TRIAL_TITLE: ${{ vars.DEVEX_TRIAL_TITLE }}
+          DEVEX_TRIAL_HYPOTHESIS: ${{ vars.DEVEX_TRIAL_HYPOTHESIS }}
+          DEVEX_TRIAL_START: ${{ vars.DEVEX_TRIAL_START }}
+          DEVEX_BASELINE_FROM: ${{ vars.DEVEX_BASELINE_FROM }}
+          DEVEX_BASELINE_TO: ${{ vars.DEVEX_BASELINE_TO }}
+          DEVEX_TRIAL_MILESTONES: ${{ vars.DEVEX_TRIAL_MILESTONES }}
+          DEVEX_HISTORY_DIR: .metrics-data/data
+        run: |
+          mkdir -p _site
+          node dist/build-pages.js
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
