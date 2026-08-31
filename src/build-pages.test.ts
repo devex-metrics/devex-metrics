@@ -1447,3 +1447,184 @@ describe("build-pages · nothing collected yet", () => {
     }
   });
 });
+
+describe("build-pages · CI health card", () => {
+  const dataDir = path.resolve(process.cwd(), "data");
+  const siteDir = path.resolve(process.cwd(), "_site");
+  const cacheFile = path.join(dataDir, "ci-owner.json");
+  const ciDir = path.join(dataDir, "history", "ci-owner");
+  const ciFile = path.join(ciDir, "ci.ndjson");
+
+  /** `days` ago, so the fixture never ages out of the CI window. */
+  function ago(days: number, hours = 0): string {
+    return new Date(Date.now() - days * 86400000 - hours * 3600000).toISOString();
+  }
+
+  function ciRow(extra: Record<string, unknown>) {
+    return JSON.stringify({
+      v: 1,
+      scope: "ci-owner",
+      repo: "ci-owner/api",
+      runId: 1,
+      attempt: 1,
+      workflow: "CI",
+      branch: "main",
+      headSha: "abc",
+      event: "push",
+      conclusion: "success",
+      createdAt: ago(3, 2),
+      startedAt: ago(3, 1.9),
+      completedAt: ago(3, 1.8),
+      ...extra,
+    });
+  }
+
+  beforeEach(() => {
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(
+      cacheFile,
+      JSON.stringify({
+        date: new Date().toISOString().slice(0, 10),
+        data: {
+          schemaVersion: CURRENT_SCHEMA_VERSION,
+          owner: "ci-owner",
+          ownerType: "org",
+          collectedAt: new Date().toISOString(),
+          repoCount: 1,
+          repos: [
+            {
+              name: "api",
+              fullName: "ci-owner/api",
+              issues: { open: 0, closed: 0 },
+              pullRequests: { open: 0, closed: 0, merged: 1 },
+              pullRequestDetails: [],
+              mergedPRTimeline: [
+                {
+                  number: 1,
+                  createdAt: ago(5),
+                  mergedAt: ago(4),
+                  author: "amy",
+                  isBotAuthor: false,
+                  isCopilotAuthored: false,
+                  timeToMergeHours: 24,
+                  closesIssues: [],
+                  linesAdded: 10,
+                  linesDeleted: 1,
+                },
+              ],
+              committerCount: 1,
+              reviewerCount: 1,
+              contributorCount: 1,
+              dependentCount: 0,
+            },
+          ],
+          weeklyTrends: [],
+        },
+      })
+    );
+  });
+
+  afterEach(() => {
+    if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
+    fs.rmSync(ciDir, { recursive: true, force: true });
+  });
+
+  function build(): string {
+    execFileSync("node", ["dist/build-pages.js", "ci-owner"], { cwd: process.cwd() });
+    return fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+  }
+
+  function load(html: string) {
+    const errors: string[] = [];
+    const dom = new JSDOM(html, {
+      runScripts: "dangerously",
+      url: "https://example.com/?period=all",
+      virtualConsole: new VirtualConsole().on("jsdomError", (e: Error) =>
+        errors.push(e.message)
+      ),
+    });
+    dom.window.document.dispatchEvent(
+      new dom.window.Event("DOMContentLoaded", { bubbles: true })
+    );
+    return { dom, errors };
+  }
+
+  it("renders no CI card at all when the crawl has collected nothing", () => {
+    const html = build();
+    expect(html).not.toContain('aria-label="CI health"');
+  });
+
+  it("ignores CI runs older than the configured window", () => {
+    fs.mkdirSync(ciDir, { recursive: true });
+    fs.writeFileSync(
+      ciFile,
+      ciRow({ createdAt: ago(400), startedAt: ago(400), completedAt: ago(400) }) + "\n"
+    );
+    expect(build()).not.toContain('aria-label="CI health"');
+  });
+
+  it("fills the card from the CI run stream", () => {
+    fs.mkdirSync(ciDir, { recursive: true });
+    fs.writeFileSync(
+      ciFile,
+      [
+        ciRow({ runId: 1 }),
+        ciRow({ runId: 2, conclusion: "failure" }),
+        ciRow({ runId: 3, attempt: 1, conclusion: "failure" }),
+        ciRow({ runId: 3, attempt: 2, conclusion: "success" }),
+        // Cancelled runs are dropped: a human changing their mind is not a
+        // broken pipeline, so this must not count against the success rate.
+        ciRow({ runId: 4, conclusion: "cancelled" }),
+      ].join("\n") + "\n"
+    );
+
+    const { dom, errors } = load(build());
+    expect(errors).toEqual([]);
+    const doc = dom.window.document;
+    // Three runs survive: two green (one of them a re-run), one red.
+    expect(doc.getElementById("ciVal-green")?.textContent).toBe("66.7%");
+    expect(doc.getElementById("ciDetail-green")?.textContent).toBe("2 of 3 runs");
+    expect(doc.getElementById("ciVal-flaky")?.textContent).toBe("33.3%");
+    expect(doc.getElementById("ciVal-duration")?.textContent).not.toBe("–");
+    expect(doc.getElementById("ciVal-queue")?.textContent).not.toBe("–");
+    expect(doc.getElementById("ciNote")?.textContent).toContain(
+      "3 completed default-branch runs"
+    );
+  });
+
+  it("says a small sample is too small to read as a rate", () => {
+    fs.mkdirSync(ciDir, { recursive: true });
+    fs.writeFileSync(ciFile, ciRow({ runId: 1 }) + "\n");
+    const { dom } = load(build());
+    expect(dom.window.document.getElementById("ciNote")?.textContent).toContain(
+      "Too few runs"
+    );
+  });
+
+  it("reports no runs rather than a zero when the period excludes them all", () => {
+    fs.mkdirSync(ciDir, { recursive: true });
+    fs.writeFileSync(
+      ciFile,
+      ciRow({ runId: 1, createdAt: ago(60), startedAt: ago(60), completedAt: ago(60) }) +
+        "\n"
+    );
+    const html = build();
+    const errors: string[] = [];
+    const dom = new JSDOM(html, {
+      runScripts: "dangerously",
+      // The default 30-day slice excludes a run that finished 60 days ago.
+      url: "https://example.com/?period=30days",
+      virtualConsole: new VirtualConsole().on("jsdomError", (e: Error) =>
+        errors.push(e.message)
+      ),
+    });
+    dom.window.document.dispatchEvent(
+      new dom.window.Event("DOMContentLoaded", { bubbles: true })
+    );
+    expect(errors).toEqual([]);
+    expect(dom.window.document.getElementById("ciVal-green")?.textContent).toBe("–");
+    expect(dom.window.document.getElementById("ciNote")?.textContent).toContain(
+      "No CI runs in the selected slice"
+    );
+  });
+});
