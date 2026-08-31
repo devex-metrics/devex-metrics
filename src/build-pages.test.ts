@@ -1117,7 +1117,35 @@ describe("build-pages · dashboard JS executes", () => {
                 closesIssues: [],
                 linesAdded: 10 * (i + 1),
                 linesDeleted: 2,
+                firstReviewAt: "2026-08-20T06:00:00Z",
+                firstApprovalAt: "2026-08-21T00:00:00Z",
+                reviewCount: 2,
+                changesRequestedCount: i,
+                revertsPR: undefined,
               },
+            ],
+            closedPRTimeline: [
+              {
+                number: i * 10 + 2,
+                createdAt: "2026-08-18T00:00:00Z",
+                closedAt: "2026-08-23T00:00:00Z",
+                author: "bob",
+                isBotAuthor: false,
+                linesAdded: 5,
+                linesDeleted: 1,
+              },
+            ],
+            openPRTimeline: [
+              {
+                number: i * 10 + 3,
+                createdAt: "2026-08-10T00:00:00Z",
+                author: "carol",
+                isBotAuthor: false,
+              },
+            ],
+            reviewerLoad: [
+              { reviewer: "amy", reviews: 5 - i },
+              { reviewer: "bob", reviews: 1 },
             ],
             weeklyTrends: [
               {
@@ -1254,6 +1282,82 @@ describe("build-pages · dashboard JS executes", () => {
     const active = dom.window.document.querySelector(".filter-btn.active");
     expect(active?.getAttribute("data-period")).toBe("30days");
   });
+
+  it("fills the three review legs with real durations", () => {
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    const doc = dom.window.document;
+    // Opened 2026-08-20T00:00 → first review 06:00 → approval next day.
+    expect(doc.getElementById("flowP50-review")?.textContent).toBe("6.0hr");
+    expect(doc.getElementById("flowP50-approval")?.textContent).toBe("18.0hr");
+    expect(doc.getElementById("flowN-review")?.textContent).toBe("2");
+  });
+
+  it("says so plainly when a leg has no data to read", () => {
+    const { dom } = run("?period=all");
+    const note = dom.window.document.getElementById("flowNote")?.textContent ?? "";
+    expect(note).toContain("Measured over 2 reviewed pull requests");
+    expect(note).toContain("Too few to read as a rate");
+  });
+
+  it("fills the AI versus human comparison from the same filtered set", () => {
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    const doc = dom.window.document;
+    // One AI-authored PR in api, one human-authored PR in billing.
+    expect(doc.getElementById("aiHumanAI-merged")?.textContent).toBe("1");
+    expect(doc.getElementById("aiHumanHuman-merged")?.textContent).toBe("1");
+    expect(doc.getElementById("aiHumanAI-cycle")?.textContent).not.toBe("–");
+    expect(doc.getElementById("aiHumanNote")?.textContent).toContain("AI n=1");
+  });
+
+  it("reports review-load concentration across the collected reviewers", () => {
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    const badge = dom.window.document.getElementById("giniBadge")?.textContent ?? "";
+    expect(badge).toMatch(/^Gini 0\.\d\d$/);
+    expect(dom.window.document.getElementById("giniNote")?.textContent).toContain(
+      "2 reviewers"
+    );
+  });
+
+  it("reports the abandonment rate and the age of open work", () => {
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    // Two merged and two closed-unmerged PRs across the two repos.
+    expect(dom.window.document.getElementById("kpiAbandonVal")?.textContent).toBe("50.0%");
+    expect(dom.window.document.getElementById("kpiAbandonSub")?.textContent).toContain(
+      "2 open"
+    );
+  });
+
+  it("shows the median PR size and the share of large changes", () => {
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    expect(dom.window.document.getElementById("kpiSizeVal")?.textContent).not.toBe("–");
+    expect(dom.window.document.getElementById("kpiSizeSub")?.textContent).toContain(
+      "over 400 lines"
+    );
+  });
+
+  it("renders a dash for cost per agent PR when there is no agent data", () => {
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    expect(dom.window.document.getElementById("kpiAgentCostVal")?.textContent).toBe("–");
+    expect(dom.window.document.getElementById("kpiAgentCostSub")?.textContent).toBe(
+      "no agent data"
+    );
+  });
+
+  it("keeps the new metrics working under a repo filter", () => {
+    const { dom, errors } = run("?period=all&repos=api");
+    expect(errors).toEqual([]);
+    const doc = dom.window.document;
+    expect(doc.getElementById("repoPickerLabel")?.textContent).toBe("1 repo");
+    // api's single merged PR is the AI-authored one.
+    expect(doc.getElementById("aiHumanAI-merged")?.textContent).toBe("1");
+    expect(doc.getElementById("aiHumanHuman-merged")?.textContent).toBe("0");
+  });
 });
 
 describe("build-pages · nothing collected yet", () => {
@@ -1341,5 +1445,186 @@ describe("build-pages · nothing collected yet", () => {
     } finally {
       if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
     }
+  });
+});
+
+describe("build-pages · CI health card", () => {
+  const dataDir = path.resolve(process.cwd(), "data");
+  const siteDir = path.resolve(process.cwd(), "_site");
+  const cacheFile = path.join(dataDir, "ci-owner.json");
+  const ciDir = path.join(dataDir, "history", "ci-owner");
+  const ciFile = path.join(ciDir, "ci.ndjson");
+
+  /** `days` ago, so the fixture never ages out of the CI window. */
+  function ago(days: number, hours = 0): string {
+    return new Date(Date.now() - days * 86400000 - hours * 3600000).toISOString();
+  }
+
+  function ciRow(extra: Record<string, unknown>) {
+    return JSON.stringify({
+      v: 1,
+      scope: "ci-owner",
+      repo: "ci-owner/api",
+      runId: 1,
+      attempt: 1,
+      workflow: "CI",
+      branch: "main",
+      headSha: "abc",
+      event: "push",
+      conclusion: "success",
+      createdAt: ago(3, 2),
+      startedAt: ago(3, 1.9),
+      completedAt: ago(3, 1.8),
+      ...extra,
+    });
+  }
+
+  beforeEach(() => {
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(
+      cacheFile,
+      JSON.stringify({
+        date: new Date().toISOString().slice(0, 10),
+        data: {
+          schemaVersion: CURRENT_SCHEMA_VERSION,
+          owner: "ci-owner",
+          ownerType: "org",
+          collectedAt: new Date().toISOString(),
+          repoCount: 1,
+          repos: [
+            {
+              name: "api",
+              fullName: "ci-owner/api",
+              issues: { open: 0, closed: 0 },
+              pullRequests: { open: 0, closed: 0, merged: 1 },
+              pullRequestDetails: [],
+              mergedPRTimeline: [
+                {
+                  number: 1,
+                  createdAt: ago(5),
+                  mergedAt: ago(4),
+                  author: "amy",
+                  isBotAuthor: false,
+                  isCopilotAuthored: false,
+                  timeToMergeHours: 24,
+                  closesIssues: [],
+                  linesAdded: 10,
+                  linesDeleted: 1,
+                },
+              ],
+              committerCount: 1,
+              reviewerCount: 1,
+              contributorCount: 1,
+              dependentCount: 0,
+            },
+          ],
+          weeklyTrends: [],
+        },
+      })
+    );
+  });
+
+  afterEach(() => {
+    if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
+    fs.rmSync(ciDir, { recursive: true, force: true });
+  });
+
+  function build(): string {
+    execFileSync("node", ["dist/build-pages.js", "ci-owner"], { cwd: process.cwd() });
+    return fs.readFileSync(path.join(siteDir, "index.html"), "utf-8");
+  }
+
+  function load(html: string) {
+    const errors: string[] = [];
+    const dom = new JSDOM(html, {
+      runScripts: "dangerously",
+      url: "https://example.com/?period=all",
+      virtualConsole: new VirtualConsole().on("jsdomError", (e: Error) =>
+        errors.push(e.message)
+      ),
+    });
+    dom.window.document.dispatchEvent(
+      new dom.window.Event("DOMContentLoaded", { bubbles: true })
+    );
+    return { dom, errors };
+  }
+
+  it("renders no CI card at all when the crawl has collected nothing", () => {
+    const html = build();
+    expect(html).not.toContain('aria-label="CI health"');
+  });
+
+  it("ignores CI runs older than the configured window", () => {
+    fs.mkdirSync(ciDir, { recursive: true });
+    fs.writeFileSync(
+      ciFile,
+      ciRow({ createdAt: ago(400), startedAt: ago(400), completedAt: ago(400) }) + "\n"
+    );
+    expect(build()).not.toContain('aria-label="CI health"');
+  });
+
+  it("fills the card from the CI run stream", () => {
+    fs.mkdirSync(ciDir, { recursive: true });
+    fs.writeFileSync(
+      ciFile,
+      [
+        ciRow({ runId: 1 }),
+        ciRow({ runId: 2, conclusion: "failure" }),
+        ciRow({ runId: 3, attempt: 1, conclusion: "failure" }),
+        ciRow({ runId: 3, attempt: 2, conclusion: "success" }),
+        // Cancelled runs are dropped: a human changing their mind is not a
+        // broken pipeline, so this must not count against the success rate.
+        ciRow({ runId: 4, conclusion: "cancelled" }),
+      ].join("\n") + "\n"
+    );
+
+    const { dom, errors } = load(build());
+    expect(errors).toEqual([]);
+    const doc = dom.window.document;
+    // Three runs survive: two green (one of them a re-run), one red.
+    expect(doc.getElementById("ciVal-green")?.textContent).toBe("66.7%");
+    expect(doc.getElementById("ciDetail-green")?.textContent).toBe("2 of 3 runs");
+    expect(doc.getElementById("ciVal-flaky")?.textContent).toBe("33.3%");
+    expect(doc.getElementById("ciVal-duration")?.textContent).not.toBe("–");
+    expect(doc.getElementById("ciVal-queue")?.textContent).not.toBe("–");
+    expect(doc.getElementById("ciNote")?.textContent).toContain(
+      "3 completed default-branch runs"
+    );
+  });
+
+  it("says a small sample is too small to read as a rate", () => {
+    fs.mkdirSync(ciDir, { recursive: true });
+    fs.writeFileSync(ciFile, ciRow({ runId: 1 }) + "\n");
+    const { dom } = load(build());
+    expect(dom.window.document.getElementById("ciNote")?.textContent).toContain(
+      "Too few runs"
+    );
+  });
+
+  it("reports no runs rather than a zero when the period excludes them all", () => {
+    fs.mkdirSync(ciDir, { recursive: true });
+    fs.writeFileSync(
+      ciFile,
+      ciRow({ runId: 1, createdAt: ago(60), startedAt: ago(60), completedAt: ago(60) }) +
+        "\n"
+    );
+    const html = build();
+    const errors: string[] = [];
+    const dom = new JSDOM(html, {
+      runScripts: "dangerously",
+      // The default 30-day slice excludes a run that finished 60 days ago.
+      url: "https://example.com/?period=30days",
+      virtualConsole: new VirtualConsole().on("jsdomError", (e: Error) =>
+        errors.push(e.message)
+      ),
+    });
+    dom.window.document.dispatchEvent(
+      new dom.window.Event("DOMContentLoaded", { bubbles: true })
+    );
+    expect(errors).toEqual([]);
+    expect(dom.window.document.getElementById("ciVal-green")?.textContent).toBe("–");
+    expect(dom.window.document.getElementById("ciNote")?.textContent).toContain(
+      "No CI runs in the selected slice"
+    );
   });
 });

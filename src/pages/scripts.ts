@@ -380,6 +380,35 @@ function renderDeliveryCharts(){
         options:lineOpts});
     }
   }
+  // Wait-for-first-review trend. Built from the same merged PRs as the cycle
+  // time chart, but only those that actually received a review.
+  if(prs.length>0){
+    var weekWaits={};
+    prs.forEach(function(p){
+      var h=hoursBetweenISO(p.createdAt,p.firstReviewAt);
+      if(h===null)return;
+      var w=getISOWeek(p.mergedAt);
+      if(!weekWaits[w])weekWaits[w]=[];
+      weekWaits[w].push(h);
+    });
+    var waitWeeks=Object.keys(weekWaits).sort();
+    charts.reviewWait=new Chart(document.getElementById("chartReviewWait"),{type:"line",
+      data:{labels:waitWeeks,datasets:[
+        {label:"Median wait for first review (hours)",data:waitWeeks.map(function(w){return Math.round(medianOf(weekWaits[w])*10)/10;}),
+          borderColor:cssColors.warn,backgroundColor:cssColors.warnS,tension:0.3,fill:true,pointRadius:3}]},
+      options:lineOpts});
+  }
+  // Review load per reviewer — the distribution behind the Gini figure.
+  var loadPairs=aggregateReviewerLoad(null);
+  if(loadPairs.length>0){
+    charts.reviewerLoad=new Chart(document.getElementById("chartReviewerLoad"),{type:"bar",
+      data:{labels:loadPairs.slice(0,15).map(function(r){return r[0];}),datasets:[
+        {label:"Reviews",data:loadPairs.slice(0,15).map(function(r){return r[1];}),
+          backgroundColor:cssColors.accent,borderRadius:2}]},
+      options:{indexAxis:"y",responsive:true,maintainAspectRatio:true,
+        scales:{x:{grid:{display:false},beginAtZero:true},y:{grid:{display:false}}},
+        plugins:{legend:{display:false}}}});
+  }
   // Agent tasks by repo — horizontal stacked bar (30d window, static)
   var agentByRepo=(CHART_DATA.copilotAgent||{}).byRepo||{};
   var agentRepoNames=Object.keys(agentByRepo).filter(function(n){return agentByRepo[n].totalTasks>0;})
@@ -428,6 +457,57 @@ function renderDeliveryCharts(){
           }
           e.chart.canvas.style.cursor=cursor;}}});
   }
+}
+// ── Duration and distribution helpers ──
+// Every duration below is derived from raw timestamps at render time, never
+// read from a stored latency, so a change of definition needs a redeploy of
+// the page rather than a re-collection of the history.
+function hoursBetweenISO(from,to){
+  if(!from||!to)return null;
+  var ms=new Date(to).getTime()-new Date(from).getTime();
+  if(!isFinite(ms)||ms<0)return null;
+  return ms/3600000;
+}
+function quantilesOf(values){
+  return {p50:pctl(values,50),p75:pctl(values,75),p90:pctl(values,90),n:values.length};
+}
+/** Gini coefficient — mirrors gini() in src/stats.ts. */
+function giniOf(values){
+  var clean=values.filter(function(v){return isFinite(v)&&v>=0;});
+  var n=clean.length;
+  if(n<2)return 0;
+  var sorted=clean.slice().sort(function(a,b){return a-b;});
+  var total=0,weighted=0;
+  for(var i=0;i<n;i++){total+=sorted[i];weighted+=(i+1)*sorted[i];}
+  if(total===0)return 0;
+  return (2*weighted)/(n*total)-(n+1)/n;
+}
+function prSize(p){return (p.linesAdded||0)+(p.linesDeleted||0);}
+/**
+ * Reviews per reviewer across the selected repositories, heaviest first.
+ * Pass a repo name array to restrict it, or null for every collected repo.
+ */
+function aggregateReviewerLoad(repoNames){
+  var byRepo=CHART_DATA.reviewerLoadByRepo||{};
+  var totals={};
+  Object.keys(byRepo).forEach(function(name){
+    if(repoNames&&repoNames.indexOf(name)===-1)return;
+    (byRepo[name]||[]).forEach(function(entry){
+      totals[entry.reviewer]=(totals[entry.reviewer]||0)+entry.reviews;
+    });
+  });
+  return Object.keys(totals).map(function(k){return [k,totals[k]];})
+    .sort(function(a,b){return b[1]-a[1]||(a[0]<b[0]?-1:1);});
+}
+function getRepoFilteredClosedPRs(){
+  var all=CHART_DATA.allClosedPRs||[];
+  if(selectedRepos.size===0)return all;
+  return all.filter(function(p){return selectedRepos.has(p.repo);});
+}
+function getRepoFilteredOpenPRs(){
+  var all=CHART_DATA.allOpenPRs||[];
+  if(selectedRepos.size===0)return all;
+  return all.filter(function(p){return selectedRepos.has(p.repo);});
 }
 function setupFilter(){
   document.querySelectorAll(".filter-btn").forEach(function(btn){
@@ -905,7 +985,353 @@ function applyFilter(period){
   var note=document.getElementById("reposPeriodNote");
   if(note)note.style.display=(period==="all"&&!repoFiltered)?"none":"";
 
+  // ── Wait-for-review trend chart ──
+  if(charts.reviewWait){
+    var wRW={};
+    filteredPR.forEach(function(p){
+      var h=hoursBetweenISO(p.createdAt,p.firstReviewAt);
+      if(h===null)return;
+      var w=getISOWeek(p.mergedAt);
+      if(!wRW[w])wRW[w]=[];
+      wRW[w].push(h);
+    });
+    var rwWeeks=Object.keys(wRW).sort();
+    charts.reviewWait.data.labels=rwWeeks;
+    charts.reviewWait.data.datasets[0].data=rwWeeks.map(function(w){return Math.round(medianOf(wRW[w])*10)/10;});
+    charts.reviewWait.options.plugins.annotation=(yearBoundaryAnnotations(rwWeeks).annotation||{annotations:{}});
+    charts.reviewWait.update();
+  }
+
+  var closedInPeriod=getRepoFilteredClosedPRs();
+  if(excludeBots)closedInPeriod=closedInPeriod.filter(function(p){return !p.isBotAuthor;});
+  if(cutoff)closedInPeriod=closedInPeriod.filter(function(p){return new Date(p.closedAt)>=cutoff;});
+  var openNow=getRepoFilteredOpenPRs();
+  if(excludeBots)openNow=openNow.filter(function(p){return !p.isBotAuthor;});
+
+  updateSizeKPI(filteredPR);
+  updateFlow(filteredPR,period);
+  updateAbandonment(filteredPR,closedInPeriod,openNow);
+  updateAgentCost(repoFiltered);
+  updateAIHuman(filteredPR,allPRBase,period,excludeBots);
+  updateReviewLoad(repoFiltered?Array.from(selectedRepos):null);
+  updateCiHealth(cutoff,repoFiltered,period);
+
   updateTrial(cutoff,excludeBots,period);
+}
+
+// ── PR size distribution ──
+// The median says how big a typical change is; the share over the large-change
+// threshold says how often the team ships one nobody can review properly.
+var LARGE_PR_LINES=400;
+function updateSizeKPI(prs){
+  var sizes=[];
+  prs.forEach(function(p){var s=prSize(p);if(s>0)sizes.push(s);});
+  var val=document.getElementById("kpiSizeVal");
+  var sub=document.getElementById("kpiSizeSub");
+  if(val)val.textContent=sizes.length>0?Math.round(pctl(sizes,50)).toLocaleString():"–";
+  if(sub){
+    if(sizes.length===0){sub.textContent="no sized PRs";}
+    else{
+      var large=sizes.filter(function(s){return s>=LARGE_PR_LINES;}).length;
+      sub.textContent=Math.round(large/sizes.length*100)+"% over "+LARGE_PR_LINES+" lines";
+    }
+  }
+}
+
+// ── The three legs of review ──
+// Reported as order statistics with the sample size beside them: a p90 over
+// four pull requests is noise wearing a percentile's clothes, and the table
+// says so rather than letting the number stand on its own.
+var FLOW_LEGS=[
+  {id:"review",from:"createdAt",to:"firstReviewAt"},
+  {id:"approval",from:"firstReviewAt",to:"firstApprovalAt"},
+  {id:"merge",from:"firstApprovalAt",to:"mergedAt"}
+];
+var SMALL_SAMPLE=10;
+function updateFlow(prs,period){
+  var counts={};
+  FLOW_LEGS.forEach(function(leg){
+    var values=[];
+    prs.forEach(function(p){
+      var h=hoursBetweenISO(p[leg.from],p[leg.to]);
+      if(h!==null)values.push(h);
+    });
+    var q=quantilesOf(values);
+    counts[leg.id]=q.n;
+    var set=function(id,text,thin){
+      var el=document.getElementById(id);
+      if(!el)return;
+      el.textContent=text;
+      el.className=thin?"thin":"";
+    };
+    if(q.n===0){
+      set("flowP50-"+leg.id,"–",true);
+      set("flowP75-"+leg.id,"–",true);
+      set("flowP90-"+leg.id,"–",true);
+      set("flowN-"+leg.id,"0",true);
+      return;
+    }
+    // Below the small-sample line the quantiles are still shown, but muted and
+    // with the count beside them, so nobody reads four PRs as a trend.
+    var thin=q.n<SMALL_SAMPLE;
+    set("flowP50-"+leg.id,fmtHours(q.p50),thin);
+    set("flowP75-"+leg.id,fmtHours(q.p75),thin);
+    set("flowP90-"+leg.id,fmtHours(q.p90),thin);
+    set("flowN-"+leg.id,String(q.n),true);
+  });
+  var note=document.getElementById("flowNote");
+  if(!note)return;
+  var pLabel=period==="all"?"all time":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
+  var parts=[];
+  if(counts.review===0){
+    parts.push("No reviewed pull requests in "+pLabel+" — review timestamps are collected from "+
+      "the day this deployment started, and filled in backwards by the historical crawl.");
+  }else{
+    parts.push("Measured over "+counts.review+" reviewed pull request"+(counts.review===1?"":"s")+" in "+pLabel+".");
+    if(counts.review<SMALL_SAMPLE)parts.push("Too few to read as a rate — treat these as anecdotes, not percentiles.");
+    if(counts.approval===0)parts.push("No approving reviews recorded, so the last two legs are empty.");
+  }
+  note.textContent=parts.join(" ");
+}
+
+// ── Abandonment ──
+function updateAbandonment(mergedPRs,closedPRs,openPRs){
+  var val=document.getElementById("kpiAbandonVal");
+  var sub=document.getElementById("kpiAbandonSub");
+  var concluded=mergedPRs.length+closedPRs.length;
+  if(val)val.textContent=concluded>0?(closedPRs.length/concluded*100).toFixed(1)+"%":"–";
+  if(sub){
+    if(openPRs.length>0){
+      var now=new Date(CHART_DATA.collectedAt).getTime();
+      var ages=[];
+      openPRs.forEach(function(p){
+        var h=(now-new Date(p.createdAt).getTime())/3600000;
+        if(isFinite(h)&&h>=0)ages.push(h);
+      });
+      sub.textContent=openPRs.length+" open · median age "+(ages.length>0?fmtHours(pctl(ages,50)):"–");
+    }else{
+      sub.textContent=closedPRs.length+" closed unmerged";
+    }
+  }
+}
+
+// ── Cost per merged agent pull request ──
+// Credits divided by the pull requests the agent actually produced. A run with
+// no agent PRs has no cost per PR — it renders as a dash rather than as a zero
+// or an infinity.
+function updateAgentCost(repoFiltered){
+  var agent=CHART_DATA.copilotAgent||{};
+  var credits=agent.totalCredits||0;
+  var prs=agent.agentPRs||0;
+  var minutes=agent.totalActionsMinutes||0;
+  if(repoFiltered){
+    credits=0;prs=0;minutes=0;
+    var byRepo=agent.byRepo||{};
+    Array.from(selectedRepos).forEach(function(name){
+      var rd=byRepo[name];
+      if(!rd)return;
+      credits+=rd.credits||0;
+      prs+=rd.agentPRs||0;
+      minutes+=rd.actionsMinutes||0;
+    });
+  }
+  var val=document.getElementById("kpiAgentCostVal");
+  var sub=document.getElementById("kpiAgentCostSub");
+  if(val)val.textContent=prs>0?(credits/prs).toFixed(1):"–";
+  if(sub){
+    if(prs>0){
+      sub.textContent=credits.toFixed(1)+" credits · "+prs+" PRs"+
+        (minutes>0?" · "+(minutes/prs).toFixed(1)+" CI min/PR":"");
+    }else{
+      sub.textContent="no agent data";
+    }
+  }
+}
+
+// ── AI versus human ──
+// One row per measurement, both columns computed from the same filtered set so
+// authorship is the only thing that differs between them.
+function fmtRounds(n){return n===null?"–":n.toFixed(1);}
+var AI_HUMAN_METRICS=[
+  {id:"merged",fmt:fmtCount,lowerIsBetter:null},
+  {id:"cycle",fmt:fmtHours,lowerIsBetter:true},
+  {id:"cycle75",fmt:fmtHours,lowerIsBetter:true},
+  {id:"size",fmt:fmtLines,lowerIsBetter:true},
+  {id:"large",fmt:fmtPct,lowerIsBetter:true},
+  {id:"reviewWait",fmt:fmtHours,lowerIsBetter:true},
+  {id:"rounds",fmt:fmtRounds,lowerIsBetter:true},
+  {id:"revert",fmt:fmtPct,lowerIsBetter:true}
+];
+/** Summarise one authorship class into the row values the table shows. */
+function summariseClass(prs,revertedKeys){
+  var cycles=[],sizes=[],waits=[],rounds=[];
+  var large=0,sized=0,reverted=0;
+  prs.forEach(function(p){
+    if(p.timeToMergeHours>0)cycles.push(p.timeToMergeHours);
+    var size=prSize(p);
+    if(size>0){sizes.push(size);sized++;if(size>=LARGE_PR_LINES)large++;}
+    var wait=hoursBetweenISO(p.createdAt,p.firstReviewAt);
+    if(wait!==null)waits.push(wait);
+    if(typeof p.changesRequestedCount==="number")rounds.push(p.changesRequestedCount);
+    if(revertedKeys[p.repo+"#"+p.number])reverted++;
+  });
+  return {
+    merged:prs.length,
+    cycle:pctl(cycles,50),cycle75:pctl(cycles,75),
+    size:pctl(sizes,50),
+    large:sized>0?(large/sized)*100:null,
+    reviewWait:pctl(waits,50),
+    rounds:pctl(rounds,50),
+    revert:prs.length>0?(reverted/prs.length)*100:null,
+    n:prs.length,
+    reviewedN:waits.length
+  };
+}
+function updateAIHuman(filteredPR,allPRBase,period,excludeBots){
+  // Revert references are taken from every collected pull request, not just the
+  // ones in the selected period: a change reverted next month was still a
+  // change that had to be reverted.
+  var revertedKeys={};
+  (allPRBase||[]).forEach(function(p){
+    if(typeof p.revertsPR==="number")revertedKeys[p.repo+"#"+p.revertsPR]=true;
+  });
+  var ai=filteredPR.filter(function(p){return p.isCopilotAuthored;});
+  var human=filteredPR.filter(function(p){return !p.isBotAuthor&&!p.isCopilotAuthored;});
+  var aiSum=summariseClass(ai,revertedKeys);
+  var humanSum=summariseClass(human,revertedKeys);
+
+  AI_HUMAN_METRICS.forEach(function(m){
+    var aEl=document.getElementById("aiHumanAI-"+m.id);
+    var hEl=document.getElementById("aiHumanHuman-"+m.id);
+    var dEl=document.getElementById("aiHumanDelta-"+m.id);
+    if(!aEl||!hEl||!dEl)return;
+    var a=aiSum[m.id],h=humanSum[m.id];
+    aEl.textContent=m.fmt(a);
+    hEl.textContent=m.fmt(h);
+    dEl.className="trial-delta";
+    if(a===null||h===null||h===0){dEl.textContent="–";return;}
+    var change=((a-h)/Math.abs(h))*100;
+    var arrow=change>0?"↑":(change<0?"↓":"→");
+    dEl.textContent=arrow+" "+Math.abs(change).toFixed(0)+"%";
+    if(Math.abs(change)<2){dEl.classList.add("flat");}
+    else if(m.lowerIsBetter===null){/* a count has no better direction */}
+    else if((change<0)===m.lowerIsBetter){dEl.classList.add("better");}
+    else{dEl.classList.add("worse");}
+  });
+
+  var note=document.getElementById("aiHumanNote");
+  if(!note)return;
+  var pLabel=period==="all"?"all time":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
+  var parts=["AI n="+aiSum.n+" · human n="+humanSum.n+" merged pull requests over "+pLabel+"."];
+  if(aiSum.n<SMALL_SAMPLE||humanSum.n<SMALL_SAMPLE){
+    parts.push("One side is too small to compare — the difference column is arithmetic, not evidence.");
+  }
+  parts.push("Revert rate counts pull requests later reverted by a PR whose body carries GitHub's "+
+    "“Reverts #n” reference, so it reads as a lower bound.");
+  if(excludeBots)parts.push("Bot-authored PRs are excluded from both columns either way.");
+  note.textContent=parts.join(" ");
+}
+
+// ── CI health ──
+// Every figure comes from the same filtered set of completed runs, so the
+// success rate, the durations and the flaky share always describe the same
+// builds. Cancelled runs were dropped upstream: a human changing their mind
+// is not a broken pipeline.
+function updateCiHealth(cutoff,repoFiltered,period){
+  var all=CHART_DATA.ciSamples||[];
+  if(all.length===0)return;
+  var runs=all;
+  if(repoFiltered)runs=runs.filter(function(r){return selectedRepos.has(r.repo);});
+  if(cutoff)runs=runs.filter(function(r){return new Date(r.finishedAt)>=cutoff;});
+
+  var set=function(id,value,detail){
+    var v=document.getElementById("ciVal-"+id);
+    var d=document.getElementById("ciDetail-"+id);
+    if(v)v.textContent=value;
+    if(d)d.textContent=detail;
+  };
+  if(runs.length===0){
+    ["green","duration","queue","flaky"].forEach(function(id){set(id,"–","no runs");});
+    var emptyNote=document.getElementById("ciNote");
+    if(emptyNote)emptyNote.textContent="No CI runs in the selected slice.";
+    return;
+  }
+
+  var green=runs.filter(function(r){return r.success;}).length;
+  set("green",(green/runs.length*100).toFixed(1)+"%",green+" of "+runs.length+" runs");
+
+  var durations=[],queues=[];
+  runs.forEach(function(r){
+    if(typeof r.durationMinutes==="number")durations.push(r.durationMinutes);
+    if(typeof r.queueMinutes==="number")queues.push(r.queueMinutes);
+  });
+  if(durations.length>0){
+    set("duration",fmtMinutes(pctl(durations,50)),
+      "p75 "+fmtMinutes(pctl(durations,75))+" · p90 "+fmtMinutes(pctl(durations,90))+" · n="+durations.length);
+  }else{
+    set("duration","–","no timing data");
+  }
+  if(queues.length>0){
+    set("queue",fmtMinutes(pctl(queues,50)),
+      "p90 "+fmtMinutes(pctl(queues,90))+" · n="+queues.length);
+  }else{
+    set("queue","–","no queue data");
+  }
+
+  var flaky=runs.filter(function(r){return r.flaky;}).length;
+  set("flaky",(flaky/runs.length*100).toFixed(1)+"%",flaky+" re-run to green");
+
+  var note=document.getElementById("ciNote");
+  if(!note)return;
+  var pLabel=period==="all"?"the collected window":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
+  var parts=["Measured over "+runs.length+" completed default-branch run"+(runs.length===1?"":"s")+" in "+pLabel+"."];
+  if(runs.length<SMALL_SAMPLE)parts.push("Too few runs to read as a rate.");
+  parts.push("A run counts as flaky when it passed only after a re-run of the same commit, "+
+    "so a pipeline that was never re-run cannot appear here.");
+  note.textContent=parts.join(" ");
+}
+function fmtMinutes(m){
+  if(m===null)return "–";
+  if(m<1)return Math.round(m*60)+"s";
+  if(m<60)return m.toFixed(1)+"min";
+  return (m/60).toFixed(1)+"hr";
+}
+
+// ── Review load concentration ──
+function updateReviewLoad(repoNames){
+  var pairs=aggregateReviewerLoad(repoNames);
+  var badge=document.getElementById("giniBadge");
+  var note=document.getElementById("giniNote");
+  var values=pairs.map(function(r){return r[1];});
+  var g=giniOf(values);
+  if(badge){
+    badge.className="gini-badge";
+    if(pairs.length<2){badge.textContent="–";}
+    else{
+      badge.textContent="Gini "+g.toFixed(2);
+      if(g>=0.6)badge.classList.add("high");
+      else if(g<=0.4)badge.classList.add("ok");
+    }
+  }
+  if(note){
+    if(pairs.length===0){
+      note.textContent="No reviews recorded for the selected repositories.";
+    }else if(pairs.length===1){
+      note.textContent="One reviewer ("+pairs[0][0]+") did all "+pairs[0][1]+
+        " recorded review"+(pairs[0][1]===1?"":"s")+" — concentration is undefined with a single reviewer.";
+    }else{
+      var total=values.reduce(function(a,b){return a+b;},0);
+      var topShare=total>0?Math.round(pairs[0][1]/total*100):0;
+      note.textContent=pairs.length+" reviewers, "+total+" reviews. The busiest ("+pairs[0][0]+
+        ") carries "+topShare+"% of them. A Gini near 0 means the load is shared; near 1 means one person carries it.";
+    }
+  }
+  if(charts.reviewerLoad){
+    var top=pairs.slice(0,15);
+    charts.reviewerLoad.data.labels=top.map(function(r){return r[0];});
+    charts.reviewerLoad.data.datasets[0].data=top.map(function(r){return r[1];});
+    charts.reviewerLoad.update();
+  }
 }
 
 // ── Improvement trial ──

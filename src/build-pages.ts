@@ -4,6 +4,7 @@ import { generateReport } from "./report.js";
 import { CURRENT_SCHEMA_VERSION, fixturesEnabled } from "./cache.js";
 import { loadConfig, applyScope } from "./config.js";
 import { latestPath, loadRollup } from "./history.js";
+import { loadCiRuns, toCiSamples } from "./ci-health.js";
 import type { CacheEnvelope, OrgMetrics } from "./types.js";
 import { buildDashboardHtml } from "./pages/dashboard.js";
 
@@ -140,6 +141,21 @@ function main(): void {
     console.log(`  no history rows yet — trial view will show current data only`);
   }
 
+  // CI health lives in its own append-only stream, crawled on its own budget,
+  // so it is read here rather than through the collection cache. An empty
+  // stream is the normal state until a deployment turns the crawl on.
+  const ciWindowStart = new Date(
+    Date.now() - config.collection.ciHealth.windowDays * 24 * 60 * 60 * 1000
+  ).toISOString();
+  const ciSamples = toCiSamples(loadCiRuns(historyDir, config.owner)).filter(
+    (s) => s.finishedAt >= ciWindowStart
+  );
+  if (ciSamples.length > 0) {
+    console.log(
+      `  ${ciSamples.length} CI run(s) in the last ${config.collection.ciHealth.windowDays} days`
+    );
+  }
+
   const siteDir = path.resolve(process.cwd(), "_site");
   fs.mkdirSync(siteDir, { recursive: true });
   fs.writeFileSync(path.join(siteDir, "report.md"), generateReport(data));
@@ -148,6 +164,8 @@ function main(): void {
   const html = buildDashboardHtml(data, date, process.env.GITHUB_REF_NAME, buildRunUrl(), {
     branding: config.branding,
     history,
+    ciSamples,
+    ciWindowDays: config.collection.ciHealth.windowDays,
   });
   fs.writeFileSync(path.join(siteDir, "index.html"), html);
 

@@ -52,13 +52,19 @@
     "maxRepoAgeHours": 8,
     "features": {
       "dependents": false,
-      "copilotAgent": true
+      "copilotAgent": true,
+      "ciHealth": false
     },
     "backfill": {
       "enabled": true,
       "pagesPerRun": 200,
       "maxPagesPerRepo": 20,
       "recomputeRollups": true
+    },
+    "ciHealth": {
+      "pagesPerRun": 20,
+      "maxPagesPerRepo": 5,
+      "windowDays": 90
     }
   },
 

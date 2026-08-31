@@ -310,3 +310,84 @@ describe("describeBackfill", () => {
     expect(line).toContain("Continues next run");
   });
 });
+
+describe("toEventRow review and revert facts", () => {
+  it("records the first approval alongside the first review", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: {
+          totalCount: 3,
+          nodes: [
+            { submittedAt: "2019-03-02T12:00:00Z", author: { login: "bob" }, state: "APPROVED" },
+            { submittedAt: "2019-03-02T06:00:00Z", author: { login: "amy" }, state: "CHANGES_REQUESTED" },
+            { submittedAt: "2019-03-02T18:00:00Z", author: { login: "cat" }, state: "APPROVED" },
+          ],
+        },
+      })
+    );
+    expect(row.firstReviewAt).toBe("2019-03-02T06:00:00Z");
+    expect(row.firstApprovalAt).toBe("2019-03-02T12:00:00Z");
+    expect(row.changesRequestedCount).toBe(1);
+  });
+
+  it("leaves the approval absent when nobody approved", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: {
+          totalCount: 1,
+          nodes: [
+            { submittedAt: "2019-03-02T06:00:00Z", author: { login: "amy" }, state: "COMMENTED" },
+          ],
+        },
+      })
+    );
+    expect(row.firstApprovalAt).toBeUndefined();
+    expect(row.changesRequestedCount).toBe(0);
+  });
+
+  it("omits the round count entirely when no review carried a state", () => {
+    // Rows crawled before `state` was requested must stay absent rather than
+    // claiming a confident zero.
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: {
+          totalCount: 1,
+          nodes: [{ submittedAt: "2019-03-02T06:00:00Z", author: { login: "amy" } }],
+        },
+      })
+    );
+    expect(row.changesRequestedCount).toBeUndefined();
+    expect(row.firstReviewAt).toBe("2019-03-02T06:00:00Z");
+  });
+
+  it("records the pull request a historical revert refers to", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(9, { body: "Reverts acme/api#4" })
+    );
+    expect(row.revertsPR).toBe(4);
+  });
+
+  it("leaves the revert reference off an ordinary pull request", () => {
+    const row = toEventRow("acme", "acme/api", node(9, { body: "Fixes #4" }));
+    expect(row.revertsPR).toBeUndefined();
+  });
+
+  it("still records an abandoned pull request with no reviews at all", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(3, { state: "CLOSED", mergedAt: null, closedAt: "2019-04-01T00:00:00Z" })
+    );
+    expect(row.state).toBe("closed");
+    expect(row.firstApprovalAt).toBeUndefined();
+    expect(row.changesRequestedCount).toBeUndefined();
+  });
+});

@@ -86,6 +86,36 @@ export interface FeatureFlags {
   dependents: boolean;
   /** Copilot agent task metrics (needs COPILOT_AGENT_TOKEN). */
   copilotAgent: boolean;
+  /**
+   * CI health: default-branch build success rate, pipeline duration, runner
+   * queue time and flaky re-runs.
+   *
+   * Off by default. It is the only collector that walks a second history, and
+   * although the crawl is budgeted, a deployment should opt into the extra
+   * calls rather than inherit them.
+   */
+  ciHealth: boolean;
+}
+
+/**
+ * The budgeted CI crawl.
+ *
+ * Same shape as the pull-request backfill and for the same reason: the honest
+ * measurement is far too expensive to take in one run, so it is taken a
+ * bounded number of pages at a time until it is caught up, then kept current
+ * with one page per repository per run.
+ */
+export interface CiHealthConfig {
+  /** Maximum workflow-run pages to fetch per run, across all repositories. */
+  pagesPerRun: number;
+  /** Maximum pages one repository may take per run. */
+  maxPagesPerRepo: number;
+  /**
+   * How much history the dashboard reads back, in days. The crawl keeps every
+   * run it has ever seen; this only bounds what the site build ships to the
+   * page, so a decade of builds does not become a ten-megabyte payload.
+   */
+  windowDays: number;
 }
 
 /**
@@ -120,6 +150,7 @@ export interface CollectionConfig {
   maxRepoAgeHours: number;
   features: FeatureFlags;
   backfill: BackfillConfig;
+  ciHealth: CiHealthConfig;
 }
 
 /** Long-term history store settings. */
@@ -166,13 +197,14 @@ export function defaultConfig(): DevexConfig {
       historyWeeks: 104,
       maxPRPages: 10,
       maxRepoAgeHours: 8,
-      features: { dependents: false, copilotAgent: true },
+      features: { dependents: false, copilotAgent: true, ciHealth: false },
       backfill: {
         enabled: true,
         pagesPerRun: 200,
         maxPagesPerRepo: 20,
         recomputeRollups: true,
       },
+      ciHealth: { pagesPerRun: 20, maxPagesPerRepo: 5, windowDays: 90 },
     },
     history: { enabled: true, dir: "data/history" },
   };
@@ -262,10 +294,11 @@ function mergePartial(target: DevexConfig, partial: Partial<DevexConfig>): void 
   if (partial.branding) Object.assign(target.branding, partial.branding);
   if (partial.repos) Object.assign(target.repos, partial.repos);
   if (partial.collection) {
-    const { features, backfill, ...rest } = partial.collection;
+    const { features, backfill, ciHealth, ...rest } = partial.collection;
     Object.assign(target.collection, rest);
     if (features) Object.assign(target.collection.features, features);
     if (backfill) Object.assign(target.collection.backfill, backfill);
+    if (ciHealth) Object.assign(target.collection.ciHealth, ciHealth);
   }
   if (partial.history) Object.assign(target.history, partial.history);
   if (partial.team) {
@@ -309,6 +342,11 @@ function applyEnv(config: DevexConfig, env: Env): void {
   assign(config.collection, "maxRepoAgeHours", int(env, "DEVEX_MAX_REPO_AGE_HOURS"));
   assign(config.collection.features, "dependents", bool(env, "DEVEX_FEATURE_DEPENDENTS"));
   assign(config.collection.features, "copilotAgent", bool(env, "DEVEX_FEATURE_COPILOT_AGENT"));
+  assign(config.collection.features, "ciHealth", bool(env, "DEVEX_FEATURE_CI_HEALTH"));
+
+  assign(config.collection.ciHealth, "pagesPerRun", int(env, "DEVEX_CI_PAGES_PER_RUN"));
+  assign(config.collection.ciHealth, "maxPagesPerRepo", int(env, "DEVEX_CI_MAX_PAGES_PER_REPO"));
+  assign(config.collection.ciHealth, "windowDays", int(env, "DEVEX_CI_WINDOW_DAYS"));
 
   assign(config.collection.backfill, "enabled", bool(env, "DEVEX_BACKFILL_ENABLED"));
   assign(config.collection.backfill, "pagesPerRun", int(env, "DEVEX_BACKFILL_PAGES_PER_RUN"));

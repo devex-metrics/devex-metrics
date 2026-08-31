@@ -10,6 +10,16 @@ import {
   rollupPath,
 } from "./history.js";
 import { runBackfill, describeBackfill } from "./backfill.js";
+import {
+  runCiCrawl,
+  describeCiCrawl,
+  loadCiRuns,
+  loadCiState,
+  saveCiState,
+  rearmCompleted,
+  summariseCiHealth,
+  toCiSamples,
+} from "./ci-health.js";
 import * as fsp from "node:fs";
 import * as fs from "node:fs";
 import * as path from "node:path";
@@ -61,26 +71,69 @@ async function main(): Promise<void> {
   );
 
   const backfill = config.collection.backfill;
-  if (!backfill.enabled) {
+  if (backfill.enabled) {
+    console.log(
+      `\nWalking history backwards (budget: ${backfill.pagesPerRun} pages)…`
+    );
+    const targets = metrics.repos.map((r) => ({ fullName: r.fullName }));
+    const backfillResult = await runBackfill(
+      historyDir,
+      config.owner,
+      targets,
+      backfill
+    );
+    console.log(describeBackfill(backfillResult, backfill));
+
+    if (backfill.recomputeRollups && backfillResult.eventsAppended > 0) {
+      rebuildHistoricalRollups(historyDir, config.owner);
+    }
+  } else {
     console.log("Historical backfill disabled (DEVEX_BACKFILL_ENABLED=false)");
+  }
+
+  if (config.collection.features.ciHealth) {
+    await crawlCiHealth(historyDir, config, metrics.repos);
+  }
+}
+
+/**
+ * Advance the CI crawl by one budgeted step.
+ *
+ * Deliberately last: it is the only optional collector that walks a second
+ * history, so if it fails or runs out of budget everything above it has
+ * already been written.
+ */
+async function crawlCiHealth(
+  historyDir: string,
+  config: ReturnType<typeof loadConfig>,
+  repos: readonly { fullName: string; defaultBranch?: string }[]
+): Promise<void> {
+  const ci = config.collection.ciHealth;
+  const today = new Date().toISOString().slice(0, 10);
+
+  // A repository that finished its crawl still gets new builds; re-arming it
+  // costs one page a run rather than a fresh walk through its whole history.
+  saveCiState(historyDir, rearmCompleted(loadCiState(historyDir, config.owner), today));
+
+  console.log(`\nCollecting CI health (budget: ${ci.pagesPerRun} pages)…`);
+  const targets = repos.map((r) => ({
+    fullName: r.fullName,
+    defaultBranch: r.defaultBranch,
+  }));
+  const result = await runCiCrawl(historyDir, config.owner, targets, ci, today);
+  console.log(describeCiCrawl(result, ci));
+
+  const summary = summariseCiHealth(toCiSamples(loadCiRuns(historyDir, config.owner)));
+  if (summary.runs === 0) {
+    console.log("  no completed CI runs recorded yet");
     return;
   }
-
   console.log(
-    `\nWalking history backwards (budget: ${backfill.pagesPerRun} pages)…`
+    `  ${summary.runs} completed runs · ${summary.successRate ?? 0}% green · ` +
+      `median ${summary.durationP50 ?? 0} min (p90 ${summary.durationP90 ?? 0}) · ` +
+      `queue p50 ${summary.queueP50 ?? 0} min · ` +
+      `${summary.flakyRuns} flaky (${summary.flakyRate ?? 0}%)`
   );
-  const targets = metrics.repos.map((r) => ({ fullName: r.fullName }));
-  const backfillResult = await runBackfill(
-    historyDir,
-    config.owner,
-    targets,
-    backfill
-  );
-  console.log(describeBackfill(backfillResult, backfill));
-
-  if (backfill.recomputeRollups && backfillResult.eventsAppended > 0) {
-    rebuildHistoricalRollups(historyDir, config.owner);
-  }
 }
 
 /**

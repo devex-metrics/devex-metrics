@@ -3,7 +3,12 @@ import { setOctokit, resetOctokit } from "../github-client.js";
 import type { Octokit } from "@octokit/rest";
 import { collectRepos } from "./repos.js";
 
-type RepoPage = Array<{ name: string; full_name: string; pushed_at: string | null }>;
+type RepoPage = Array<{
+  name: string;
+  full_name: string;
+  pushed_at: string | null;
+  default_branch?: string;
+}>;
 
 function buildMockOctokit(pages: RepoPage[], authenticatedLogin?: string | null) {
   const listForOrg = Symbol("listForOrg");
@@ -56,6 +61,7 @@ describe("collectRepos", () => {
       archived: false,
       fork: false,
       isTeamRepo: false,
+      defaultBranch: "",
     });
     expect(captured.method).toBe(listForOrg);
     expect(captured.params).toMatchObject({ org: "myorg" });
@@ -174,6 +180,7 @@ function repo(fullName: string, extra: Partial<DiscoveredRepo> = {}): Discovered
     archived: false,
     fork: false,
     isTeamRepo: false,
+    defaultBranch: "main",
     ...extra,
   };
 }
@@ -330,5 +337,36 @@ describe("describeFiltering", () => {
   it("omits the skipped clause when nothing was dropped", () => {
     const result = filterRepos([repo("acme/api")], configWith(() => {}));
     expect(describeFiltering(1, result)).toBe("1/1 repositories kept");
+  });
+});
+
+describe("collectRepos default branch", () => {
+  afterEach(() => resetOctokit());
+
+  it("records the default branch from the listing", async () => {
+    const { mock } = buildMockOctokit([
+      [
+        {
+          name: "repo-a",
+          full_name: "myorg/repo-a",
+          pushed_at: "2026-01-01T00:00:00Z",
+          default_branch: "trunk",
+        },
+      ],
+    ]);
+    setOctokit(mock);
+
+    const repos = await collectRepos("myorg", "org");
+    expect(repos[0].defaultBranch).toBe("trunk");
+  });
+
+  it("leaves the default branch empty when GitHub reports none", async () => {
+    const { mock } = buildMockOctokit([
+      [{ name: "repo-a", full_name: "myorg/repo-a", pushed_at: "" }],
+    ]);
+    setOctokit(mock);
+
+    const repos = await collectRepos("myorg", "org");
+    expect(repos[0].defaultBranch).toBe("");
   });
 });

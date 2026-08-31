@@ -14,6 +14,9 @@ import {
   buildPullRequestCounts,
   buildMergedPRTimeline,
   collectPullRequestDetailsFromNodes,
+  buildClosedPRTimeline,
+  buildOpenPRTimeline,
+  countReviewerLoad,
   extractReviewerLogins,
   collectCopilotAgentMetrics,
 } from "./collectors/index.js";
@@ -89,7 +92,7 @@ export async function collect(
   // Collects pre-fetched GraphQL PR nodes per repo for the trends collector.
   const prDataByRepo = new Map<string, GraphQLPRNode[]>();
 
-  for (const { fullName, pushedAt, isTeamRepo } of repoList) {
+  for (const { fullName, pushedAt, isTeamRepo, defaultBranch } of repoList) {
     // Reuse per-repo data if it is recent enough. The team flag comes from the
     // current config rather than the cache, so re-scoping a trial takes effect
     // without discarding collected data.
@@ -97,7 +100,9 @@ export async function collect(
       const cached = cachedRepoMap.get(fullName);
       if (cached && isWithinHours(cached.collectedAt, maxAgeHours)) {
         console.log(`  → ${fullName} (cached)`);
-        repos.push({ ...cached, isTeamRepo });
+        // The default branch, like the team flag, comes from this run's
+        // discovery rather than from whatever the cache was written with.
+        repos.push({ ...cached, isTeamRepo, defaultBranch: defaultBranch || cached.defaultBranch });
         continue;
       }
     }
@@ -117,6 +122,12 @@ export async function collect(
     const graphqlData = await collectRepoGraphQL(repoOwner, repoName);
 
     let issues, prCounts, prDetails, mergedPRTimeline, contributors, dependentCount;
+    // Abandonment, open-PR age and review-load concentration are derived from
+    // nodes the GraphQL path already fetched; the REST fallback has no cheap
+    // equivalent, so they stay absent there rather than costing extra calls.
+    let closedPRTimeline: RepoMetrics["closedPRTimeline"];
+    let openPRTimeline: RepoMetrics["openPRTimeline"];
+    let reviewerLoad: RepoMetrics["reviewerLoad"];
 
     if (graphqlData !== null) {
       // Fast path: derive most data from the pre-fetched GraphQL result.
@@ -131,6 +142,9 @@ export async function collect(
         repoName,
         graphqlData.prNodes
       );
+      closedPRTimeline = buildClosedPRTimeline(graphqlData.prNodes);
+      openPRTimeline = buildOpenPRTimeline(graphqlData.openPRNodes ?? []);
+      reviewerLoad = countReviewerLoad(graphqlData.prNodes);
       const reviewerLogins = extractReviewerLogins(graphqlData.prNodes);
       [contributors, dependentCount] = await Promise.all([
         collectContributors(repoOwner, repoName, reviewerLogins),
@@ -174,11 +188,15 @@ export async function collect(
       fullName,
       pushedAt,
       isTeamRepo,
+      defaultBranch: defaultBranch || undefined,
       collectedAt: new Date().toISOString(),
       issues,
       pullRequests: prCounts,
       pullRequestDetails: prDetails,
       mergedPRTimeline,
+      closedPRTimeline,
+      openPRTimeline,
+      reviewerLoad,
       copilotAdoption,
       issueLeadTimes,
       committerCount: contributors.committerCount,

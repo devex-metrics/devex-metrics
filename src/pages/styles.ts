@@ -197,5 +197,13 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
 .trial-delta.worse{color:var(--err)}
 .trial-delta.flat{color:var(--muted)}
 .trial-note{margin:.7rem 0 0;font-size:.75rem;color:var(--muted)}
+.metric-card{margin-bottom:1.5rem}
+.metric-lede{margin:0 0 .2rem;font-size:.78rem;color:var(--muted);max-width:80ch}
+.gini-badge{float:right;font-size:.78rem;font-weight:700;font-variant-numeric:tabular-nums;
+  color:var(--muted)}
+.gini-badge.high{color:var(--err)}
+.gini-badge.ok{color:var(--ok)}
+.metric-card .trial-table td{font-variant-numeric:tabular-nums}
+.metric-card .trial-table td.thin{color:var(--muted);font-weight:400}
 `;
 }
