@@ -441,7 +441,11 @@ export function buildRollupRows(metrics: OrgMetrics, date: string): RollupRow[] 
     isTeamRepo: false,
     ...org,
     agentCredits: round(org.agentCredits),
-    mergedPRs30d: orgCycles.length > 0 ? orgCycles.length : 0,
+    // Count every merged PR in the window, not just those with a non-zero
+    // cycle time. orgCycles is filtered to h > 0, so using its length dropped
+    // any PR merged within the rounding floor — routine for auto-merged bot
+    // PRs — making the org row disagree with the per-repo rows above.
+    mergedPRs30d: orgPRs.length,
     cycleP50: round(ocq.p50),
     cycleP75: round(ocq.p75),
     cycleP90: round(ocq.p90),

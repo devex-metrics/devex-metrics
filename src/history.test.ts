@@ -121,6 +121,25 @@ describe("buildRollupRows", () => {
     expect(rows[1].isTeamRepo).toBe(false);
   });
 
+  it("counts a zero-cycle-time merge in the org row, matching the repo rows", () => {
+    // Auto-merged bot PRs land within the rounding floor, so timeToMergeHours
+    // is 0. Those were previously dropped from the org count but kept in the
+    // per-repo counts, so the two rows disagreed.
+    const rows = buildRollupRows(
+      metrics([
+        repo("acme/api", [
+          pr(1, 1, { timeToMergeHours: 0 }),
+          pr(2, 2, { timeToMergeHours: 12 }),
+        ]),
+      ]),
+      "2026-08-30"
+    );
+    const repoRow = rows.find((r) => r.repo === "acme/api")!;
+    const orgRow = rows.find((r) => r.repo === "*")!;
+    expect(repoRow.mergedPRs30d).toBe(2);
+    expect(orgRow.mergedPRs30d).toBe(2);
+  });
+
   it("sums repo counts into the org row", () => {
     const rows = buildRollupRows(
       metrics([repo("acme/api", [pr(1, 1)]), repo("acme/web", [pr(2, 1)])]),
