@@ -4,6 +4,7 @@ import {
   computeAgentMetrics,
   collectCopilotAgentMetrics,
   collectActionsMinutesForPRs,
+  resetAgentAuthFailure,
 } from "./copilot-agent.js";
 import {
   setAgentOctokit,
@@ -28,6 +29,7 @@ const mockSaveAgentCache = vi.mocked(saveAgentCache);
 afterEach(() => {
   resetAgentOctokit();
   resetOctokit();
+  resetAgentAuthFailure();
   vi.clearAllMocks();
 });
 
@@ -297,6 +299,50 @@ describe("collectCopilotAgentMetrics", () => {
     expect(result).toBeNull();
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("403"));
     warnSpy.mockRestore();
+  });
+
+  it("returns null and warns once on 401, without failing the run", async () => {
+    // An expired COPILOT_AGENT_TOKEN previously threw here, aborting the whole
+    // collection on the first repository it touched.
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const request = vi.fn().mockRejectedValue({ status: 401 });
+    setAgentOctokit({ request } as unknown as Octokit);
+
+    await expect(
+      collectCopilotAgentMetrics("owner", "repo"),
+    ).resolves.toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("401"));
+    warnSpy.mockRestore();
+  });
+
+  it("skips the agent API for the rest of the run after a 401", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const request = vi.fn().mockRejectedValue({ status: 401 });
+    setAgentOctokit({ request } as unknown as Octokit);
+
+    await collectCopilotAgentMetrics("owner", "repo-a");
+    await collectCopilotAgentMetrics("owner", "repo-b");
+    await collectCopilotAgentMetrics("owner", "repo-c");
+
+    // One request and one warning in total — not one per repository.
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    warnSpy.mockRestore();
+  });
+
+  it("resumes agent collection once the latch is cleared", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    setAgentOctokit({
+      request: vi.fn().mockRejectedValue({ status: 401 }),
+    } as unknown as Octokit);
+    await collectCopilotAgentMetrics("owner", "repo");
+    warnSpy.mockRestore();
+
+    resetAgentAuthFailure();
+    const request = vi.fn().mockRejectedValue({ status: 404 });
+    setAgentOctokit({ request } as unknown as Octokit);
+    await expect(collectCopilotAgentMetrics("owner", "repo")).resolves.toBeNull();
+    expect(request).toHaveBeenCalledTimes(1);
   });
 
   it("re-throws unexpected errors", async () => {
