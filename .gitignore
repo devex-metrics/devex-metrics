@@ -17,3 +17,8 @@ devex.config.json
 
 # History store checkout (lives on the metrics-data branch)
 .metrics-data/
+
+# Transient git worktrees created for Claude Code subagents.
+# Never project content; ignoring only this path leaves .claude/skills and
+# .claude/settings.json free to be tracked.
+.claude/worktrees/
