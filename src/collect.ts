@@ -14,6 +14,9 @@ import {
   buildPullRequestCounts,
   buildMergedPRTimeline,
   collectPullRequestDetailsFromNodes,
+  buildClosedPRTimeline,
+  buildOpenPRTimeline,
+  countReviewerLoad,
   extractReviewerLogins,
   collectCopilotAgentMetrics,
 } from "./collectors/index.js";
@@ -117,6 +120,12 @@ export async function collect(
     const graphqlData = await collectRepoGraphQL(repoOwner, repoName);
 
     let issues, prCounts, prDetails, mergedPRTimeline, contributors, dependentCount;
+    // Abandonment, open-PR age and review-load concentration are derived from
+    // nodes the GraphQL path already fetched; the REST fallback has no cheap
+    // equivalent, so they stay absent there rather than costing extra calls.
+    let closedPRTimeline: RepoMetrics["closedPRTimeline"];
+    let openPRTimeline: RepoMetrics["openPRTimeline"];
+    let reviewerLoad: RepoMetrics["reviewerLoad"];
 
     if (graphqlData !== null) {
       // Fast path: derive most data from the pre-fetched GraphQL result.
@@ -131,6 +140,9 @@ export async function collect(
         repoName,
         graphqlData.prNodes
       );
+      closedPRTimeline = buildClosedPRTimeline(graphqlData.prNodes);
+      openPRTimeline = buildOpenPRTimeline(graphqlData.openPRNodes ?? []);
+      reviewerLoad = countReviewerLoad(graphqlData.prNodes);
       const reviewerLogins = extractReviewerLogins(graphqlData.prNodes);
       [contributors, dependentCount] = await Promise.all([
         collectContributors(repoOwner, repoName, reviewerLogins),
@@ -179,6 +191,9 @@ export async function collect(
       pullRequests: prCounts,
       pullRequestDetails: prDetails,
       mergedPRTimeline,
+      closedPRTimeline,
+      openPRTimeline,
+      reviewerLoad,
       copilotAdoption,
       issueLeadTimes,
       committerCount: contributors.committerCount,

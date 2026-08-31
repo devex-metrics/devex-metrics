@@ -19,8 +19,8 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { quantiles, round } from "./stats.js";
-import type { OrgMetrics, RepoMetrics } from "./types.js";
+import { gini, quantiles, round } from "./stats.js";
+import type { MergedPRSummary, OrgMetrics, RepoMetrics } from "./types.js";
 
 /** Bump when the row shapes below change in a non-additive way. */
 export const HISTORY_SCHEMA_VERSION = 1;
@@ -63,7 +63,41 @@ export interface RollupRow {
   humanPRs30d: number;
   agentTasks: number;
   agentCredits: number;
+
+  // Fields below were added after the first rows were written. The stream is
+  // append-only, so every one of them is optional and absent on older rows —
+  // read them with a fallback, never as a zero.
+
+  /** PR size p90 (lines changed) over the window. */
+  sizeP90?: number;
+  /** Merged PRs over the large-change threshold (400 lines) in the window. */
+  largePRs30d?: number;
+  /** Pull requests closed without merging in the window. */
+  abandonedPRs30d?: number;
+  /** Merged PRs in the window whose body reverts another pull request. */
+  revertPRs30d?: number;
+  /** Merged PRs in the window that received at least one review. */
+  reviewedPRs30d?: number;
+  /** Opened → first review, in hours. The leg that is usually the problem. */
+  reviewWaitP50?: number;
+  reviewWaitP90?: number;
+  /** First review → first approval, in hours. */
+  approvalWaitP50?: number;
+  /** First approval → merge, in hours. */
+  mergeWaitP50?: number;
+  /** Median changes-requested reviews per merged PR — review rounds. */
+  reviewRoundsP50?: number;
+  /**
+   * Gini coefficient of reviews per reviewer over the window: 0 when the load
+   * is shared evenly, approaching 1 when one person reviews everything.
+   */
+  reviewGini?: number;
+  /** Median age of pull requests still open on `date`, in hours. */
+  openAgeP50?: number;
 }
+
+/** Merged PRs at or above this many lines changed count as large. */
+export const LARGE_PR_LINES = 400;
 
 /**
  * One closed pull request. Appended once and never rewritten.
@@ -102,6 +136,131 @@ export interface EventRow {
   firstReviewAt?: string;
   /** Distinct reviewer logins, for historical reviewer counts. */
   reviewers?: string[];
+  /**
+   * When the first approving review was submitted. Raw fact again: the split
+   * between "waiting for a review" and "waiting for a merge" is derived from
+   * this and `firstReviewAt`, never stored pre-computed.
+   */
+  firstApprovalAt?: string;
+  /** Reviews that requested changes — one per round trip through review. */
+  changesRequestedCount?: number;
+  /** The pull request this one reverts, when its body carries the reference. */
+  revertsPR?: number;
+}
+
+/**
+ * The subset of a pull request the window aggregates are derived from.
+ *
+ * Both an `EventRow` and a `MergedPRSummary` satisfy it, so the observed and
+ * the reconstructed path compute every derived figure through the same code
+ * and cannot drift apart.
+ */
+interface PRFacts {
+  createdAt: string;
+  mergedAt?: string;
+  linesAdded?: number;
+  linesDeleted?: number;
+  firstReviewAt?: string;
+  firstApprovalAt?: string;
+  changesRequestedCount?: number;
+  revertsPR?: number;
+  reviewers?: string[];
+}
+
+/** Hours between two ISO timestamps, or undefined when either is unusable. */
+function hoursBetween(from?: string, to?: string): number | undefined {
+  if (!from || !to) return undefined;
+  const ms = new Date(to).getTime() - new Date(from).getTime();
+  if (!Number.isFinite(ms) || ms < 0) return undefined;
+  return ms / 3_600_000;
+}
+
+/** The optional half of a rollup row: everything derived from raw PR facts. */
+type RollupExtras = Pick<
+  RollupRow,
+  | "sizeP90"
+  | "largePRs30d"
+  | "abandonedPRs30d"
+  | "revertPRs30d"
+  | "reviewedPRs30d"
+  | "reviewWaitP50"
+  | "reviewWaitP90"
+  | "approvalWaitP50"
+  | "mergeWaitP50"
+  | "reviewRoundsP50"
+  | "reviewGini"
+>;
+
+/**
+ * Derive one window's aggregates from the raw per-PR facts.
+ *
+ * Every figure here is recomputable from the event stream, which is the point:
+ * a definition that changes later can be applied to the whole history rather
+ * than only to the days collected after the change.
+ */
+export function deriveRollupExtras(
+  prs: readonly PRFacts[],
+  abandoned: number
+): RollupExtras {
+  const sizes: number[] = [];
+  const reviewWaits: number[] = [];
+  const approvalWaits: number[] = [];
+  const mergeWaits: number[] = [];
+  const rounds: number[] = [];
+  const reviewsBy = new Map<string, number>();
+  let large = 0;
+  let reverts = 0;
+  let reviewed = 0;
+
+  for (const pr of prs) {
+    const size = (pr.linesAdded ?? 0) + (pr.linesDeleted ?? 0);
+    if (size > 0) {
+      sizes.push(size);
+      if (size >= LARGE_PR_LINES) large++;
+    }
+    if (pr.revertsPR !== undefined) reverts++;
+    if (pr.firstReviewAt) reviewed++;
+
+    const toReview = hoursBetween(pr.createdAt, pr.firstReviewAt);
+    if (toReview !== undefined) reviewWaits.push(toReview);
+    const toApproval = hoursBetween(pr.firstReviewAt, pr.firstApprovalAt);
+    if (toApproval !== undefined) approvalWaits.push(toApproval);
+    const toMerge = hoursBetween(pr.firstApprovalAt, pr.mergedAt);
+    if (toMerge !== undefined) mergeWaits.push(toMerge);
+
+    if (pr.changesRequestedCount !== undefined) rounds.push(pr.changesRequestedCount);
+    for (const reviewer of pr.reviewers ?? []) {
+      reviewsBy.set(reviewer, (reviewsBy.get(reviewer) ?? 0) + 1);
+    }
+  }
+
+  const sq = quantiles(sizes);
+  const rw = quantiles(reviewWaits);
+  return {
+    sizeP90: round(sq.p90),
+    largePRs30d: large,
+    abandonedPRs30d: abandoned,
+    revertPRs30d: reverts,
+    reviewedPRs30d: reviewed,
+    reviewWaitP50: round(rw.p50),
+    reviewWaitP90: round(rw.p90),
+    approvalWaitP50: round(quantiles(approvalWaits).p50),
+    mergeWaitP50: round(quantiles(mergeWaits).p50),
+    reviewRoundsP50: round(quantiles(rounds).p50),
+    reviewGini: round(gini([...reviewsBy.values()]), 3),
+  };
+}
+
+/** Median age in hours of the pull requests still open on `date`. */
+function openAgeMedian(repo: RepoMetrics, date: string): number | undefined {
+  const open = repo.openPRTimeline;
+  if (!open || open.length === 0) return undefined;
+  const at = new Date(`${date}T23:59:59Z`).getTime();
+  const ages = open
+    .map((pr) => (at - new Date(pr.createdAt).getTime()) / 3_600_000)
+    .filter((h) => Number.isFinite(h) && h >= 0);
+  if (ages.length === 0) return undefined;
+  return round(quantiles(ages).p50);
 }
 
 function scopeDir(dir: string, scope: string): string {
@@ -150,7 +309,7 @@ export function latestPath(dir: string, scope: string): string {
 }
 
 /** Merged PRs from a repo's timeline, newest-first sources included. */
-function mergedPRs(repo: RepoMetrics) {
+function mergedPRs(repo: RepoMetrics): MergedPRSummary[] {
   if (repo.mergedPRTimeline && repo.mergedPRTimeline.length > 0) {
     return repo.mergedPRTimeline;
   }
@@ -191,6 +350,8 @@ export function buildRollupRows(metrics: OrgMetrics, date: string): RollupRow[] 
   };
   const orgCycles: number[] = [];
   const orgSizes: number[] = [];
+  const orgPRs: MergedPRSummary[] = [];
+  let orgAbandoned = 0;
   let orgAI = 0;
   let orgHuman = 0;
 
@@ -198,6 +359,9 @@ export function buildRollupRows(metrics: OrgMetrics, date: string): RollupRow[] 
     const recent = mergedPRs(repo).filter(
       (pr) => new Date(pr.mergedAt).getTime() >= cutoff
     );
+    const abandoned = (repo.closedPRTimeline ?? []).filter(
+      (pr) => new Date(pr.closedAt).getTime() >= cutoff
+    ).length;
     const cycles = recent.map((pr) => pr.timeToMergeHours).filter((h) => h > 0);
     const sizes = recent
       .map((pr) => (pr.linesAdded ?? 0) + (pr.linesDeleted ?? 0))
@@ -233,6 +397,8 @@ export function buildRollupRows(metrics: OrgMetrics, date: string): RollupRow[] 
       humanPRs30d: human,
       agentTasks: repo.copilotAgentMetrics?.totalTasks ?? 0,
       agentCredits: round(repo.copilotAgentMetrics?.totalCreditsUsed ?? 0),
+      ...deriveRollupExtras(recent, abandoned),
+      openAgeP50: openAgeMedian(repo, date),
     });
 
     org.openIssues += Math.max(0, repo.issues.open);
@@ -248,6 +414,8 @@ export function buildRollupRows(metrics: OrgMetrics, date: string): RollupRow[] 
     org.agentCredits += repo.copilotAgentMetrics?.totalCreditsUsed ?? 0;
     orgCycles.push(...cycles);
     orgSizes.push(...sizes);
+    orgPRs.push(...recent);
+    orgAbandoned += abandoned;
     orgAI += ai;
     orgHuman += human;
   }
@@ -270,12 +438,33 @@ export function buildRollupRows(metrics: OrgMetrics, date: string): RollupRow[] 
     sizeP75: round(osq.p75),
     aiPRs30d: orgAI,
     humanPRs30d: orgHuman,
+    ...deriveRollupExtras(orgPRs, orgAbandoned),
+    openAgeP50: orgOpenAgeMedian(metrics.repos, date),
   });
 
   return rows;
 }
 
-/** Build the event rows for one collection run. */
+/** Median age in hours of every open pull request across the organisation. */
+function orgOpenAgeMedian(repos: readonly RepoMetrics[], date: string): number | undefined {
+  const at = new Date(`${date}T23:59:59Z`).getTime();
+  const ages: number[] = [];
+  for (const repo of repos) {
+    for (const pr of repo.openPRTimeline ?? []) {
+      const hours = (at - new Date(pr.createdAt).getTime()) / 3_600_000;
+      if (Number.isFinite(hours) && hours >= 0) ages.push(hours);
+    }
+  }
+  return ages.length > 0 ? round(quantiles(ages).p50) : undefined;
+}
+
+/**
+ * Build the event rows for one collection run.
+ *
+ * Both outcomes are recorded: a merged pull request and one closed without
+ * merging are the numerator and the denominator of the same question, and the
+ * abandoned ones were fetched by the same query.
+ */
 export function buildEventRows(metrics: OrgMetrics): EventRow[] {
   const rows: EventRow[] = [];
   for (const repo of metrics.repos) {
@@ -293,6 +482,27 @@ export function buildEventRows(metrics: OrgMetrics): EventRow[] {
         mergedAt: pr.mergedAt,
         closedAt: pr.mergedAt,
         timeToMergeHours: round(pr.timeToMergeHours),
+        linesAdded: pr.linesAdded,
+        linesDeleted: pr.linesDeleted,
+        reviewCount: pr.reviewCount,
+        firstReviewAt: pr.firstReviewAt,
+        firstApprovalAt: pr.firstApprovalAt,
+        changesRequestedCount: pr.changesRequestedCount,
+        revertsPR: pr.revertsPR,
+      });
+    }
+    for (const pr of repo.closedPRTimeline ?? []) {
+      rows.push({
+        v: HISTORY_SCHEMA_VERSION,
+        scope: metrics.owner,
+        repo: repo.fullName,
+        number: pr.number,
+        state: "closed",
+        author: pr.author,
+        isBot: pr.isBotAuthor,
+        aiAuthorType: pr.aiAuthorType,
+        createdAt: pr.createdAt,
+        closedAt: pr.closedAt,
         linesAdded: pr.linesAdded,
         linesDeleted: pr.linesDeleted,
       });
@@ -589,6 +799,18 @@ export function recomputeRollupFromEvents(
     else byRepo.set(e.repo, [e]);
   }
 
+  // Pull requests closed without merging, bucketed the same way. A repository
+  // with abandonments but no merges in a window still produces no row: the
+  // window's other figures would all be empty, and an empty row reads as a
+  // collapse in delivery rather than as an absence of data.
+  const closedByRepo = new Map<string, EventRow[]>();
+  for (const e of events) {
+    if (isMergedEvent(e) || !e.closedAt) continue;
+    const list = closedByRepo.get(e.repo);
+    if (list) list.push(e);
+    else closedByRepo.set(e.repo, [e]);
+  }
+
   const rows: RollupRow[] = [];
   const WINDOW = 30 * 24 * 60 * 60 * 1000;
 
@@ -598,6 +820,8 @@ export function recomputeRollupFromEvents(
 
     const orgCycles: number[] = [];
     const orgSizes: number[] = [];
+    const orgPRs: EventRow[] = [];
+    let orgAbandoned = 0;
     let orgAI = 0;
     let orgHuman = 0;
     let orgCount = 0;
@@ -619,6 +843,11 @@ export function recomputeRollupFromEvents(
       const human = inWindow.filter(
         (e) => !e.isBot && e.aiAuthorType === undefined
       ).length;
+
+      const abandoned = (closedByRepo.get(repo) ?? []).filter((e) => {
+        const t = new Date(e.closedAt as string).getTime();
+        return t >= start && t <= end;
+      }).length;
 
       const cq = quantiles(cycles);
       const sq = quantiles(sizes);
@@ -649,10 +878,13 @@ export function recomputeRollupFromEvents(
         humanPRs30d: human,
         agentTasks: 0,
         agentCredits: 0,
+        ...deriveRollupExtras(inWindow, abandoned),
       });
 
       orgCycles.push(...cycles);
       orgSizes.push(...sizes);
+      orgPRs.push(...inWindow);
+      orgAbandoned += abandoned;
       orgAI += ai;
       orgHuman += human;
       orgCount += inWindow.length;
@@ -687,6 +919,7 @@ export function recomputeRollupFromEvents(
       humanPRs30d: orgHuman,
       agentTasks: 0,
       agentCredits: 0,
+      ...deriveRollupExtras(orgPRs, orgAbandoned),
     });
   }
 

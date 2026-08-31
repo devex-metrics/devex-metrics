@@ -4,9 +4,18 @@ import type {
   PullRequestCounts,
   PullRequestDetail,
   MergedPRSummary,
+  ClosedPRSummary,
+  OpenPRSummary,
+  ReviewerLoad,
   CopilotAdoption,
 } from "../types.js";
-import type { GraphQLRepoData, GraphQLPRNode, CommitAuthorNode } from "./repo-graphql.js";
+import type {
+  GraphQLRepoData,
+  GraphQLPRNode,
+  CommitAuthorNode,
+  OpenPRNode,
+  ReviewNode,
+} from "./repo-graphql.js";
 
 /**
  * Identify which AI tool authored a PR.
@@ -149,6 +158,89 @@ function resolveAIType(
 function isCopilotUser(login: string, typeHint?: string): boolean {
   const lower = login.toLowerCase();
   return lower === "copilot[bot]" || (lower === "copilot" && typeHint === "Bot");
+}
+
+/**
+ * The pull request a body says it reverts.
+ *
+ * GitHub's "Revert" button writes `Reverts owner/repo#123` into the body, so
+ * the reference is a fact carried by the data we already fetch. A revert
+ * written by hand without that line is invisible here, which makes every
+ * revert rate built on this a lower bound — say so wherever one is shown.
+ */
+export function parseRevertRef(body: string | null | undefined): number | undefined {
+  if (!body) return undefined;
+  const match = /reverts\s+(?:[\w.-]+\/[\w.-]+)?#(\d+)/i.exec(body);
+  if (!match) return undefined;
+  const n = Number(match[1]);
+  return Number.isFinite(n) && n > 0 ? n : undefined;
+}
+
+/** The review facts a pull request carries, before any latency is derived. */
+export interface ReviewFacts {
+  /** When the first review of any kind was submitted. */
+  firstReviewAt?: string;
+  /** When the first approving review was submitted. */
+  firstApprovalAt?: string;
+  /** Reviews submitted on the pull request. */
+  reviewCount: number;
+  /** Reviews that requested changes — one per round trip through review. */
+  changesRequestedCount: number;
+}
+
+/**
+ * Reduce a review connection to the raw facts stored per pull request.
+ *
+ * Timestamps, not latencies: storing `firstReviewAt` rather than
+ * "hours to first review" keeps the definition free to change later without
+ * re-crawling every repository.
+ *
+ * Reviews still in progress carry no `submittedAt` and are ignored for timing
+ * but still counted, and automated reviewers are counted like anyone else —
+ * a Copilot review really did happen, and callers that want humans only can
+ * filter on the reviewer set.
+ */
+export function summariseReviews(nodes: readonly ReviewNode[] | undefined): ReviewFacts {
+  const facts: ReviewFacts = { reviewCount: 0, changesRequestedCount: 0 };
+  for (const review of nodes ?? []) {
+    facts.reviewCount++;
+    const state = review.state;
+    if (state === "CHANGES_REQUESTED") facts.changesRequestedCount++;
+    const at = review.submittedAt;
+    if (typeof at !== "string" || at === "") continue;
+    if (facts.firstReviewAt === undefined || at < facts.firstReviewAt) {
+      facts.firstReviewAt = at;
+    }
+    if (
+      state === "APPROVED" &&
+      (facts.firstApprovalAt === undefined || at < facts.firstApprovalAt)
+    ) {
+      facts.firstApprovalAt = at;
+    }
+  }
+  return facts;
+}
+
+/**
+ * Count reviews per reviewer across pre-fetched GraphQL PR nodes.
+ *
+ * Bots are left out on purpose: this feeds a review-load concentration figure,
+ * and an automated reviewer that comments on every pull request would dominate
+ * the distribution while telling you nothing about who carries the work.
+ * Sorted by review count descending, so the heaviest reviewers come first.
+ */
+export function countReviewerLoad(nodes: readonly GraphQLPRNode[]): ReviewerLoad[] {
+  const counts = new Map<string, number>();
+  for (const node of nodes) {
+    for (const review of node.reviews?.nodes ?? []) {
+      const login = review.author?.login;
+      if (!login || isBotLogin(login)) continue;
+      counts.set(login, (counts.get(login) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .map(([reviewer, reviews]) => ({ reviewer, reviews }))
+    .sort((a, b) => b.reviews - a.reviews || a.reviewer.localeCompare(b.reviewer));
 }
 
 /**
@@ -447,6 +539,7 @@ export function buildMergedPRTimeline(nodes: GraphQLPRNode[]): MergedPRSummary[]
     const authorLogin = node.author?.login ?? "unknown";
     const isBot = node.author?.__typename === "Bot" || isBotLogin(authorLogin);
     const aiType = resolveAIType(authorLogin, node.author?.__typename, node.mergeCommit?.message, node.commits.nodes, node.body);
+    const reviews = summariseReviews(node.reviews?.nodes);
     timeline.push({
       number: node.number,
       createdAt: node.createdAt,
@@ -460,9 +553,68 @@ export function buildMergedPRTimeline(nodes: GraphQLPRNode[]): MergedPRSummary[]
       closesIssues: parseIssueRefs(node.body),
       linesAdded: node.additions,
       linesDeleted: node.deletions,
+      firstReviewAt: reviews.firstReviewAt,
+      firstApprovalAt: reviews.firstApprovalAt,
+      reviewCount: reviews.reviewCount,
+      changesRequestedCount: reviews.changesRequestedCount,
+      revertsPR: parseRevertRef(node.body),
     });
   }
   return timeline.sort((a, b) => (b.mergedAt > a.mergedAt ? 1 : -1));
+}
+
+/**
+ * Build the abandoned-PR timeline from pre-fetched GraphQL PR nodes.
+ *
+ * Only CLOSED nodes — a pull request closed without merging. The daily query
+ * already asks for CLOSED and MERGED together, so this is free: the nodes were
+ * fetched and then thrown away before. No API calls.
+ */
+export function buildClosedPRTimeline(nodes: readonly GraphQLPRNode[]): ClosedPRSummary[] {
+  const closed: ClosedPRSummary[] = [];
+  for (const node of nodes) {
+    if (node.state !== "CLOSED" || node.mergedAt || !node.closedAt) continue;
+    const authorLogin = node.author?.login ?? "unknown";
+    const aiType = resolveAIType(
+      authorLogin,
+      node.author?.__typename,
+      null,
+      node.commits?.nodes,
+      node.body
+    );
+    closed.push({
+      number: node.number,
+      createdAt: node.createdAt,
+      closedAt: node.closedAt,
+      author: authorLogin,
+      isBotAuthor: node.author?.__typename === "Bot" || isBotLogin(authorLogin),
+      aiAuthorType: aiType ?? undefined,
+      linesAdded: node.additions,
+      linesDeleted: node.deletions,
+    });
+  }
+  return closed.sort((a, b) => (b.closedAt > a.closedAt ? 1 : -1));
+}
+
+/**
+ * Build the open-PR list from the daily query's first page.
+ *
+ * Ordered oldest first by the query, which is the order that matters: the
+ * point of this list is the age of work still waiting, and the oldest entries
+ * are the ones that carry the signal. No API calls.
+ */
+export function buildOpenPRTimeline(nodes: readonly OpenPRNode[]): OpenPRSummary[] {
+  return nodes.map((node) => {
+    const authorLogin = node.author?.login ?? "unknown";
+    const aiType = getAIAuthorType(authorLogin, node.author?.__typename);
+    return {
+      number: node.number,
+      createdAt: node.createdAt,
+      author: authorLogin,
+      isBotAuthor: node.author?.__typename === "Bot" || isBotLogin(authorLogin),
+      aiAuthorType: aiType ?? undefined,
+    };
+  });
 }
 
 /**

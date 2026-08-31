@@ -1111,7 +1111,35 @@ describe("build-pages · dashboard JS executes", () => {
                 closesIssues: [],
                 linesAdded: 10 * (i + 1),
                 linesDeleted: 2,
+                firstReviewAt: "2026-08-20T06:00:00Z",
+                firstApprovalAt: "2026-08-21T00:00:00Z",
+                reviewCount: 2,
+                changesRequestedCount: i,
+                revertsPR: undefined,
               },
+            ],
+            closedPRTimeline: [
+              {
+                number: i * 10 + 2,
+                createdAt: "2026-08-18T00:00:00Z",
+                closedAt: "2026-08-23T00:00:00Z",
+                author: "bob",
+                isBotAuthor: false,
+                linesAdded: 5,
+                linesDeleted: 1,
+              },
+            ],
+            openPRTimeline: [
+              {
+                number: i * 10 + 3,
+                createdAt: "2026-08-10T00:00:00Z",
+                author: "carol",
+                isBotAuthor: false,
+              },
+            ],
+            reviewerLoad: [
+              { reviewer: "amy", reviews: 5 - i },
+              { reviewer: "bob", reviews: 1 },
             ],
             weeklyTrends: [
               {
@@ -1247,5 +1275,81 @@ describe("build-pages · dashboard JS executes", () => {
     const { dom } = run("?period=nonsense");
     const active = dom.window.document.querySelector(".filter-btn.active");
     expect(active?.getAttribute("data-period")).toBe("30days");
+  });
+
+  it("fills the three review legs with real durations", () => {
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    const doc = dom.window.document;
+    // Opened 2026-08-20T00:00 → first review 06:00 → approval next day.
+    expect(doc.getElementById("flowP50-review")?.textContent).toBe("6.0hr");
+    expect(doc.getElementById("flowP50-approval")?.textContent).toBe("18.0hr");
+    expect(doc.getElementById("flowN-review")?.textContent).toBe("2");
+  });
+
+  it("says so plainly when a leg has no data to read", () => {
+    const { dom } = run("?period=all");
+    const note = dom.window.document.getElementById("flowNote")?.textContent ?? "";
+    expect(note).toContain("Measured over 2 reviewed pull requests");
+    expect(note).toContain("Too few to read as a rate");
+  });
+
+  it("fills the AI versus human comparison from the same filtered set", () => {
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    const doc = dom.window.document;
+    // One AI-authored PR in api, one human-authored PR in billing.
+    expect(doc.getElementById("aiHumanAI-merged")?.textContent).toBe("1");
+    expect(doc.getElementById("aiHumanHuman-merged")?.textContent).toBe("1");
+    expect(doc.getElementById("aiHumanAI-cycle")?.textContent).not.toBe("–");
+    expect(doc.getElementById("aiHumanNote")?.textContent).toContain("AI n=1");
+  });
+
+  it("reports review-load concentration across the collected reviewers", () => {
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    const badge = dom.window.document.getElementById("giniBadge")?.textContent ?? "";
+    expect(badge).toMatch(/^Gini 0\.\d\d$/);
+    expect(dom.window.document.getElementById("giniNote")?.textContent).toContain(
+      "2 reviewers"
+    );
+  });
+
+  it("reports the abandonment rate and the age of open work", () => {
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    // Two merged and two closed-unmerged PRs across the two repos.
+    expect(dom.window.document.getElementById("kpiAbandonVal")?.textContent).toBe("50.0%");
+    expect(dom.window.document.getElementById("kpiAbandonSub")?.textContent).toContain(
+      "2 open"
+    );
+  });
+
+  it("shows the median PR size and the share of large changes", () => {
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    expect(dom.window.document.getElementById("kpiSizeVal")?.textContent).not.toBe("–");
+    expect(dom.window.document.getElementById("kpiSizeSub")?.textContent).toContain(
+      "over 400 lines"
+    );
+  });
+
+  it("renders a dash for cost per agent PR when there is no agent data", () => {
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    expect(dom.window.document.getElementById("kpiAgentCostVal")?.textContent).toBe("–");
+    expect(dom.window.document.getElementById("kpiAgentCostSub")?.textContent).toBe(
+      "no agent data"
+    );
+  });
+
+  it("keeps the new metrics working under a repo filter", () => {
+    const { dom, errors } = run("?period=all&repos=api");
+    expect(errors).toEqual([]);
+    const doc = dom.window.document;
+    expect(doc.getElementById("repoPickerLabel")?.textContent).toBe("1 repo");
+    // api's single merged PR is the AI-authored one.
+    expect(doc.getElementById("aiHumanAI-merged")?.textContent).toBe("1");
+    expect(doc.getElementById("aiHumanHuman-merged")?.textContent).toBe("0");
   });
 });

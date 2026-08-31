@@ -54,3 +54,42 @@ export function round(value: number, digits = 2): number {
   const factor = 10 ** digits;
   return Math.round(value * factor) / factor;
 }
+
+/**
+ * Gini coefficient of `values` — 0 when every value is identical, approaching
+ * 1 as a single value takes the whole total.
+ *
+ * Used for review load: a team where one person reviews everything scores near
+ * 1, a team that shares the work evenly scores near 0. Zero entries are kept
+ * on purpose — a nominal reviewer who reviews nothing is part of the
+ * inequality, not absent from it.
+ *
+ * Returns 0 for the degenerate cases where inequality is undefined: fewer than
+ * two values, or a total of zero. Negative and non-finite values are dropped,
+ * since a negative share has no meaning here.
+ */
+export function gini(values: readonly number[]): number {
+  const clean = values.filter((v) => Number.isFinite(v) && v >= 0);
+  const n = clean.length;
+  if (n < 2) return 0;
+  const sorted = [...clean].sort((a, b) => a - b);
+  let total = 0;
+  let weighted = 0;
+  for (let i = 0; i < n; i++) {
+    total += sorted[i];
+    weighted += (i + 1) * sorted[i];
+  }
+  if (total === 0) return 0;
+  return (2 * weighted) / (n * total) - (n + 1) / n;
+}
+
+/**
+ * Share of `values` at or above `threshold`, as a percentage. Returns 0 for an
+ * empty input rather than NaN, so a repository with no pull requests renders as
+ * a zero instead of a hole.
+ */
+export function shareAtLeast(values: readonly number[], threshold: number): number {
+  if (values.length === 0) return 0;
+  const hits = values.filter((v) => v >= threshold).length;
+  return (hits / values.length) * 100;
+}

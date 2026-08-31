@@ -90,6 +90,21 @@ export interface RepoMetrics {
   mergedPRTimeline?: MergedPRSummary[];
   /** Per-repo Copilot adoption summary. */
   copilotAdoption?: CopilotAdoption;
+  /**
+   * Pull requests closed without merging, from the same GraphQL page as the
+   * merged ones. Absent in data collected before abandonment was tracked.
+   */
+  closedPRTimeline?: ClosedPRSummary[];
+  /**
+   * Pull requests still open at collection time, oldest first. Used for the
+   * median age of open work; absent in older data.
+   */
+  openPRTimeline?: OpenPRSummary[];
+  /**
+   * Reviews per reviewer across the collected pull requests, for review-load
+   * concentration. Absent in older data.
+   */
+  reviewerLoad?: ReviewerLoad[];
   /** Lead-time data for issues referenced by merged PRs. */
   issueLeadTimes?: IssueLeadTime[];
   /** Unique committers in the default branch (last 90 days). */
@@ -171,6 +186,70 @@ export interface MergedPRSummary {
   linesAdded?: number;
   /** Lines deleted by this PR. See `linesAdded` for source caveats. */
   linesDeleted?: number;
+  /**
+   * When the first review was submitted. A raw fact, not a latency: the
+   * definition of "review latency" is free to change without re-collecting.
+   */
+  firstReviewAt?: string;
+  /** When the first approving review was submitted. */
+  firstApprovalAt?: string;
+  /** Total reviews submitted on the PR. */
+  reviewCount?: number;
+  /** Reviews that requested changes — one per review round. */
+  changesRequestedCount?: number;
+  /**
+   * The pull request this one reverts, when its body carries GitHub's
+   * "Reverts owner/repo#N" reference. Absent for hand-written reverts that
+   * drop the reference, so revert rates read as a lower bound.
+   */
+  revertsPR?: number;
+}
+
+/**
+ * A pull request closed without being merged.
+ *
+ * Collected from the same GraphQL page as the merged ones — the query already
+ * asks for CLOSED and MERGED together — so abandonment costs no extra calls.
+ */
+export interface ClosedPRSummary {
+  /** PR number. */
+  number: number;
+  /** ISO-8601 timestamp when the PR was created. */
+  createdAt: string;
+  /** ISO-8601 timestamp when the PR was closed. */
+  closedAt: string;
+  /** GitHub login of the PR author. */
+  author: string;
+  /** True when the PR author is a bot. */
+  isBotAuthor: boolean;
+  /** Which AI tool authored this PR; undefined for human/other-bot authors. */
+  aiAuthorType?: "copilot" | "claude" | "codex";
+  /** Lines added by this PR. */
+  linesAdded?: number;
+  /** Lines deleted by this PR. */
+  linesDeleted?: number;
+}
+
+/** A pull request still open when the collection ran. */
+export interface OpenPRSummary {
+  /** PR number. */
+  number: number;
+  /** ISO-8601 timestamp when the PR was created. */
+  createdAt: string;
+  /** GitHub login of the PR author. */
+  author: string;
+  /** True when the PR author is a bot. */
+  isBotAuthor: boolean;
+  /** Which AI tool authored this PR; undefined for human/other-bot authors. */
+  aiAuthorType?: "copilot" | "claude" | "codex";
+}
+
+/** How many reviews one reviewer submitted in the collected window. */
+export interface ReviewerLoad {
+  /** Reviewer's GitHub login. */
+  reviewer: string;
+  /** Reviews submitted across the collected pull requests. */
+  reviews: number;
 }
 
 /** Per-repo Copilot adoption summary. */

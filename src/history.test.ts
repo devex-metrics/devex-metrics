@@ -297,6 +297,8 @@ import {
   mergeReconstructed,
   backfillPath,
   isMergedEvent,
+  deriveRollupExtras,
+  LARGE_PR_LINES,
 } from "./history.js";
 import type { EventRow } from "./history.js";
 
@@ -554,5 +556,331 @@ describe("isMergedEvent", () => {
     const rows = recomputeRollupFromEvents(legacy, "acme", Date.parse("2026-08-30T00:00:00Z"));
     expect(rows.length).toBeGreaterThan(0);
     expect(rows.some((r) => r.mergedPRs30d === 2)).toBe(true);
+  });
+});
+
+// ── Metrics added on top of the original rollup ──────────────────────────────
+
+describe("deriveRollupExtras", () => {
+  it("returns zeroes for an empty window rather than holes", () => {
+    const extras = deriveRollupExtras([], 0);
+    expect(extras).toMatchObject({
+      sizeP90: 0,
+      largePRs30d: 0,
+      abandonedPRs30d: 0,
+      revertPRs30d: 0,
+      reviewedPRs30d: 0,
+      reviewWaitP50: 0,
+      reviewGini: 0,
+    });
+  });
+
+  it("counts pull requests at or over the large-change threshold", () => {
+    const extras = deriveRollupExtras(
+      [
+        { createdAt: "2026-08-01T00:00:00Z", linesAdded: 100, linesDeleted: 10 },
+        { createdAt: "2026-08-01T00:00:00Z", linesAdded: LARGE_PR_LINES, linesDeleted: 0 },
+        { createdAt: "2026-08-01T00:00:00Z", linesAdded: 900, linesDeleted: 100 },
+      ],
+      0
+    );
+    expect(extras.largePRs30d).toBe(2);
+  });
+
+  it("splits the wait for review, approval and merge from raw timestamps", () => {
+    const extras = deriveRollupExtras(
+      [
+        {
+          createdAt: "2026-08-01T00:00:00Z",
+          firstReviewAt: "2026-08-02T00:00:00Z",
+          firstApprovalAt: "2026-08-03T00:00:00Z",
+          mergedAt: "2026-08-03T12:00:00Z",
+        },
+      ],
+      0
+    );
+    expect(extras.reviewWaitP50).toBe(24);
+    expect(extras.approvalWaitP50).toBe(24);
+    expect(extras.mergeWaitP50).toBe(12);
+    expect(extras.reviewedPRs30d).toBe(1);
+  });
+
+  it("leaves a leg at zero when the timestamps behind it are missing", () => {
+    const extras = deriveRollupExtras([{ createdAt: "2026-08-01T00:00:00Z" }], 0);
+    expect(extras.reviewWaitP50).toBe(0);
+    expect(extras.approvalWaitP50).toBe(0);
+    expect(extras.reviewedPRs30d).toBe(0);
+  });
+
+  it("ignores a review timestamp that precedes the pull request", () => {
+    const extras = deriveRollupExtras(
+      [{ createdAt: "2026-08-05T00:00:00Z", firstReviewAt: "2026-08-01T00:00:00Z" }],
+      0
+    );
+    expect(extras.reviewWaitP50).toBe(0);
+  });
+
+  it("takes the median of the changes-requested counts as review rounds", () => {
+    const extras = deriveRollupExtras(
+      [
+        { createdAt: "2026-08-01T00:00:00Z", changesRequestedCount: 0 },
+        { createdAt: "2026-08-01T00:00:00Z", changesRequestedCount: 2 },
+        { createdAt: "2026-08-01T00:00:00Z", changesRequestedCount: 4 },
+      ],
+      0
+    );
+    expect(extras.reviewRoundsP50).toBe(2);
+  });
+
+  it("counts pull requests that revert another one", () => {
+    const extras = deriveRollupExtras(
+      [
+        { createdAt: "2026-08-01T00:00:00Z", revertsPR: 12 },
+        { createdAt: "2026-08-01T00:00:00Z" },
+      ],
+      0
+    );
+    expect(extras.revertPRs30d).toBe(1);
+  });
+
+  it("passes the abandoned count straight through", () => {
+    expect(deriveRollupExtras([], 7).abandonedPRs30d).toBe(7);
+  });
+
+  it("measures review concentration across the window's reviewers", () => {
+    const shared = deriveRollupExtras(
+      [
+        { createdAt: "2026-08-01T00:00:00Z", reviewers: ["amy"] },
+        { createdAt: "2026-08-01T00:00:00Z", reviewers: ["bob"] },
+      ],
+      0
+    );
+    const concentrated = deriveRollupExtras(
+      [
+        { createdAt: "2026-08-01T00:00:00Z", reviewers: ["amy"] },
+        { createdAt: "2026-08-01T00:00:00Z", reviewers: ["amy"] },
+        { createdAt: "2026-08-01T00:00:00Z", reviewers: ["amy", "bob"] },
+      ],
+      0
+    );
+    expect(shared.reviewGini).toBe(0);
+    expect(concentrated.reviewGini).toBeGreaterThan(0);
+  });
+});
+
+describe("buildRollupRows with the newer metrics", () => {
+  it("carries the derived fields onto every row", () => {
+    const rows = buildRollupRows(
+      metrics([
+        repo("acme/api", [
+          pr(1, 5, {
+            linesAdded: 500,
+            linesDeleted: 10,
+            firstReviewAt: new Date(Date.parse("2026-08-25T00:00:00Z")).toISOString(),
+          }),
+        ]),
+      ]),
+      "2026-08-30"
+    );
+    expect(rows[0].largePRs30d).toBe(1);
+    expect(rows[0].sizeP90).toBe(510);
+    expect(rows[1].largePRs30d).toBe(1);
+  });
+
+  it("counts abandoned pull requests inside the window only", () => {
+    const rows = buildRollupRows(
+      metrics([
+        repo("acme/api", [pr(1, 5)], {
+          closedPRTimeline: [
+            {
+              number: 90,
+              createdAt: "2026-08-01T00:00:00Z",
+              closedAt: "2026-08-28T00:00:00Z",
+              author: "amy",
+              isBotAuthor: false,
+            },
+            {
+              number: 91,
+              createdAt: "2025-01-01T00:00:00Z",
+              closedAt: "2025-02-01T00:00:00Z",
+              author: "amy",
+              isBotAuthor: false,
+            },
+          ],
+        }),
+      ]),
+      "2026-08-30"
+    );
+    expect(rows[0].abandonedPRs30d).toBe(1);
+    expect(rows[1].abandonedPRs30d).toBe(1);
+  });
+
+  it("reports the median age of the pull requests still open", () => {
+    const rows = buildRollupRows(
+      metrics([
+        repo("acme/api", [pr(1, 5)], {
+          openPRTimeline: [
+            { number: 5, createdAt: "2026-08-29T23:59:59Z", author: "amy", isBotAuthor: false },
+          ],
+        }),
+      ]),
+      "2026-08-30"
+    );
+    expect(rows[0].openAgeP50).toBeCloseTo(24, 0);
+  });
+
+  it("leaves the open age undefined when nothing is open", () => {
+    const rows = buildRollupRows(metrics([repo("acme/api", [pr(1, 5)])]), "2026-08-30");
+    expect(rows[0].openAgeP50).toBeUndefined();
+  });
+});
+
+describe("buildEventRows for abandoned pull requests", () => {
+  it("records a closed-unmerged PR as its own event", () => {
+    const rows = buildEventRows(
+      metrics([
+        repo("acme/api", [pr(1, 5)], {
+          closedPRTimeline: [
+            {
+              number: 42,
+              createdAt: "2026-08-01T00:00:00Z",
+              closedAt: "2026-08-10T00:00:00Z",
+              author: "amy",
+              isBotAuthor: false,
+              linesAdded: 3,
+              linesDeleted: 1,
+            },
+          ],
+        }),
+      ])
+    );
+    const closed = rows.find((r) => r.number === 42);
+    expect(closed).toMatchObject({
+      state: "closed",
+      closedAt: "2026-08-10T00:00:00Z",
+      linesAdded: 3,
+    });
+    expect(closed?.mergedAt).toBeUndefined();
+    expect(closed?.timeToMergeHours).toBeUndefined();
+  });
+
+  it("carries the review facts onto a merged event", () => {
+    const rows = buildEventRows(
+      metrics([
+        repo("acme/api", [
+          pr(1, 5, {
+            firstReviewAt: "2026-08-24T00:00:00Z",
+            firstApprovalAt: "2026-08-24T06:00:00Z",
+            reviewCount: 3,
+            changesRequestedCount: 1,
+            revertsPR: 8,
+          }),
+        ]),
+      ])
+    );
+    expect(rows[0]).toMatchObject({
+      firstReviewAt: "2026-08-24T00:00:00Z",
+      firstApprovalAt: "2026-08-24T06:00:00Z",
+      reviewCount: 3,
+      changesRequestedCount: 1,
+      revertsPR: 8,
+    });
+  });
+
+  it("leaves the new fields absent when nothing was collected for them", () => {
+    const rows = buildEventRows(metrics([repo("acme/api", [pr(1, 5)])]));
+    expect(rows[0].firstApprovalAt).toBeUndefined();
+    expect(rows[0].changesRequestedCount).toBeUndefined();
+  });
+});
+
+describe("recomputeRollupFromEvents with the newer metrics", () => {
+  const scope = "acme";
+  const now = Date.parse("2026-08-30T00:00:00Z");
+
+  function ev(extra: Partial<EventRow>): EventRow {
+    return {
+      v: HISTORY_SCHEMA_VERSION,
+      scope,
+      repo: "acme/api",
+      number: 1,
+      state: "merged",
+      author: "amy",
+      isBot: false,
+      createdAt: "2026-08-20T00:00:00Z",
+      mergedAt: "2026-08-22T00:00:00Z",
+      closedAt: "2026-08-22T00:00:00Z",
+      timeToMergeHours: 48,
+      linesAdded: 10,
+      linesDeleted: 5,
+      ...extra,
+    };
+  }
+
+  it("reaches the review-latency metrics back through history", () => {
+    const rows = recomputeRollupFromEvents(
+      [
+        ev({
+          number: 1,
+          firstReviewAt: "2026-08-21T00:00:00Z",
+          firstApprovalAt: "2026-08-21T12:00:00Z",
+        }),
+      ],
+      scope,
+      now
+    );
+    const repoRows = rows.filter((r) => r.repo === "acme/api");
+    expect(repoRows.length).toBeGreaterThan(0);
+    const withData = repoRows[repoRows.length - 1];
+    expect(withData.reviewWaitP50).toBe(24);
+    expect(withData.approvalWaitP50).toBe(12);
+    expect(withData.reviewedPRs30d).toBe(1);
+    expect(withData.reconstructed).toBe(true);
+  });
+
+  it("counts abandoned pull requests from closed events", () => {
+    const rows = recomputeRollupFromEvents(
+      [
+        ev({ number: 1 }),
+        ev({
+          number: 2,
+          state: "closed",
+          mergedAt: undefined,
+          timeToMergeHours: undefined,
+          closedAt: "2026-08-23T00:00:00Z",
+        }),
+      ],
+      scope,
+      now
+    );
+    const last = rows.filter((r) => r.repo === "acme/api").pop();
+    expect(last?.abandonedPRs30d).toBe(1);
+  });
+
+  it("still reconstructs rows when the newer fields are absent from old events", () => {
+    const rows = recomputeRollupFromEvents([ev({ number: 1 })], scope, now);
+    const last = rows.filter((r) => r.repo === "acme/api").pop();
+    expect(last?.mergedPRs30d).toBe(1);
+    expect(last?.reviewWaitP50).toBe(0);
+    expect(last?.reviewGini).toBe(0);
+  });
+
+  it("produces no row for a window that only holds abandonments", () => {
+    const rows = recomputeRollupFromEvents(
+      [
+        ev({ number: 1, mergedAt: "2026-01-05T00:00:00Z", closedAt: "2026-01-05T00:00:00Z" }),
+        ev({
+          number: 2,
+          state: "closed",
+          mergedAt: undefined,
+          timeToMergeHours: undefined,
+          closedAt: "2026-08-23T00:00:00Z",
+        }),
+      ],
+      scope,
+      now
+    );
+    const august = rows.filter((r) => r.repo === "acme/api" && r.date > "2026-08-01");
+    expect(august).toEqual([]);
   });
 });

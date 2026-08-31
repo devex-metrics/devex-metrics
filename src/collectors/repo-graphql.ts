@@ -42,9 +42,31 @@ export interface GraphQLPRNode {
   comments: { totalCount: number };
   /** Inline review comment threads (maps to REST `review_comments` count). */
   reviewThreads: { totalCount: number };
-  reviews: { nodes: Array<{ author: { login: string } | null }> };
+  /**
+   * Submitted reviews. `submittedAt` and `state` are requested by the daily
+   * query but typed optional: the connection is also populated from fixtures
+   * and older cached responses that predate them.
+   */
+  reviews: { nodes: ReviewNode[] };
   /** Merge commit for MERGED PRs — null for CLOSED/OPEN PRs. */
   mergeCommit: { message: string } | null;
+}
+
+/** One submitted review on a pull request. */
+export interface ReviewNode {
+  /** Reviewer, or null when the account is gone. */
+  author: { login: string } | null;
+  /** When the review was submitted; null for a review still in progress. */
+  submittedAt?: string | null;
+  /** APPROVED | CHANGES_REQUESTED | COMMENTED | DISMISSED | PENDING. */
+  state?: string;
+}
+
+/** A pull request still open, from the daily query's first page. */
+export interface OpenPRNode {
+  number: number;
+  createdAt: string;
+  author: { login: string; __typename: string } | null;
 }
 
 /** Aggregated repository data returned from the GraphQL query. */
@@ -57,6 +79,12 @@ export interface GraphQLRepoData {
   mergedPRCount: number;
   /** PR nodes, sorted by updatedAt descending, up to maxPages*100. */
   prNodes: GraphQLPRNode[];
+  /**
+   * Up to 100 of the oldest still-open pull requests. Requested only on the
+   * first page (`@include(if: $firstPage)`), so paginating a busy repository
+   * does not pay for the same list again on every page.
+   */
+  openPRNodes: OpenPRNode[];
 }
 
 /** Shape of one GraphQL page response. */
@@ -68,6 +96,7 @@ interface GraphQLPageResponse {
     openPRs: { totalCount: number };
     closedPRs: { totalCount: number };
     mergedPRs: { totalCount: number };
+    openPRList?: { nodes: OpenPRNode[] };
     pullRequests: {
       pageInfo: { hasNextPage: boolean; endCursor: string | null };
       nodes: GraphQLPRNode[];
@@ -76,7 +105,7 @@ interface GraphQLPageResponse {
 }
 
 const REPO_DATA_QUERY = `
-  query RepoData($owner: String!, $name: String!, $cursor: String) {
+  query RepoData($owner: String!, $name: String!, $cursor: String, $firstPage: Boolean!) {
     repository(owner: $owner, name: $name) {
       isFork
       openIssues: issues(states: [OPEN], first: 1) { totalCount }
@@ -84,6 +113,17 @@ const REPO_DATA_QUERY = `
       openPRs: pullRequests(states: [OPEN], first: 1) { totalCount }
       closedPRs: pullRequests(states: [CLOSED], first: 1) { totalCount }
       mergedPRs: pullRequests(states: [MERGED], first: 1) { totalCount }
+      openPRList: pullRequests(
+        first: 100
+        states: [OPEN]
+        orderBy: { field: CREATED_AT, direction: ASC }
+      ) @include(if: $firstPage) {
+        nodes {
+          number
+          createdAt
+          author { login __typename }
+        }
+      }
       pullRequests(
         first: 100
         states: [CLOSED, MERGED]
@@ -117,7 +157,7 @@ const REPO_DATA_QUERY = `
           comments(first: 1) { totalCount }
           reviewThreads(first: 1) { totalCount }
           reviews(first: 100) {
-            nodes { author { login } }
+            nodes { author { login } submittedAt state }
           }
           mergeCommit { message }
         }
@@ -166,7 +206,7 @@ export async function collectRepoGraphQL(
       response = await fetchGraphQLPage<GraphQLPageResponse>(
         octokit,
         REPO_DATA_QUERY,
-        { owner, name: repo, cursor },
+        { owner, name: repo, cursor, firstPage },
         `${owner}/${repo}`
       );
     } catch (err: unknown) {
@@ -199,6 +239,7 @@ export async function collectRepoGraphQL(
         closedPRCount: repoData.closedPRs.totalCount,
         mergedPRCount: repoData.mergedPRs.totalCount,
         prNodes: [],
+        openPRNodes: repoData.openPRList?.nodes ?? [],
       };
       firstPage = false;
     }
@@ -228,6 +269,7 @@ export async function collectRepoGraphQL(
       closedPRCount: 0,
       mergedPRCount: 0,
       prNodes: [],
+      openPRNodes: [],
     };
   }
 
@@ -337,7 +379,12 @@ export interface HistoricalPRNode {
   body: string | null;
   reviews: {
     totalCount: number;
-    nodes: Array<{ submittedAt: string | null; author: { login: string } | null }>;
+    nodes: Array<{
+      submittedAt: string | null;
+      author: { login: string } | null;
+      /** APPROVED | CHANGES_REQUESTED | COMMENTED | DISMISSED. */
+      state?: string;
+    }>;
   };
 }
 
@@ -381,7 +428,7 @@ const HISTORICAL_PR_QUERY = `
           body
           reviews(first: 20) {
             totalCount
-            nodes { submittedAt author { login } }
+            nodes { submittedAt author { login } state }
           }
         }
       }
