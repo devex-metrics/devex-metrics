@@ -45,6 +45,12 @@ function toDiscovered(repo: RawRepo): DiscoveredRepo {
 /**
  * Fetch all repos for an org or user.
  * Returns basic repo info used by downstream collectors.
+ *
+ * `ownerType` selects the listing endpoint. Getting it wrong is an easy
+ * configuration mistake — the org endpoint 404s for a user account and vice
+ * versa — so a mismatch is detected and corrected rather than failing the run:
+ * the owner's type is a discoverable fact, not something a deployment should
+ * have to get right by hand.
  */
 export async function collectRepos(
   owner: string,
@@ -54,6 +60,22 @@ export async function collectRepos(
   const repos: DiscoveredRepo[] = [];
 
   if (ownerType === "org") {
+    let orgExists = true;
+    try {
+      await octokit.rest.orgs.get({ org: owner });
+    } catch (err: unknown) {
+      if ((err as { status?: number }).status !== 404) throw err;
+      orgExists = false;
+    }
+
+    if (!orgExists) {
+      console.warn(
+        `  ⚠ repos: "${owner}" is not an organisation. Collecting it as a user ` +
+          `instead. Set the DEVEX_OWNER_TYPE variable to "user" to silence this.`
+      );
+      return collectRepos(owner, "user");
+    }
+
     for await (const response of octokit.paginate.iterator(
       octokit.rest.repos.listForOrg,
       { org: owner, per_page: 100, type: "all" }
@@ -91,13 +113,28 @@ export async function collectRepos(
         }
       }
     } else {
-      for await (const response of octokit.paginate.iterator(
-        octokit.rest.repos.listForUser,
-        { username: owner, per_page: 100, type: "all" }
-      )) {
-        for (const repo of response.data) {
-          repos.push(toDiscovered(repo));
+      try {
+        for await (const response of octokit.paginate.iterator(
+          octokit.rest.repos.listForUser,
+          { username: owner, per_page: 100, type: "all" }
+        )) {
+          for (const repo of response.data) {
+            repos.push(toDiscovered(repo));
+          }
         }
+      } catch (err: unknown) {
+        if ((err as { status?: number }).status === 404) {
+          // Reached either by an explicit ownerType of "user" or by the
+          // org fallback above, so at this point the name matched neither.
+          throw new Error(
+            `"${owner}" is neither an organisation nor a user account on this ` +
+              `GitHub host, so there are no repositories to collect. Check the ` +
+              `DEVEX_OWNER variable for a typo. Note that a private organisation ` +
+              `also returns 404 when the token cannot see it, so if the name is ` +
+              `right, confirm the GitHub App is installed on it.`
+          );
+        }
+        throw err;
       }
     }
   }

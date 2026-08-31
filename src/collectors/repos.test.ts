@@ -10,7 +10,18 @@ type RepoPage = Array<{
   default_branch?: string;
 }>;
 
-function buildMockOctokit(pages: RepoPage[], authenticatedLogin?: string | null) {
+interface MockOptions {
+  /** When false, GET /orgs/{org} answers 404 the way it does for a user account. */
+  orgExists?: boolean;
+  /** When false, listing the user's repos answers 404 (no such account). */
+  userExists?: boolean;
+}
+
+function buildMockOctokit(
+  pages: RepoPage[],
+  authenticatedLogin?: string | null,
+  { orgExists = true, userExists = true }: MockOptions = {}
+) {
   const listForOrg = Symbol("listForOrg");
   const listForUser = Symbol("listForUser");
   const listForAuthenticatedUser = Symbol("listForAuthenticatedUser");
@@ -19,10 +30,17 @@ function buildMockOctokit(pages: RepoPage[], authenticatedLogin?: string | null)
   async function* fakeIterator(method: unknown, params: unknown) {
     captured.method = method;
     captured.params = params;
+    if (method === listForUser && !userExists) {
+      throw Object.assign(new Error("Not Found"), { status: 404 });
+    }
     for (const page of pages) {
       yield { data: page };
     }
   }
+
+  const orgsGet = orgExists
+    ? vi.fn().mockResolvedValue({ data: { login: "myorg" } })
+    : vi.fn().mockRejectedValue(Object.assign(new Error("Not Found"), { status: 404 }));
 
   const getAuthenticated =
     authenticatedLogin === null
@@ -35,11 +53,20 @@ function buildMockOctokit(pages: RepoPage[], authenticatedLogin?: string | null)
     rest: {
       repos: { listForOrg, listForUser, listForAuthenticatedUser },
       users: { getAuthenticated },
+      orgs: { get: orgsGet },
     },
     paginate: Object.assign(vi.fn(), { iterator: fakeIterator }),
   } as unknown as Octokit;
 
-  return { mock, captured, listForOrg, listForUser, listForAuthenticatedUser, getAuthenticated };
+  return {
+    mock,
+    captured,
+    listForOrg,
+    listForUser,
+    listForAuthenticatedUser,
+    getAuthenticated,
+    orgsGet,
+  };
 }
 
 describe("collectRepos", () => {
@@ -162,6 +189,82 @@ describe("collectRepos", () => {
     const repos = await collectRepos("org", "org");
 
     expect(repos).toHaveLength(0);
+  });
+
+  it("collects a user account configured as an org instead of failing", async () => {
+    const { mock, captured, listForAuthenticatedUser } = buildMockOctokit(
+      [[{ name: "repo-b", full_name: "myuser/repo-b", pushed_at: "" }]],
+      "myuser",
+      { orgExists: false }
+    );
+    setOctokit(mock);
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const repos = await collectRepos("myuser", "org");
+
+    expect(captured.method).toBe(listForAuthenticatedUser);
+    expect(repos).toHaveLength(1);
+    expect(warn.mock.calls.join(" ")).toContain("DEVEX_OWNER_TYPE");
+    warn.mockRestore();
+  });
+
+  it("checks for the org before listing, and only when configured as an org", async () => {
+    const { mock, orgsGet } = buildMockOctokit(
+      [[{ name: "repo-b", full_name: "myuser/repo-b", pushed_at: "" }]],
+      "myuser"
+    );
+    setOctokit(mock);
+
+    await collectRepos("myuser", "user");
+
+    expect(orgsGet).not.toHaveBeenCalled();
+  });
+
+  it("rethrows a non-404 error from the org lookup rather than guessing", async () => {
+    const { mock } = buildMockOctokit([[]], "myuser");
+    const boom = Object.assign(new Error("Bad credentials"), { status: 401 });
+    (mock as unknown as { rest: { orgs: { get: unknown } } }).rest.orgs.get = vi
+      .fn()
+      .mockRejectedValue(boom);
+    setOctokit(mock);
+
+    await expect(collectRepos("myorg", "org")).rejects.toThrow("Bad credentials");
+  });
+
+  it("explains the failure when the owner is neither an org nor a user", async () => {
+    const { mock } = buildMockOctokit([], "someoneelse", {
+      orgExists: false,
+      userExists: false,
+    });
+    setOctokit(mock);
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    await expect(collectRepos("nobody", "org")).rejects.toThrow(
+      /neither an organisation nor a user account/
+    );
+    warn.mockRestore();
+  });
+
+  it("rethrows a non-404 error from the user listing", async () => {
+    const listFailure = Object.assign(new Error("Server Error"), { status: 500 });
+    const listForUser = Symbol("listForUser");
+    async function* failingIterator(method: unknown) {
+      if (method === listForUser) throw listFailure;
+      yield { data: [] };
+    }
+    const mock = {
+      rest: {
+        repos: { listForOrg: Symbol("listForOrg"), listForUser, listForAuthenticatedUser: Symbol("lfau") },
+        users: {
+          getAuthenticated: vi.fn().mockResolvedValue({ data: { login: "someoneelse" } }),
+        },
+        orgs: { get: vi.fn() },
+      },
+      paginate: Object.assign(vi.fn(), { iterator: failingIterator }),
+    } as unknown as Octokit;
+    setOctokit(mock);
+
+    await expect(collectRepos("otheruser", "user")).rejects.toThrow("Server Error");
   });
 });
 
