@@ -49,9 +49,28 @@ function todayDateString(): string {
 }
 
 /**
+ * Whether committed fixtures may stand in for collected data.
+ *
+ * Fixtures have no date restriction, so a stale one silently masquerading as
+ * fresh data is a real hazard in CI — a run can "succeed" while reporting
+ * numbers that are arbitrarily old. They are therefore opt-in: set
+ * `DEVEX_USE_FIXTURE=1` (local development, offline demos) to enable them.
+ */
+export function fixturesEnabled(
+  env: Record<string, string | undefined> = process.env
+): boolean {
+  const v = (env.DEVEX_USE_FIXTURE ?? "").trim();
+  return /^(1|true|yes|on)$/i.test(v);
+}
+
+/**
  * Load committed fixture data for `owner` (no date restriction).
  * Fixture files are checked-in to the repo for use across worktrees
  * without needing live API access.
+ *
+ * This is the raw loader and always reads the file when present. Callers that
+ * resolve "the data to use" go through `loadCache` / `loadRawCache`, which
+ * consult `fixturesEnabled()` first.
  */
 export function loadFixture(owner: string): OrgMetrics | null {
   const filePath = fixtureFilePath(owner);
@@ -100,9 +119,12 @@ export function isWithinHours(timestamp: string | undefined, hours: number): boo
  * Fixture files take precedence over the daily cache.
  */
 export function loadRawCache(owner: string): OrgMetrics | null {
-  // Fixture first (already date-independent)
-  const fixture = loadFixture(owner);
-  if (fixture) return fixture;
+  // Fixtures are date-independent, so they are only consulted when explicitly
+  // enabled — otherwise a months-old file would shadow the daily cache.
+  if (fixturesEnabled()) {
+    const fixture = loadFixture(owner);
+    if (fixture) return fixture;
+  }
 
   const filePath = cacheFilePath(owner);
   if (!fs.existsSync(filePath)) return null;
@@ -124,10 +146,15 @@ export function loadRawCache(owner: string): OrgMetrics | null {
  * date restriction — they are intended for local development.
  */
 export function loadCache(owner: string): OrgMetrics | null {
-  const fixture = loadFixture(owner);
-  if (fixture) {
-    console.log(`Using fixture data for ${owner} (collected ${fixture.collectedAt})`);
-    return fixture;
+  if (fixturesEnabled()) {
+    const fixture = loadFixture(owner);
+    if (fixture) {
+      console.log(
+        `Using fixture data for ${owner} (collected ${fixture.collectedAt}) ` +
+          `— DEVEX_USE_FIXTURE is set`
+      );
+      return { ...fixture, dataSource: "fixture" };
+    }
   }
 
   const filePath = cacheFilePath(owner);
@@ -143,7 +170,7 @@ export function loadCache(owner: string): OrgMetrics | null {
       envelope.data.weeklyTrends !== undefined &&
       envelope.data.schemaVersion === CURRENT_SCHEMA_VERSION
     ) {
-      return envelope.data;
+      return { ...envelope.data, dataSource: "cache" };
     }
     return null; // stale cache, missing weeklyTrends, or schema version mismatch
   } catch {

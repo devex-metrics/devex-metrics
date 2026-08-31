@@ -4,6 +4,8 @@ var charts={};
 var reposVisibility=[true,true];
 var cssColors={};
 var selectedRepos=new Set();
+var repoScope="all";
+var restoringState=false;
 document.addEventListener("DOMContentLoaded",function(){
   var cs=getComputedStyle(document.documentElement);
   var cv=function(v){return cs.getPropertyValue(v).trim();};
@@ -17,9 +19,130 @@ document.addEventListener("DOMContentLoaded",function(){
   setupSortHeaders();
   setupFilter();
   setupRepoPicker();
+  setupScopeButtons();
+  setupShare();
   formatLineNumbers();
-  applyFilter("30days");
+  applyFilter(readStateFromUrl());
 });
+
+// ── Shareable slice URLs ──
+// The filter bar's state lives in the query string so any view can be pasted
+// into a message or a deck and reopen exactly as it was.
+function readStateFromUrl(){
+  var params=new URLSearchParams(window.location.search);
+  var period=params.get("period");
+  if(["all","year","90days","30days"].indexOf(period)===-1)period="30days";
+
+  var bots=params.get("bots");
+  var botCb=document.getElementById("excludeBots");
+  if(botCb)botCb.checked=(bots==="exclude");
+
+  var scope=params.get("scope");
+  repoScope=(scope==="team"&&(CHART_DATA.teamRepos||[]).length>0)?"team":"all";
+
+  var repos=params.get("repos");
+  if(repos){
+    var known={};
+    (CHART_DATA.repoNames||[]).forEach(function(n){known[n]=true;});
+    // Drop names that are no longer collected rather than filtering to nothing.
+    repos.split(",").forEach(function(n){
+      var name=n.trim();
+      if(name&&known[name])selectedRepos.add(name);
+    });
+  }
+
+  restoringState=true;
+  syncScopeButtons();
+  syncRepoCheckboxes();
+  document.querySelectorAll(".filter-btn").forEach(function(b){
+    b.classList.toggle("active",b.dataset.period===period);
+  });
+  restoringState=false;
+  return period;
+}
+function writeStateToUrl(period){
+  if(restoringState)return;
+  var params=new URLSearchParams();
+  if(period&&period!=="30days")params.set("period",period);
+  var botCb=document.getElementById("excludeBots");
+  if(botCb&&botCb.checked)params.set("bots","exclude");
+  if(repoScope==="team")params.set("scope","team");
+  if(selectedRepos.size>0)params.set("repos",Array.from(selectedRepos).join(","));
+  var qs=params.toString();
+  var url=window.location.pathname+(qs?"?"+qs:"")+window.location.hash;
+  window.history.replaceState(null,"",url);
+}
+function setupShare(){
+  var btn=document.getElementById("shareBtn");
+  var lbl=document.getElementById("shareBtnLabel");
+  if(!btn||!lbl)return;
+  btn.addEventListener("click",function(){
+    var url=window.location.href;
+    var done=function(ok){
+      lbl.textContent=ok?"Link copied":"Press Ctrl+C";
+      btn.classList.toggle("copied",ok);
+      setTimeout(function(){lbl.textContent="Copy link";btn.classList.remove("copied");},2400);
+    };
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(function(){done(true);},function(){done(false);});
+    }else{
+      // Older browsers and non-secure contexts have no clipboard API; select
+      // the URL so the keyboard shortcut still works.
+      var input=document.createElement("input");
+      input.value=url;
+      document.body.appendChild(input);
+      input.select();
+      var ok=false;
+      try{ok=document.execCommand("copy");}catch(e){ok=false;}
+      document.body.removeChild(input);
+      done(ok);
+    }
+  });
+}
+
+// ── Repository scope: the whole org (baseline) or the trial team ──
+function setupScopeButtons(){
+  var btns=document.querySelectorAll(".scope-btn");
+  if(btns.length===0)return;
+  btns.forEach(function(btn){
+    btn.addEventListener("click",function(){
+      repoScope=btn.dataset.scope==="team"?"team":"all";
+      syncScopeButtons();
+      syncRepoCheckboxes();
+      var activeBtn=document.querySelector(".filter-btn.active");
+      applyFilter(activeBtn?activeBtn.dataset.period:"30days");
+    });
+  });
+}
+function syncScopeButtons(){
+  document.querySelectorAll(".scope-btn").forEach(function(b){
+    b.classList.toggle("active",b.dataset.scope===repoScope);
+  });
+  // Selecting the team scope selects exactly the team's repos; going back to
+  // "All repos" clears the selection rather than leaving a stale subset.
+  if(repoScope==="team"){
+    selectedRepos=new Set(CHART_DATA.teamRepos||[]);
+  }else if((CHART_DATA.teamRepos||[]).length>0&&sameSet(selectedRepos,CHART_DATA.teamRepos)){
+    selectedRepos=new Set();
+  }
+}
+function sameSet(set,arr){
+  if(set.size!==arr.length)return false;
+  for(var i=0;i<arr.length;i++){if(!set.has(arr[i]))return false;}
+  return true;
+}
+function syncRepoCheckboxes(){
+  var list=document.getElementById("repoPickerList");
+  if(!list)return;
+  list.querySelectorAll("input[type=checkbox]").forEach(function(cb){
+    cb.checked=selectedRepos.has(cb.value);
+  });
+  var lbl=document.getElementById("repoPickerLabel");
+  var btn=document.getElementById("repoPickerBtn");
+  var active=isRepoFilterActive();
+  if(lbl)lbl.textContent=active?selectedRepos.size+" repo"+(selectedRepos.size===1?"":"s"):"All repos";
+  if(btn)btn.classList.toggle("active",active);
+}
 function formatLineNumbers(){
   document.querySelectorAll(".td-lines .add,.td-lines .del").forEach(function(el){
     var t=el.textContent||"";
@@ -409,6 +532,7 @@ function setupRepoPicker(){
     cb.addEventListener("change",function(){
       if(cb.checked)selectedRepos.add(name);
       else selectedRepos.delete(name);
+      reconcileScope();
       updatePickerLabel();
       triggerRepoFilter();
     });
@@ -432,6 +556,8 @@ function setupRepoPicker(){
   var clearBtn=document.getElementById("repoPickerClear");
   if(resetBtn)resetBtn.addEventListener("click",function(){
     selectedRepos=new Set();
+    repoScope="all";
+    syncScopeButtons();
     list.querySelectorAll("input[type=checkbox]").forEach(function(cb){cb.checked=false;});
     if(searchInput){searchInput.value="";list.querySelectorAll(".repo-picker-item").forEach(function(it){it.style.display="";});}
     updatePickerLabel();
@@ -439,6 +565,7 @@ function setupRepoPicker(){
   });
   if(clearBtn)clearBtn.addEventListener("click",function(){
     list.querySelectorAll("input[type=checkbox]:checked").forEach(function(cb){cb.checked=false;selectedRepos.delete(cb.value);});
+    reconcileScope();
     updatePickerLabel();
     triggerRepoFilter();
   });
@@ -478,8 +605,20 @@ function weekToDate(weekStr){
   mon.setUTCDate(jan4.getUTCDate()-dow+1+(week-1)*7);
   return mon;
 }
+/** Mark the scope as custom once a hand-picked selection stops matching the team. */
+function reconcileScope(){
+  var team=CHART_DATA.teamRepos||[];
+  var next=(team.length>0&&sameSet(selectedRepos,team))?"team":"all";
+  if(next!==repoScope){
+    repoScope=next;
+    document.querySelectorAll(".scope-btn").forEach(function(b){
+      b.classList.toggle("active",b.dataset.scope===repoScope);
+    });
+  }
+}
 function applyFilter(period){
   var cutoff=getCutoffDate(period);
+  writeStateToUrl(period);
   var excludeBots=!!document.getElementById("excludeBots")&&document.getElementById("excludeBots").checked;
   var repoFiltered=isRepoFilterActive();
 
@@ -508,7 +647,7 @@ function applyFilter(period){
     charts.prTrends.data.datasets[0].data=prTrendsPeriod.map(function(t){return t.prsOpened;});
     charts.prTrends.data.datasets[1].data=prTrendsPeriod.map(function(t){return t.prsMerged;});
     charts.prTrends.setDatasetVisibility(0,!repoFiltered||allSelectedHaveRepoTrends);
-    charts.prTrends.options.plugins.annotation=(yearBoundaryAnnotations(prTrendLabels).annotation||{annotations:{}});
+    charts.prTrends.options.plugins.annotation=trendAnnotations(prTrendLabels);
     charts.prTrends.update();
   }
   if(charts.issueTrends){
@@ -516,7 +655,7 @@ function applyFilter(period){
     charts.issueTrends.data.labels=issueTrendLabels;
     charts.issueTrends.data.datasets[0].data=issueTrendsPeriod.map(function(t){return t.issuesOpened;});
     charts.issueTrends.data.datasets[1].data=issueTrendsPeriod.map(function(t){return t.issuesClosed;});
-    charts.issueTrends.options.plugins.annotation=(yearBoundaryAnnotations(issueTrendLabels).annotation||{annotations:{}});
+    charts.issueTrends.options.plugins.annotation=trendAnnotations(issueTrendLabels);
     charts.issueTrends.update();
   }
   if(charts.prSizeTrends){
@@ -524,7 +663,7 @@ function applyFilter(period){
     charts.prSizeTrends.data.labels=prSizeLabels;
     charts.prSizeTrends.data.datasets[0].data=prTrendsPeriod.map(function(t){return t.linesAdded;});
     charts.prSizeTrends.data.datasets[1].data=prTrendsPeriod.map(function(t){return t.linesDeleted;});
-    charts.prSizeTrends.options.plugins.annotation=(yearBoundaryAnnotations(prSizeLabels).annotation||{annotations:{}});
+    charts.prSizeTrends.options.plugins.annotation=trendAnnotations(prSizeLabels);
     charts.prSizeTrends.update();
   }
 
@@ -765,6 +904,162 @@ function applyFilter(period){
   }
   var note=document.getElementById("reposPeriodNote");
   if(note)note.style.display=(period==="all"&&!repoFiltered)?"none":"";
+
+  updateTrial(cutoff,excludeBots,period);
+}
+
+// ── Improvement trial ──
+// The baseline is every collected repository; the comparison column is the
+// team's repositories over the selected period. Durations are reported as
+// order statistics — delivery metrics are heavily right-skewed, so a mean
+// would be moved by a single pull request left open over a holiday.
+function pctl(values,p){
+  if(values.length===0)return null;
+  var sorted=values.slice().sort(function(a,b){return a-b;});
+  if(sorted.length===1)return sorted[0];
+  var rank=(Math.min(100,Math.max(0,p))/100)*(sorted.length-1);
+  var lo=Math.floor(rank),hi=Math.ceil(rank);
+  if(lo===hi)return sorted[lo];
+  return sorted[lo]+(sorted[hi]-sorted[lo])*(rank-lo);
+}
+function fmtHours(h){
+  if(h===null)return "\u2013";
+  if(h<1)return Math.round(h*60)+"min";
+  if(h<24)return h.toFixed(1)+"hr";
+  return (h/24).toFixed(1)+"d";
+}
+function fmtLines(n){return n===null?"\u2013":Math.round(n).toLocaleString();}
+function fmtCount(n){return n===null?"\u2013":Math.round(n).toLocaleString();}
+function fmtPct(n){return n===null?"\u2013":n.toFixed(1)+"%";}
+/** Summarise one set of merged PRs into the metrics the trial table shows. */
+function summarisePRs(prs){
+  var cycles=[],sizes=[],ai=0,human=0;
+  prs.forEach(function(p){
+    if(p.timeToMergeHours>0)cycles.push(p.timeToMergeHours);
+    var size=(p.linesAdded||0)+(p.linesDeleted||0);
+    if(size>0)sizes.push(size);
+    if(p.isCopilotAuthored)ai++;
+    else if(!p.isBotAuthor)human++;
+  });
+  var aiDenom=ai+human;
+  return {
+    cycle:pctl(cycles,50),cycle75:pctl(cycles,75),cycle90:pctl(cycles,90),
+    size:pctl(sizes,50),
+    merged:prs.length,
+    ai:aiDenom>0?(ai/aiDenom)*100:null,
+    n:cycles.length
+  };
+}
+// Lower is better for durations and PR size; for merged count and AI share a
+// direction would be a value judgement, so those are reported without one.
+var TRIAL_METRICS=[
+  {id:"cycle",fmt:fmtHours,lowerIsBetter:true},
+  {id:"cycle75",fmt:fmtHours,lowerIsBetter:true},
+  {id:"cycle90",fmt:fmtHours,lowerIsBetter:true},
+  {id:"size",fmt:fmtLines,lowerIsBetter:true},
+  {id:"merged",fmt:fmtCount,lowerIsBetter:null},
+  {id:"ai",fmt:fmtPct,lowerIsBetter:null}
+];
+function updateTrial(cutoff,excludeBots,period){
+  if(!CHART_DATA.trial)return;
+  var team=CHART_DATA.teamRepos||[];
+  var teamSet={};team.forEach(function(n){teamSet[n]=true;});
+
+  var all=(CHART_DATA.allPRDetails||[]).slice();
+  if(excludeBots)all=all.filter(function(p){return !p.isBotAuthor;});
+
+  // Baseline: every repository. Bounded by the configured baseline window when
+  // one is set, otherwise the whole collected history.
+  var trial=CHART_DATA.trial;
+  var baseFrom=trial.baselineFrom?new Date(trial.baselineFrom+"T00:00:00Z"):null;
+  var baseTo=trial.baselineTo?new Date(trial.baselineTo+"T23:59:59Z"):null;
+  var basePRs=all.filter(function(p){
+    var t=new Date(p.mergedAt);
+    if(baseFrom&&t<baseFrom)return false;
+    if(baseTo&&t>baseTo)return false;
+    return true;
+  });
+
+  // Comparison: the team's repositories over the selected period.
+  var teamPRs=all.filter(function(p){
+    if(!teamSet[p.repo])return false;
+    return !cutoff||new Date(p.mergedAt)>=cutoff;
+  });
+
+  var base=summarisePRs(basePRs);
+  var cur=summarisePRs(teamPRs);
+
+  TRIAL_METRICS.forEach(function(m){
+    var bEl=document.getElementById("trialBaseline-"+m.id);
+    var tEl=document.getElementById("trialTeam-"+m.id);
+    var dEl=document.getElementById("trialDelta-"+m.id);
+    if(!bEl||!tEl||!dEl)return;
+    var b=base[m.id],c=cur[m.id];
+    bEl.textContent=m.fmt(b);
+    tEl.textContent=m.fmt(c);
+    dEl.className="trial-delta";
+    if(b===null||c===null||b===0){dEl.textContent="\u2013";return;}
+    var change=((c-b)/Math.abs(b))*100;
+    var arrow=change>0?"\u2191":(change<0?"\u2193":"\u2192");
+    dEl.textContent=arrow+" "+Math.abs(change).toFixed(0)+"%";
+    if(Math.abs(change)<2){dEl.classList.add("flat");}
+    else if(m.lowerIsBetter===null){/* no direction to judge */}
+    else if((change<0)===m.lowerIsBetter){dEl.classList.add("better");}
+    else{dEl.classList.add("worse");}
+  });
+
+  // Sample sizes decide whether any of this is worth reading. Say so plainly
+  // rather than letting a two-PR week look like a result.
+  var noteEl=document.getElementById("trialNote");
+  if(noteEl){
+    var pLabel=period==="all"?"all time":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
+    var parts=["Baseline n="+base.n+" merged PRs across all repositories; "+
+      (CHART_DATA.team?CHART_DATA.team.name:"team")+" n="+cur.n+" over "+pLabel+"."];
+    if(cur.n<20){
+      parts.push("Not enough team data yet to read a difference — treat these numbers as provisional.");
+    }
+    if(excludeBots)parts.push("Bot-authored PRs excluded.");
+    noteEl.textContent=parts.join(" ");
+  }
+}
+/** Vertical markers for the intervention date and any configured milestones. */
+function trialAnnotations(labels){
+  var trial=CHART_DATA.trial;
+  if(!trial||!labels||labels.length===0)return {};
+  var out={};
+  var mark=function(key,dateStr,label,solid){
+    if(!dateStr)return;
+    var week=getISOWeek(dateStr+"T00:00:00Z");
+    var idx=labels.indexOf(week);
+    // Only annotate dates the chart's x-axis actually covers.
+    if(idx===-1)return;
+    out[key]={
+      type:"line",
+      xMin:idx,xMax:idx,
+      borderColor:cssColors.err||"#c00",
+      borderWidth:solid?2:1,
+      borderDash:solid?undefined:[3,3],
+      label:{
+        display:true,content:label,position:"start",
+        backgroundColor:cssColors.err||"#c00",color:"#fff",
+        font:{size:10,weight:solid?"bold":"normal"},padding:3
+      }
+    };
+  };
+  mark("interventionLine",trial.interventionStart,trial.title,true);
+  (trial.milestones||[]).forEach(function(m,i){
+    mark("milestoneLine"+i,m.date,m.label,false);
+  });
+  return out;
+}
+/** Merge the year-boundary annotations with the trial markers. */
+function trendAnnotations(labels){
+  var base=yearBoundaryAnnotations(labels).annotation||{annotations:{}};
+  var merged={};
+  Object.keys(base.annotations||{}).forEach(function(k){merged[k]=base.annotations[k];});
+  var trial=trialAnnotations(labels);
+  Object.keys(trial).forEach(function(k){merged[k]=trial[k];});
+  return {annotations:merged};
 }
 function compareRows(a,b,by){
   if(by==="name")return a.dataset.name.localeCompare(b.dataset.name,undefined,{sensitivity:"base"});

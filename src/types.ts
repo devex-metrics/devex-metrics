@@ -21,6 +21,44 @@ export interface OrgMetrics {
   repos: RepoMetrics[];
   /** Weekly activity trends aggregated across all repos (last ~2 years). */
   weeklyTrends?: WeeklyTrendPoint[];
+  /**
+   * Where this data came from: a fresh API collection, the daily cache, or an
+   * explicitly opted-in fixture. Surfaced in the dashboard so a stale page is
+   * never mistaken for a fresh one.
+   */
+  dataSource?: "fresh" | "cache" | "fixture";
+  /** The team under study, when one is configured. */
+  team?: TeamSummary;
+  /** The improvement trial this collection is measuring, when one is configured. */
+  trial?: TrialSummary;
+}
+
+/** The configured team, copied into the dataset so the site can render it. */
+export interface TeamSummary {
+  /** Stable identifier, also used in share URLs. */
+  id: string;
+  /** Display name. */
+  name: string;
+  /** Full names ("owner/repo") of the repositories in the team. */
+  repos: string[];
+  /** True when the whole org was collected to form a baseline. */
+  discoverAll: boolean;
+}
+
+/** The configured trial, copied into the dataset so the site can render it. */
+export interface TrialSummary {
+  /** Headline shown above the comparison. */
+  title: string;
+  /** What the intervention is expected to change. */
+  hypothesis?: string;
+  /** ISO-8601 date the intervention started. */
+  interventionStart?: string;
+  /** Start of the baseline window (ISO-8601 date). */
+  baselineFrom?: string;
+  /** End of the baseline window (ISO-8601 date). */
+  baselineTo?: string;
+  /** Dated milestones rendered as secondary chart annotations. */
+  milestones: { date: string; label: string }[];
 }
 
 /** Aggregated metrics for a single repository. */
@@ -31,6 +69,11 @@ export interface RepoMetrics {
   pushedAt?: string;
   /** ISO-8601 timestamp when metrics for this repo were last collected. */
   collectedAt?: string;
+  /**
+   * True when this repository matches the configured team globs. Absent in
+   * data collected before teams existed, which reads as "not a team repo".
+   */
+  isTeamRepo?: boolean;
   /** Issue counts by state. */
   issues: IssueCounts;
   /** Weekly activity trends for this repository (last ~2 years). */

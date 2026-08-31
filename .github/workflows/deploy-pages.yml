@@ -1,5 +1,8 @@
 name: Deploy Pages
 
+# Rebuilds and redeploys the dashboard without re-collecting: the site code
+# changed, or a trial/branding variable was edited. Data is read from the
+# metrics-data branch as it stands.
 on:
   push:
     branches: [main]
@@ -7,15 +10,18 @@ on:
       - "src/build-pages.ts"
       - "src/report.ts"
       - "src/types.ts"
+      - "src/config.ts"
+      - "src/history.ts"
+      - "src/stats.ts"
+      - "src/pages/**"
       - ".github/workflows/deploy-pages.yml"
+      - ".github/workflows/pages.yml"
   workflow_dispatch:
     inputs:
       owner:
-        description: "GitHub org or user to build pages for"
+        description: "Owner to build the site for. Defaults to the DEVEX_OWNER variable."
         required: false
-        default: "rajbos"
 
-# Deny all permissions by default; each job grants only what it needs.
 permissions: {}
 
 concurrency:
@@ -23,59 +29,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      # actions/checkout requires read access to the repository.
-      contents: read
-      # actions/deploy-pages authenticates via OIDC — requires id-token write.
-      id-token: write
-      # Required to publish artifacts to GitHub Pages.
-      pages: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: actions/setup-node@v7
-        with:
-          node-version: "20"
-          cache: "npm"
-
-      - run: npm ci
-
-      - run: npm run build
-
-      - name: Get today's date
-        id: date
-        run: echo "date=$(date -u +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-
-      - name: Restore data cache
-        uses: actions/cache@v6
-        with:
-          path: data
-          key: metrics-data-${{ github.repository_owner }}-${{ steps.date.outputs.date }}
-
-      - name: Restore agent data cache
-        uses: actions/cache@v6
-        with:
-          path: data/agents-*.json
-          key: agent-data-${{ github.repository_owner }}-${{ steps.date.outputs.date }}
-          restore-keys: |
-            agent-data-${{ github.repository_owner }}-
-
-      - name: Build pages site
-        run: |
-          OWNER="${{ github.event.inputs.owner || 'rajbos' }}"
-          mkdir -p _site
-          node dist/build-pages.js "$OWNER"
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5.0.0
-        with:
-          path: _site
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+  pages:
+    uses: ./.github/workflows/pages.yml
+    secrets: inherit
+    with:
+      owner: ${{ inputs.owner }}

@@ -1,4 +1,6 @@
 import type { OrgMetrics, RepoMetrics } from "../types.js";
+import type { BrandingConfig } from "../config.js";
+import type { RollupRow } from "../history.js";
 import { escapeHtml, computeMedian, weekToDate, formatDurationHtml } from "./utils.js";
 import { getCSS } from "./styles.js";
 import { getJS } from "./scripts.js";
@@ -42,13 +44,36 @@ function aggregate(repos: RepoMetrics[]): Totals {
   };
 }
 
+/** Optional extras threaded in from the site build. */
+export interface DashboardExtras {
+  /** Site branding. Falls back to the built-in defaults when absent. */
+  branding?: BrandingConfig;
+  /** Rollup history rows, used by the trial view's baseline. */
+  history?: RollupRow[];
+}
+
+const DEFAULT_BRANDING: BrandingConfig = {
+  title: "DevEx Metrics",
+  attribution: "Made with \u2764\uFE0F by rajbos",
+  attributionUrl: "https://github.com/rajbos",
+};
+
 export function buildDashboardHtml(
   data: OrgMetrics,
   date: string,
   branch?: string,
   runUrl?: string,
+  extras: DashboardExtras = {},
 ): string {
+  const branding = extras.branding ?? DEFAULT_BRANDING;
+  const history = extras.history ?? [];
   const totals = aggregate(data.repos);
+  const teamRepos = data.repos.filter((r) => r.isTeamRepo);
+  const teamRepoNames = teamRepos.map((r) => r.name);
+  // History rows are keyed by full name; match on the team resolved for *this*
+  // build rather than the flag stored when the row was written, so re-scoping a
+  // team also re-scopes its history.
+  const teamFullNames = new Set(teamRepos.map((r) => r.fullName));
 
   // Compute data date range from merged PR details
   let oldestDataDate = '';
@@ -283,6 +308,25 @@ export function buildDashboardHtml(
       byRepo: agentByRepo,
     },
     collectedAt: data.collectedAt,
+    teamRepos: teamRepoNames,
+    team: data.team ?? null,
+    trial: data.trial ?? null,
+    // Only the org-level rollup rows are needed for the trial baseline; the
+    // per-repo rows would multiply the payload by the repo count for no gain.
+    history: history
+      .filter((r) => r.repo === "*" || teamFullNames.has(r.repo))
+      .map((r) => ({
+        date: r.date,
+        repo: r.repo,
+        isTeamRepo: r.isTeamRepo,
+        mergedPRs30d: r.mergedPRs30d,
+        cycleP50: r.cycleP50,
+        cycleP75: r.cycleP75,
+        cycleP90: r.cycleP90,
+        sizeP50: r.sizeP50,
+        aiPRs30d: r.aiPRs30d,
+        humanPRs30d: r.humanPRs30d,
+      })),
   });
 
   return `<!DOCTYPE html>
@@ -290,7 +334,7 @@ export function buildDashboardHtml(
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DevEx Metrics &ndash; ${escapeHtml(data.owner)}</title>
+  <title>${escapeHtml(branding.title)} &ndash; ${escapeHtml(data.owner)}</title>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>${getCSS()}</style>
@@ -305,11 +349,13 @@ export function buildDashboardHtml(
       ${dataRangeHtml ? `<div class="subtitle-bottom">${dataRangeHtml}</div>` : ''}
     </div>
     <nav class="hero-nav">
-      <a href="https://github.com/rajbos" class="hero-nav-link">Made with &#x2764;&#xFE0F; by rajbos</a>
+      <a href="${escapeHtml(branding.attributionUrl)}" class="hero-nav-link">${escapeHtml(branding.attribution)}</a>
     </nav>
   </div>
-  <h1>DevEx Metrics</h1>
+  <h1>${escapeHtml(branding.title)}</h1>
 </header>
+
+${buildTrialBanner(data, teamRepoNames.length)}
 
 <div class="filter-bar" role="toolbar" aria-label="Time period filter">
   <div class="filter-bar-inner">
@@ -323,6 +369,10 @@ export function buildDashboardHtml(
     <label class="filter-toggle" title="Exclude PRs authored by bots (dependabot, renovate, etc.) from charts and KPIs">
       <input type="checkbox" id="excludeBots" /> Exclude bots
     </label>
+    ${teamRepoNames.length > 0 ? `<div class="scope-btns" role="group" aria-label="Repository scope">
+      <button class="scope-btn active" data-scope="all" title="Every collected repository — the baseline">All repos</button>
+      <button class="scope-btn" data-scope="team" title="Only the repositories in ${escapeHtml(data.team?.name ?? "the team")}">${escapeHtml(data.team?.name ?? "Team")}</button>
+    </div>` : ""}
     <div class="repo-picker" id="repoPicker">
       <button class="repo-picker-btn" id="repoPickerBtn" aria-haspopup="true" aria-expanded="false" title="Filter charts by repository">
         <span id="repoPickerLabel">All repos</span> <span class="repo-picker-caret" aria-hidden="true">&#9660;</span>
@@ -336,6 +386,9 @@ export function buildDashboardHtml(
         <div class="repo-picker-list" id="repoPickerList"></div>
       </div>
     </div>
+    <button class="share-btn" id="shareBtn" title="Copy a link to this exact slice — period, repositories and bot filter included">
+      <span id="shareBtnLabel">Copy link</span>
+    </button>
   </div>
 </div>
 
@@ -464,4 +517,88 @@ ${getJS()}
 </a>
 </body>
 </html>`;
+}
+
+/**
+ * The trial banner: what the intervention is, when it started, and how the
+ * team's current numbers sit against the org-wide baseline.
+ *
+ * The numbers themselves are filled in by the client so they follow the period
+ * and bot filters; this renders the frame and the static context.
+ */
+function buildTrialBanner(data: OrgMetrics, teamRepoCount: number): string {
+  const trial = data.trial;
+  if (!trial) return "";
+
+  const teamName = data.team?.name ?? "the team";
+  const started = trial.interventionStart
+    ? `<span class="trial-date" title="Intervention start">started ${escapeHtml(trial.interventionStart)}</span>`
+    : "";
+  const baseline =
+    trial.baselineFrom && trial.baselineTo
+      ? `<span class="trial-baseline-window">baseline ${escapeHtml(trial.baselineFrom)} &rarr; ${escapeHtml(trial.baselineTo)}</span>`
+      : `<span class="trial-baseline-window">baseline: all repositories, all time</span>`;
+  const hypothesis = trial.hypothesis
+    ? `<p class="trial-hypothesis">${escapeHtml(trial.hypothesis)}</p>`
+    : "";
+  const milestones =
+    trial.milestones.length > 0
+      ? `<ul class="trial-milestones">${trial.milestones
+          .map(
+            (m) =>
+              `<li><span class="trial-milestone-date">${escapeHtml(m.date)}</span> ${escapeHtml(m.label)}</li>`
+          )
+          .join("")}</ul>`
+      : "";
+
+  // One row per metric: baseline (all repos) vs the team's current numbers.
+  const rows = [
+    { id: "cycle", label: "Median cycle time", hint: "PR created → merged" },
+    { id: "cycle75", label: "Cycle time p75", hint: "the slow quarter of PRs" },
+    { id: "cycle90", label: "Cycle time p90", hint: "the worst tenth" },
+    { id: "size", label: "Median PR size", hint: "lines added + deleted" },
+    { id: "merged", label: "Merged PRs", hint: "in the selected period" },
+    { id: "ai", label: "AI-authored PRs", hint: "share of human + AI PRs" },
+  ]
+    .map(
+      (r) => `<tr data-metric="${r.id}">
+        <th scope="row">${r.label}<span class="trial-hint">${r.hint}</span></th>
+        <td class="trial-baseline" id="trialBaseline-${r.id}">&ndash;</td>
+        <td class="trial-team" id="trialTeam-${r.id}">&ndash;</td>
+        <td class="trial-delta" id="trialDelta-${r.id}">&ndash;</td>
+      </tr>`
+    )
+    .join("\n");
+
+  return `<section class="trial" aria-label="Improvement trial">
+  <div class="trial-head">
+    <div>
+      <div class="trial-eyebrow">Improvement trial</div>
+      <h2 class="trial-title">${escapeHtml(trial.title)}</h2>
+      ${hypothesis}
+    </div>
+    <div class="trial-facts">
+      <div class="trial-team-name">${escapeHtml(teamName)} &middot; ${teamRepoCount} repo${teamRepoCount === 1 ? "" : "s"}</div>
+      ${started}
+      ${baseline}
+    </div>
+  </div>
+  ${milestones}
+  <div class="trial-table-wrap">
+    <table class="trial-table">
+      <thead>
+        <tr>
+          <th scope="col">Metric</th>
+          <th scope="col">Baseline<span class="trial-hint">all ${data.repoCount} repos</span></th>
+          <th scope="col">${escapeHtml(teamName)}<span class="trial-hint">current period</span></th>
+          <th scope="col">Difference</th>
+        </tr>
+      </thead>
+      <tbody>
+${rows}
+      </tbody>
+    </table>
+  </div>
+  <p class="trial-note" id="trialNote"></p>
+</section>`;
 }
