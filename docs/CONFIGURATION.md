@@ -26,7 +26,7 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | Variable | Type | Meaning |
 | --- | --- | --- |
 | `DEVEX_OWNER` | string | GitHub org or username to collect. **Required.** |
-| `DEVEX_OWNER_TYPE` | `org` \| `user` | How to enumerate repositories. Default `org`. |
+| `DEVEX_OWNER_TYPE` | `org` \| `user` | How to enumerate repositories. Default `org`, auto-corrected to `user` when the owner turns out to be a personal account. |
 | `DEVEX_CONFIG` | JSON | The whole config object, as in the example file. |
 | `DEVEX_TITLE` | string | Dashboard title. |
 | `DEVEX_ATTRIBUTION` | string | Attribution line in the header. |
@@ -68,6 +68,18 @@ string clears it rather than falling back to the default.
 
 Globs support `*` and `?`, and are matched against both `repo` and
 `owner/repo`, case-insensitively.
+
+### Collecting a personal account
+
+`DEVEX_OWNER` may name a personal account rather than an organisation. Leaving
+`DEVEX_OWNER_TYPE` unset is fine: discovery notices that the owner is not an
+org and re-lists it as a user, warning once per run. Setting
+`DEVEX_OWNER_TYPE=user` explicitly skips the check and the warning.
+
+When the owner is also the account the token authenticates as, discovery lists
+that account's own repositories, which includes repos it reaches through
+organisation membership — so a personal-account deployment usually sees more
+than the account's public profile does.
 
 ## Baselining the org, measuring the team
 
