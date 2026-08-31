@@ -14,6 +14,11 @@ export interface DiscoveredRepo {
   fork: boolean;
   /** True when the repo matches the configured team globs. */
   isTeamRepo: boolean;
+  /**
+   * Default branch. Comes free with the same listing call and is what the CI
+   * crawl treats as the trunk; empty when GitHub reports none.
+   */
+  defaultBranch: string;
 }
 
 interface RawRepo {
@@ -22,6 +27,7 @@ interface RawRepo {
   pushed_at?: string | null;
   archived?: boolean;
   fork?: boolean;
+  default_branch?: string | null;
 }
 
 function toDiscovered(repo: RawRepo): DiscoveredRepo {
@@ -32,6 +38,7 @@ function toDiscovered(repo: RawRepo): DiscoveredRepo {
     archived: repo.archived ?? false,
     fork: repo.fork ?? false,
     isTeamRepo: false,
+    defaultBranch: repo.default_branch ?? "",
   };
 }
 

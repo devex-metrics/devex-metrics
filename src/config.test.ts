@@ -294,3 +294,66 @@ describe("applyScope", () => {
     expect(data.repos[0].isTeamRepo).toBeUndefined();
   });
 });
+
+describe("CI health configuration", () => {
+  it("is off by default — it is the only collector that walks a second history", () => {
+    expect(defaultConfig().collection.features.ciHealth).toBe(false);
+  });
+
+  it("defaults to a conservative crawl budget", () => {
+    const ci = defaultConfig().collection.ciHealth;
+    expect(ci.pagesPerRun).toBe(20);
+    expect(ci.maxPagesPerRepo).toBe(5);
+    expect(ci.windowDays).toBe(90);
+  });
+
+  it("is enabled by DEVEX_FEATURE_CI_HEALTH", () => {
+    const config = loadConfig({ ...EMPTY, DEVEX_FEATURE_CI_HEALTH: "true" });
+    expect(config.collection.features.ciHealth).toBe(true);
+  });
+
+  it("reads the crawl budget from DEVEX_CI_* variables", () => {
+    const config = loadConfig({
+      ...EMPTY,
+      DEVEX_CI_PAGES_PER_RUN: "50",
+      DEVEX_CI_MAX_PAGES_PER_REPO: "8",
+      DEVEX_CI_WINDOW_DAYS: "30",
+    });
+    expect(config.collection.ciHealth).toEqual({
+      pagesPerRun: 50,
+      maxPagesPerRepo: 8,
+      windowDays: 30,
+    });
+  });
+
+  it("keeps the defaults when a DEVEX_CI_* variable is blank", () => {
+    const config = loadConfig({ ...EMPTY, DEVEX_CI_PAGES_PER_RUN: "  " });
+    expect(config.collection.ciHealth.pagesPerRun).toBe(20);
+  });
+
+  it("merges a partial ciHealth block from DEVEX_CONFIG", () => {
+    const config = loadConfig({
+      ...EMPTY,
+      DEVEX_CONFIG: JSON.stringify({
+        owner: "acme",
+        collection: { ciHealth: { pagesPerRun: 5 } },
+      }),
+    });
+    expect(config.collection.ciHealth.pagesPerRun).toBe(5);
+    // The fields the block did not mention keep their defaults.
+    expect(config.collection.ciHealth.maxPagesPerRepo).toBe(5);
+    expect(config.collection.ciHealth.windowDays).toBe(90);
+  });
+
+  it("lets a discrete variable win over DEVEX_CONFIG", () => {
+    const config = loadConfig({
+      ...EMPTY,
+      DEVEX_CONFIG: JSON.stringify({
+        owner: "acme",
+        collection: { features: { ciHealth: true } },
+      }),
+      DEVEX_FEATURE_CI_HEALTH: "false",
+    });
+    expect(config.collection.features.ciHealth).toBe(false);
+  });
+});

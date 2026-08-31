@@ -1014,6 +1014,7 @@ function applyFilter(period){
   updateAgentCost(repoFiltered);
   updateAIHuman(filteredPR,allPRBase,period,excludeBots);
   updateReviewLoad(repoFiltered?Array.from(selectedRepos):null);
+  updateCiHealth(cutoff,repoFiltered,period);
 
   updateTrial(cutoff,excludeBots,period);
 }
@@ -1229,6 +1230,71 @@ function updateAIHuman(filteredPR,allPRBase,period,excludeBots){
     "“Reverts #n” reference, so it reads as a lower bound.");
   if(excludeBots)parts.push("Bot-authored PRs are excluded from both columns either way.");
   note.textContent=parts.join(" ");
+}
+
+// ── CI health ──
+// Every figure comes from the same filtered set of completed runs, so the
+// success rate, the durations and the flaky share always describe the same
+// builds. Cancelled runs were dropped upstream: a human changing their mind
+// is not a broken pipeline.
+function updateCiHealth(cutoff,repoFiltered,period){
+  var all=CHART_DATA.ciSamples||[];
+  if(all.length===0)return;
+  var runs=all;
+  if(repoFiltered)runs=runs.filter(function(r){return selectedRepos.has(r.repo);});
+  if(cutoff)runs=runs.filter(function(r){return new Date(r.finishedAt)>=cutoff;});
+
+  var set=function(id,value,detail){
+    var v=document.getElementById("ciVal-"+id);
+    var d=document.getElementById("ciDetail-"+id);
+    if(v)v.textContent=value;
+    if(d)d.textContent=detail;
+  };
+  if(runs.length===0){
+    ["green","duration","queue","flaky"].forEach(function(id){set(id,"–","no runs");});
+    var emptyNote=document.getElementById("ciNote");
+    if(emptyNote)emptyNote.textContent="No CI runs in the selected slice.";
+    return;
+  }
+
+  var green=runs.filter(function(r){return r.success;}).length;
+  set("green",(green/runs.length*100).toFixed(1)+"%",green+" of "+runs.length+" runs");
+
+  var durations=[],queues=[];
+  runs.forEach(function(r){
+    if(typeof r.durationMinutes==="number")durations.push(r.durationMinutes);
+    if(typeof r.queueMinutes==="number")queues.push(r.queueMinutes);
+  });
+  if(durations.length>0){
+    set("duration",fmtMinutes(pctl(durations,50)),
+      "p75 "+fmtMinutes(pctl(durations,75))+" · p90 "+fmtMinutes(pctl(durations,90))+" · n="+durations.length);
+  }else{
+    set("duration","–","no timing data");
+  }
+  if(queues.length>0){
+    set("queue",fmtMinutes(pctl(queues,50)),
+      "p90 "+fmtMinutes(pctl(queues,90))+" · n="+queues.length);
+  }else{
+    set("queue","–","no queue data");
+  }
+
+  var flaky=runs.filter(function(r){return r.flaky;}).length;
+  set("flaky",(flaky/runs.length*100).toFixed(1)+"%",flaky+" re-run to green");
+
+  var note=document.getElementById("ciNote");
+  if(!note)return;
+  var pLabel=period==="all"?"the collected window":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
+  var parts=["Measured over "+runs.length+" completed default-branch run"+(runs.length===1?"":"s")+" in "+pLabel+"."];
+  if(runs.length<SMALL_SAMPLE)parts.push("Too few runs to read as a rate.");
+  parts.push("A run counts as flaky when it passed only after a re-run of the same commit, "+
+    "so a pipeline that was never re-run cannot appear here.");
+  note.textContent=parts.join(" ");
+}
+function fmtMinutes(m){
+  if(m===null)return "–";
+  if(m<1)return Math.round(m*60)+"s";
+  if(m<60)return m.toFixed(1)+"min";
+  return (m/60).toFixed(1)+"hr";
 }
 
 // ── Review load concentration ──

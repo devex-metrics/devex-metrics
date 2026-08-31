@@ -1,4 +1,4 @@
-import type { OrgMetrics, RepoMetrics } from "../types.js";
+import type { CiRunSample, OrgMetrics, RepoMetrics } from "../types.js";
 import type { BrandingConfig } from "../config.js";
 import type { RollupRow } from "../history.js";
 import { LARGE_PR_LINES } from "../history.js";
@@ -51,6 +51,13 @@ export interface DashboardExtras {
   branding?: BrandingConfig;
   /** Rollup history rows, used by the trial view's baseline. */
   history?: RollupRow[];
+  /**
+   * Completed CI runs inside the configured window. Empty when the CI crawl
+   * is off, which is its default — the card is then not rendered at all.
+   */
+  ciSamples?: CiRunSample[];
+  /** How many days of CI history `ciSamples` covers, for the card's label. */
+  ciWindowDays?: number;
 }
 
 const DEFAULT_BRANDING: BrandingConfig = {
@@ -68,6 +75,8 @@ export function buildDashboardHtml(
 ): string {
   const branding = extras.branding ?? DEFAULT_BRANDING;
   const history = extras.history ?? [];
+  const ciSamples = extras.ciSamples ?? [];
+  const ciWindowDays = extras.ciWindowDays ?? 90;
   const totals = aggregate(data.repos);
   const teamRepos = data.repos.filter((r) => r.isTeamRepo);
   const teamRepoNames = teamRepos.map((r) => r.name);
@@ -356,6 +365,7 @@ export function buildDashboardHtml(
           })),
         ])
     ),
+    ciSamples,
     allPRDetails,
     allClosedPRs,
     allOpenPRs,
@@ -543,6 +553,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
 
   ${buildFlowSection()}
   ${buildAIHumanSection()}
+  ${buildCiSection(ciSamples.length > 0, ciWindowDays)}
 
   <section class="charts" aria-label="Charts">
     <div class="card card-chart"><h2>Issues</h2><canvas id="chartIssues"></canvas></div>
@@ -676,6 +687,51 @@ ${legs}
     </table>
   </div>
   <p class="trial-note" id="flowNote"></p>
+</section>`;
+}
+
+/**
+ * CI health: how often the trunk is green, how long a build takes, how long it
+ * waits for a runner, and how often it needs a second attempt.
+ *
+ * Rendered only when the CI crawl has collected something. The alternative —
+ * an empty card promising numbers that will never arrive because the feature
+ * is off — is worse than no card.
+ */
+function buildCiSection(hasData: boolean, windowDays: number): string {
+  if (!hasData) return "";
+  const rows = [
+    { id: "green", label: "Default-branch builds green", hint: "successful runs, excluding cancelled" },
+    { id: "duration", label: "Build duration", hint: "runner pickup → conclusion" },
+    { id: "queue", label: "Waiting for a runner", hint: "queued → picked up" },
+    { id: "flaky", label: "Flaky runs", hint: "passed only on a re-run of the same commit" },
+  ]
+    .map(
+      (r) => `<tr data-ci="${r.id}">
+        <th scope="row">${r.label}<span class="trial-hint">${r.hint}</span></th>
+        <td id="ciVal-${r.id}">&ndash;</td>
+        <td id="ciDetail-${r.id}" class="thin">&ndash;</td>
+      </tr>`
+    )
+    .join("\n");
+
+  return `<section class="card card-wide metric-card" aria-label="CI health">
+  <h2>CI health</h2>
+  <p class="metric-lede">Workflow runs on each repository's default branch, collected by a budgeted
+  crawl rather than by asking for every commit's checks. Covers the last ${windowDays} days.</p>
+  <div class="trial-table-wrap">
+    <table class="trial-table">
+      <thead><tr>
+        <th scope="col">Measure</th>
+        <th scope="col">Value</th>
+        <th scope="col">Detail</th>
+      </tr></thead>
+      <tbody>
+${rows}
+      </tbody>
+    </table>
+  </div>
+  <p class="trial-note" id="ciNote"></p>
 </section>`;
 }
 

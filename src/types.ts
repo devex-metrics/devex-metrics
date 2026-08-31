@@ -67,6 +67,12 @@ export interface RepoMetrics {
   fullName: string;
   /** ISO-8601 date when the repository was last pushed to. */
   pushedAt?: string;
+  /**
+   * Default branch, from repository discovery. Absent in data collected before
+   * it was recorded; the CI crawl skips a repository whose trunk it does not
+   * know rather than guessing one.
+   */
+  defaultBranch?: string;
   /** ISO-8601 timestamp when metrics for this repo were last collected. */
   collectedAt?: string;
   /**
@@ -242,6 +248,30 @@ export interface OpenPRSummary {
   isBotAuthor: boolean;
   /** Which AI tool authored this PR; undefined for human/other-bot authors. */
   aiAuthorType?: "copilot" | "claude" | "codex";
+}
+
+/**
+ * One completed CI run, reduced to what the dashboard needs.
+ *
+ * Built at site-build time from the CI run stream, not stored in `OrgMetrics`:
+ * CI health is crawled on its own budgeted watermark and lives in its own
+ * append-only file, so it never enters the daily collection's cache.
+ */
+export interface CiRunSample {
+  /** Bare repository name, so the dashboard's repo filter matches on it. */
+  repo: string;
+  /** Workflow name, for attributing a failure to a pipeline. */
+  workflow: string;
+  /** ISO-8601 timestamp when the run finished. */
+  finishedAt: string;
+  /** True when the final attempt concluded successfully. */
+  success: boolean;
+  /** True when the run passed only after a re-run of the same commit. */
+  flaky: boolean;
+  /** Wall-clock minutes from runner pickup to conclusion. */
+  durationMinutes?: number;
+  /** Minutes the run waited for a runner before starting. */
+  queueMinutes?: number;
 }
 
 /** How many reviews one reviewer submitted in the collected window. */

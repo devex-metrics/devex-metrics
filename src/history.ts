@@ -293,6 +293,17 @@ function writeNdjson(filePath: string, rows: readonly unknown[]): void {
   fs.writeFileSync(filePath, rows.length > 0 ? `${body}\n` : "");
 }
 
+/**
+ * Path of `file` inside a scope's directory in the store.
+ *
+ * Exported so a store that lives alongside the rollup and event streams — the
+ * CI crawl's, for one — lands in the same place without duplicating the
+ * scope-name sanitising above.
+ */
+export function scopePath(dir: string, scope: string, file: string): string {
+  return path.join(scopeDir(dir, scope), file);
+}
+
 /** Path of the rollup stream for a scope. */
 export function rollupPath(dir: string, scope: string): string {
   return path.join(scopeDir(dir, scope), "rollup.ndjson");
@@ -593,6 +604,18 @@ export function appendEventRows(
   }
 
   return { appended: fresh.length, alreadyPresent: existing.length };
+}
+
+/**
+ * Append rows to an NDJSON file, creating it and its directory when absent.
+ *
+ * Exported for the CI store, which is append-only for the same reason the
+ * event stream is: a run that already happened never changes.
+ */
+export function appendNdjson(filePath: string, rows: readonly unknown[]): void {
+  if (rows.length === 0) return;
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.appendFileSync(filePath, `${rows.map((r) => JSON.stringify(r)).join("\n")}\n`);
 }
 
 /** Read back the rollup stream for a scope. */

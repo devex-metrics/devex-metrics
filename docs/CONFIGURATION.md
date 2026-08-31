@@ -51,6 +51,10 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_MAX_REPO_AGE_HOURS` | int | Per-repo cache freshness. Default `8`. |
 | `DEVEX_FEATURE_DEPENDENTS` | bool | Dependent-repo counts. Default `false`. |
 | `DEVEX_FEATURE_COPILOT_AGENT` | bool | Copilot agent metrics. Default `true`. |
+| `DEVEX_FEATURE_CI_HEALTH` | bool | CI health crawl (build success, duration, queue time, flaky re-runs). Default `false`. |
+| `DEVEX_CI_PAGES_PER_RUN` | int | CI crawl budget per run, all repos. Default `20`. |
+| `DEVEX_CI_MAX_PAGES_PER_REPO` | int | CI crawl cap per repo per run. Default `5`. |
+| `DEVEX_CI_WINDOW_DAYS` | int | Days of CI history the dashboard reads back. Default `90`. |
 | `DEVEX_HISTORY_ENABLED` | bool | Append to the history store. Default `true`. |
 | `DEVEX_HISTORY_DIR` | path | Where the history store lives. Set by the workflow. |
 | `DEVEX_BACKFILL_ENABLED` | bool | Crawl history back to each repo's first PR. Default `true`. |
@@ -116,11 +120,53 @@ several times cheaper per page than the daily one.
 To sprint through it once, run the workflow manually with **backfill_pages** set
 high (say `2000`), then leave the default in place for the steady state.
 
+## CI health
+
+Off by default. Build success rate, pipeline duration, runner queue time and
+flaky re-runs are among the most useful things a team can measure and the most
+expensive to fetch honestly: per-commit check runs cost one API call per commit,
+for the life of every repository.
+
+So this is not fetched by the daily collection at all. It uses the same
+budgeted-watermark pattern as the pull-request backfill, against the workflow-runs
+listing, which carries the same facts for a hundred runs per call:
+
+```
+DEVEX_FEATURE_CI_HEALTH      = true   # opt in; nothing is fetched otherwise
+DEVEX_CI_PAGES_PER_RUN       = 20     # ~2 000 workflow runs per run, all repos
+DEVEX_CI_MAX_PAGES_PER_REPO  = 5      # no single repo starves the rest
+```
+
+With the defaults that is **at most 20 extra REST calls a day**, and none at all
+while the flag is off. Each repository keeps a cursor pinned to an anchor date,
+so a page number means the same thing tomorrow as it did today. A repository
+that reports a short page is caught up; on the next run its watermark is
+re-armed against a fresh anchor and it costs one page to pick up new builds.
+
+Runs are stored raw in `ci.ndjson` — one row per run attempt, with conclusion,
+queue and timing — so a definition that changes later can be recomputed over
+everything already collected. What the dashboard derives from them:
+
+- **Default-branch build success rate.** Cancelled and skipped runs are dropped:
+  a human changing their mind is not a broken pipeline.
+- **Build duration** and **runner queue time**, as p50/p75/p90 with their sample
+  sizes. Queue time is `run_started_at` minus `created_at` — how long a run
+  waited before a runner picked it up.
+- **Flaky rate**: runs that passed only on a re-run of the same commit. This is
+  measured per *run*, not per job — job-level attribution would need one extra
+  call per re-run, and the run-level signal answers the same question. A
+  pipeline that is never re-run cannot appear, so the figure is a lower bound.
+
+The token needs `Actions: read`. Without it the crawl warns once and collects
+nothing; it never fails a run.
+
 ### What the history can and cannot contain
 
 Once the crawl completes, everything derived from pull requests reaches back to
-each repository's first one: cycle time, PR size, merge and abandonment counts,
-AI-versus-human authorship, and the raw review timestamps behind review latency.
+each repository's first one: cycle time, PR size and the share over 400 lines,
+merge and abandonment counts, AI-versus-human authorship, review-load
+concentration, and the raw review timestamps behind the three legs of review
+latency (opened → first review → approval → merged) and the review-round count.
 Historical rollup rows are recomputed from those events and marked
 `reconstructed: true`.
 

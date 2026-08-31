@@ -92,7 +92,7 @@ export async function collect(
   // Collects pre-fetched GraphQL PR nodes per repo for the trends collector.
   const prDataByRepo = new Map<string, GraphQLPRNode[]>();
 
-  for (const { fullName, pushedAt, isTeamRepo } of repoList) {
+  for (const { fullName, pushedAt, isTeamRepo, defaultBranch } of repoList) {
     // Reuse per-repo data if it is recent enough. The team flag comes from the
     // current config rather than the cache, so re-scoping a trial takes effect
     // without discarding collected data.
@@ -100,7 +100,9 @@ export async function collect(
       const cached = cachedRepoMap.get(fullName);
       if (cached && isWithinHours(cached.collectedAt, maxAgeHours)) {
         console.log(`  → ${fullName} (cached)`);
-        repos.push({ ...cached, isTeamRepo });
+        // The default branch, like the team flag, comes from this run's
+        // discovery rather than from whatever the cache was written with.
+        repos.push({ ...cached, isTeamRepo, defaultBranch: defaultBranch || cached.defaultBranch });
         continue;
       }
     }
@@ -186,6 +188,7 @@ export async function collect(
       fullName,
       pushedAt,
       isTeamRepo,
+      defaultBranch: defaultBranch || undefined,
       collectedAt: new Date().toISOString(),
       issues,
       pullRequests: prCounts,
