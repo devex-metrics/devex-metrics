@@ -1,0 +1,4738 @@
+{
+  "schemaVersion": 10,
+  "owner": "devex-metrics",
+  "ownerType": "org",
+  "collectedAt": "2026-08-31T19:48:50.685Z",
+  "repoCount": 1,
+  "repos": [
+    {
+      "name": "devex-metrics",
+      "fullName": "devex-metrics/devex-metrics",
+      "pushedAt": "2026-08-31T19:43:26Z",
+      "isTeamRepo": false,
+      "defaultBranch": "main",
+      "collectedAt": "2026-08-31T19:46:51.810Z",
+      "issues": {
+        "open": 2,
+        "closed": 1
+      },
+      "pullRequests": {
+        "open": 0,
+        "closed": 26,
+        "merged": 266
+      },
+      "pullRequestDetails": [
+        {
+          "number": 295,
+          "title": "fix: collect a personal account even when configured as an org",
+          "state": "merged",
+          "createdAt": "2026-08-31T17:46:48Z",
+          "author": "rajbos",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 161,
+          "linesDeleted": 9,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 10.37,
+          "timeToMergeHours": 1.94,
+          "mergedAt": "2026-08-31T19:43:24Z"
+        },
+        {
+          "number": 294,
+          "title": "feat: new DevEx metrics — review latency, PR size, abandonment, AI-vs-human, CI health",
+          "state": "merged",
+          "createdAt": "2026-08-31T11:36:31Z",
+          "author": "rajbos",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 4428,
+          "linesDeleted": 39,
+          "commentCount": 0,
+          "commitCount": 5,
+          "actionsMinutes": 9.73,
+          "timeToMergeHours": 5.2,
+          "mergedAt": "2026-08-31T16:48:25Z"
+        },
+        {
+          "number": 293,
+          "title": "fix: do not fail the first Pages deploy of a freshly configured site",
+          "state": "merged",
+          "createdAt": "2026-08-31T07:19:52Z",
+          "author": "rajbos",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 165,
+          "linesDeleted": 24,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 6.77,
+          "timeToMergeHours": 0.88,
+          "mergedAt": "2026-08-31T08:12:56Z"
+        },
+        {
+          "number": 288,
+          "title": "chore(deps-dev): bump @stryker-mutator/vitest-runner from 9.6.1 to 10.0.0",
+          "state": "merged",
+          "createdAt": "2026-08-17T21:24:53Z",
+          "author": "dependabot[bot]",
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
+          "hasCopilotReview": false,
+          "linesAdded": 459,
+          "linesDeleted": 405,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 7.85,
+          "timeToMergeHours": 322.12,
+          "mergedAt": "2026-08-31T07:31:56Z"
+        },
+        {
+          "number": 292,
+          "title": "fix: unblock Pages deploy and stop a bad agent token failing collection",
+          "state": "merged",
+          "createdAt": "2026-08-31T06:53:13Z",
+          "author": "rajbos",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 96,
+          "linesDeleted": 2,
+          "commentCount": 0,
+          "commitCount": 2,
+          "actionsMinutes": 7.8,
+          "timeToMergeHours": 0.37,
+          "mergedAt": "2026-08-31T07:15:26Z"
+        },
+        {
+          "number": 273,
+          "title": "chore(deps): bump @octokit/plugin-throttling from 11.0.3 to 11.0.5",
+          "state": "merged",
+          "createdAt": "2026-08-04T21:24:09Z",
+          "author": "dependabot[bot]",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 21,
+          "linesDeleted": 6,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 5.65,
+          "timeToMergeHours": 633.62,
+          "mergedAt": "2026-08-31T07:01:12Z"
+        },
+        {
+          "number": 286,
+          "title": "chore(deps-dev): bump @typescript-eslint/parser from 8.67.0 to 8.68.0",
+          "state": "merged",
+          "createdAt": "2026-08-13T21:23:58Z",
+          "author": "dependabot[bot]",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 140,
+          "linesDeleted": 10,
+          "commentCount": 1,
+          "commitCount": 1,
+          "actionsMinutes": 5.02,
+          "timeToMergeHours": 417.57,
+          "mergedAt": "2026-08-31T06:58:25Z"
+        },
+        {
+          "number": 276,
+          "title": "chore(deps): bump @octokit/auth-app from 8.2.0 to 8.3.0",
+          "state": "merged",
+          "createdAt": "2026-08-05T21:24:09Z",
+          "author": "dependabot[bot]",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 164,
+          "linesDeleted": 62,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 4.07,
+          "timeToMergeHours": 609.46,
+          "mergedAt": "2026-08-31T06:51:46Z"
+        },
+        {
+          "number": 283,
+          "title": "chore(deps-dev): bump eslint from 10.8.0 to 10.8.1",
+          "state": "merged",
+          "createdAt": "2026-08-10T21:25:09Z",
+          "author": "dependabot[bot]",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 5,
+          "linesDeleted": 5,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 4.4,
+          "timeToMergeHours": 489.44,
+          "mergedAt": "2026-08-31T06:51:37Z"
+        }
+      ],
+      "mergedPRTimeline": [
+        {
+          "number": 295,
+          "createdAt": "2026-08-31T17:46:48Z",
+          "mergedAt": "2026-08-31T19:43:24Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 1.94,
+          "closesIssues": []
+        },
+        {
+          "number": 294,
+          "createdAt": "2026-08-31T11:36:31Z",
+          "mergedAt": "2026-08-31T16:48:25Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 5.2,
+          "closesIssues": []
+        },
+        {
+          "number": 293,
+          "createdAt": "2026-08-31T07:19:52Z",
+          "mergedAt": "2026-08-31T08:12:56Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.88,
+          "closesIssues": []
+        },
+        {
+          "number": 288,
+          "createdAt": "2026-08-17T21:24:53Z",
+          "mergedAt": "2026-08-31T07:31:56Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 322.12,
+          "closesIssues": []
+        },
+        {
+          "number": 292,
+          "createdAt": "2026-08-31T06:53:13Z",
+          "mergedAt": "2026-08-31T07:15:26Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.37,
+          "closesIssues": []
+        },
+        {
+          "number": 273,
+          "createdAt": "2026-08-04T21:24:09Z",
+          "mergedAt": "2026-08-31T07:01:12Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 633.62,
+          "closesIssues": []
+        },
+        {
+          "number": 286,
+          "createdAt": "2026-08-13T21:23:58Z",
+          "mergedAt": "2026-08-31T06:58:25Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 417.57,
+          "closesIssues": []
+        },
+        {
+          "number": 276,
+          "createdAt": "2026-08-05T21:24:09Z",
+          "mergedAt": "2026-08-31T06:51:46Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 609.46,
+          "closesIssues": []
+        },
+        {
+          "number": 283,
+          "createdAt": "2026-08-10T21:25:09Z",
+          "mergedAt": "2026-08-31T06:51:37Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 489.44,
+          "closesIssues": []
+        },
+        {
+          "number": 284,
+          "createdAt": "2026-08-10T21:25:15Z",
+          "mergedAt": "2026-08-31T06:51:26Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 489.44,
+          "closesIssues": []
+        },
+        {
+          "number": 285,
+          "createdAt": "2026-08-10T21:25:26Z",
+          "mergedAt": "2026-08-31T06:51:17Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 489.43,
+          "closesIssues": []
+        },
+        {
+          "number": 287,
+          "createdAt": "2026-08-13T21:24:08Z",
+          "mergedAt": "2026-08-31T06:50:32Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 417.44,
+          "closesIssues": []
+        },
+        {
+          "number": 290,
+          "createdAt": "2026-08-21T21:24:56Z",
+          "mergedAt": "2026-08-31T06:50:23Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 225.42,
+          "closesIssues": []
+        },
+        {
+          "number": 291,
+          "createdAt": "2026-08-30T07:05:22Z",
+          "mergedAt": "2026-08-31T06:48:22Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 23.72,
+          "closesIssues": []
+        },
+        {
+          "number": 282,
+          "createdAt": "2026-08-09T07:06:57Z",
+          "mergedAt": "2026-08-09T07:08:04Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 279,
+          "createdAt": "2026-08-07T21:24:06Z",
+          "mergedAt": "2026-08-08T12:55:49Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 15.53,
+          "closesIssues": []
+        },
+        {
+          "number": 281,
+          "createdAt": "2026-08-08T07:01:47Z",
+          "mergedAt": "2026-08-08T07:02:56Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 278,
+          "createdAt": "2026-08-07T07:27:58Z",
+          "mergedAt": "2026-08-07T07:28:56Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 277,
+          "createdAt": "2026-08-06T08:45:39Z",
+          "mergedAt": "2026-08-06T08:46:27Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 275,
+          "createdAt": "2026-08-05T15:37:27Z",
+          "mergedAt": "2026-08-05T19:44:42Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 4.12,
+          "closesIssues": []
+        },
+        {
+          "number": 274,
+          "createdAt": "2026-08-05T08:48:56Z",
+          "mergedAt": "2026-08-05T08:49:50Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 272,
+          "createdAt": "2026-08-04T08:49:08Z",
+          "mergedAt": "2026-08-04T08:52:13Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.05,
+          "closesIssues": []
+        },
+        {
+          "number": 271,
+          "createdAt": "2026-08-03T09:54:23Z",
+          "mergedAt": "2026-08-03T09:55:14Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 270,
+          "createdAt": "2026-08-02T08:31:01Z",
+          "mergedAt": "2026-08-02T08:31:49Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 269,
+          "createdAt": "2026-08-01T08:30:39Z",
+          "mergedAt": "2026-08-01T08:31:31Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 268,
+          "createdAt": "2026-07-31T09:03:25Z",
+          "mergedAt": "2026-07-31T09:04:12Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 266,
+          "createdAt": "2026-07-29T21:24:00Z",
+          "mergedAt": "2026-07-30T21:16:02Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 23.87,
+          "closesIssues": []
+        },
+        {
+          "number": 267,
+          "createdAt": "2026-07-30T08:36:26Z",
+          "mergedAt": "2026-07-30T08:37:25Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 265,
+          "createdAt": "2026-07-29T08:50:26Z",
+          "mergedAt": "2026-07-29T08:51:14Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 264,
+          "createdAt": "2026-07-28T08:47:13Z",
+          "mergedAt": "2026-07-28T08:48:11Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 233,
+          "createdAt": "2026-07-06T21:24:51Z",
+          "mergedAt": "2026-07-28T08:11:28Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 514.78,
+          "closesIssues": []
+        },
+        {
+          "number": 244,
+          "createdAt": "2026-07-14T21:23:32Z",
+          "mergedAt": "2026-07-28T08:11:24Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 322.8,
+          "closesIssues": []
+        },
+        {
+          "number": 251,
+          "createdAt": "2026-07-20T21:25:11Z",
+          "mergedAt": "2026-07-28T08:11:19Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 178.77,
+          "closesIssues": []
+        },
+        {
+          "number": 254,
+          "createdAt": "2026-07-21T21:24:03Z",
+          "mergedAt": "2026-07-28T08:11:11Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 154.79,
+          "closesIssues": []
+        },
+        {
+          "number": 258,
+          "createdAt": "2026-07-24T21:23:43Z",
+          "mergedAt": "2026-07-28T08:11:06Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 82.79,
+          "closesIssues": []
+        },
+        {
+          "number": 259,
+          "createdAt": "2026-07-25T10:00:45Z",
+          "mergedAt": "2026-07-28T08:11:01Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 70.17,
+          "closesIssues": []
+        },
+        {
+          "number": 262,
+          "createdAt": "2026-07-27T21:24:46Z",
+          "mergedAt": "2026-07-28T07:17:10Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 9.87,
+          "closesIssues": []
+        },
+        {
+          "number": 263,
+          "createdAt": "2026-07-27T21:24:57Z",
+          "mergedAt": "2026-07-28T07:10:58Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 9.77,
+          "closesIssues": []
+        },
+        {
+          "number": 261,
+          "createdAt": "2026-07-27T10:04:30Z",
+          "mergedAt": "2026-07-27T10:05:26Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 260,
+          "createdAt": "2026-07-26T08:32:45Z",
+          "mergedAt": "2026-07-26T08:33:43Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 257,
+          "createdAt": "2026-07-24T08:39:43Z",
+          "mergedAt": "2026-07-24T08:40:35Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 256,
+          "createdAt": "2026-07-23T08:40:14Z",
+          "mergedAt": "2026-07-23T08:46:54Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.11,
+          "closesIssues": []
+        },
+        {
+          "number": 255,
+          "createdAt": "2026-07-22T08:39:23Z",
+          "mergedAt": "2026-07-22T08:40:24Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 253,
+          "createdAt": "2026-07-21T08:36:31Z",
+          "mergedAt": "2026-07-21T08:37:30Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 250,
+          "createdAt": "2026-07-20T09:08:17Z",
+          "mergedAt": "2026-07-20T09:09:16Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 249,
+          "createdAt": "2026-07-19T08:22:14Z",
+          "mergedAt": "2026-07-19T08:23:13Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 248,
+          "createdAt": "2026-07-18T07:55:59Z",
+          "mergedAt": "2026-07-18T07:59:41Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 247,
+          "createdAt": "2026-07-17T08:21:34Z",
+          "mergedAt": "2026-07-17T08:26:06Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.08,
+          "closesIssues": []
+        },
+        {
+          "number": 246,
+          "createdAt": "2026-07-16T08:23:30Z",
+          "mergedAt": "2026-07-16T08:24:22Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 245,
+          "createdAt": "2026-07-15T08:15:15Z",
+          "mergedAt": "2026-07-15T08:19:14Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.07,
+          "closesIssues": []
+        },
+        {
+          "number": 243,
+          "createdAt": "2026-07-14T08:09:18Z",
+          "mergedAt": "2026-07-14T08:13:15Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.07,
+          "closesIssues": []
+        },
+        {
+          "number": 240,
+          "createdAt": "2026-07-13T09:14:22Z",
+          "mergedAt": "2026-07-13T09:18:18Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.07,
+          "closesIssues": []
+        },
+        {
+          "number": 239,
+          "createdAt": "2026-07-12T08:24:52Z",
+          "mergedAt": "2026-07-12T08:25:45Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 228,
+          "createdAt": "2026-06-29T21:24:59Z",
+          "mergedAt": "2026-07-06T11:38:12Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 158.22,
+          "closesIssues": []
+        },
+        {
+          "number": 229,
+          "createdAt": "2026-06-29T21:25:05Z",
+          "mergedAt": "2026-07-06T11:32:04Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 158.12,
+          "closesIssues": []
+        },
+        {
+          "number": 231,
+          "createdAt": "2026-07-01T21:27:35Z",
+          "mergedAt": "2026-07-06T11:29:52Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 110.04,
+          "closesIssues": []
+        },
+        {
+          "number": 230,
+          "createdAt": "2026-06-30T21:23:56Z",
+          "mergedAt": "2026-07-06T11:29:50Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 134.1,
+          "closesIssues": []
+        },
+        {
+          "number": 227,
+          "createdAt": "2026-06-29T21:24:49Z",
+          "mergedAt": "2026-07-06T11:29:40Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 158.08,
+          "closesIssues": []
+        },
+        {
+          "number": 225,
+          "createdAt": "2026-06-29T11:05:56Z",
+          "mergedAt": "2026-06-29T11:06:51Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 224,
+          "createdAt": "2026-06-28T08:59:00Z",
+          "mergedAt": "2026-06-28T09:02:59Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.07,
+          "closesIssues": []
+        },
+        {
+          "number": 223,
+          "createdAt": "2026-06-27T08:45:13Z",
+          "mergedAt": "2026-06-27T08:46:03Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 222,
+          "createdAt": "2026-06-26T09:12:13Z",
+          "mergedAt": "2026-06-26T09:16:05Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 219,
+          "createdAt": "2026-06-23T21:23:56Z",
+          "mergedAt": "2026-06-24T10:16:18Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 12.87,
+          "closesIssues": []
+        },
+        {
+          "number": 220,
+          "createdAt": "2026-06-24T09:16:12Z",
+          "mergedAt": "2026-06-24T09:17:07Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 218,
+          "createdAt": "2026-06-23T09:46:35Z",
+          "mergedAt": "2026-06-23T09:49:33Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.05,
+          "closesIssues": []
+        },
+        {
+          "number": 214,
+          "createdAt": "2026-06-22T12:02:52Z",
+          "mergedAt": "2026-06-22T12:03:46Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 213,
+          "createdAt": "2026-06-21T09:54:09Z",
+          "mergedAt": "2026-06-21T09:55:17Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 212,
+          "createdAt": "2026-06-20T08:59:35Z",
+          "mergedAt": "2026-06-20T09:03:41Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.07,
+          "closesIssues": []
+        },
+        {
+          "number": 210,
+          "createdAt": "2026-06-19T10:35:34Z",
+          "mergedAt": "2026-06-19T10:36:32Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 209,
+          "createdAt": "2026-06-19T06:04:14Z",
+          "mergedAt": "2026-06-19T06:20:23Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.27,
+          "closesIssues": []
+        },
+        {
+          "number": 208,
+          "createdAt": "2026-06-18T21:23:41Z",
+          "mergedAt": "2026-06-19T06:03:22Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 8.66,
+          "closesIssues": []
+        },
+        {
+          "number": 207,
+          "createdAt": "2026-06-17T11:01:15Z",
+          "mergedAt": "2026-06-17T11:02:08Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 206,
+          "createdAt": "2026-06-16T21:07:34Z",
+          "mergedAt": "2026-06-17T05:33:48Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 8.44,
+          "closesIssues": []
+        },
+        {
+          "number": 193,
+          "createdAt": "2026-06-09T21:24:11Z",
+          "mergedAt": "2026-06-16T20:37:59Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 167.23,
+          "closesIssues": []
+        },
+        {
+          "number": 198,
+          "createdAt": "2026-06-12T21:25:18Z",
+          "mergedAt": "2026-06-16T20:37:46Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 95.21,
+          "closesIssues": []
+        },
+        {
+          "number": 196,
+          "createdAt": "2026-06-11T21:24:21Z",
+          "mergedAt": "2026-06-16T20:37:33Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 119.22,
+          "closesIssues": []
+        },
+        {
+          "number": 205,
+          "createdAt": "2026-06-16T11:19:56Z",
+          "mergedAt": "2026-06-16T11:31:30Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.19,
+          "closesIssues": []
+        },
+        {
+          "number": 203,
+          "createdAt": "2026-06-15T21:33:28Z",
+          "mergedAt": "2026-06-16T09:40:52Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 12.12,
+          "closesIssues": []
+        },
+        {
+          "number": 204,
+          "createdAt": "2026-06-15T21:33:41Z",
+          "mergedAt": "2026-06-16T09:40:33Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 12.11,
+          "closesIssues": []
+        },
+        {
+          "number": 201,
+          "createdAt": "2026-06-15T12:10:20Z",
+          "mergedAt": "2026-06-15T12:11:16Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 200,
+          "createdAt": "2026-06-14T09:41:03Z",
+          "mergedAt": "2026-06-14T09:45:02Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.07,
+          "closesIssues": []
+        },
+        {
+          "number": 199,
+          "createdAt": "2026-06-13T09:08:29Z",
+          "mergedAt": "2026-06-13T09:09:22Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 197,
+          "createdAt": "2026-06-12T10:24:34Z",
+          "mergedAt": "2026-06-12T10:25:30Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 195,
+          "createdAt": "2026-06-11T10:34:30Z",
+          "mergedAt": "2026-06-11T10:35:19Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 194,
+          "createdAt": "2026-06-10T10:06:48Z",
+          "mergedAt": "2026-06-10T10:07:37Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 192,
+          "createdAt": "2026-06-09T09:51:58Z",
+          "mergedAt": "2026-06-09T09:52:56Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 188,
+          "createdAt": "2026-06-08T10:45:51Z",
+          "mergedAt": "2026-06-08T10:46:55Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 187,
+          "createdAt": "2026-06-07T09:06:23Z",
+          "mergedAt": "2026-06-07T09:07:26Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 186,
+          "createdAt": "2026-06-06T08:45:03Z",
+          "mergedAt": "2026-06-06T08:46:04Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 185,
+          "createdAt": "2026-06-05T09:58:28Z",
+          "mergedAt": "2026-06-05T09:59:37Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 184,
+          "createdAt": "2026-06-04T10:09:21Z",
+          "mergedAt": "2026-06-04T10:10:18Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 183,
+          "createdAt": "2026-06-03T11:09:32Z",
+          "mergedAt": "2026-06-03T11:10:33Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 178,
+          "createdAt": "2026-06-02T10:34:36Z",
+          "mergedAt": "2026-06-02T10:35:42Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 177,
+          "createdAt": "2026-06-01T11:46:30Z",
+          "mergedAt": "2026-06-01T11:50:21Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 174,
+          "createdAt": "2026-05-31T09:31:47Z",
+          "mergedAt": "2026-05-31T09:59:46Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.47,
+          "closesIssues": []
+        },
+        {
+          "number": 176,
+          "createdAt": "2026-05-31T09:51:30Z",
+          "mergedAt": "2026-05-31T09:53:07Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.03,
+          "closesIssues": []
+        },
+        {
+          "number": 172,
+          "createdAt": "2026-05-31T09:15:33Z",
+          "mergedAt": "2026-05-31T09:38:53Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.39,
+          "closesIssues": []
+        },
+        {
+          "number": 175,
+          "createdAt": "2026-05-31T09:33:01Z",
+          "mergedAt": "2026-05-31T09:33:08Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0,
+          "closesIssues": []
+        },
+        {
+          "number": 173,
+          "createdAt": "2026-05-31T09:16:54Z",
+          "mergedAt": "2026-05-31T09:24:21Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.12,
+          "closesIssues": []
+        },
+        {
+          "number": 169,
+          "createdAt": "2026-05-31T09:10:24Z",
+          "mergedAt": "2026-05-31T09:16:25Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.1,
+          "closesIssues": []
+        },
+        {
+          "number": 170,
+          "createdAt": "2026-05-31T09:10:45Z",
+          "mergedAt": "2026-05-31T09:15:54Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.09,
+          "closesIssues": []
+        },
+        {
+          "number": 171,
+          "createdAt": "2026-05-31T09:11:11Z",
+          "mergedAt": "2026-05-31T09:15:36Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.07,
+          "closesIssues": []
+        },
+        {
+          "number": 168,
+          "createdAt": "2026-05-31T08:55:51Z",
+          "mergedAt": "2026-05-31T08:56:50Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 167,
+          "createdAt": "2026-05-30T08:40:50Z",
+          "mergedAt": "2026-05-30T08:41:49Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 166,
+          "createdAt": "2026-05-29T10:05:23Z",
+          "mergedAt": "2026-05-29T10:06:23Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 165,
+          "createdAt": "2026-05-28T10:19:47Z",
+          "mergedAt": "2026-05-28T10:20:47Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 164,
+          "createdAt": "2026-05-27T10:02:07Z",
+          "mergedAt": "2026-05-27T10:05:57Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 163,
+          "createdAt": "2026-05-26T10:07:02Z",
+          "mergedAt": "2026-05-26T10:08:17Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 161,
+          "createdAt": "2026-05-25T06:54:39Z",
+          "mergedAt": "2026-05-25T19:53:13Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 12.98,
+          "closesIssues": []
+        },
+        {
+          "number": 162,
+          "createdAt": "2026-05-25T10:16:50Z",
+          "mergedAt": "2026-05-25T10:17:45Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 160,
+          "createdAt": "2026-05-24T08:38:13Z",
+          "mergedAt": "2026-05-24T08:39:21Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 151,
+          "createdAt": "2026-05-20T03:57:32Z",
+          "mergedAt": "2026-05-24T08:34:46Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 100.62,
+          "closesIssues": []
+        },
+        {
+          "number": 153,
+          "createdAt": "2026-05-20T23:52:05Z",
+          "mergedAt": "2026-05-24T08:34:30Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 80.71,
+          "closesIssues": []
+        },
+        {
+          "number": 159,
+          "createdAt": "2026-05-23T14:47:38Z",
+          "mergedAt": "2026-05-24T08:34:27Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 17.78,
+          "closesIssues": []
+        },
+        {
+          "number": 158,
+          "createdAt": "2026-05-23T09:18:18Z",
+          "mergedAt": "2026-05-23T09:34:38Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.27,
+          "closesIssues": []
+        },
+        {
+          "number": 157,
+          "createdAt": "2026-05-23T08:28:36Z",
+          "mergedAt": "2026-05-23T08:32:16Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 156,
+          "createdAt": "2026-05-22T20:02:59Z",
+          "mergedAt": "2026-05-22T21:14:57Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 1.2,
+          "closesIssues": []
+        },
+        {
+          "number": 155,
+          "createdAt": "2026-05-22T09:11:40Z",
+          "mergedAt": "2026-05-22T09:12:39Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 154,
+          "createdAt": "2026-05-21T09:50:52Z",
+          "mergedAt": "2026-05-21T09:51:50Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 152,
+          "createdAt": "2026-05-20T09:17:25Z",
+          "mergedAt": "2026-05-20T09:18:20Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 150,
+          "createdAt": "2026-05-19T09:53:17Z",
+          "mergedAt": "2026-05-19T09:54:19Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 148,
+          "createdAt": "2026-05-19T06:31:16Z",
+          "mergedAt": "2026-05-19T06:49:47Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.31,
+          "closesIssues": []
+        },
+        {
+          "number": 149,
+          "createdAt": "2026-05-19T06:45:48Z",
+          "mergedAt": "2026-05-19T06:48:49Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.05,
+          "closesIssues": []
+        },
+        {
+          "number": 147,
+          "createdAt": "2026-05-18T15:13:24Z",
+          "mergedAt": "2026-05-19T05:54:31Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 14.69,
+          "closesIssues": []
+        },
+        {
+          "number": 125,
+          "createdAt": "2026-05-12T03:48:24Z",
+          "mergedAt": "2026-05-18T14:24:10Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 154.6,
+          "closesIssues": []
+        },
+        {
+          "number": 130,
+          "createdAt": "2026-05-13T00:13:19Z",
+          "mergedAt": "2026-05-18T14:24:04Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 134.18,
+          "closesIssues": []
+        },
+        {
+          "number": 131,
+          "createdAt": "2026-05-13T00:13:41Z",
+          "mergedAt": "2026-05-18T14:23:46Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 134.17,
+          "closesIssues": []
+        },
+        {
+          "number": 141,
+          "createdAt": "2026-05-15T11:57:37Z",
+          "mergedAt": "2026-05-18T12:18:57Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 72.36,
+          "closesIssues": []
+        },
+        {
+          "number": 146,
+          "createdAt": "2026-05-18T10:08:50Z",
+          "mergedAt": "2026-05-18T10:10:00Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 145,
+          "createdAt": "2026-05-18T08:18:25Z",
+          "mergedAt": "2026-05-18T08:40:10Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.36,
+          "closesIssues": []
+        },
+        {
+          "number": 144,
+          "createdAt": "2026-05-17T08:26:23Z",
+          "mergedAt": "2026-05-17T08:29:57Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 143,
+          "createdAt": "2026-05-16T08:08:54Z",
+          "mergedAt": "2026-05-16T08:09:56Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 136,
+          "createdAt": "2026-05-14T21:27:06Z",
+          "mergedAt": "2026-05-15T18:15:23Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 20.8,
+          "closesIssues": []
+        },
+        {
+          "number": 142,
+          "createdAt": "2026-05-15T12:17:52Z",
+          "mergedAt": "2026-05-15T12:23:13Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.09,
+          "closesIssues": []
+        },
+        {
+          "number": 140,
+          "createdAt": "2026-05-15T09:31:07Z",
+          "mergedAt": "2026-05-15T12:12:46Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 2.69,
+          "closesIssues": []
+        },
+        {
+          "number": 138,
+          "createdAt": "2026-05-15T09:26:57Z",
+          "mergedAt": "2026-05-15T09:32:45Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.1,
+          "closesIssues": []
+        },
+        {
+          "number": 139,
+          "createdAt": "2026-05-15T09:27:47Z",
+          "mergedAt": "2026-05-15T09:32:30Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.08,
+          "closesIssues": []
+        },
+        {
+          "number": 137,
+          "createdAt": "2026-05-15T09:00:17Z",
+          "mergedAt": "2026-05-15T09:01:22Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 135,
+          "createdAt": "2026-05-14T20:20:57Z",
+          "mergedAt": "2026-05-14T20:26:12Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.09,
+          "closesIssues": []
+        },
+        {
+          "number": 134,
+          "createdAt": "2026-05-14T08:45:40Z",
+          "mergedAt": "2026-05-14T08:46:58Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 133,
+          "createdAt": "2026-05-13T18:09:08Z",
+          "mergedAt": "2026-05-13T20:07:37Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 1.97,
+          "closesIssues": []
+        },
+        {
+          "number": 132,
+          "createdAt": "2026-05-13T08:52:47Z",
+          "mergedAt": "2026-05-13T08:56:20Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 129,
+          "createdAt": "2026-05-12T16:28:34Z",
+          "mergedAt": "2026-05-12T16:40:10Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.19,
+          "closesIssues": []
+        },
+        {
+          "number": 128,
+          "createdAt": "2026-05-12T16:22:15Z",
+          "mergedAt": "2026-05-12T16:29:55Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.13,
+          "closesIssues": []
+        },
+        {
+          "number": 127,
+          "createdAt": "2026-05-12T08:45:38Z",
+          "mergedAt": "2026-05-12T08:49:20Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 123,
+          "createdAt": "2026-05-11T14:34:11Z",
+          "mergedAt": "2026-05-11T14:35:30Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 122,
+          "createdAt": "2026-05-11T14:04:25Z",
+          "mergedAt": "2026-05-11T14:09:52Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.09,
+          "closesIssues": []
+        },
+        {
+          "number": 121,
+          "createdAt": "2026-05-11T12:46:48Z",
+          "mergedAt": "2026-05-11T12:47:53Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 120,
+          "createdAt": "2026-05-11T11:48:41Z",
+          "mergedAt": "2026-05-11T11:52:22Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 119,
+          "createdAt": "2026-05-11T11:32:00Z",
+          "mergedAt": "2026-05-11T11:32:56Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 118,
+          "createdAt": "2026-05-11T10:23:19Z",
+          "mergedAt": "2026-05-11T11:18:47Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.92,
+          "closesIssues": []
+        },
+        {
+          "number": 117,
+          "createdAt": "2026-05-11T09:43:22Z",
+          "mergedAt": "2026-05-11T09:44:36Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 116,
+          "createdAt": "2026-05-11T08:45:41Z",
+          "mergedAt": "2026-05-11T08:46:42Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 115,
+          "createdAt": "2026-05-11T08:24:28Z",
+          "mergedAt": "2026-05-11T08:31:18Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.11,
+          "closesIssues": []
+        },
+        {
+          "number": 114,
+          "createdAt": "2026-05-10T20:25:58Z",
+          "mergedAt": "2026-05-10T20:26:59Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 113,
+          "createdAt": "2026-05-10T13:18:35Z",
+          "mergedAt": "2026-05-10T13:19:35Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 112,
+          "createdAt": "2026-05-10T13:16:05Z",
+          "mergedAt": "2026-05-10T13:17:15Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 111,
+          "createdAt": "2026-05-10T12:45:02Z",
+          "mergedAt": "2026-05-10T13:06:50Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.36,
+          "closesIssues": []
+        },
+        {
+          "number": 110,
+          "createdAt": "2026-05-10T11:16:36Z",
+          "mergedAt": "2026-05-10T11:19:44Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.05,
+          "closesIssues": []
+        },
+        {
+          "number": 109,
+          "createdAt": "2026-05-10T10:42:39Z",
+          "mergedAt": "2026-05-10T11:02:19Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.33,
+          "closesIssues": []
+        },
+        {
+          "number": 108,
+          "createdAt": "2026-05-10T08:12:11Z",
+          "mergedAt": "2026-05-10T08:13:12Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 107,
+          "createdAt": "2026-05-09T12:15:12Z",
+          "mergedAt": "2026-05-09T12:23:31Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.14,
+          "closesIssues": []
+        },
+        {
+          "number": 106,
+          "createdAt": "2026-05-09T08:26:08Z",
+          "mergedAt": "2026-05-09T08:29:37Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 105,
+          "createdAt": "2026-05-09T07:59:09Z",
+          "mergedAt": "2026-05-09T08:00:08Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 104,
+          "createdAt": "2026-05-08T17:35:28Z",
+          "mergedAt": "2026-05-08T18:05:34Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.5,
+          "closesIssues": []
+        },
+        {
+          "number": 99,
+          "createdAt": "2026-05-07T21:28:41Z",
+          "mergedAt": "2026-05-08T17:36:16Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 20.13,
+          "closesIssues": []
+        },
+        {
+          "number": 91,
+          "createdAt": "2026-04-30T21:27:36Z",
+          "mergedAt": "2026-05-08T17:34:14Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 188.11,
+          "closesIssues": []
+        },
+        {
+          "number": 103,
+          "createdAt": "2026-05-08T17:30:54Z",
+          "mergedAt": "2026-05-08T17:34:04Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.05,
+          "closesIssues": []
+        },
+        {
+          "number": 102,
+          "createdAt": "2026-05-08T08:06:58Z",
+          "mergedAt": "2026-05-08T17:33:37Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 9.44,
+          "closesIssues": []
+        },
+        {
+          "number": 100,
+          "createdAt": "2026-05-08T07:18:30Z",
+          "mergedAt": "2026-05-08T07:42:20Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.4,
+          "closesIssues": []
+        },
+        {
+          "number": 101,
+          "createdAt": "2026-05-08T07:33:18Z",
+          "mergedAt": "2026-05-08T07:36:09Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.05,
+          "closesIssues": []
+        },
+        {
+          "number": 98,
+          "createdAt": "2026-05-07T08:39:07Z",
+          "mergedAt": "2026-05-07T08:40:10Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 97,
+          "createdAt": "2026-05-06T08:29:00Z",
+          "mergedAt": "2026-05-06T08:30:07Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 96,
+          "createdAt": "2026-05-05T08:13:39Z",
+          "mergedAt": "2026-05-05T08:14:47Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 95,
+          "createdAt": "2026-05-04T08:35:55Z",
+          "mergedAt": "2026-05-04T08:36:54Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 94,
+          "createdAt": "2026-05-03T08:05:09Z",
+          "mergedAt": "2026-05-03T08:06:17Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 93,
+          "createdAt": "2026-05-02T07:36:06Z",
+          "mergedAt": "2026-05-02T07:37:17Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 92,
+          "createdAt": "2026-05-01T08:18:29Z",
+          "mergedAt": "2026-05-01T08:19:23Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 86,
+          "createdAt": "2026-04-28T00:36:41Z",
+          "mergedAt": "2026-04-30T20:27:11Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 67.84,
+          "closesIssues": []
+        },
+        {
+          "number": 90,
+          "createdAt": "2026-04-30T19:25:04Z",
+          "mergedAt": "2026-04-30T19:36:49Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.2,
+          "closesIssues": []
+        },
+        {
+          "number": 89,
+          "createdAt": "2026-04-30T08:25:32Z",
+          "mergedAt": "2026-04-30T08:26:36Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 88,
+          "createdAt": "2026-04-29T08:19:15Z",
+          "mergedAt": "2026-04-29T08:22:23Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.05,
+          "closesIssues": []
+        },
+        {
+          "number": 87,
+          "createdAt": "2026-04-28T08:28:25Z",
+          "mergedAt": "2026-04-28T08:29:23Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 85,
+          "createdAt": "2026-04-27T12:26:44Z",
+          "mergedAt": "2026-04-27T12:58:23Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.53,
+          "closesIssues": []
+        },
+        {
+          "number": 84,
+          "createdAt": "2026-04-27T10:26:28Z",
+          "mergedAt": "2026-04-27T10:29:48Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 83,
+          "createdAt": "2026-04-27T09:11:37Z",
+          "mergedAt": "2026-04-27T09:16:21Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.08,
+          "closesIssues": []
+        },
+        {
+          "number": 82,
+          "createdAt": "2026-04-27T08:27:59Z",
+          "mergedAt": "2026-04-27T08:28:58Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 81,
+          "createdAt": "2026-04-26T07:33:20Z",
+          "mergedAt": "2026-04-26T07:34:15Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 80,
+          "createdAt": "2026-04-25T21:20:41Z",
+          "mergedAt": "2026-04-25T21:24:25Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 79,
+          "createdAt": "2026-04-25T17:12:09Z",
+          "mergedAt": "2026-04-25T17:13:12Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 78,
+          "createdAt": "2026-04-25T07:17:24Z",
+          "mergedAt": "2026-04-25T07:20:20Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.05,
+          "closesIssues": []
+        },
+        {
+          "number": 76,
+          "createdAt": "2026-04-24T20:57:03Z",
+          "mergedAt": "2026-04-24T21:03:32Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.11,
+          "closesIssues": []
+        },
+        {
+          "number": 77,
+          "createdAt": "2026-04-24T20:57:13Z",
+          "mergedAt": "2026-04-24T21:03:21Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.1,
+          "closesIssues": []
+        },
+        {
+          "number": 75,
+          "createdAt": "2026-04-24T08:06:31Z",
+          "mergedAt": "2026-04-24T08:09:28Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.05,
+          "closesIssues": []
+        },
+        {
+          "number": 74,
+          "createdAt": "2026-04-23T21:25:14Z",
+          "mergedAt": "2026-04-23T21:28:00Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.05,
+          "closesIssues": []
+        },
+        {
+          "number": 73,
+          "createdAt": "2026-04-23T21:08:09Z",
+          "mergedAt": "2026-04-23T21:13:14Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.08,
+          "closesIssues": []
+        },
+        {
+          "number": 72,
+          "createdAt": "2026-04-23T20:43:05Z",
+          "mergedAt": "2026-04-23T20:48:28Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.09,
+          "closesIssues": []
+        },
+        {
+          "number": 71,
+          "createdAt": "2026-04-23T20:33:47Z",
+          "mergedAt": "2026-04-23T20:35:33Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.03,
+          "closesIssues": []
+        },
+        {
+          "number": 70,
+          "createdAt": "2026-04-23T20:18:51Z",
+          "mergedAt": "2026-04-23T20:21:58Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.05,
+          "closesIssues": []
+        },
+        {
+          "number": 69,
+          "createdAt": "2026-04-23T18:01:08Z",
+          "mergedAt": "2026-04-23T18:02:20Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 67,
+          "createdAt": "2026-04-23T17:15:15Z",
+          "mergedAt": "2026-04-23T17:41:22Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.44,
+          "closesIssues": []
+        },
+        {
+          "number": 68,
+          "createdAt": "2026-04-23T17:28:25Z",
+          "mergedAt": "2026-04-23T17:30:51Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.04,
+          "closesIssues": []
+        },
+        {
+          "number": 65,
+          "createdAt": "2026-04-21T21:27:15Z",
+          "mergedAt": "2026-04-23T17:28:56Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 44.03,
+          "closesIssues": []
+        },
+        {
+          "number": 66,
+          "createdAt": "2026-04-23T15:53:14Z",
+          "mergedAt": "2026-04-23T15:54:08Z",
+          "author": "devexmetrics[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 64,
+          "createdAt": "2026-04-17T21:26:38Z",
+          "mergedAt": "2026-04-19T15:41:46Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 42.25,
+          "closesIssues": []
+        },
+        {
+          "number": 63,
+          "createdAt": "2026-04-14T07:50:01Z",
+          "mergedAt": "2026-04-14T07:50:54Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 62,
+          "createdAt": "2026-04-13T20:15:40Z",
+          "mergedAt": "2026-04-13T20:18:10Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.04,
+          "closesIssues": []
+        },
+        {
+          "number": 61,
+          "createdAt": "2026-04-13T17:47:34Z",
+          "mergedAt": "2026-04-13T18:43:16Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.93,
+          "closesIssues": []
+        },
+        {
+          "number": 60,
+          "createdAt": "2026-04-13T17:13:30Z",
+          "mergedAt": "2026-04-13T17:31:03Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.29,
+          "closesIssues": []
+        },
+        {
+          "number": 59,
+          "createdAt": "2026-04-13T15:58:00Z",
+          "mergedAt": "2026-04-13T16:01:31Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 58,
+          "createdAt": "2026-04-12T16:37:28Z",
+          "mergedAt": "2026-04-12T16:38:23Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 57,
+          "createdAt": "2026-04-12T15:54:36Z",
+          "mergedAt": "2026-04-12T15:56:59Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.04,
+          "closesIssues": []
+        },
+        {
+          "number": 56,
+          "createdAt": "2026-04-12T09:19:18Z",
+          "mergedAt": "2026-04-12T09:20:28Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 55,
+          "createdAt": "2026-04-12T09:03:16Z",
+          "mergedAt": "2026-04-12T09:11:14Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.13,
+          "closesIssues": []
+        },
+        {
+          "number": 54,
+          "createdAt": "2026-04-11T22:25:43Z",
+          "mergedAt": "2026-04-11T22:28:08Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.04,
+          "closesIssues": []
+        },
+        {
+          "number": 53,
+          "createdAt": "2026-04-11T22:23:54Z",
+          "mergedAt": "2026-04-11T22:25:43Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.03,
+          "closesIssues": []
+        },
+        {
+          "number": 52,
+          "createdAt": "2026-04-11T21:53:58Z",
+          "mergedAt": "2026-04-11T22:01:34Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.13,
+          "closesIssues": []
+        },
+        {
+          "number": 51,
+          "createdAt": "2026-04-11T21:46:42Z",
+          "mergedAt": "2026-04-11T21:53:14Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.11,
+          "closesIssues": []
+        },
+        {
+          "number": 50,
+          "createdAt": "2026-04-11T21:15:25Z",
+          "mergedAt": "2026-04-11T21:30:40Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.25,
+          "closesIssues": []
+        },
+        {
+          "number": 49,
+          "createdAt": "2026-04-11T20:45:03Z",
+          "mergedAt": "2026-04-11T20:54:34Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.16,
+          "closesIssues": []
+        },
+        {
+          "number": 48,
+          "createdAt": "2026-04-11T20:38:16Z",
+          "mergedAt": "2026-04-11T20:40:22Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.04,
+          "closesIssues": []
+        },
+        {
+          "number": 47,
+          "createdAt": "2026-04-11T20:08:36Z",
+          "mergedAt": "2026-04-11T20:13:31Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.08,
+          "closesIssues": []
+        },
+        {
+          "number": 46,
+          "createdAt": "2026-04-11T19:58:55Z",
+          "mergedAt": "2026-04-11T19:59:52Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 45,
+          "createdAt": "2026-04-11T19:48:49Z",
+          "mergedAt": "2026-04-11T19:51:04Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.04,
+          "closesIssues": []
+        },
+        {
+          "number": 42,
+          "createdAt": "2026-04-11T19:08:05Z",
+          "mergedAt": "2026-04-11T19:47:32Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.66,
+          "closesIssues": []
+        },
+        {
+          "number": 44,
+          "createdAt": "2026-04-11T19:35:00Z",
+          "mergedAt": "2026-04-11T19:36:41Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.03,
+          "closesIssues": []
+        },
+        {
+          "number": 43,
+          "createdAt": "2026-04-11T19:29:21Z",
+          "mergedAt": "2026-04-11T19:31:36Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.04,
+          "closesIssues": []
+        },
+        {
+          "number": 41,
+          "createdAt": "2026-04-11T18:58:07Z",
+          "mergedAt": "2026-04-11T19:22:14Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.4,
+          "closesIssues": []
+        },
+        {
+          "number": 39,
+          "createdAt": "2026-04-11T18:43:28Z",
+          "mergedAt": "2026-04-11T18:58:19Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.25,
+          "closesIssues": []
+        },
+        {
+          "number": 40,
+          "createdAt": "2026-04-11T18:49:45Z",
+          "mergedAt": "2026-04-11T18:51:53Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.04,
+          "closesIssues": []
+        },
+        {
+          "number": 38,
+          "createdAt": "2026-04-11T18:43:09Z",
+          "mergedAt": "2026-04-11T18:46:09Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.05,
+          "closesIssues": []
+        },
+        {
+          "number": 37,
+          "createdAt": "2026-04-11T18:16:22Z",
+          "mergedAt": "2026-04-11T18:22:17Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.1,
+          "closesIssues": []
+        },
+        {
+          "number": 36,
+          "createdAt": "2026-04-11T16:08:11Z",
+          "mergedAt": "2026-04-11T16:09:42Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.03,
+          "closesIssues": []
+        },
+        {
+          "number": 35,
+          "createdAt": "2026-04-11T15:12:27Z",
+          "mergedAt": "2026-04-11T16:05:54Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.89,
+          "closesIssues": []
+        },
+        {
+          "number": 32,
+          "createdAt": "2026-04-11T11:13:34Z",
+          "mergedAt": "2026-04-11T15:05:39Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 3.87,
+          "closesIssues": []
+        },
+        {
+          "number": 34,
+          "createdAt": "2026-04-11T13:28:54Z",
+          "mergedAt": "2026-04-11T13:35:39Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.11,
+          "closesIssues": []
+        },
+        {
+          "number": 33,
+          "createdAt": "2026-04-11T13:23:55Z",
+          "mergedAt": "2026-04-11T13:25:43Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.03,
+          "closesIssues": []
+        },
+        {
+          "number": 31,
+          "createdAt": "2026-04-11T10:42:10Z",
+          "mergedAt": "2026-04-11T10:57:38Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.26,
+          "closesIssues": []
+        },
+        {
+          "number": 30,
+          "createdAt": "2026-04-11T10:25:03Z",
+          "mergedAt": "2026-04-11T10:27:18Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.04,
+          "closesIssues": []
+        },
+        {
+          "number": 29,
+          "createdAt": "2026-04-11T10:00:55Z",
+          "mergedAt": "2026-04-11T10:02:01Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 28,
+          "createdAt": "2026-04-11T09:57:30Z",
+          "mergedAt": "2026-04-11T09:58:43Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 27,
+          "createdAt": "2026-04-11T09:54:26Z",
+          "mergedAt": "2026-04-11T09:56:26Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.03,
+          "closesIssues": []
+        },
+        {
+          "number": 26,
+          "createdAt": "2026-04-11T09:49:52Z",
+          "mergedAt": "2026-04-11T09:53:21Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.06,
+          "closesIssues": []
+        },
+        {
+          "number": 24,
+          "createdAt": "2026-04-11T09:16:29Z",
+          "mergedAt": "2026-04-11T09:29:40Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.22,
+          "closesIssues": []
+        },
+        {
+          "number": 23,
+          "createdAt": "2026-04-11T09:15:53Z",
+          "mergedAt": "2026-04-11T09:24:43Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.15,
+          "closesIssues": []
+        },
+        {
+          "number": 25,
+          "createdAt": "2026-04-11T09:17:45Z",
+          "mergedAt": "2026-04-11T09:18:37Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 22,
+          "createdAt": "2026-04-11T09:15:52Z",
+          "mergedAt": "2026-04-11T09:17:39Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.03,
+          "closesIssues": []
+        },
+        {
+          "number": 21,
+          "createdAt": "2026-04-11T09:12:25Z",
+          "mergedAt": "2026-04-11T09:13:50Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.02,
+          "closesIssues": []
+        },
+        {
+          "number": 20,
+          "createdAt": "2026-04-10T22:19:16Z",
+          "mergedAt": "2026-04-10T22:19:52Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.01,
+          "closesIssues": []
+        },
+        {
+          "number": 19,
+          "createdAt": "2026-04-10T21:38:49Z",
+          "mergedAt": "2026-04-10T21:50:43Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.2,
+          "closesIssues": []
+        },
+        {
+          "number": 17,
+          "createdAt": "2026-04-10T20:22:57Z",
+          "mergedAt": "2026-04-10T21:02:59Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.67,
+          "closesIssues": []
+        },
+        {
+          "number": 12,
+          "createdAt": "2026-04-10T20:22:31Z",
+          "mergedAt": "2026-04-10T21:02:46Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.67,
+          "closesIssues": []
+        },
+        {
+          "number": 15,
+          "createdAt": "2026-04-10T20:22:38Z",
+          "mergedAt": "2026-04-10T21:02:30Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.66,
+          "closesIssues": []
+        },
+        {
+          "number": 14,
+          "createdAt": "2026-04-10T20:22:33Z",
+          "mergedAt": "2026-04-10T21:02:16Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.66,
+          "closesIssues": []
+        },
+        {
+          "number": 13,
+          "createdAt": "2026-04-10T20:22:33Z",
+          "mergedAt": "2026-04-10T21:02:02Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.66,
+          "closesIssues": []
+        },
+        {
+          "number": 16,
+          "createdAt": "2026-04-10T20:22:38Z",
+          "mergedAt": "2026-04-10T20:44:35Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.37,
+          "closesIssues": []
+        },
+        {
+          "number": 18,
+          "createdAt": "2026-04-10T20:22:58Z",
+          "mergedAt": "2026-04-10T20:44:18Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.36,
+          "closesIssues": []
+        },
+        {
+          "number": 11,
+          "createdAt": "2026-04-10T20:06:43Z",
+          "mergedAt": "2026-04-10T20:21:55Z",
+          "author": "rajbos",
+          "isBotAuthor": false,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.25,
+          "closesIssues": []
+        },
+        {
+          "number": 10,
+          "createdAt": "2026-03-31T21:06:44Z",
+          "mergedAt": "2026-04-10T14:52:46Z",
+          "author": "Copilot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
+          "timeToMergeHours": 233.77,
+          "closesIssues": []
+        },
+        {
+          "number": 7,
+          "createdAt": "2026-03-29T03:24:49Z",
+          "mergedAt": "2026-03-30T06:55:51Z",
+          "author": "Copilot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
+          "timeToMergeHours": 27.52,
+          "closesIssues": []
+        },
+        {
+          "number": 6,
+          "createdAt": "2026-03-29T02:50:37Z",
+          "mergedAt": "2026-03-29T03:20:20Z",
+          "author": "Copilot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
+          "timeToMergeHours": 0.5,
+          "closesIssues": []
+        },
+        {
+          "number": 5,
+          "createdAt": "2026-03-29T02:26:23Z",
+          "mergedAt": "2026-03-29T02:48:46Z",
+          "author": "Copilot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
+          "timeToMergeHours": 0.37,
+          "closesIssues": []
+        },
+        {
+          "number": 4,
+          "createdAt": "2026-03-29T01:58:14Z",
+          "mergedAt": "2026-03-29T02:25:04Z",
+          "author": "Copilot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
+          "timeToMergeHours": 0.45,
+          "closesIssues": []
+        },
+        {
+          "number": 3,
+          "createdAt": "2026-03-29T01:38:33Z",
+          "mergedAt": "2026-03-29T01:51:41Z",
+          "author": "Copilot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
+          "timeToMergeHours": 0.22,
+          "closesIssues": []
+        },
+        {
+          "number": 2,
+          "createdAt": "2026-03-28T19:31:49Z",
+          "mergedAt": "2026-03-29T01:34:20Z",
+          "author": "Copilot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
+          "timeToMergeHours": 6.04,
+          "closesIssues": []
+        },
+        {
+          "number": 1,
+          "createdAt": "2026-03-28T17:09:55Z",
+          "mergedAt": "2026-03-28T19:29:26Z",
+          "author": "Copilot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": true,
+          "aiAuthorType": "copilot",
+          "timeToMergeHours": 2.33,
+          "closesIssues": []
+        }
+      ],
+      "copilotAdoption": {
+        "copilotAuthoredPRs": 8,
+        "copilotReviewedPRs": 0,
+        "totalMergedPRs": 266,
+        "totalDetailedPRs": 9,
+        "humanMergedPRs": 101
+      },
+      "issueLeadTimes": [],
+      "committerCount": 3,
+      "reviewerCount": 1,
+      "contributorCount": 3,
+      "dependentCount": 0,
+      "weeklyTrends": [
+        {
+          "week": "2024-W37",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W38",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W39",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W40",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W41",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W42",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W43",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W44",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W45",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W46",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W47",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W48",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W49",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W50",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W51",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2024-W52",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W01",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W02",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W03",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W04",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W05",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W06",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W07",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W08",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W09",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W10",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W11",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W12",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W13",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W14",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W15",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W16",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W17",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W18",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W19",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W20",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W21",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W22",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W23",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W24",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W25",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W26",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W27",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W28",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W29",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W30",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W31",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W32",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W33",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W34",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W35",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W36",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W37",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W38",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W39",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W40",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W41",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W42",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W43",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W44",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W45",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W46",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W47",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W48",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W49",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W50",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W51",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2025-W52",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W01",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W02",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W03",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W04",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W05",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W06",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W07",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W08",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W09",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W10",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W11",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W12",
+          "prsOpened": 0,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W13",
+          "prsOpened": 7,
+          "prsMerged": 6,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W14",
+          "prsOpened": 1,
+          "prsMerged": 1,
+          "issuesOpened": 2,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W15",
+          "prsOpened": 48,
+          "prsMerged": 49,
+          "issuesOpened": 0,
+          "issuesClosed": 1,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W16",
+          "prsOpened": 6,
+          "prsMerged": 6,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W17",
+          "prsOpened": 17,
+          "prsMerged": 17,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 16060,
+          "linesDeleted": 33516
+        },
+        {
+          "week": "2026-W18",
+          "prsOpened": 13,
+          "prsMerged": 12,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 25649,
+          "linesDeleted": 20702
+        },
+        {
+          "week": "2026-W19",
+          "prsOpened": 20,
+          "prsMerged": 21,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 25718,
+          "linesDeleted": 6377
+        },
+        {
+          "week": "2026-W20",
+          "prsOpened": 30,
+          "prsMerged": 24,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 190609,
+          "linesDeleted": 59990
+        },
+        {
+          "week": "2026-W21",
+          "prsOpened": 16,
+          "prsMerged": 20,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 42148,
+          "linesDeleted": 36837
+        },
+        {
+          "week": "2026-W22",
+          "prsOpened": 16,
+          "prsMerged": 16,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 45237,
+          "linesDeleted": 43730
+        },
+        {
+          "week": "2026-W23",
+          "prsOpened": 11,
+          "prsMerged": 7,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 61118,
+          "linesDeleted": 61197
+        },
+        {
+          "week": "2026-W24",
+          "prsOpened": 13,
+          "prsMerged": 7,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 42813,
+          "linesDeleted": 42431
+        },
+        {
+          "week": "2026-W25",
+          "prsOpened": 13,
+          "prsMerged": 14,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 28852,
+          "linesDeleted": 28487
+        },
+        {
+          "week": "2026-W26",
+          "prsOpened": 10,
+          "prsMerged": 7,
+          "issuesOpened": 1,
+          "issuesClosed": 0,
+          "linesAdded": 24595,
+          "linesDeleted": 25128
+        },
+        {
+          "week": "2026-W27",
+          "prsOpened": 7,
+          "prsMerged": 1,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 2667,
+          "linesDeleted": 2233
+        },
+        {
+          "week": "2026-W28",
+          "prsOpened": 8,
+          "prsMerged": 6,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 8845,
+          "linesDeleted": 11219
+        },
+        {
+          "week": "2026-W29",
+          "prsOpened": 10,
+          "prsMerged": 7,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 29517,
+          "linesDeleted": 24164
+        },
+        {
+          "week": "2026-W30",
+          "prsOpened": 11,
+          "prsMerged": 6,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 33249,
+          "linesDeleted": 32930
+        },
+        {
+          "week": "2026-W31",
+          "prsOpened": 10,
+          "prsMerged": 16,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 55301,
+          "linesDeleted": 54016
+        },
+        {
+          "week": "2026-W32",
+          "prsOpened": 12,
+          "prsMerged": 9,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 27440,
+          "linesDeleted": 27426
+        },
+        {
+          "week": "2026-W33",
+          "prsOpened": 5,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W34",
+          "prsOpened": 3,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W35",
+          "prsOpened": 1,
+          "prsMerged": 0,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 0,
+          "linesDeleted": 0
+        },
+        {
+          "week": "2026-W36",
+          "prsOpened": 4,
+          "prsMerged": 14,
+          "issuesOpened": 0,
+          "issuesClosed": 0,
+          "linesAdded": 11018,
+          "linesDeleted": 1106
+        }
+      ]
+    }
+  ],
+  "weeklyTrends": [
+    {
+      "week": "2024-W37",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W38",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W39",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W40",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W41",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W42",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W43",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W44",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W45",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W46",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W47",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W48",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W49",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W50",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W51",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2024-W52",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W01",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W02",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W03",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W04",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W05",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W06",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W07",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W08",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W09",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W10",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W11",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W12",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W13",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W14",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W15",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W16",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W17",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W18",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W19",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W20",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W21",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W22",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W23",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W24",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W25",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W26",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W27",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W28",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W29",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W30",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W31",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W32",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W33",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W34",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W35",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W36",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W37",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W38",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W39",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W40",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W41",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W42",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W43",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W44",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W45",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W46",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W47",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W48",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W49",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W50",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W51",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2025-W52",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W01",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W02",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W03",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W04",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W05",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W06",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W07",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W08",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W09",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W10",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W11",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W12",
+      "prsOpened": 0,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W13",
+      "prsOpened": 7,
+      "prsMerged": 6,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W14",
+      "prsOpened": 1,
+      "prsMerged": 1,
+      "issuesOpened": 2,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W15",
+      "prsOpened": 48,
+      "prsMerged": 49,
+      "issuesOpened": 0,
+      "issuesClosed": 1,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W16",
+      "prsOpened": 6,
+      "prsMerged": 6,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W17",
+      "prsOpened": 17,
+      "prsMerged": 17,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 16060,
+      "linesDeleted": 33516
+    },
+    {
+      "week": "2026-W18",
+      "prsOpened": 13,
+      "prsMerged": 12,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 25649,
+      "linesDeleted": 20702
+    },
+    {
+      "week": "2026-W19",
+      "prsOpened": 20,
+      "prsMerged": 21,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 25718,
+      "linesDeleted": 6377
+    },
+    {
+      "week": "2026-W20",
+      "prsOpened": 30,
+      "prsMerged": 24,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 190609,
+      "linesDeleted": 59990
+    },
+    {
+      "week": "2026-W21",
+      "prsOpened": 16,
+      "prsMerged": 20,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 42148,
+      "linesDeleted": 36837
+    },
+    {
+      "week": "2026-W22",
+      "prsOpened": 16,
+      "prsMerged": 16,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 45237,
+      "linesDeleted": 43730
+    },
+    {
+      "week": "2026-W23",
+      "prsOpened": 11,
+      "prsMerged": 7,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 61118,
+      "linesDeleted": 61197
+    },
+    {
+      "week": "2026-W24",
+      "prsOpened": 13,
+      "prsMerged": 7,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 42813,
+      "linesDeleted": 42431
+    },
+    {
+      "week": "2026-W25",
+      "prsOpened": 13,
+      "prsMerged": 14,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 28852,
+      "linesDeleted": 28487
+    },
+    {
+      "week": "2026-W26",
+      "prsOpened": 10,
+      "prsMerged": 7,
+      "issuesOpened": 1,
+      "issuesClosed": 0,
+      "linesAdded": 24595,
+      "linesDeleted": 25128
+    },
+    {
+      "week": "2026-W27",
+      "prsOpened": 7,
+      "prsMerged": 1,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 2667,
+      "linesDeleted": 2233
+    },
+    {
+      "week": "2026-W28",
+      "prsOpened": 8,
+      "prsMerged": 6,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 8845,
+      "linesDeleted": 11219
+    },
+    {
+      "week": "2026-W29",
+      "prsOpened": 10,
+      "prsMerged": 7,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 29517,
+      "linesDeleted": 24164
+    },
+    {
+      "week": "2026-W30",
+      "prsOpened": 11,
+      "prsMerged": 6,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 33249,
+      "linesDeleted": 32930
+    },
+    {
+      "week": "2026-W31",
+      "prsOpened": 10,
+      "prsMerged": 16,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 55301,
+      "linesDeleted": 54016
+    },
+    {
+      "week": "2026-W32",
+      "prsOpened": 12,
+      "prsMerged": 9,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 27440,
+      "linesDeleted": 27426
+    },
+    {
+      "week": "2026-W33",
+      "prsOpened": 5,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W34",
+      "prsOpened": 3,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W35",
+      "prsOpened": 1,
+      "prsMerged": 0,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0
+    },
+    {
+      "week": "2026-W36",
+      "prsOpened": 4,
+      "prsMerged": 14,
+      "issuesOpened": 0,
+      "issuesClosed": 0,
+      "linesAdded": 11018,
+      "linesDeleted": 1106
+    }
+  ],
+  "dataSource": "fresh",
+  "team": {
+    "id": "team",
+    "name": "Team",
+    "repos": [],
+    "discoverAll": true
+  }
+}

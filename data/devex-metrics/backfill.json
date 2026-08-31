@@ -1,0 +1,15 @@
+{
+  "v": 1,
+  "scope": "devex-metrics",
+  "repos": {
+    "devex-metrics/devex-metrics": {
+      "cursor": "Y3Vyc29yOnYyOpK0MjAyNi0wOC0zMVQxNzo0Njo0OFrPAAAAAQaMm08=",
+      "complete": true,
+      "pagesFetched": 3,
+      "prsSeen": 292,
+      "oldestCreatedAt": "2026-03-28T17:09:55Z",
+      "newestCreatedAt": "2026-08-31T17:46:48Z",
+      "updatedAt": "2026-08-31T19:49:54.738Z"
+    }
+  }
+}
