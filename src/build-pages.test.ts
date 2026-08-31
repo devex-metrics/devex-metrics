@@ -581,14 +581,15 @@ describe("build-pages", () => {
       };
       fs.writeFileSync(fixtureFile, JSON.stringify(fixtureData));
 
-      // Fixtures are opt-in: without the flag the build refuses rather than
-      // silently publishing data of unknown age.
-      expect(() =>
-        execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
-          cwd: process.cwd(),
-          stdio: "pipe",
-        })
-      ).toThrow();
+      // Fixtures are opt-in: without the flag the build treats this as "nothing
+      // collected yet" and skips publishing, rather than silently publishing
+      // data of unknown age OR failing the deploy of a fresh site.
+      const skipped = execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+        cwd: process.cwd(),
+        encoding: "utf-8",
+      });
+      expect(skipped).toContain("Nothing collected for");
+      expect(skipped).toContain("fixtures are opt-in");
 
       execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
         cwd: process.cwd(),
@@ -603,7 +604,7 @@ describe("build-pages", () => {
     }
   });
 
-  it("should exit with error when fixture has a stale schema version", () => {
+  it("should exit with error when an opted-in fixture has a stale schema version", () => {
     const fixtureFile = path.join(dataDir, "test-pages-owner.fixture.json");
     if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
     try {
@@ -617,9 +618,14 @@ describe("build-pages", () => {
       };
       fs.writeFileSync(fixtureFile, JSON.stringify(staleFixture));
 
+      // The stale-schema guard only applies once fixtures are opted into.
+      // Without the flag the fixture is ignored entirely and the build reports
+      // "nothing collected yet" instead — covered separately.
       expect(() =>
         execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
           cwd: process.cwd(),
+          stdio: "pipe",
+          env: { ...process.env, DEVEX_USE_FIXTURE: "1" },
         })
       ).toThrow();
     } finally {
@@ -1351,5 +1357,93 @@ describe("build-pages · dashboard JS executes", () => {
     // api's single merged PR is the AI-authored one.
     expect(doc.getElementById("aiHumanAI-merged")?.textContent).toBe("1");
     expect(doc.getElementById("aiHumanHuman-merged")?.textContent).toBe("0");
+  });
+});
+
+describe("build-pages · nothing collected yet", () => {
+  const dataDir = path.resolve(process.cwd(), "data");
+  const siteDir = path.resolve(process.cwd(), "_site");
+  const owner = "never-collected-owner";
+  const outputFile = path.join(dataDir, "gh-output-test.txt");
+
+  afterEach(() => {
+    if (fs.existsSync(outputFile)) fs.unlinkSync(outputFile);
+  });
+
+  function build(extraEnv: Record<string, string> = {}) {
+    return execFileSync("node", ["dist/build-pages.js", owner], {
+      cwd: process.cwd(),
+      encoding: "utf-8",
+      env: { ...process.env, ...extraEnv },
+    });
+  }
+
+  it("exits successfully instead of failing the first deploy of a new site", () => {
+    // A fresh deployment builds Pages on a code push before the first
+    // scheduled collection has run, so there is legitimately no data.
+    const out = build();
+    expect(out).toContain("Nothing collected for");
+    expect(out).toContain("Collect DevEx Metrics");
+  });
+
+  it("reports site-built=false so the workflow skips upload and deploy", () => {
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(outputFile, "");
+    build({ GITHUB_OUTPUT: outputFile });
+    expect(fs.readFileSync(outputFile, "utf-8")).toContain("site-built=false");
+  });
+
+  it("reports site-built=true when a site is actually produced", () => {
+    const cacheFile = path.join(dataDir, "built-owner.json");
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(outputFile, "");
+    fs.writeFileSync(
+      cacheFile,
+      JSON.stringify({
+        date: "2026-08-31",
+        data: {
+          schemaVersion: CURRENT_SCHEMA_VERSION,
+          owner: "built-owner",
+          ownerType: "org",
+          collectedAt: "2026-08-31T00:00:00.000Z",
+          repoCount: 0,
+          repos: [],
+          weeklyTrends: [],
+        },
+      })
+    );
+    try {
+      execFileSync("node", ["dist/build-pages.js", "built-owner"], {
+        cwd: process.cwd(),
+        env: { ...process.env, GITHUB_OUTPUT: outputFile },
+      });
+      expect(fs.readFileSync(outputFile, "utf-8")).toContain("site-built=true");
+      expect(fs.existsSync(path.join(siteDir, "index.html"))).toBe(true);
+    } finally {
+      if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
+    }
+  });
+
+  it("still fails hard when data exists but carries a stale schema", () => {
+    // "Not collected yet" is forgiven; "collected but broken" must not be.
+    const cacheFile = path.join(dataDir, "stale-owner.json");
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(
+      cacheFile,
+      JSON.stringify({
+        date: "2026-08-31",
+        data: { schemaVersion: 1, owner: "stale-owner", repos: [] },
+      })
+    );
+    try {
+      expect(() =>
+        execFileSync("node", ["dist/build-pages.js", "stale-owner"], {
+          cwd: process.cwd(),
+          stdio: "pipe",
+        })
+      ).toThrow();
+    } finally {
+      if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
+    }
   });
 });

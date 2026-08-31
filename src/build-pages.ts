@@ -27,7 +27,10 @@ import { buildDashboardHtml } from "./pages/dashboard.js";
  *   _site/data.json   – raw JSON API
  */
 
-/** Where the data came from, for the log and the page footer. */
+/**
+ * Where the data came from, for the log and the page footer.
+ * `null` means nothing has ever been collected for this owner.
+ */
 interface ResolvedData {
   data: OrgMetrics;
   date: string;
@@ -48,7 +51,7 @@ function readJson<T>(filePath: string): T {
   return JSON.parse(fs.readFileSync(filePath, "utf-8")) as T;
 }
 
-function resolveData(owner: string, historyDir: string): ResolvedData {
+function resolveData(owner: string, historyDir: string): ResolvedData | null {
   const snapshot = latestPath(historyDir, owner);
   if (fs.existsSync(snapshot)) {
     const data = readJson<OrgMetrics>(snapshot);
@@ -65,14 +68,7 @@ function resolveData(owner: string, historyDir: string): ResolvedData {
   }
 
   const fixtureFile = path.join(dataDir, `${owner}.fixture.json`);
-  if (fs.existsSync(fixtureFile)) {
-    if (!fixturesEnabled()) {
-      console.error(
-        `No collected data for ${owner}. A fixture exists at ${fixtureFile}, but ` +
-          `fixtures are opt-in — set DEVEX_USE_FIXTURE=1 to build from it.`
-      );
-      process.exit(1);
-    }
+  if (fs.existsSync(fixtureFile) && fixturesEnabled()) {
     console.log(`Building from fixture at ${fixtureFile} (DEVEX_USE_FIXTURE is set)`);
     const data = readJson<OrgMetrics>(fixtureFile);
     checkSchema(data, `Fixture ${fixtureFile}`);
@@ -83,12 +79,28 @@ function resolveData(owner: string, historyDir: string): ResolvedData {
     };
   }
 
-  console.error(
-    `No data found for ${owner}. Looked in:\n` +
-      `  ${snapshot}\n  ${cacheFile}\n  ${fixtureFile}\n` +
-      `Run a collection first (node dist/index.js).`
+  // Nothing has ever been collected. On a fresh deployment this is the normal
+  // first state, not a fault: Pages builds on a code push while collection runs
+  // on a schedule, so the very first build always precedes the first
+  // collection. Failing here would greet every new deployment with a red X.
+  //
+  // Note this is specifically "no data source exists at all". Data that exists
+  // but is unreadable or carries a stale schema still fails hard above — the
+  // point is to distinguish "not collected yet" from "collected but broken",
+  // never to let a missing dataset pass silently as a successful publish.
+  const fixtureNote = fs.existsSync(fixtureFile)
+    ? `\nA committed fixture exists at ${fixtureFile}, but fixtures are opt-in ` +
+      `so they cannot stand in for collected data; set DEVEX_USE_FIXTURE=1 to ` +
+      `build from it deliberately.`
+    : "";
+  console.log(
+    `Nothing collected for ${owner} yet, so there is no site to build.\n` +
+      `Looked in:\n  ${snapshot}\n  ${cacheFile}\n  ${fixtureFile}` +
+      fixtureNote +
+      `\nRun the "Collect DevEx Metrics" workflow (or \`node dist/index.js\`), ` +
+      `then this build will publish the dashboard.`
   );
-  process.exit(1);
+  return null;
 }
 
 function main(): void {
@@ -103,6 +115,12 @@ function main(): void {
 
   const historyDir = path.resolve(process.cwd(), config.history.dir);
   const resolved = resolveData(config.owner, historyDir);
+  if (resolved === null) {
+    // Tell the workflow to skip the upload and deploy steps rather than
+    // publishing an empty site over a previously good one.
+    reportSiteBuilt(false);
+    return;
+  }
   const { date, origin } = resolved;
   // Team membership and trial metadata come from the current configuration, so
   // re-scoping a trial only needs a site rebuild, not a re-collection.
@@ -152,6 +170,22 @@ function main(): void {
   fs.writeFileSync(path.join(siteDir, "index.html"), html);
 
   console.log(`GitHub Pages site built in ${siteDir}/`);
+  reportSiteBuilt(true);
+}
+
+/**
+ * Publish a `site-built` step output so the workflow can skip uploading and
+ * deploying when there was nothing to build. Writing to GITHUB_OUTPUT is a
+ * no-op outside Actions.
+ */
+function reportSiteBuilt(built: boolean): void {
+  const outputFile = process.env.GITHUB_OUTPUT;
+  if (!outputFile) return;
+  try {
+    fs.appendFileSync(outputFile, `site-built=${String(built)}\n`);
+  } catch (err: unknown) {
+    console.warn(`  ⚠ could not write GITHUB_OUTPUT: ${String(err)}`);
+  }
 }
 
 function buildRunUrl(): string | undefined {
