@@ -1334,7 +1334,7 @@ function updateReviewLoad(repoNames){
   }
 }
 
-// ── Improvement trial ──
+// ── Baseline versus focus repositories ──
 // The baseline is every collected repository; the comparison column is the
 // team's repositories over the selected period. Durations are reported as
 // order statistics — delivery metrics are heavily right-skewed, so a mean
@@ -1387,8 +1387,11 @@ var TRIAL_METRICS=[
   {id:"ai",fmt:fmtPct,lowerIsBetter:null}
 ];
 function updateTrial(cutoff,excludeBots,period){
-  if(!CHART_DATA.trial)return;
   var team=CHART_DATA.teamRepos||[];
+  var trial=CHART_DATA.trial;
+  // A configured team is enough to compare against the baseline; the trial is
+  // only an overlay on top of it.
+  if(!trial&&team.length===0)return;
   var teamSet={};team.forEach(function(n){teamSet[n]=true;});
 
   var all=(CHART_DATA.allPRDetails||[]).slice();
@@ -1396,9 +1399,8 @@ function updateTrial(cutoff,excludeBots,period){
 
   // Baseline: every repository. Bounded by the configured baseline window when
   // one is set, otherwise the whole collected history.
-  var trial=CHART_DATA.trial;
-  var baseFrom=trial.baselineFrom?new Date(trial.baselineFrom+"T00:00:00Z"):null;
-  var baseTo=trial.baselineTo?new Date(trial.baselineTo+"T23:59:59Z"):null;
+  var baseFrom=trial&&trial.baselineFrom?new Date(trial.baselineFrom+"T00:00:00Z"):null;
+  var baseTo=trial&&trial.baselineTo?new Date(trial.baselineTo+"T23:59:59Z"):null;
   var basePRs=all.filter(function(p){
     var t=new Date(p.mergedAt);
     if(baseFrom&&t<baseFrom)return false;
