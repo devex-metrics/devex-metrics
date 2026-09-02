@@ -1033,6 +1033,20 @@ describe("build-pages · trial and branding", () => {
     expect(html).toContain("started 2026-05-01");
   });
 
+  it("renders the comparison panel from a team alone, with no trial", () => {
+    const html = build({
+      DEVEX_TEAM_NAME: "Team Alpha",
+      DEVEX_TEAM_REPOS: "trial-owner/api",
+    });
+    expect(html).toContain('<section class="trial"');
+    expect(html).toContain('<div class="trial-eyebrow">Focus repositories</div>');
+    expect(html).toContain('<h2 class="trial-title">Team Alpha</h2>');
+    expect(html).toContain("baseline: all repositories, all time");
+    // Trial-only framing stays out until a trial is configured.
+    expect(html).not.toContain("Improvement trial");
+    expect(html).not.toContain('class="trial-date"');
+  });
+
   it("scopes the team from the current config rather than the stored data", () => {
     const html = build({
       DEVEX_TEAM_NAME: "Team Alpha",
@@ -1226,6 +1240,23 @@ describe("build-pages · dashboard JS executes", () => {
     // Both repos merged a PR, so the baseline has data; the team is api only.
     expect(baseline?.textContent).not.toBe("–");
     expect(team?.textContent).not.toBe("–");
+    expect(dom.window.document.getElementById("trialNote")?.textContent).toContain(
+      "Baseline n="
+    );
+  });
+
+  it("fills the comparison table when a team is set but no trial is", () => {
+    const { dom, errors } = run("", {
+      DEVEX_TEAM_NAME: "Platform",
+      DEVEX_TEAM_REPOS: "js-owner/api",
+    });
+    expect(errors).toEqual([]);
+    expect(
+      dom.window.document.getElementById("trialBaseline-cycle")?.textContent
+    ).not.toBe("–");
+    expect(
+      dom.window.document.getElementById("trialTeam-cycle")?.textContent
+    ).not.toBe("–");
     expect(dom.window.document.getElementById("trialNote")?.textContent).toContain(
       "Baseline n="
     );

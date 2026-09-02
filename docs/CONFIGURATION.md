@@ -97,6 +97,13 @@ DEVEX_TRIAL_START    = 2026-05-01
 Collection walks the whole org, so the rest of the org is the comparison group,
 and the dashboard shows the team's numbers against that baseline.
 
+`DEVEX_TEAM_REPOS` alone is enough for that comparison: the dashboard renders a
+baseline-versus-focus table — every collected repository on one side, the team's
+repositories on the other — as soon as a team is configured. The `DEVEX_TRIAL_*`
+variables are an overlay on top of it, adding a headline, a hypothesis, an
+intervention date and milestone markers on the charts. Configure the comparison
+first and add the trial framing when an experiment actually starts.
+
 To collect *only* the team's repos — much cheaper, but no baseline — set
 `DEVEX_DISCOVER_ALL=false`. Repos are then filtered to `DEVEX_TEAM_REPOS`
 during discovery, so the API cost drops to the team's repos alone.

@@ -785,29 +785,35 @@ ${rows}
 }
 
 /**
- * The trial banner: what the intervention is, when it started, and how the
- * team's current numbers sit against the org-wide baseline.
+ * The comparison banner: how the focus repositories' numbers sit against the
+ * baseline of every collected repository.
+ *
+ * A configured team is enough to render it — the comparison is useful on its
+ * own, before any intervention exists. Trial framing (headline, hypothesis,
+ * intervention date, milestones) is an optional overlay on top of it.
  *
  * The numbers themselves are filled in by the client so they follow the period
  * and bot filters; this renders the frame and the static context.
  */
 function buildTrialBanner(data: OrgMetrics, teamRepoCount: number): string {
   const trial = data.trial;
-  if (!trial) return "";
+  if (!trial && teamRepoCount === 0) return "";
 
   const teamName = data.team?.name ?? "the team";
-  const started = trial.interventionStart
+  const eyebrow = trial ? "Improvement trial" : "Focus repositories";
+  const title = trial ? trial.title : teamName;
+  const started = trial?.interventionStart
     ? `<span class="trial-date" title="Intervention start">started ${escapeHtml(trial.interventionStart)}</span>`
     : "";
   const baseline =
-    trial.baselineFrom && trial.baselineTo
+    trial?.baselineFrom && trial.baselineTo
       ? `<span class="trial-baseline-window">baseline ${escapeHtml(trial.baselineFrom)} &rarr; ${escapeHtml(trial.baselineTo)}</span>`
       : `<span class="trial-baseline-window">baseline: all repositories, all time</span>`;
-  const hypothesis = trial.hypothesis
+  const hypothesis = trial?.hypothesis
     ? `<p class="trial-hypothesis">${escapeHtml(trial.hypothesis)}</p>`
     : "";
   const milestones =
-    trial.milestones.length > 0
+    trial && trial.milestones.length > 0
       ? `<ul class="trial-milestones">${trial.milestones
           .map(
             (m) =>
@@ -815,6 +821,11 @@ function buildTrialBanner(data: OrgMetrics, teamRepoCount: number): string {
           )
           .join("")}</ul>`
       : "";
+  // Without a trial the headline is already the team name, so the facts line
+  // carries only the repository count.
+  const teamFact = trial
+    ? `${escapeHtml(teamName)} &middot; ${teamRepoCount} repo${teamRepoCount === 1 ? "" : "s"}`
+    : `${teamRepoCount} repo${teamRepoCount === 1 ? "" : "s"}`;
 
   // One row per metric: baseline (all repos) vs the team's current numbers.
   const rows = [
@@ -835,15 +846,15 @@ function buildTrialBanner(data: OrgMetrics, teamRepoCount: number): string {
     )
     .join("\n");
 
-  return `<section class="trial" aria-label="Improvement trial">
+  return `<section class="trial" aria-label="${trial ? "Improvement trial" : "Focus repositories versus baseline"}">
   <div class="trial-head">
     <div>
-      <div class="trial-eyebrow">Improvement trial</div>
-      <h2 class="trial-title">${escapeHtml(trial.title)}</h2>
+      <div class="trial-eyebrow">${eyebrow}</div>
+      <h2 class="trial-title">${escapeHtml(title)}</h2>
       ${hypothesis}
     </div>
     <div class="trial-facts">
-      <div class="trial-team-name">${escapeHtml(teamName)} &middot; ${teamRepoCount} repo${teamRepoCount === 1 ? "" : "s"}</div>
+      <div class="trial-team-name">${teamFact}</div>
       ${started}
       ${baseline}
     </div>
