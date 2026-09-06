@@ -1132,6 +1132,13 @@
       "pagesFetched": 1,
       "prsSeen": 0,
       "updatedAt": "2026-09-01T11:25:54.326Z"
+    },
+    "rajbos/github-vnext-chopin": {
+      "cursor": null,
+      "complete": true,
+      "pagesFetched": 1,
+      "prsSeen": 0,
+      "updatedAt": "2026-09-06T10:23:31.884Z"
     }
   }
 }
