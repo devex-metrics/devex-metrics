@@ -67,16 +67,17 @@ copy `devex.config.example.json` to `devex.config.json` (gitignored).
 
 A workflow is included at `.github/workflows/collect-metrics.yml`.
 
-### Option A – Personal Access Token
+### Authentication – GitHub App
 
-1. Create a **Personal Access Token** with `repo` and `read:org` scopes.
-2. Add it as a repository secret. It cannot be called `GITHUB_TOKEN` — that name
-   is reserved by Actions — so use something like `METRICS_TOKEN` and map it to
-   the `GITHUB_TOKEN` environment variable in the workflow step.
+The included workflows require a GitHub App. Personal access tokens are
+supported for local development, but should not be used as the primary
+credential for an unattended deployment: they are tied to an individual user
+and inherit that user's access. A GitHub App can be installed only on the
+required repositories, can be granted explicit permissions and issues
+short-lived installation tokens.
 
-### Option B – GitHub App (recommended)
-
-Using a GitHub App provides fine-grained permissions and higher rate limits.
+For a detailed comparison of the available token types, see
+[GitHub Access Tokens explained](https://devopsjournal.io/blog/2022/01/03/GitHub-Tokens).
 
 1. [Create a GitHub App](https://docs.github.com/en/apps/creating-github-apps) with the required repository permissions (e.g. `Issues: read`, `Pull requests: read`, `Contents: read`).
 2. Install the app on the target organisation or repositories.
