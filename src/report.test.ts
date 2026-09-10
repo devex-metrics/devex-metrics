@@ -322,6 +322,50 @@ describe("generateReport", () => {
     expect(report).toContain("| Total tasks | 5 |");
   });
 
+  it("should escape pipe characters in PR titles so the table is not corrupted", () => {
+    const metrics: OrgMetrics = {
+      owner: "test-org",
+      ownerType: "org",
+      collectedAt: "2026-03-28T12:00:00Z",
+      repoCount: 1,
+      repos: [
+        {
+          name: "repo-a",
+          fullName: "test-org/repo-a",
+          issues: { open: 0, closed: 0 },
+          pullRequests: { open: 0, closed: 0, merged: 1 },
+          pullRequestDetails: [
+            {
+              number: 7,
+              title: "UI Composer | Implementation | Side-by-side layout",
+              state: "merged",
+              mergedAt: "2026-03-01T00:00:00Z",
+              linesAdded: 1,
+              linesDeleted: 0,
+              commentCount: 0,
+              commitCount: 1,
+              actionsMinutes: 0,
+            },
+          ],
+          committerCount: 0,
+          reviewerCount: 0,
+          contributorCount: 0,
+          dependentCount: 0,
+        },
+      ],
+    };
+    const report = generateReport(metrics);
+    expect(report).toContain(
+      "#7 UI Composer \\| Implementation \\| Side-by-side layout"
+    );
+    // Each row of the PR table must have exactly 6 unescaped pipe-delimited cells (7 separators).
+    const row = report
+      .split("\n")
+      .find((line) => line.startsWith("| #7 "));
+    expect(row).toBeDefined();
+    expect((row!.match(/(?<!\\)\|/g) ?? []).length).toBe(7);
+  });
+
   it("should place PRs without mergedAt after those with mergedAt", () => {
     const metrics: OrgMetrics = {
       owner: "test-org",
