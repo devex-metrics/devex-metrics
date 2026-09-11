@@ -368,7 +368,7 @@ describe("collectCopilotAgentMetrics", () => {
       updated_at: recentDate,
       html_url: "https://github.com/owner/repo/tasks/task-1",
       session_count: 1,
-      artifacts: [{ type: "pull", data: { id: 42 } }],
+      artifacts: [{ type: "pull", data: { id: 4218675309, global_id: "PR_kwDOhappy" } }],
     };
     const rawDetail = {
       ...rawTask,
@@ -410,6 +410,15 @@ describe("collectCopilotAgentMetrics", () => {
           }),
         },
       },
+      graphql: vi.fn().mockResolvedValue({
+        nodes: [
+          {
+            __typename: "PullRequest",
+            number: 42,
+            repository: { owner: { login: "owner" }, name: "repo" },
+          },
+        ],
+      }),
     } as unknown as Octokit;
     setOctokit(regularOctokit);
 
@@ -635,6 +644,170 @@ describe("collectCopilotAgentMetrics", () => {
     // 100 (page1) + 1 (page2) tasks fetched
     expect(result!.totalTasks).toBe(101);
   });
+
+  it("regression: resolves the repo-scoped PR number instead of using the artifact's database ID", async () => {
+    // Sanitized regression fixture modeled on the observed failure: the
+    // Agent Tasks API's pull artifact only carries a database ID
+    // (`data.id`, format int64) and a GraphQL global node ID
+    // (`data.global_id`) — never the repository-scoped PR `number`.
+    const recentDate = new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString();
+    const rawTask = {
+      id: "task-regression",
+      name: "Agent PR task",
+      state: "completed",
+      created_at: recentDate,
+      updated_at: recentDate,
+      html_url: "https://github.com/acme/component/tasks/task-regression",
+      session_count: 0,
+      artifacts: [
+        { type: "pull", data: { id: 4419865008, global_id: "PR_kwDOsanitized" } },
+      ],
+    };
+
+    const agentOctokit = makeMockOctokit([rawTask], { ...rawTask, sessions: [] });
+    setAgentOctokit(agentOctokit);
+
+    const pullsGetMock = vi.fn().mockResolvedValue({
+      data: { state: "closed", head: { sha: "sha-285" } },
+    });
+    const checksListMock = vi.fn().mockResolvedValue({
+      data: { check_runs: [] },
+    });
+    const graphqlMock = vi.fn().mockResolvedValue({
+      nodes: [
+        {
+          __typename: "PullRequest",
+          number: 285,
+          repository: { owner: { login: "acme" }, name: "component" },
+        },
+      ],
+    });
+    setOctokit({
+      rest: { pulls: { get: pullsGetMock }, checks: { listForRef: checksListMock } },
+      graphql: graphqlMock,
+    } as unknown as Octokit);
+
+    const result = await collectCopilotAgentMetrics("acme", "component");
+
+    expect(result).not.toBeNull();
+    expect(result!.agentCreatedPRs).toBe(1);
+
+    // The REST pull_number must be the resolved repo-scoped number (285),
+    // never the artifact's raw database ID (4419865008).
+    expect(pullsGetMock).toHaveBeenCalledWith(
+      expect.objectContaining({ pull_number: 285 }),
+    );
+    for (const call of pullsGetMock.mock.calls) {
+      expect(call[0].pull_number).not.toBe(4419865008);
+    }
+    for (const call of checksListMock.mock.calls) {
+      expect(JSON.stringify(call[0])).not.toContain("4419865008");
+    }
+  });
+
+  it("skips an artifact resolved to a different repository (cross-repo mismatch)", async () => {
+    const recentDate = new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString();
+    const rawTask = {
+      id: "task-cross-repo",
+      name: "Cross-repo artifact",
+      state: "completed",
+      created_at: recentDate,
+      updated_at: recentDate,
+      html_url: "https://github.com/acme/source/tasks/task-cross-repo",
+      session_count: 0,
+      artifacts: [
+        { type: "pull", data: { id: 9988776655, global_id: "PR_kwDOother" } },
+      ],
+    };
+    const agentOctokit = makeMockOctokit([rawTask], { ...rawTask, sessions: [] });
+    setAgentOctokit(agentOctokit);
+
+    const pullsGetMock = vi.fn();
+    const graphqlMock = vi.fn().mockResolvedValue({
+      nodes: [
+        {
+          __typename: "PullRequest",
+          number: 25,
+          // Resolves to a *different* repository than the one being collected.
+          repository: { owner: { login: "acme" }, name: "target" },
+        },
+      ],
+    });
+    setOctokit({
+      rest: { pulls: { get: pullsGetMock }, checks: { listForRef: vi.fn() } },
+      graphql: graphqlMock,
+    } as unknown as Octokit);
+
+    const result = await collectCopilotAgentMetrics("acme", "source");
+
+    expect(result).not.toBeNull();
+    expect(result!.agentCreatedPRs).toBe(0);
+    expect(pullsGetMock).not.toHaveBeenCalled();
+  });
+
+  it("skips an artifact when GraphQL returns no valid PR number", async () => {
+    const recentDate = new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString();
+    const rawTask = {
+      id: "task-no-number",
+      name: "Unresolvable artifact",
+      state: "completed",
+      created_at: recentDate,
+      updated_at: recentDate,
+      html_url: "https://github.com/owner/repo/tasks/task-no-number",
+      session_count: 0,
+      artifacts: [
+        { type: "pull", data: { id: 5566778899, global_id: "PR_kwDOmissing" } },
+      ],
+    };
+    const agentOctokit = makeMockOctokit([rawTask], { ...rawTask, sessions: [] });
+    setAgentOctokit(agentOctokit);
+
+    const pullsGetMock = vi.fn();
+    // Node lookup fails / returns null (e.g. deleted PR, unrecognized node).
+    const graphqlMock = vi.fn().mockResolvedValue({ nodes: [null] });
+    setOctokit({
+      rest: { pulls: { get: pullsGetMock }, checks: { listForRef: vi.fn() } },
+      graphql: graphqlMock,
+    } as unknown as Octokit);
+
+    const result = await collectCopilotAgentMetrics("owner", "repo");
+
+    expect(result).not.toBeNull();
+    expect(result!.agentCreatedPRs).toBe(0);
+    expect(pullsGetMock).not.toHaveBeenCalled();
+  });
+
+  it("skips an artifact with no global_id rather than falling back to the database ID", async () => {
+    const recentDate = new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString();
+    const rawTask = {
+      id: "task-no-global-id",
+      name: "Old-shaped artifact",
+      state: "completed",
+      created_at: recentDate,
+      updated_at: recentDate,
+      html_url: "https://github.com/owner/repo/tasks/task-no-global-id",
+      session_count: 0,
+      // Only the database ID is present — no global_id to resolve from.
+      artifacts: [{ type: "pull", data: { id: 1234567890 } }],
+    };
+    const agentOctokit = makeMockOctokit([rawTask], { ...rawTask, sessions: [] });
+    setAgentOctokit(agentOctokit);
+
+    const pullsGetMock = vi.fn();
+    const graphqlMock = vi.fn();
+    setOctokit({
+      rest: { pulls: { get: pullsGetMock }, checks: { listForRef: vi.fn() } },
+      graphql: graphqlMock,
+    } as unknown as Octokit);
+
+    const result = await collectCopilotAgentMetrics("owner", "repo");
+
+    expect(result).not.toBeNull();
+    expect(result!.agentCreatedPRs).toBe(0);
+    expect(pullsGetMock).not.toHaveBeenCalled();
+    // No global_id means nothing to resolve — GraphQL should not even be called.
+    expect(graphqlMock).not.toHaveBeenCalled();
+  });
 });
 
 // ── Unit: collectActionsMinutesForPRs ─────────────────────────────────────────
@@ -776,7 +949,7 @@ describe("collectActionsMinutesForPRs", () => {
       updated_at: recentDate,
       html_url: "https://github.com/owner/repo/tasks/task-cache-test",
       session_count: 0,
-      artifacts: [{ type: "pull", data: { id: 101 } }],
+      artifacts: [{ type: "pull", data: { id: 4218675310, global_id: "PR_kwDOcachetest" } }],
     };
 
     const agentOctokit = makeMockOctokit([rawTask], { ...rawTask, sessions: [] });
@@ -794,6 +967,15 @@ describe("collectActionsMinutesForPRs", () => {
     });
     setOctokit({
       rest: { pulls: { get: pullsGetMock }, checks: { listForRef: checksListMock } },
+      graphql: vi.fn().mockResolvedValue({
+        nodes: [
+          {
+            __typename: "PullRequest",
+            number: 101,
+            repository: { owner: { login: "owner" }, name: "repo" },
+          },
+        ],
+      }),
     } as unknown as Octokit);
 
     await collectCopilotAgentMetrics("owner", "repo");
