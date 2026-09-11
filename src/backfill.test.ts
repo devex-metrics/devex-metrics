@@ -9,7 +9,7 @@ vi.mock("./collectors/repo-graphql.js", () => ({
 
 import { fetchHistoricalPRPage } from "./collectors/repo-graphql.js";
 import { runBackfill, toEventRow, describeBackfill } from "./backfill.js";
-import { loadBackfillState, loadEvents } from "./history.js";
+import { loadBackfillState, loadEvents, saveBackfillState } from "./history.js";
 import type { HistoricalPRNode } from "./collectors/repo-graphql.js";
 import type { BackfillConfig } from "./config.js";
 
@@ -32,9 +32,15 @@ function config(patch: Partial<BackfillConfig> = {}): BackfillConfig {
     pagesPerRun: 100,
     maxPagesPerRepo: 20,
     recomputeRollups: false,
+    pageSize: 50,
+    minPageSize: 10,
+    adaptivePageSize: true,
     ...patch,
   };
 }
+
+/** The page-size fetch options `runBackfill` passes for `config()`'s defaults. */
+const DEFAULT_SIZE_OPTIONS = { pageSize: 50, minPageSize: 10, adaptive: true };
 
 function node(number: number, extra: Partial<HistoricalPRNode> = {}): HistoricalPRNode {
   return {
@@ -59,6 +65,7 @@ function queuePages(pages: HistoricalPRNode[][]) {
       nodes,
       hasNextPage: i < pages.length - 1,
       endCursor: `cursor-${i}`,
+      pageSize: 50,
     });
   });
 }
@@ -176,6 +183,7 @@ describe("runBackfill", () => {
       nodes: [node(1)],
       hasNextPage: true,
       endCursor: "cursor-A",
+      pageSize: 50,
     });
     await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ pagesPerRun: 1 }));
 
@@ -189,9 +197,10 @@ describe("runBackfill", () => {
       nodes: [node(2)],
       hasNextPage: false,
       endCursor: "cursor-B",
+      pageSize: 50,
     });
     await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ pagesPerRun: 1 }));
-    expect(mockFetch).toHaveBeenLastCalledWith("acme", "api", "cursor-A");
+    expect(mockFetch).toHaveBeenLastCalledWith("acme", "api", "cursor-A", DEFAULT_SIZE_OPTIONS);
     expect(loadBackfillState(dir, "acme").repos["acme/api"].complete).toBe(true);
   });
 
@@ -207,7 +216,7 @@ describe("runBackfill", () => {
   });
 
   it("respects the per-run page budget", async () => {
-    mockFetch.mockResolvedValue({ nodes: [node(1)], hasNextPage: true, endCursor: "c" });
+    mockFetch.mockResolvedValue({ nodes: [node(1)], hasNextPage: true, endCursor: "c", pageSize: 50 });
     const result = await runBackfill(
       dir,
       "acme",
@@ -219,7 +228,7 @@ describe("runBackfill", () => {
   });
 
   it("caps one repository so it cannot starve the others", async () => {
-    mockFetch.mockResolvedValue({ nodes: [node(1)], hasNextPage: true, endCursor: "c" });
+    mockFetch.mockResolvedValue({ nodes: [node(1)], hasNextPage: true, endCursor: "c", pageSize: 50 });
     await runBackfill(
       dir,
       "acme",
@@ -277,6 +286,106 @@ describe("runBackfill", () => {
   });
 });
 
+describe("runBackfill adaptive page sizing", () => {
+  it("requests the configured page size and reports no reduction on a normal page", async () => {
+    queuePages([[node(1)]]);
+    const result = await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
+    expect(mockFetch).toHaveBeenCalledWith("acme", "api", null, DEFAULT_SIZE_OPTIONS);
+    expect(result.pageSizeReductions).toBe(0);
+    expect(result.reposWithReducedPageSize).toEqual([]);
+  });
+
+  it("adopts a reduced page size returned by the collector and keeps using it for later pages", async () => {
+    mockFetch
+      .mockResolvedValueOnce({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-A", pageSize: 25 })
+      .mockResolvedValueOnce({ nodes: [node(2)], hasNextPage: false, endCursor: "cursor-B", pageSize: 25 });
+
+    const result = await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
+
+    expect(result.pageSizeReductions).toBe(1);
+    expect(result.reposWithReducedPageSize).toEqual(["acme/api"]);
+    // The first page requested the configured default (50); the second must
+    // request the reduced size (25) rather than immediately going back to 50.
+    expect(mockFetch).toHaveBeenNthCalledWith(1, "acme", "api", null, DEFAULT_SIZE_OPTIONS);
+    expect(mockFetch).toHaveBeenNthCalledWith(2, "acme", "api", "cursor-A", {
+      pageSize: 25,
+      minPageSize: 10,
+      adaptive: true,
+    });
+    expect(loadBackfillState(dir, "acme").repos["acme/api"].preferredPageSize).toBe(25);
+  });
+
+  it("persists the reduced page size as a hint and starts the next run there", async () => {
+    mockFetch.mockResolvedValueOnce({
+      nodes: [node(1)],
+      hasNextPage: true,
+      endCursor: "cursor-A",
+      pageSize: 25,
+    });
+    await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ pagesPerRun: 1 }));
+    expect(loadBackfillState(dir, "acme").repos["acme/api"].preferredPageSize).toBe(25);
+
+    mockFetch.mockResolvedValueOnce({
+      nodes: [node(2)],
+      hasNextPage: false,
+      endCursor: "cursor-B",
+      pageSize: 25,
+    });
+    await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ pagesPerRun: 1 }));
+    expect(mockFetch).toHaveBeenLastCalledWith("acme", "api", "cursor-A", {
+      pageSize: 25,
+      minPageSize: 10,
+      adaptive: true,
+    });
+  });
+
+  it("keeps each repository's page size independent — one reduction does not affect another repo", async () => {
+    mockFetch
+      .mockResolvedValueOnce({ nodes: [node(1)], hasNextPage: false, endCursor: "c1", pageSize: 25 })
+      .mockResolvedValueOnce({ nodes: [node(2)], hasNextPage: false, endCursor: "c2", pageSize: 50 });
+
+    await runBackfill(
+      dir,
+      "acme",
+      [{ fullName: "acme/api" }, { fullName: "acme/web" }],
+      config()
+    );
+
+    expect(mockFetch).toHaveBeenNthCalledWith(1, "acme", "api", null, DEFAULT_SIZE_OPTIONS);
+    expect(mockFetch).toHaveBeenNthCalledWith(2, "acme", "web", null, DEFAULT_SIZE_OPTIONS);
+    expect(loadBackfillState(dir, "acme").repos["acme/api"].preferredPageSize).toBe(25);
+    expect(loadBackfillState(dir, "acme").repos["acme/web"].preferredPageSize).toBe(50);
+  });
+
+  it("ignores a stale preferredPageSize hint that no longer fits the current configuration", async () => {
+    // A hint below the current minPageSize (config changed since it was recorded).
+    const state = loadBackfillState(dir, "acme");
+    state.repos["acme/api"] = {
+      cursor: "cursor-A",
+      complete: false,
+      pagesFetched: 1,
+      prsSeen: 1,
+      updatedAt: new Date().toISOString(),
+      preferredPageSize: 5,
+    };
+    saveBackfillState(dir, state);
+    queuePages([[node(2)]]);
+
+    await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ minPageSize: 10 }));
+    expect(mockFetch).toHaveBeenCalledWith("acme", "api", "cursor-A", DEFAULT_SIZE_OPTIONS);
+  });
+
+  it("falls back to a single request at the configured size when adaptivePageSize is disabled", async () => {
+    queuePages([[node(1)]]);
+    await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ adaptivePageSize: false }));
+    expect(mockFetch).toHaveBeenCalledWith("acme", "api", null, {
+      pageSize: 50,
+      minPageSize: 10,
+      adaptive: false,
+    });
+  });
+});
+
 describe("describeBackfill", () => {
   it("reports completion once every repository is crawled", () => {
     const line = describeBackfill(
@@ -287,6 +396,8 @@ describe("describeBackfill", () => {
         pagesFetched: 0,
         eventsAppended: 0,
         allComplete: true,
+        pageSizeReductions: 0,
+        reposWithReducedPageSize: [],
       },
       config()
     );
@@ -302,12 +413,33 @@ describe("describeBackfill", () => {
         pagesFetched: 5,
         eventsAppended: 400,
         allComplete: false,
+        pageSizeReductions: 0,
+        reposWithReducedPageSize: [],
       },
       config({ pagesPerRun: 100 })
     );
     expect(line).toContain("5/100 pages");
     expect(line).toContain("400 PRs recorded");
     expect(line).toContain("Continues next run");
+  });
+
+  it("mentions page-size reductions when any occurred", () => {
+    const line = describeBackfill(
+      {
+        reposTouched: 2,
+        reposCompleted: 0,
+        reposAlreadyComplete: 0,
+        pagesFetched: 5,
+        eventsAppended: 100,
+        allComplete: false,
+        pageSizeReductions: 2,
+        reposWithReducedPageSize: ["acme/api"],
+      },
+      config()
+    );
+    expect(line).toContain("initial=50");
+    expect(line).toContain("min=10");
+    expect(line).toContain("2 reduction(s) across 1 repo(s)");
   });
 });
 

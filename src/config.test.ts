@@ -357,3 +357,71 @@ describe("CI health configuration", () => {
     expect(config.collection.features.ciHealth).toBe(false);
   });
 });
+
+describe("Backfill historical page size configuration", () => {
+  it("defaults to a conservative page size, a valid minimum, and adaptive sizing on", () => {
+    const backfill = defaultConfig().collection.backfill;
+    expect(backfill.pageSize).toBe(50);
+    expect(backfill.minPageSize).toBe(10);
+    expect(backfill.adaptivePageSize).toBe(true);
+  });
+
+  it("reads valid overrides from DEVEX_BACKFILL_* variables", () => {
+    const config = loadConfig({
+      ...EMPTY,
+      DEVEX_BACKFILL_PAGE_SIZE: "80",
+      DEVEX_BACKFILL_MIN_PAGE_SIZE: "20",
+      DEVEX_BACKFILL_ADAPTIVE_PAGE_SIZE: "false",
+    });
+    expect(config.collection.backfill.pageSize).toBe(80);
+    expect(config.collection.backfill.minPageSize).toBe(20);
+    expect(config.collection.backfill.adaptivePageSize).toBe(false);
+  });
+
+  it("accepts the boundary values 1 and 100", () => {
+    expect(
+      loadConfig({ ...EMPTY, DEVEX_BACKFILL_PAGE_SIZE: "100", DEVEX_BACKFILL_MIN_PAGE_SIZE: "1" })
+        .collection.backfill
+    ).toMatchObject({ pageSize: 100, minPageSize: 1 });
+  });
+
+  it("keeps the defaults when a DEVEX_BACKFILL_PAGE_SIZE variable is blank", () => {
+    const config = loadConfig({ ...EMPTY, DEVEX_BACKFILL_PAGE_SIZE: "  " });
+    expect(config.collection.backfill.pageSize).toBe(50);
+  });
+
+  it.each([
+    ["0", "DEVEX_BACKFILL_PAGE_SIZE"],
+    ["-5", "DEVEX_BACKFILL_PAGE_SIZE"],
+    ["101", "DEVEX_BACKFILL_PAGE_SIZE"],
+    ["50.5", "DEVEX_BACKFILL_PAGE_SIZE"],
+    ["abc", "DEVEX_BACKFILL_PAGE_SIZE"],
+    ["NaN", "DEVEX_BACKFILL_PAGE_SIZE"],
+    ["0", "DEVEX_BACKFILL_MIN_PAGE_SIZE"],
+    ["-1", "DEVEX_BACKFILL_MIN_PAGE_SIZE"],
+    ["150", "DEVEX_BACKFILL_MIN_PAGE_SIZE"],
+    ["12.5", "DEVEX_BACKFILL_MIN_PAGE_SIZE"],
+  ])("rejects %s for %s with a clear error", (value, key) => {
+    expect(() => loadConfig({ ...EMPTY, [key]: value })).toThrow(/must be a whole number|must be an integer/);
+  });
+
+  it("rejects a minPageSize larger than pageSize", () => {
+    expect(() =>
+      loadConfig({
+        ...EMPTY,
+        DEVEX_BACKFILL_PAGE_SIZE: "20",
+        DEVEX_BACKFILL_MIN_PAGE_SIZE: "30",
+      })
+    ).toThrow(/must not exceed/);
+  });
+
+  it("accepts pageSize equal to minPageSize", () => {
+    const config = loadConfig({
+      ...EMPTY,
+      DEVEX_BACKFILL_PAGE_SIZE: "25",
+      DEVEX_BACKFILL_MIN_PAGE_SIZE: "25",
+    });
+    expect(config.collection.backfill.pageSize).toBe(25);
+    expect(config.collection.backfill.minPageSize).toBe(25);
+  });
+});

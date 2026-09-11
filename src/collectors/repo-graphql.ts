@@ -393,6 +393,29 @@ export interface HistoricalPRPage {
   nodes: HistoricalPRNode[];
   hasNextPage: boolean;
   endCursor: string | null;
+  /**
+   * The GraphQL page size that actually succeeded. Equal to the requested
+   * size unless adaptive reduction kicked in, in which case the caller
+   * should keep using this smaller size for the rest of the repository's
+   * crawl this run (see `pageSizeReductionSequence`).
+   */
+  pageSize: number;
+}
+
+/** Effective page-size policy for one historical page request. */
+export interface HistoricalPageSizeOptions {
+  /** Size to request first — the repository's current effective page size. */
+  pageSize: number;
+  /** Floor the adaptive reduction will not go below. */
+  minPageSize: number;
+  /**
+   * Retry the same cursor with a smaller page size on an expensive-query
+   * signal (502/504, or a generic GraphQL execution error). When false, a
+   * single request is made at `pageSize` and any such error behaves exactly
+   * as it did before adaptive sizing existed (the page is abandoned for this
+   * run).
+   */
+  adaptive: boolean;
 }
 
 /**
@@ -405,12 +428,16 @@ export interface HistoricalPRPage {
  * Only the first review is needed per PR (`submittedAt` ascending gives the
  * earliest), but the connection is fetched small rather than filtered so the
  * reviewer set stays available for historical reviewer counts.
+ *
+ * `pageSize` is a validated `Int!` variable rather than a literal so a
+ * repository whose pages are too expensive to execute at the configured size
+ * can be retried at a smaller one without building the query text by hand.
  */
 const HISTORICAL_PR_QUERY = `
-  query HistoricalPRs($owner: String!, $name: String!, $cursor: String) {
+  query HistoricalPRs($owner: String!, $name: String!, $cursor: String, $pageSize: Int!) {
     repository(owner: $owner, name: $name) {
       pullRequests(
-        first: 100
+        first: $pageSize
         states: [CLOSED, MERGED]
         orderBy: { field: CREATED_AT, direction: ASC }
         after: $cursor
@@ -446,46 +473,127 @@ interface HistoricalPageResponse {
 }
 
 /**
+ * Deterministic page-size reduction sequence used to retry a historical page
+ * after an expensive-query signal: halve (rounding down), clamp to `min`, and
+ * stop once `min` is reached. For the documented defaults (50, 10) this is
+ * `[50, 25, 12, 10]`.
+ *
+ * This *is* the retry policy for the historical page fetch — each entry is
+ * tried once, so the maximum number of GraphQL attempts for one page equals
+ * `sizes.length` (4 by default). It intentionally does not stack with a
+ * separate same-size backoff-retry loop, which would multiply attempts
+ * unpredictably (e.g. 3 retries × 4 sizes = 12 undocumented attempts).
+ */
+export function pageSizeReductionSequence(initial: number, min: number): number[] {
+  const sizes: number[] = [];
+  let size = Math.max(initial, min);
+  for (;;) {
+    sizes.push(size);
+    if (size <= min) break;
+    size = Math.max(min, Math.floor(size / 2));
+  }
+  return sizes;
+}
+
+/**
+ * True for GitHub responses that indicate the *query itself* was too
+ * expensive to execute — as opposed to a permanent authentication,
+ * authorization, not-found, or validation problem. These are the only
+ * signals that justify retrying the same page with a smaller `pageSize`;
+ * every other error is left to the caller's existing handling (403/404
+ * skip, or a re-thrown fatal error).
+ */
+function isExpensiveQuerySignal(err: unknown): boolean {
+  if (isTransientServerError(err)) return true; // covers HTTP 502/504
+  const graphqlError = err as { errors?: Array<{ type?: string; message?: string }> };
+  if (!graphqlError.errors) return false;
+  return graphqlError.errors.some((e) => {
+    const msg = e.message?.toLowerCase() ?? "";
+    return (
+      e.type === "TIMEOUT" ||
+      msg.includes("something went wrong while executing your query") ||
+      msg.includes("something went wrong executing your query") ||
+      msg.includes("query timeout") ||
+      msg.includes("timed out")
+    );
+  });
+}
+
+/**
  * Fetch one page of historical pull requests for `owner/repo`.
  *
- * Returns `null` when the repository is gone or inaccessible, or when GitHub
- * keeps returning 5xx — the caller treats that as "skip this repo for now" and
- * leaves the watermark untouched so the next run retries from the same place.
+ * Returns `null` when the repository is gone or inaccessible, or when every
+ * page size in the reduction sequence (see `pageSizeReductionSequence`) keeps
+ * failing with an expensive-query signal — the caller treats that as "skip
+ * this repo for now" and leaves the watermark untouched so the next run
+ * retries the same cursor.
+ *
+ * The returned page carries the `pageSize` that actually succeeded so the
+ * caller can keep using it for the repository's remaining pages this run,
+ * and optionally persist it as a hint for the next run.
  */
 export async function fetchHistoricalPRPage(
   owner: string,
   repo: string,
-  cursor: string | null
+  cursor: string | null,
+  options: HistoricalPageSizeOptions
 ): Promise<HistoricalPRPage | null> {
   const octokit = await getOctokit();
-  let response: HistoricalPageResponse;
-  try {
-    response = await fetchGraphQLPage<HistoricalPageResponse>(
-      octokit,
-      HISTORICAL_PR_QUERY,
-      { owner, name: repo, cursor },
-      `${owner}/${repo}`
-    );
-  } catch (err: unknown) {
-    if (isGraphQLNotFoundOrForbidden(err)) {
-      if (hasGraphQLForbiddenError(err)) {
-        console.warn(`  ⚠ backfill: skipping ${owner}/${repo}: access denied (403)`);
+  const sizes = options.adaptive
+    ? pageSizeReductionSequence(options.pageSize, options.minPageSize)
+    : [options.pageSize];
+
+  for (let i = 0; i < sizes.length; i++) {
+    const size = sizes[i];
+    let response: HistoricalPageResponse;
+    try {
+      response = await octokit.graphql<HistoricalPageResponse>(HISTORICAL_PR_QUERY, {
+        owner,
+        name: repo,
+        cursor,
+        pageSize: size,
+      });
+    } catch (err: unknown) {
+      if (isGraphQLNotFoundOrForbidden(err)) {
+        if (hasGraphQLForbiddenError(err)) {
+          console.warn(`  ⚠ backfill: skipping ${owner}/${repo}: access denied (403)`);
+        }
+        return null;
       }
-      return null;
+      if (isExpensiveQuerySignal(err)) {
+        if (i < sizes.length - 1) {
+          const next = sizes[i + 1];
+          console.warn(
+            `  ⚠ backfill: ${owner}/${repo} historical page timed out at size ${size}; ` +
+              `retrying the same cursor with page size ${next}`
+          );
+          await sleep(TRANSIENT_BACKOFF_MS[Math.min(i, TRANSIENT_BACKOFF_MS.length - 1)]);
+          continue;
+        }
+        console.warn(
+          `  ⚠ backfill: ${owner}/${repo} still timing out at the minimum page size ` +
+            `(${size}); will retry next run`
+        );
+        return null;
+      }
+      throw err;
     }
-    if (isTransientServerError(err)) {
-      console.warn(`  ⚠ backfill: ${owner}/${repo} still failing after retries; will retry next run`);
-      return null;
+
+    if (!response?.repository) return null;
+
+    const { nodes, pageInfo } = response.repository.pullRequests;
+    if (i > 0) {
+      console.log(`  ✓ backfill: ${owner}/${repo} continuing with page size ${size}`);
     }
-    throw err;
+    return {
+      nodes: nodes ?? [],
+      hasNextPage: pageInfo.hasNextPage,
+      endCursor: pageInfo.endCursor,
+      pageSize: size,
+    };
   }
 
-  if (!response?.repository) return null;
-
-  const { nodes, pageInfo } = response.repository.pullRequests;
-  return {
-    nodes: nodes ?? [],
-    hasNextPage: pageInfo.hasNextPage,
-    endCursor: pageInfo.endCursor,
-  };
+  // Unreachable: `sizes` always has at least one entry, and the loop above
+  // always returns or `continue`s. Kept only to satisfy the return type.
+  return null;
 }
