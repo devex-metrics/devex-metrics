@@ -445,29 +445,32 @@ describe("fetchHistoricalPRPage", () => {
     };
   }
 
-  it("retries a generic GraphQL execution error and succeeds on a later retry", async () => {
+  const DEFAULT_OPTIONS = { pageSize: 50, minPageSize: 10, adaptive: true };
+
+  it("retries a generic GraphQL execution error at a smaller page size and succeeds", async () => {
     vi.useFakeTimers();
     const err = makeGenericExecutionError();
     const success = makeHistoricalPageResponse({ nodes: [{ number: 1 }], hasNextPage: false });
     setOctokit(buildMockOctokit([err, success]));
 
-    const p = fetchHistoricalPRPage("barcoclickshare", "cx_system_tests", null);
+    const p = fetchHistoricalPRPage("barcoclickshare", "cx_system_tests", null, DEFAULT_OPTIONS);
     await vi.advanceTimersByTimeAsync(5_001);
     const outcome = await p;
 
     expect(outcome.ok).toBe(true);
     if (outcome.ok) {
       expect(outcome.page.nodes).toHaveLength(1);
+      expect(outcome.page.pageSize).toBe(25);
     }
     vi.useRealTimers();
   });
 
-  it("defers the repository (returns a transient failure outcome) after exhausting retries on a generic execution error, carrying the attempt count and request id", async () => {
+  it("defers the repository (returns a transient failure outcome) after exhausting all page sizes on a generic execution error, carrying the attempt count and request id", async () => {
     vi.useFakeTimers();
     const err = makeGenericExecutionError("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655");
     setOctokit(buildMockOctokit([err])); // every attempt fails
 
-    const p = fetchHistoricalPRPage("barcoclickshare", "cx_system_tests", "cursor-9");
+    const p = fetchHistoricalPRPage("barcoclickshare", "cx_system_tests", "cursor-9", DEFAULT_OPTIONS);
     await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
     const outcome = await p;
 
@@ -488,7 +491,7 @@ describe("fetchHistoricalPRPage", () => {
     setOctokit(buildMockOctokit([err]));
 
     await expect(
-      fetchHistoricalPRPage("owner", "repo", null)
+      fetchHistoricalPRPage("owner", "repo", null, DEFAULT_OPTIONS)
     ).rejects.toThrow("Field 'bogus' doesn't exist on type 'PullRequest'");
   });
 
@@ -498,7 +501,7 @@ describe("fetchHistoricalPRPage", () => {
     });
     setOctokit(buildMockOctokit([err]));
 
-    const outcome = await fetchHistoricalPRPage("owner", "private-repo", null);
+    const outcome = await fetchHistoricalPRPage("owner", "private-repo", null, DEFAULT_OPTIONS);
     expect(outcome.ok).toBe(false);
     if (!outcome.ok) {
       expect(outcome.failure.kind).toBe("forbidden");
@@ -506,12 +509,12 @@ describe("fetchHistoricalPRPage", () => {
     }
   });
 
-  it("still resolves as a transient failure after exhausting retries on a plain 502", async () => {
+  it("still resolves as a transient failure after exhausting all page sizes on a plain 502", async () => {
     vi.useFakeTimers();
     const err = Object.assign(new Error("Bad gateway"), { status: 502 });
     setOctokit(buildMockOctokit([err]));
 
-    const p = fetchHistoricalPRPage("owner", "repo", null);
+    const p = fetchHistoricalPRPage("owner", "repo", null, DEFAULT_OPTIONS);
     await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
     const outcome = await p;
 
@@ -526,7 +529,7 @@ describe("fetchHistoricalPRPage", () => {
   it("classifies a repository that disappeared or became inaccessible mid-crawl as not-found", async () => {
     setOctokit(buildMockOctokit([{ repository: null }]));
 
-    const outcome = await fetchHistoricalPRPage("owner", "repo", null);
+    const outcome = await fetchHistoricalPRPage("owner", "repo", null, DEFAULT_OPTIONS);
     expect(outcome.ok).toBe(false);
     if (!outcome.ok) {
       expect(outcome.failure.kind).toBe("not-found");
@@ -535,3 +538,228 @@ describe("fetchHistoricalPRPage", () => {
   });
 });
 
+// ── Historical backfill with adaptive page sizing ────────────────────────────
+
+import { pageSizeReductionSequence } from "./repo-graphql.js";
+import type { HistoricalPRNode } from "./repo-graphql.js";
+
+function makeHistoricalNode(overrides: Partial<HistoricalPRNode> = {}): HistoricalPRNode {
+  return {
+    number: 1,
+    state: "MERGED",
+    createdAt: "2019-01-01T00:00:00Z",
+    mergedAt: "2019-01-02T00:00:00Z",
+    closedAt: "2019-01-02T00:00:00Z",
+    author: { login: "alice", __typename: "User" },
+    additions: 1,
+    deletions: 1,
+    body: null,
+    reviews: { totalCount: 0, nodes: [] },
+    ...overrides,
+  };
+}
+
+function makeHistoricalResponse(opts: {
+  nodes?: HistoricalPRNode[];
+  hasNextPage?: boolean;
+  endCursor?: string | null;
+}) {
+  return {
+    repository: {
+      pullRequests: {
+        pageInfo: { hasNextPage: opts.hasNextPage ?? false, endCursor: opts.endCursor ?? null },
+        nodes: opts.nodes ?? [],
+      },
+    },
+  };
+}
+
+const PAGE_SIZE_OPTIONS = { pageSize: 50, minPageSize: 10, adaptive: true };
+
+describe("pageSizeReductionSequence", () => {
+  it("halves down to the minimum, matching the documented example", () => {
+    expect(pageSizeReductionSequence(50, 10)).toEqual([50, 25, 12, 10]);
+  });
+
+  it("stops immediately when initial already equals the minimum", () => {
+    expect(pageSizeReductionSequence(10, 10)).toEqual([10]);
+  });
+
+  it("never drops below the minimum even with an odd initial size", () => {
+    const sizes = pageSizeReductionSequence(15, 10);
+    expect(sizes[sizes.length - 1]).toBe(10);
+    expect(sizes.every((s) => s >= 10)).toBe(true);
+  });
+
+  it("produces a strictly decreasing sequence until the minimum", () => {
+    const sizes = pageSizeReductionSequence(100, 5);
+    for (let i = 1; i < sizes.length; i++) {
+      expect(sizes[i]).toBeLessThan(sizes[i - 1]);
+    }
+    expect(sizes[sizes.length - 1]).toBe(5);
+  });
+});
+
+describe("fetchHistoricalPRPage (adaptive page sizing)", () => {
+  afterEach(() => resetOctokit());
+
+  it("uses the configured page size as the `first` GraphQL variable", async () => {
+    let seenVars: Record<string, unknown> | undefined;
+    const graphql = async (_query: string, vars: Record<string, unknown>) => {
+      seenVars = vars;
+      return makeHistoricalResponse({ nodes: [makeHistoricalNode()], hasNextPage: false });
+    };
+    setOctokit({ graphql } as unknown as Octokit);
+
+    await fetchHistoricalPRPage("owner", "repo", null, PAGE_SIZE_OPTIONS);
+    expect(seenVars).toMatchObject({ owner: "owner", name: "repo", cursor: null, pageSize: 50 });
+  });
+
+  it("returns the configured page size unchanged on a normal successful page", async () => {
+    setOctokit(
+      buildMockOctokit([makeHistoricalResponse({ nodes: [makeHistoricalNode()], hasNextPage: false })])
+    );
+    const outcome = await fetchHistoricalPRPage("owner", "repo", null, PAGE_SIZE_OPTIONS);
+    expect(outcome.ok).toBe(true);
+    if (outcome.ok) {
+      expect(outcome.page.pageSize).toBe(50);
+    }
+  });
+
+  it("retries the same cursor at a smaller page size on a 502, and does not append or advance for the failed attempt", async () => {
+    vi.useFakeTimers();
+    const err = Object.assign(new Error("Bad gateway"), { status: 502 });
+    const success = makeHistoricalResponse({
+      nodes: [makeHistoricalNode({ number: 2 })],
+      hasNextPage: false,
+      endCursor: "cursor-2",
+    });
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    setOctokit(buildMockOctokit([err, success]));
+
+    const pagePromise = fetchHistoricalPRPage("owner", "repo", "cursor-1", PAGE_SIZE_OPTIONS);
+    await vi.advanceTimersByTimeAsync(5_001);
+    const outcome = await pagePromise;
+
+    expect(outcome.ok).toBe(true);
+    if (outcome.ok) {
+      expect(outcome.page.pageSize).toBe(25);
+      expect(outcome.page.nodes).toHaveLength(1);
+      expect(outcome.page.endCursor).toBe("cursor-2");
+    }
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("historical page timed out at size 50")
+    );
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("page size 25"));
+    warnSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it("retries the same cursor at a smaller page size on a 504", async () => {
+    vi.useFakeTimers();
+    const err = Object.assign(new Error("Gateway timeout"), { status: 504 });
+    const success = makeHistoricalResponse({ nodes: [], hasNextPage: false });
+    setOctokit(buildMockOctokit([err, success]));
+    const pagePromise = fetchHistoricalPRPage("owner", "repo", null, PAGE_SIZE_OPTIONS);
+    await vi.advanceTimersByTimeAsync(5_001);
+    const outcome = await pagePromise;
+    expect(outcome.ok).toBe(true);
+    if (outcome.ok) {
+      expect(outcome.page.pageSize).toBe(25);
+    }
+    vi.useRealTimers();
+  });
+
+  it("reduces the page size on a generic GraphQL execution error with no usable data", async () => {
+    vi.useFakeTimers();
+    const err = Object.assign(new Error("Something went wrong"), {
+      errors: [{ message: "Something went wrong while executing your query. Please include `abc123` when reporting this issue." }],
+    });
+    const success = makeHistoricalResponse({ nodes: [], hasNextPage: false });
+    setOctokit(buildMockOctokit([err, success]));
+    const pagePromise = fetchHistoricalPRPage("owner", "repo", null, PAGE_SIZE_OPTIONS);
+    await vi.advanceTimersByTimeAsync(5_001);
+    const outcome = await pagePromise;
+    expect(outcome.ok).toBe(true);
+    if (outcome.ok) {
+      expect(outcome.page.pageSize).toBe(25);
+    }
+    vi.useRealTimers();
+  });
+
+  it("does not reduce the page size for a GraphQL validation error — it is fatal instead", async () => {
+    const err = Object.assign(new Error("Validation failed"), {
+      errors: [{ type: "GRAPHQL_VALIDATION_FAILED", message: "Field 'bogus' doesn't exist on type 'PullRequest'" }],
+    });
+    setOctokit(buildMockOctokit([err]));
+    await expect(fetchHistoricalPRPage("owner", "repo", null, PAGE_SIZE_OPTIONS)).rejects.toThrow();
+  });
+
+  it("returns a not-found failure for a repository-not-found error", async () => {
+    const err = Object.assign(new Error("Not found"), {
+      errors: [{ type: "NOT_FOUND", message: "Could not resolve to a Repository" }],
+    });
+    setOctokit(buildMockOctokit([err]));
+    const outcome = await fetchHistoricalPRPage("owner", "repo", null, PAGE_SIZE_OPTIONS);
+    expect(outcome.ok).toBe(false);
+    if (!outcome.ok) {
+      expect(outcome.failure.kind).toBe("not-found");
+    }
+  });
+
+  it("stops reducing at the configured minimum and defers when it keeps failing", async () => {
+    vi.useFakeTimers();
+    const err = Object.assign(new Error("Bad gateway"), { status: 502 });
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    setOctokit(buildMockOctokit([err])); // every attempt fails, at every size
+
+    const pagePromise = fetchHistoricalPRPage("owner", "repo", "cursor-1", PAGE_SIZE_OPTIONS);
+    await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
+    const outcome = await pagePromise;
+
+    expect(outcome.ok).toBe(false);
+    if (!outcome.ok) {
+      expect(outcome.failure.kind).toBe("transient");
+    }
+    // Bounded: exactly one attempt per size in the sequence [50, 25, 12, 10] = 4.
+    expect((warnSpy.mock.calls as unknown[][]).length).toBe(4);
+    expect(warnSpy).toHaveBeenLastCalledWith(
+      expect.stringContaining("still timing out at the minimum page size")
+    );
+    warnSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it("makes a single request and does not reduce when adaptive sizing is disabled", async () => {
+    const err = Object.assign(new Error("Bad gateway"), { status: 502 });
+    let callCount = 0;
+    const graphql = async () => {
+      callCount++;
+      throw err;
+    };
+    setOctokit({ graphql } as unknown as Octokit);
+
+    const outcome = await fetchHistoricalPRPage("owner", "repo", null, {
+      pageSize: 50,
+      minPageSize: 10,
+      adaptive: false,
+    });
+
+    expect(outcome.ok).toBe(false);
+    if (!outcome.ok) {
+      expect(outcome.failure.kind).toBe("transient");
+    }
+    expect(callCount).toBe(1);
+  });
+
+  it("does not advance past the failed page — a subsequent call with the same cursor is what the caller must retry", async () => {
+    vi.useFakeTimers();
+    const err = Object.assign(new Error("Bad gateway"), { status: 502 });
+    setOctokit(buildMockOctokit([err]));
+    const pagePromise = fetchHistoricalPRPage("owner", "repo", "cursor-X", PAGE_SIZE_OPTIONS);
+    await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
+    const outcome = await pagePromise;
+    expect(outcome.ok).toBe(false);
+    vi.useRealTimers();
+  });
+});

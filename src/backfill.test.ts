@@ -48,9 +48,15 @@ function config(patch: Partial<BackfillConfig> = {}): BackfillConfig {
     pagesPerRun: 100,
     maxPagesPerRepo: 20,
     recomputeRollups: false,
+    pageSize: 50,
+    minPageSize: 10,
+    adaptivePageSize: true,
     ...patch,
   };
 }
+
+/** The page-size fetch options `runBackfill` passes for `config()`'s defaults. */
+const DEFAULT_SIZE_OPTIONS = { pageSize: 50, minPageSize: 10, adaptive: true };
 
 function node(number: number, extra: Partial<HistoricalPRNode> = {}): HistoricalPRNode {
   return {
@@ -89,6 +95,7 @@ function queuePages(pages: HistoricalPRNode[][]) {
         nodes,
         hasNextPage: i < pages.length - 1,
         endCursor: `cursor-${i}`,
+        pageSize: 50,
       })
     );
   });
@@ -209,6 +216,7 @@ describe("runBackfill", () => {
         nodes: [node(1)],
         hasNextPage: true,
         endCursor: "cursor-A",
+        pageSize: 50,
       })
     );
     await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ pagesPerRun: 1 }));
@@ -224,10 +232,11 @@ describe("runBackfill", () => {
         nodes: [node(2)],
         hasNextPage: false,
         endCursor: "cursor-B",
+        pageSize: 50,
       })
     );
     await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ pagesPerRun: 1 }));
-    expect(mockFetch).toHaveBeenLastCalledWith("acme", "api", "cursor-A");
+    expect(mockFetch).toHaveBeenLastCalledWith("acme", "api", "cursor-A", DEFAULT_SIZE_OPTIONS);
     expect(loadBackfillState(dir, "acme").repos["acme/api"].complete).toBe(true);
   });
 
@@ -243,7 +252,7 @@ describe("runBackfill", () => {
   });
 
   it("respects the per-run page budget", async () => {
-    mockFetch.mockResolvedValue(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "c" }));
+    mockFetch.mockResolvedValue(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "c", pageSize: 50 }));
     const result = await runBackfill(
       dir,
       "acme",
@@ -255,7 +264,7 @@ describe("runBackfill", () => {
   });
 
   it("caps one repository so it cannot starve the others", async () => {
-    mockFetch.mockResolvedValue(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "c" }));
+    mockFetch.mockResolvedValue(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "c", pageSize: 50 }));
     await runBackfill(
       dir,
       "acme",
@@ -282,7 +291,7 @@ describe("runBackfill", () => {
     // internally and only resolves { ok: false } once its own retries are
     // exhausted — simulate that exhaustion here for the failing repo.
     mockFetch.mockResolvedValueOnce(fail()); // acme/flaky exhausts its retries
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1" })); // acme/ok succeeds
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1", pageSize: 50 })); // acme/ok succeeds
 
     const result = await runBackfill(
       dir,
@@ -304,7 +313,7 @@ describe("runBackfill", () => {
     mockFetch.mockResolvedValueOnce(
       fail({ kind: "forbidden", category: "repository access denied (403)", attempts: undefined })
     );
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1" }));
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1", pageSize: 50 }));
 
     const result = await runBackfill(
       dir,
@@ -324,7 +333,7 @@ describe("runBackfill", () => {
     // durably-appended progress must survive even though the run as a whole
     // must fail (an unclassified exception is, by construction, not one of
     // fetchHistoricalPRPage's recognized repository-local outcomes).
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1" }));
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1", pageSize: 50 }));
     mockFetch.mockRejectedValueOnce(new Error("boom: unexpected programming error"));
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
@@ -339,7 +348,7 @@ describe("runBackfill", () => {
   });
 
   it("keeps the cursor at the last successfully stored page when a later page in the same repo fails", async () => {
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-good" }));
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-good", pageSize: 50 }));
     mockFetch.mockResolvedValueOnce(fail()); // second page exhausts its retries
 
     const result = await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
@@ -351,22 +360,22 @@ describe("runBackfill", () => {
     expect(loadEvents(dir, "acme")).toHaveLength(1);
 
     // Next run must retry the failed page from the exact stored cursor.
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(2)], hasNextPage: false, endCursor: "cursor-final" }));
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(2)], hasNextPage: false, endCursor: "cursor-final", pageSize: 50 }));
     await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
-    expect(mockFetch).toHaveBeenLastCalledWith("acme", "api", "cursor-good");
+    expect(mockFetch).toHaveBeenLastCalledWith("acme", "api", "cursor-good", DEFAULT_SIZE_OPTIONS);
     expect(loadBackfillState(dir, "acme").repos["acme/api"].complete).toBe(true);
     expect(loadEvents(dir, "acme")).toHaveLength(2);
   });
 
   it("does not duplicate events when a page is refetched after a prior partial failure", async () => {
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-good" }));
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-good", pageSize: 50 }));
     mockFetch.mockResolvedValueOnce(fail());
     await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
     expect(loadEvents(dir, "acme")).toHaveLength(1);
 
     // Next run re-requests the same next page (simulating GitHub replaying
     // an overlapping page) and includes an event already recorded.
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1), node(2)], hasNextPage: false, endCursor: "cursor-final" }));
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1), node(2)], hasNextPage: false, endCursor: "cursor-final", pageSize: 50 }));
     const second = await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
 
     expect(second.eventsAppended).toBe(1);
@@ -410,7 +419,6 @@ describe("runBackfill", () => {
     expect(loadEvents(dir, "acme")).toHaveLength(1);
   });
 });
-
 describe("runBackfill cross-run resumption", () => {
   // These tests deliberately never keep a reference to a prior invocation's
   // returned `BackfillResult` or in-memory state across `runBackfill()`
@@ -429,10 +437,10 @@ describe("runBackfill cross-run resumption", () => {
 
     // Second invocation (fresh process): the initial page is attempted again,
     // from null, and this time succeeds.
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1" }));
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1", pageSize: 50 }));
     const second = await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
 
-    expect(mockFetch).toHaveBeenLastCalledWith("acme", "api", null);
+    expect(mockFetch).toHaveBeenLastCalledWith("acme", "api", null, DEFAULT_SIZE_OPTIONS);
     expect(second.reposCompleted).toBe(1);
     expect(loadEvents(dir, "acme")).toHaveLength(1);
   });
@@ -443,9 +451,9 @@ describe("runBackfill cross-run resumption", () => {
     const cfg = config({ maxPagesPerRepo: 1 });
 
     // First invocation: A makes progress, B is deferred, C completes.
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-a1" })); // A
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-a1", pageSize: 50 })); // A
     mockFetch.mockResolvedValueOnce(fail()); // B exhausts retries
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(2)], hasNextPage: false, endCursor: "cursor-c1" })); // C
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(2)], hasNextPage: false, endCursor: "cursor-c1", pageSize: 50 })); // C
 
     const first = await runBackfill(
       dir,
@@ -460,8 +468,8 @@ describe("runBackfill cross-run resumption", () => {
 
     // Second invocation, fresh process: A resumes from cursor-a1, B retries
     // from its saved (null) cursor, C is never touched again.
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(3)], hasNextPage: false, endCursor: "cursor-a2" })); // A
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(4)], hasNextPage: false, endCursor: "cursor-b1" })); // B
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(3)], hasNextPage: false, endCursor: "cursor-a2", pageSize: 50 })); // A
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(4)], hasNextPage: false, endCursor: "cursor-b1", pageSize: 50 })); // B
 
     const second = await runBackfill(
       dir,
@@ -471,8 +479,8 @@ describe("runBackfill cross-run resumption", () => {
     );
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
-    expect(mockFetch).toHaveBeenCalledWith("acme", "a", "cursor-a1");
-    expect(mockFetch).toHaveBeenCalledWith("acme", "b", null);
+    expect(mockFetch).toHaveBeenCalledWith("acme", "a", "cursor-a1", DEFAULT_SIZE_OPTIONS);
+    expect(mockFetch).toHaveBeenCalledWith("acme", "b", null, DEFAULT_SIZE_OPTIONS);
     expect(second.reposAlreadyComplete).toBe(1); // acme/c
     expect(second.reposCompleted).toBe(2); // acme/a and acme/b both finish this run
     expect(loadBackfillState(dir, "acme").repos["acme/a"].complete).toBe(true);
@@ -504,7 +512,7 @@ describe("runBackfill cross-run resumption", () => {
     fs.mkdirSync(path.join(dir, "acme"), { recursive: true });
     fs.writeFileSync(path.join(dir, "acme", "backfill.json"), JSON.stringify(oldFormatState));
 
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(6)], hasNextPage: false, endCursor: "cursor-new" }));
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(6)], hasNextPage: false, endCursor: "cursor-new", pageSize: 50 }));
 
     const result = await runBackfill(
       dir,
@@ -514,7 +522,7 @@ describe("runBackfill cross-run resumption", () => {
     );
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(mockFetch).toHaveBeenCalledWith("acme", "api", "cursor-old");
+    expect(mockFetch).toHaveBeenCalledWith("acme", "api", "cursor-old", DEFAULT_SIZE_OPTIONS);
     expect(result.reposAlreadyComplete).toBe(1);
     expect(result.reposCompleted).toBe(1);
     const mark = loadBackfillState(dir, "acme").repos["acme/api"];
@@ -541,7 +549,7 @@ describe("runBackfill cross-run resumption", () => {
     expect(deferredMark.lastRequestId).toBe("REQ-1");
 
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1" }));
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1", pageSize: 50 }));
     await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
 
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("recovered"));
@@ -555,12 +563,12 @@ describe("runBackfill cross-run resumption", () => {
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     const cfg = config({ maxPagesPerRepo: 1 });
 
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-1" }));
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-1", pageSize: 50 }));
     await runBackfill(dir, "acme", [{ fullName: "acme/api" }], cfg);
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("acme/api starting fresh"));
 
     logSpy.mockClear();
-    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(2)], hasNextPage: false, endCursor: "cursor-2" }));
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(2)], hasNextPage: false, endCursor: "cursor-2", pageSize: 50 }));
     await runBackfill(dir, "acme", [{ fullName: "acme/api" }], cfg);
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining("acme/api resuming from saved cursor"));
     // Cursors can be long and noisy — never printed in full.
@@ -581,7 +589,100 @@ describe("runBackfill cross-run resumption", () => {
     expect(result.pagesFetched).toBe(0);
     expect(result.reposAlreadyComplete).toBe(1);
   });
+});
 
+describe("runBackfill adaptive page sizing", () => {
+  it("requests the configured page size and reports no reduction on a normal page", async () => {
+    queuePages([[node(1)]]);
+    const result = await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
+    expect(mockFetch).toHaveBeenCalledWith("acme", "api", null, DEFAULT_SIZE_OPTIONS);
+    expect(result.pageSizeReductions).toBe(0);
+    expect(result.reposWithReducedPageSize).toEqual([]);
+  });
+
+  it("adopts a reduced page size returned by the collector and keeps using it for later pages", async () => {
+    mockFetch
+      .mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-A", pageSize: 25 }))
+      .mockResolvedValueOnce(ok({ nodes: [node(2)], hasNextPage: false, endCursor: "cursor-B", pageSize: 25 }));
+
+    const result = await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
+
+    expect(result.pageSizeReductions).toBe(1);
+    expect(result.reposWithReducedPageSize).toEqual(["acme/api"]);
+    // The first page requested the configured default (50); the second must
+    // request the reduced size (25) rather than immediately going back to 50.
+    expect(mockFetch).toHaveBeenNthCalledWith(1, "acme", "api", null, DEFAULT_SIZE_OPTIONS);
+    expect(mockFetch).toHaveBeenNthCalledWith(2, "acme", "api", "cursor-A", {
+      pageSize: 25,
+      minPageSize: 10,
+      adaptive: true,
+    });
+    expect(loadBackfillState(dir, "acme").repos["acme/api"].preferredPageSize).toBe(25);
+  });
+
+  it("persists the reduced page size as a hint and starts the next run there", async () => {
+    mockFetch.mockResolvedValueOnce(
+      ok({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-A", pageSize: 25 })
+    );
+    await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ pagesPerRun: 1 }));
+    expect(loadBackfillState(dir, "acme").repos["acme/api"].preferredPageSize).toBe(25);
+
+    mockFetch.mockResolvedValueOnce(
+      ok({ nodes: [node(2)], hasNextPage: false, endCursor: "cursor-B", pageSize: 25 })
+    );
+    await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ pagesPerRun: 1 }));
+    expect(mockFetch).toHaveBeenLastCalledWith("acme", "api", "cursor-A", {
+      pageSize: 25,
+      minPageSize: 10,
+      adaptive: true,
+    });
+  });
+
+  it("keeps each repository's page size independent — one reduction does not affect another repo", async () => {
+    mockFetch
+      .mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "c1", pageSize: 25 }))
+      .mockResolvedValueOnce(ok({ nodes: [node(2)], hasNextPage: false, endCursor: "c2", pageSize: 50 }));
+
+    await runBackfill(
+      dir,
+      "acme",
+      [{ fullName: "acme/api" }, { fullName: "acme/web" }],
+      config()
+    );
+
+    expect(mockFetch).toHaveBeenNthCalledWith(1, "acme", "api", null, DEFAULT_SIZE_OPTIONS);
+    expect(mockFetch).toHaveBeenNthCalledWith(2, "acme", "web", null, DEFAULT_SIZE_OPTIONS);
+    expect(loadBackfillState(dir, "acme").repos["acme/api"].preferredPageSize).toBe(25);
+    expect(loadBackfillState(dir, "acme").repos["acme/web"].preferredPageSize).toBe(50);
+  });
+
+  it("ignores a stale preferredPageSize hint that no longer fits the current configuration", async () => {
+    // A hint below the current minPageSize (config changed since it was recorded).
+    const state = loadBackfillState(dir, "acme");
+    state.repos["acme/api"] = {
+      cursor: "cursor-A",
+      complete: false,
+      pagesFetched: 1,
+      prsSeen: 1,
+      updatedAt: new Date().toISOString(),
+      preferredPageSize: 5,
+    };
+    saveBackfillState(dir, state);
+    queuePages([[node(2)]]);
+
+    await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ minPageSize: 10 }));
+    expect(mockFetch).toHaveBeenCalledWith("acme", "api", "cursor-A", DEFAULT_SIZE_OPTIONS);
+  });
+
+  it("falls back to a single request at the configured size when adaptivePageSize is disabled", async () => {
+    queuePages([[node(1)]]);
+    await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ adaptivePageSize: false }));
+    expect(mockFetch).toHaveBeenCalledWith("acme", "api", null, {
+      pageSize: 50,
+      minPageSize: 10,
+      adaptive: false,
+    });
+  });
 });
 
 describe("describeBackfill", () => {
@@ -600,6 +701,8 @@ describe("describeBackfill", () => {
         eventsAppended: 0,
         duplicateEventsIgnored: 0,
         allComplete: true,
+        pageSizeReductions: 0,
+        reposWithReducedPageSize: [],
       },
       config()
     );
@@ -621,6 +724,8 @@ describe("describeBackfill", () => {
         eventsAppended: 400,
         duplicateEventsIgnored: 0,
         allComplete: false,
+        pageSizeReductions: 0,
+        reposWithReducedPageSize: [],
       },
       config({ pagesPerRun: 100 })
     );
@@ -648,6 +753,8 @@ describe("describeBackfill", () => {
         eventsAppended: 10,
         duplicateEventsIgnored: 0,
         allComplete: false,
+        pageSizeReductions: 0,
+        reposWithReducedPageSize: [],
       },
       config({ pagesPerRun: 100 })
     );
@@ -670,10 +777,37 @@ describe("describeBackfill", () => {
         eventsAppended: 0,
         duplicateEventsIgnored: 2,
         allComplete: false,
+        pageSizeReductions: 0,
+        reposWithReducedPageSize: [],
       },
       config({ pagesPerRun: 100 })
     );
     expect(line).toContain("2 duplicate events ignored");
+  });
+
+  it("mentions page-size reductions when any occurred", () => {
+    const line = describeBackfill(
+      {
+        reposTouched: 2,
+        reposCompleted: 0,
+        reposAlreadyComplete: 0,
+        reposIncomplete: 0,
+        reposDeferred: 0,
+        reposSkipped: 0,
+        reposStarted: 2,
+        reposResumed: 0,
+        pagesFetched: 5,
+        eventsAppended: 100,
+        duplicateEventsIgnored: 0,
+        allComplete: false,
+        pageSizeReductions: 2,
+        reposWithReducedPageSize: ["acme/api"],
+      },
+      config()
+    );
+    expect(line).toContain("initial=50");
+    expect(line).toContain("min=10");
+    expect(line).toContain("2 reduction(s) across 1 repo(s)");
   });
 });
 

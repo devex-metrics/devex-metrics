@@ -71,6 +71,15 @@ export interface BackfillResult {
   duplicateEventsIgnored: number;
   /** True when every target repository is now fully crawled. */
   allComplete: boolean;
+  /**
+   * Number of times a historical page was retried at a smaller page size
+   * after an expensive-query signal (502/504, or a generic GraphQL execution
+   * error). Counted once per repository per occurrence, not per internal
+   * halving step.
+   */
+  pageSizeReductions: number;
+  /** Full names of repositories that used a page size below the configured default this run. */
+  reposWithReducedPageSize: string[];
 }
 
 
@@ -173,7 +182,8 @@ function advance(
   mark: RepoWatermark,
   nodes: readonly HistoricalPRNode[],
   endCursor: string | null,
-  hasNextPage: boolean
+  hasNextPage: boolean,
+  pageSize: number
 ): RepoWatermark {
   let oldest = mark.oldestCreatedAt;
   let newest = mark.newestCreatedAt;
@@ -191,7 +201,28 @@ function advance(
     oldestCreatedAt: oldest,
     newestCreatedAt: newest,
     updatedAt: new Date().toISOString(),
+    preferredPageSize: pageSize,
   };
+}
+
+/**
+ * The page size to start this repository's crawl at this run: its persisted
+ * hint from a previous successful reduced-size page, if still valid under
+ * the current configuration, otherwise the configured default. A stale or
+ * out-of-range hint (e.g. the configuration changed since it was recorded)
+ * is ignored rather than clamped, so behaviour stays predictable.
+ */
+function startingPageSize(mark: RepoWatermark, config: BackfillConfig): number {
+  const hint = mark.preferredPageSize;
+  if (
+    typeof hint === "number" &&
+    Number.isInteger(hint) &&
+    hint >= config.minPageSize &&
+    hint <= config.pageSize
+  ) {
+    return hint;
+  }
+  return config.pageSize;
 }
 
 /**
@@ -222,7 +253,14 @@ export async function runBackfill(
     eventsAppended: 0,
     duplicateEventsIgnored: 0,
     allComplete: false,
+    pageSizeReductions: 0,
+    reposWithReducedPageSize: [],
   };
+
+  console.log(
+    `Backfill page sizes: initial=${config.pageSize}, min=${config.minPageSize}, ` +
+      `adaptive=${config.adaptivePageSize}`
+  );
 
   let budget = config.pagesPerRun;
 
@@ -265,6 +303,7 @@ export async function runBackfill(
       // whatever this run itself just changed it to.
       const isResume = mark.cursor !== null;
       const hadPriorFailure = (mark.consecutiveFailedRuns ?? 0) > 0;
+      let effectivePageSize = startingPageSize(mark, config);
 
       if (config.maxPagesPerRepo > 0) {
         console.log(
@@ -285,7 +324,11 @@ export async function runBackfill(
           // failures, GraphQL validation/schema errors, or an unexpected
           // programming error — is not one of those recognized conditions
           // and is re-thrown by the surrounding catch, unhandled.
-          const pageOutcome = await fetchHistoricalPRPage(owner, repo, current.cursor);
+          const pageOutcome = await fetchHistoricalPRPage(owner, repo, current.cursor, {
+            pageSize: effectivePageSize,
+            minPageSize: config.minPageSize,
+            adaptive: config.adaptivePageSize,
+          });
           budget--;
           pagesThisRepo++;
 
@@ -314,6 +357,17 @@ export async function runBackfill(
           touched = true;
           result.pagesFetched++;
 
+          if (page.pageSize < effectivePageSize) {
+            result.pageSizeReductions++;
+            if (!result.reposWithReducedPageSize.includes(fullName)) {
+              result.reposWithReducedPageSize.push(fullName);
+            }
+          }
+          // Keep the size that just succeeded for the rest of this repository's
+          // run — returning to a larger size would likely reproduce the timeout
+          // on every subsequent page.
+          effectivePageSize = page.pageSize;
+
           if (page.nodes.length > 0) {
             const rows = page.nodes.map((node) => toEventRow(scope, fullName, node));
             const appendResult = appendEventRows(historyDir, scope, rows);
@@ -328,7 +382,7 @@ export async function runBackfill(
           // crashed, or simply out of time — never loses more than the page
           // it is currently mid-fetch on, and never re-requests a page whose
           // events already made it to durable history.
-          current = advance(current, page.nodes, page.endCursor, page.hasNextPage);
+          current = advance(current, page.nodes, page.endCursor, page.hasNextPage, effectivePageSize);
           state.repos[fullName] = current;
           saveBackfillState(historyDir, state);
 
@@ -423,7 +477,7 @@ export function describeBackfill(
   }
   const duplicateNote =
     result.duplicateEventsIgnored > 0 ? `, ${result.duplicateEventsIgnored} duplicate events ignored` : "";
-  return (
+  let line =
     `Backfill: ${result.pagesFetched}/${config.pagesPerRun} pages spent, ` +
     `${result.eventsAppended} events appended${duplicateNote}, ` +
     `${result.reposStarted} started, ${result.reposResumed} resumed, ` +
@@ -431,7 +485,13 @@ export function describeBackfill(
     `${result.reposIncomplete} incomplete, ` +
     `${result.reposDeferred} deferred, ` +
     `${result.reposSkipped} skipped ` +
-    `(${result.reposAlreadyComplete} already complete). Continues next run.`
-  );
+    `(${result.reposAlreadyComplete} already complete). Continues next run.`;
+  if (result.pageSizeReductions > 0) {
+    line +=
+      ` Page size: initial=${config.pageSize}, min=${config.minPageSize}, ` +
+      `${result.pageSizeReductions} reduction(s) across ` +
+      `${result.reposWithReducedPageSize.length} repo(s).`;
+  }
+  return line;
 }
 
