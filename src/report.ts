@@ -3,6 +3,27 @@ import { gini, quantiles, shareAtLeast } from "./stats.js";
 import { LARGE_PR_LINES } from "./history.js";
 
 /**
+ * Measurement windows a summary metric can be reported over. Metrics counted
+ * from different windows are not directly comparable (e.g. a repository-
+ * lifetime total versus a percentage over the last ~13 months of collected
+ * PRs), so every summary row is explicitly labelled with one of these.
+ */
+const WINDOW = {
+  /** State as of the moment the data was collected (e.g. currently-open PRs). */
+  snapshot: "Current snapshot",
+  /** Cumulative total since the repository was created. */
+  lifetime: "Repository lifetime",
+  /**
+   * The enriched PR timeline the collector keeps: up to ~1,000 most recently
+   * updated PRs per repo, roughly the last ~13 months. Not the full lifetime
+   * for older or very active repositories.
+   */
+  collected: "Collected history",
+  last30d: "Last 30 days",
+  last90d: "Last 90 days",
+} as const;
+
+/**
  * Produce a human-readable Markdown report from collected metrics.
  */
 export function generateReport(metrics: OrgMetrics): string {
@@ -19,38 +40,45 @@ export function generateReport(metrics: OrgMetrics): string {
   // -- Summary --
   lines.push("## Summary");
   lines.push("");
-  lines.push(`| Metric | Value |`);
-  lines.push(`| ------ | ----- |`);
-  lines.push(`| Repositories | ${metrics.repoCount} |`);
+  lines.push(
+    "> Metrics are measured over different windows — see the **Window** " +
+      "column. Counts from different windows are not directly comparable " +
+      "(e.g. a repository-lifetime total versus a share of the collected " +
+      "history)."
+  );
+  lines.push("");
+  lines.push(`| Metric | Value | Window |`);
+  lines.push(`| ------ | ----- | ------ |`);
+  lines.push(`| Repositories | ${metrics.repoCount} | ${WINDOW.snapshot} |`);
 
   const totals = aggregate(metrics.repos);
-  lines.push(`| Open issues | ${totals.openIssues} |`);
-  lines.push(`| Closed issues | ${totals.closedIssues} |`);
-  lines.push(`| Open PRs | ${totals.openPRs} |`);
-  lines.push(`| Merged PRs | ${totals.mergedPRs} |`);
-  lines.push(`| Closed (unmerged) PRs | ${totals.closedPRs} |`);
-  lines.push(`| Unique committers (90 d) | ${totals.committers} |`);
-  lines.push(`| Unique reviewers (90 d) | ${totals.reviewers} |`);
+  lines.push(`| Open issues | ${totals.openIssues} | ${WINDOW.snapshot} |`);
+  lines.push(`| Closed issues | ${totals.closedIssues} | ${WINDOW.lifetime} |`);
+  lines.push(`| Open PRs | ${totals.openPRs} | ${WINDOW.snapshot} |`);
+  lines.push(`| Merged PRs | ${totals.mergedPRs} | ${WINDOW.lifetime} |`);
+  lines.push(`| Closed (unmerged) PRs | ${totals.closedPRs} | ${WINDOW.lifetime} |`);
+  lines.push(`| Unique committers | ${totals.committers} | ${WINDOW.last90d} |`);
+  lines.push(`| Unique reviewers | ${totals.reviewers} | ${WINDOW.last90d} |`);
 
   // Copilot adoption summary
   const copilotTotals = aggregateCopilot(metrics.repos);
   if (copilotTotals.totalMergedPRs > 0) {
-    lines.push(`| Copilot-authored PRs | ${copilotTotals.copilotAuthoredPRs} (${pct(copilotTotals.copilotAuthoredPRs, copilotTotals.totalMergedPRs)}%) |`);
+    lines.push(`| Copilot-authored PRs | ${copilotTotals.copilotAuthoredPRs} (${pct(copilotTotals.copilotAuthoredPRs, copilotTotals.totalMergedPRs)}%) | ${WINDOW.collected} |`);
   }
   if (copilotTotals.totalDetailedPRs > 0) {
-    lines.push(`| Copilot-reviewed PRs | ${copilotTotals.copilotReviewedPRs} (${pct(copilotTotals.copilotReviewedPRs, copilotTotals.totalDetailedPRs)}%) |`);
+    lines.push(`| Copilot-reviewed PRs | ${copilotTotals.copilotReviewedPRs} (${pct(copilotTotals.copilotReviewedPRs, copilotTotals.totalDetailedPRs)}%) | ${WINDOW.collected} |`);
   }
 
   // Copilot agent tasks summary
   const agentTotals = aggregateAgentMetrics(metrics.repos);
   if (agentTotals.totalTasks > 0) {
-    lines.push(`| Copilot agent tasks | ${agentTotals.totalTasks} |`);
-    lines.push(`| Agent tasks completed | ${agentTotals.completedTasks} |`);
-    lines.push(`| Agent tasks failed | ${agentTotals.failedTasks} |`);
-    lines.push(`| Agent sessions | ${agentTotals.totalSessions} (${agentTotals.cloudAgentSessions} cloud / ${agentTotals.cliRemoteSessions} CLI) |`);
-    pushIf(lines, agentTotals.totalCreditsUsed > 0, () => `| Agent credits used | ${agentTotals.totalCreditsUsed.toFixed(1)} |`);
-    pushIf(lines, agentTotals.agentCreatedPRs > 0, () => `| PRs created by agent | ${agentTotals.agentCreatedPRs} |`);
-    pushIf(lines, agentTotals.agentActionsMinutes > 0, () => `| Agent PR Actions minutes | ${agentTotals.agentActionsMinutes.toFixed(1)} |`);
+    lines.push(`| Copilot agent tasks | ${agentTotals.totalTasks} | ${WINDOW.last30d} |`);
+    lines.push(`| Agent tasks completed | ${agentTotals.completedTasks} | ${WINDOW.last30d} |`);
+    lines.push(`| Agent tasks failed | ${agentTotals.failedTasks} | ${WINDOW.last30d} |`);
+    lines.push(`| Agent sessions | ${agentTotals.totalSessions} (${agentTotals.cloudAgentSessions} cloud / ${agentTotals.cliRemoteSessions} CLI) | ${WINDOW.last30d} |`);
+    pushIf(lines, agentTotals.totalCreditsUsed > 0, () => `| Agent credits used | ${agentTotals.totalCreditsUsed.toFixed(1)} | ${WINDOW.last30d} |`);
+    pushIf(lines, agentTotals.agentCreatedPRs > 0, () => `| PRs created by agent | ${agentTotals.agentCreatedPRs} | ${WINDOW.last30d} |`);
+    pushIf(lines, agentTotals.agentActionsMinutes > 0, () => `| Agent PR Actions minutes | ${agentTotals.agentActionsMinutes.toFixed(1)} | ${WINDOW.last30d} |`);
   }
 
   // Median cycle time
@@ -59,7 +87,7 @@ export function generateReport(metrics: OrgMetrics): string {
   );
   if (allCycleTimes.length > 0) {
     const medianHrs = median(allCycleTimes);
-    lines.push(`| Median cycle time | ${formatDuration(medianHrs)} |`);
+    lines.push(`| Median cycle time | ${formatDuration(medianHrs)} | ${WINDOW.collected} |`);
   }
 
   // Size, review latency, abandonment and review concentration. Every one of
@@ -67,54 +95,54 @@ export function generateReport(metrics: OrgMetrics): string {
   // emitted only when there is something behind it rather than a hopeful zero.
   const flow = aggregateFlow(metrics.repos);
   if (flow.sizes.length > 0) {
-    lines.push(`| Median PR size | ${Math.round(quantiles(flow.sizes).p50)} lines |`);
+    lines.push(`| Median PR size | ${Math.round(quantiles(flow.sizes).p50)} lines | ${WINDOW.collected} |`);
     lines.push(
       `| PRs over ${LARGE_PR_LINES} lines | ` +
-        `${shareAtLeast(flow.sizes, LARGE_PR_LINES).toFixed(1)}% |`
+        `${shareAtLeast(flow.sizes, LARGE_PR_LINES).toFixed(1)}% | ${WINDOW.collected} |`
     );
   }
   if (flow.reviewWaits.length > 0) {
     const rw = quantiles(flow.reviewWaits);
     lines.push(
       `| Wait for first review | ${formatDuration(rw.p50)} p50 · ` +
-        `${formatDuration(rw.p75)} p75 · ${formatDuration(rw.p90)} p90 (n=${rw.n}) |`
+        `${formatDuration(rw.p75)} p75 · ${formatDuration(rw.p90)} p90 (n=${rw.n}) | ${WINDOW.collected} |`
     );
   }
   if (flow.approvalWaits.length > 0) {
     lines.push(
       `| First review → approval | ` +
-        `${formatDuration(quantiles(flow.approvalWaits).p50)} p50 (n=${flow.approvalWaits.length}) |`
+        `${formatDuration(quantiles(flow.approvalWaits).p50)} p50 (n=${flow.approvalWaits.length}) | ${WINDOW.collected} |`
     );
   }
   if (flow.mergeWaits.length > 0) {
     lines.push(
       `| Approval → merge | ` +
-        `${formatDuration(quantiles(flow.mergeWaits).p50)} p50 (n=${flow.mergeWaits.length}) |`
+        `${formatDuration(quantiles(flow.mergeWaits).p50)} p50 (n=${flow.mergeWaits.length}) | ${WINDOW.collected} |`
     );
   }
   const concluded = flow.merged + flow.abandoned;
   if (concluded > 0 && flow.abandoned > 0) {
     lines.push(
-      `| PRs closed unmerged | ${flow.abandoned} (${pct(flow.abandoned, concluded)}%) |`
+      `| PRs closed unmerged | ${flow.abandoned} (${pct(flow.abandoned, concluded)}%) | ${WINDOW.collected} |`
     );
   }
   if (flow.openAges.length > 0) {
     lines.push(
       `| Median age of open PRs | ` +
-        `${formatDuration(quantiles(flow.openAges).p50)} (${flow.openAges.length} open) |`
+        `${formatDuration(quantiles(flow.openAges).p50)} (${flow.openAges.length} open) | ${WINDOW.snapshot} |`
     );
   }
   const reviewCounts = [...flow.reviewsBy.values()];
   if (reviewCounts.length > 1) {
     lines.push(
       `| Review load concentration | Gini ${gini(reviewCounts).toFixed(2)} ` +
-        `across ${reviewCounts.length} reviewers |`
+        `across ${reviewCounts.length} reviewers | ${WINDOW.collected} |`
     );
   }
   if (agentTotals.agentCreatedPRs > 0 && agentTotals.totalCreditsUsed > 0) {
     lines.push(
       `| Credits per agent PR | ` +
-        `${(agentTotals.totalCreditsUsed / agentTotals.agentCreatedPRs).toFixed(1)} |`
+        `${(agentTotals.totalCreditsUsed / agentTotals.agentCreatedPRs).toFixed(1)} | ${WINDOW.last30d} |`
     );
   }
 
@@ -130,13 +158,17 @@ export function generateReport(metrics: OrgMetrics): string {
       lines.push(`Last pushed: ${repo.pushedAt.slice(0, 10)}`);
     }
     lines.push(
-      `Issues: ${repo.issues.open} open / ${repo.issues.closed} closed`
+      `Issues: ${repo.issues.open} open (${WINDOW.snapshot.toLowerCase()}) / ` +
+        `${repo.issues.closed} closed (${WINDOW.lifetime.toLowerCase()})`
     );
     lines.push(
-      `PRs: ${repo.pullRequests.open} open / ${repo.pullRequests.merged} merged / ${repo.pullRequests.closed} closed`
+      `PRs: ${repo.pullRequests.open} open (${WINDOW.snapshot.toLowerCase()}) / ` +
+        `${repo.pullRequests.merged} merged / ${repo.pullRequests.closed} closed ` +
+        `(${WINDOW.lifetime.toLowerCase()})`
     );
     lines.push(
-      `Contributors: ${repo.committerCount} committers · ${repo.reviewerCount} reviewers`
+      `Contributors: ${repo.committerCount} committers · ${repo.reviewerCount} reviewers ` +
+        `(${WINDOW.last90d.toLowerCase()})`
     );
     lines.push(`Dependents: ${repo.dependentCount}`);
     lines.push("");
@@ -170,6 +202,8 @@ export function generateReport(metrics: OrgMetrics): string {
         if (!b.mergedAt) return -1;
         return b.mergedAt.localeCompare(a.mergedAt);
       });
+      lines.push(`_Sampled from the most recently updated PRs (${WINDOW.collected.toLowerCase()})._`);
+      lines.push("");
       lines.push(
         "| PR | Merged | Lines +/- | Comments | Commits | Actions min |"
       );
