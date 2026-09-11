@@ -450,38 +450,34 @@ describe("fetchHistoricalPRPage", () => {
     const err = makeGenericExecutionError();
     const success = makeHistoricalPageResponse({ nodes: [{ number: 1 }], hasNextPage: false });
     setOctokit(buildMockOctokit([err, success]));
-    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const p = fetchHistoricalPRPage("barcoclickshare", "cx_system_tests", null);
     await vi.advanceTimersByTimeAsync(5_001);
-    const page = await p;
+    const outcome = await p;
 
-    expect(page).not.toBeNull();
-    expect(page!.nodes).toHaveLength(1);
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("transient"));
-    warnSpy.mockRestore();
+    expect(outcome.ok).toBe(true);
+    if (outcome.ok) {
+      expect(outcome.page.nodes).toHaveLength(1);
+    }
     vi.useRealTimers();
   });
 
-  it("defers the repository (returns null) after exhausting retries on a generic execution error, warning with repo name and request id", async () => {
+  it("defers the repository (returns a transient failure outcome) after exhausting retries on a generic execution error, carrying the attempt count and request id", async () => {
     vi.useFakeTimers();
     const err = makeGenericExecutionError("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655");
     setOctokit(buildMockOctokit([err])); // every attempt fails
-    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const p = fetchHistoricalPRPage("barcoclickshare", "cx_system_tests", "cursor-9");
     await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
-    const page = await p;
+    const outcome = await p;
 
-    expect(page).toBeNull();
-    const warnings = warnSpy.mock.calls.map((c) => String(c[0]));
-    const giveUpWarning = warnings.find((w) => w.includes("still failing"));
-    expect(giveUpWarning).toBeDefined();
-    expect(giveUpWarning).toContain("barcoclickshare/cx_system_tests");
-    expect(giveUpWarning).toContain("3 retries");
-    expect(giveUpWarning).toContain("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655");
-    expect(giveUpWarning).toContain("resume from its saved cursor next run");
-    warnSpy.mockRestore();
+    expect(outcome.ok).toBe(false);
+    if (!outcome.ok) {
+      expect(outcome.failure.kind).toBe("transient");
+      expect(outcome.failure.category).toContain("GraphQL transient execution error");
+      expect(outcome.failure.attempts).toBe(4);
+      expect(outcome.failure.requestId).toBe("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655");
+    }
     vi.useRealTimers();
   });
 
@@ -496,33 +492,46 @@ describe("fetchHistoricalPRPage", () => {
     ).rejects.toThrow("Field 'bogus' doesn't exist on type 'PullRequest'");
   });
 
-  it("still returns null immediately (no retry) on a 403 access-denied repository", async () => {
-    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+  it("still resolves immediately (no retry) on a 403 access-denied repository, classified as forbidden", async () => {
     const err = Object.assign(new Error("Forbidden"), {
       errors: [{ type: "FORBIDDEN", message: "forbidden" }],
     });
     setOctokit(buildMockOctokit([err]));
 
-    const page = await fetchHistoricalPRPage("owner", "private-repo", null);
-    expect(page).toBeNull();
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("access denied"));
-    warnSpy.mockRestore();
+    const outcome = await fetchHistoricalPRPage("owner", "private-repo", null);
+    expect(outcome.ok).toBe(false);
+    if (!outcome.ok) {
+      expect(outcome.failure.kind).toBe("forbidden");
+      expect(outcome.failure.category).toContain("access denied");
+    }
   });
 
-  it("still returns null after exhausting retries on a plain 502", async () => {
+  it("still resolves as a transient failure after exhausting retries on a plain 502", async () => {
     vi.useFakeTimers();
     const err = Object.assign(new Error("Bad gateway"), { status: 502 });
     setOctokit(buildMockOctokit([err]));
-    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const p = fetchHistoricalPRPage("owner", "repo", null);
     await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
-    const page = await p;
+    const outcome = await p;
 
-    expect(page).toBeNull();
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("still failing"));
-    warnSpy.mockRestore();
+    expect(outcome.ok).toBe(false);
+    if (!outcome.ok) {
+      expect(outcome.failure.kind).toBe("transient");
+      expect(outcome.failure.category).toContain("5xx");
+    }
     vi.useRealTimers();
+  });
+
+  it("classifies a repository that disappeared or became inaccessible mid-crawl as not-found", async () => {
+    setOctokit(buildMockOctokit([{ repository: null }]));
+
+    const outcome = await fetchHistoricalPRPage("owner", "repo", null);
+    expect(outcome.ok).toBe(false);
+    if (!outcome.ok) {
+      expect(outcome.failure.kind).toBe("not-found");
+      expect(outcome.failure.category.toLowerCase()).toContain("disappeared");
+    }
   });
 });
 

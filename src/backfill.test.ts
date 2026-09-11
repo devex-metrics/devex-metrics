@@ -10,7 +10,12 @@ vi.mock("./collectors/repo-graphql.js", () => ({
 import { fetchHistoricalPRPage } from "./collectors/repo-graphql.js";
 import { runBackfill, toEventRow, describeBackfill } from "./backfill.js";
 import { loadBackfillState, loadEvents } from "./history.js";
-import type { HistoricalPRNode } from "./collectors/repo-graphql.js";
+import type {
+  HistoricalPRNode,
+  HistoricalPRPage,
+  HistoricalPageFailure,
+  HistoricalPageOutcome,
+} from "./collectors/repo-graphql.js";
 import type { BackfillConfig } from "./config.js";
 
 const mockFetch = vi.mocked(fetchHistoricalPRPage);
@@ -52,16 +57,32 @@ function node(number: number, extra: Partial<HistoricalPRNode> = {}): Historical
   };
 }
 
+/** Wrap a page in the `{ ok: true }` shape `fetchHistoricalPRPage` resolves to. */
+function ok(page: HistoricalPRPage): HistoricalPageOutcome {
+  return { ok: true, page };
+}
+
+/** Wrap a classified, repository-local failure in the `{ ok: false }` shape. */
+function fail(failure: Partial<HistoricalPageFailure> = {}): HistoricalPageOutcome {
+  return {
+    ok: false,
+    failure: { kind: "transient", category: "GitHub GraphQL transient execution error", attempts: 4, ...failure },
+  };
+}
+
 /** Queue `pages` responses; each entry is the nodes for one page. */
 function queuePages(pages: HistoricalPRNode[][]) {
   pages.forEach((nodes, i) => {
-    mockFetch.mockResolvedValueOnce({
-      nodes,
-      hasNextPage: i < pages.length - 1,
-      endCursor: `cursor-${i}`,
-    });
+    mockFetch.mockResolvedValueOnce(
+      ok({
+        nodes,
+        hasNextPage: i < pages.length - 1,
+        endCursor: `cursor-${i}`,
+      })
+    );
   });
 }
+
 
 describe("toEventRow", () => {
   it("maps a merged PR with its cycle time", () => {
@@ -172,11 +193,13 @@ describe("runBackfill", () => {
   });
 
   it("stores a watermark so the next run resumes rather than restarting", async () => {
-    mockFetch.mockResolvedValueOnce({
-      nodes: [node(1)],
-      hasNextPage: true,
-      endCursor: "cursor-A",
-    });
+    mockFetch.mockResolvedValueOnce(
+      ok({
+        nodes: [node(1)],
+        hasNextPage: true,
+        endCursor: "cursor-A",
+      })
+    );
     await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ pagesPerRun: 1 }));
 
     const state = loadBackfillState(dir, "acme");
@@ -185,11 +208,13 @@ describe("runBackfill", () => {
     expect(state.repos["acme/api"].prsSeen).toBe(1);
 
     // Second run must continue from the stored cursor.
-    mockFetch.mockResolvedValueOnce({
-      nodes: [node(2)],
-      hasNextPage: false,
-      endCursor: "cursor-B",
-    });
+    mockFetch.mockResolvedValueOnce(
+      ok({
+        nodes: [node(2)],
+        hasNextPage: false,
+        endCursor: "cursor-B",
+      })
+    );
     await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config({ pagesPerRun: 1 }));
     expect(mockFetch).toHaveBeenLastCalledWith("acme", "api", "cursor-A");
     expect(loadBackfillState(dir, "acme").repos["acme/api"].complete).toBe(true);
@@ -207,7 +232,7 @@ describe("runBackfill", () => {
   });
 
   it("respects the per-run page budget", async () => {
-    mockFetch.mockResolvedValue({ nodes: [node(1)], hasNextPage: true, endCursor: "c" });
+    mockFetch.mockResolvedValue(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "c" }));
     const result = await runBackfill(
       dir,
       "acme",
@@ -219,7 +244,7 @@ describe("runBackfill", () => {
   });
 
   it("caps one repository so it cannot starve the others", async () => {
-    mockFetch.mockResolvedValue({ nodes: [node(1)], hasNextPage: true, endCursor: "c" });
+    mockFetch.mockResolvedValue(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "c" }));
     await runBackfill(
       dir,
       "acme",
@@ -232,20 +257,21 @@ describe("runBackfill", () => {
   });
 
   it("leaves the watermark untouched when a repo is inaccessible", async () => {
-    mockFetch.mockResolvedValueOnce(null);
+    mockFetch.mockResolvedValueOnce(fail({ kind: "not-found", category: "repository not found", attempts: undefined }));
     const result = await runBackfill(dir, "acme", [{ fullName: "acme/gone" }], config());
     expect(result.pagesFetched).toBe(0);
     expect(result.reposTouched).toBe(0);
+    expect(result.reposSkipped).toBe(1);
     expect(loadBackfillState(dir, "acme").repos["acme/gone"].complete).toBe(false);
     expect(loadBackfillState(dir, "acme").repos["acme/gone"].cursor).toBeNull();
   });
 
   it("isolates a repository that fails with a transient/generic error and still processes the next one", async () => {
     // fetchHistoricalPRPage itself retries transient/generic GraphQL errors
-    // internally and only returns null once its own retries are exhausted —
-    // simulate that exhaustion here by resolving null for the failing repo.
-    mockFetch.mockResolvedValueOnce(null); // acme/flaky exhausts its retries
-    mockFetch.mockResolvedValueOnce({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1" }); // acme/ok succeeds
+    // internally and only resolves { ok: false } once its own retries are
+    // exhausted — simulate that exhaustion here for the failing repo.
+    mockFetch.mockResolvedValueOnce(fail()); // acme/flaky exhausts its retries
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1" })); // acme/ok succeeds
 
     const result = await runBackfill(
       dir,
@@ -263,30 +289,47 @@ describe("runBackfill", () => {
     expect(loadEvents(dir, "acme")).toHaveLength(1);
   });
 
-  it("does not let an unexpected thrown error abort the organisation-wide run", async () => {
-    mockFetch.mockRejectedValueOnce(new Error("boom: unexpected programming error"));
-    mockFetch.mockResolvedValueOnce({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1" });
-    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+  it("still returns null immediately (repository skipped, not retried) for a repository-not-found / access-denied outcome", async () => {
+    mockFetch.mockResolvedValueOnce(
+      fail({ kind: "forbidden", category: "repository access denied (403)", attempts: undefined })
+    );
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1" }));
 
     const result = await runBackfill(
       dir,
       "acme",
-      [{ fullName: "acme/throws" }, { fullName: "acme/next" }],
+      [{ fullName: "acme/private" }, { fullName: "acme/ok" }],
       config()
     );
 
-    expect(result.reposDeferred).toBe(1);
+    expect(result.reposSkipped).toBe(1);
     expect(result.reposCompleted).toBe(1);
-    expect(loadBackfillState(dir, "acme").repos["acme/throws"].cursor).toBeNull();
-    expect(loadBackfillState(dir, "acme").repos["acme/throws"].complete).toBe(false);
-    expect(loadBackfillState(dir, "acme").repos["acme/next"].complete).toBe(true);
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("acme/throws"));
-    warnSpy.mockRestore();
+    expect(loadBackfillState(dir, "acme").repos["acme/private"].complete).toBe(false);
+    expect(loadBackfillState(dir, "acme").repos["acme/private"].cursor).toBeNull();
+  });
+
+  it("propagates an unexpected thrown error (global/programming failure) and still saves progress from earlier repositories", async () => {
+    // acme/first succeeds and completes before acme/throws blows up, so its
+    // durably-appended progress must survive even though the run as a whole
+    // must fail (an unclassified exception is, by construction, not one of
+    // fetchHistoricalPRPage's recognized repository-local outcomes).
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: false, endCursor: "cursor-1" }));
+    mockFetch.mockRejectedValueOnce(new Error("boom: unexpected programming error"));
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(
+      runBackfill(dir, "acme", [{ fullName: "acme/first" }, { fullName: "acme/throws" }], config())
+    ).rejects.toThrow("boom: unexpected programming error");
+
+    expect(loadBackfillState(dir, "acme").repos["acme/first"].complete).toBe(true);
+    expect(loadEvents(dir, "acme")).toHaveLength(1);
+    expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining("acme/throws"));
+    errorSpy.mockRestore();
   });
 
   it("keeps the cursor at the last successfully stored page when a later page in the same repo fails", async () => {
-    mockFetch.mockResolvedValueOnce({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-good" });
-    mockFetch.mockResolvedValueOnce(null); // second page exhausts its retries
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-good" }));
+    mockFetch.mockResolvedValueOnce(fail()); // second page exhausts its retries
 
     const result = await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
 
@@ -297,7 +340,7 @@ describe("runBackfill", () => {
     expect(loadEvents(dir, "acme")).toHaveLength(1);
 
     // Next run must retry the failed page from the exact stored cursor.
-    mockFetch.mockResolvedValueOnce({ nodes: [node(2)], hasNextPage: false, endCursor: "cursor-final" });
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(2)], hasNextPage: false, endCursor: "cursor-final" }));
     await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
     expect(mockFetch).toHaveBeenLastCalledWith("acme", "api", "cursor-good");
     expect(loadBackfillState(dir, "acme").repos["acme/api"].complete).toBe(true);
@@ -305,14 +348,14 @@ describe("runBackfill", () => {
   });
 
   it("does not duplicate events when a page is refetched after a prior partial failure", async () => {
-    mockFetch.mockResolvedValueOnce({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-good" });
-    mockFetch.mockResolvedValueOnce(null);
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1)], hasNextPage: true, endCursor: "cursor-good" }));
+    mockFetch.mockResolvedValueOnce(fail());
     await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
     expect(loadEvents(dir, "acme")).toHaveLength(1);
 
     // Next run re-requests the same next page (simulating GitHub replaying
     // an overlapping page) and includes an event already recorded.
-    mockFetch.mockResolvedValueOnce({ nodes: [node(1), node(2)], hasNextPage: false, endCursor: "cursor-final" });
+    mockFetch.mockResolvedValueOnce(ok({ nodes: [node(1), node(2)], hasNextPage: false, endCursor: "cursor-final" }));
     const second = await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
 
     expect(second.eventsAppended).toBe(1);
@@ -327,6 +370,7 @@ describe("runBackfill", () => {
     fs.rmSync(path.join(dir, "acme", "backfill.json"));
     queuePages([[node(1), node(2), node(3)]]);
     const second = await runBackfill(dir, "acme", [{ fullName: "acme/api" }], config());
+
 
     expect(second.eventsAppended).toBe(1);
     expect(loadEvents(dir, "acme")).toHaveLength(3);
@@ -363,7 +407,9 @@ describe("describeBackfill", () => {
         reposTouched: 0,
         reposCompleted: 0,
         reposAlreadyComplete: 3,
+        reposIncomplete: 0,
         reposDeferred: 0,
+        reposSkipped: 0,
         pagesFetched: 0,
         eventsAppended: 0,
         allComplete: true,
@@ -379,7 +425,9 @@ describe("describeBackfill", () => {
         reposTouched: 2,
         reposCompleted: 1,
         reposAlreadyComplete: 0,
+        reposIncomplete: 1,
         reposDeferred: 0,
+        reposSkipped: 0,
         pagesFetched: 5,
         eventsAppended: 400,
         allComplete: false,
@@ -387,24 +435,29 @@ describe("describeBackfill", () => {
       config({ pagesPerRun: 100 })
     );
     expect(line).toContain("5/100 pages");
-    expect(line).toContain("400 PRs recorded");
+    expect(line).toContain("400 events appended");
+    expect(line).toContain("1 repositories completed");
+    expect(line).toContain("1 incomplete");
     expect(line).toContain("Continues next run");
   });
 
-  it("mentions deferred repositories when retries were exhausted this run", () => {
+  it("mentions deferred and skipped repositories when retries were exhausted or access was denied this run", () => {
     const line = describeBackfill(
       {
         reposTouched: 1,
         reposCompleted: 0,
         reposAlreadyComplete: 0,
+        reposIncomplete: 0,
         reposDeferred: 2,
+        reposSkipped: 1,
         pagesFetched: 3,
         eventsAppended: 10,
         allComplete: false,
       },
       config({ pagesPerRun: 100 })
     );
-    expect(line).toContain("2 repo(s) deferred");
+    expect(line).toContain("2 deferred");
+    expect(line).toContain("1 skipped");
   });
 });
 

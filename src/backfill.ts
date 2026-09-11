@@ -15,7 +15,7 @@
 
 import { fetchHistoricalPRPage } from "./collectors/repo-graphql.js";
 import { parseRevertRef } from "./collectors/pull-requests.js";
-import type { HistoricalPRNode } from "./collectors/repo-graphql.js";
+import type { HistoricalPRNode, HistoricalPageFailure } from "./collectors/repo-graphql.js";
 import {
   appendEventRows,
   loadBackfillState,
@@ -40,14 +40,25 @@ export interface BackfillResult {
   /** Repositories already complete before this run. */
   reposAlreadyComplete: number;
   /**
-   * Repositories where this run stopped early because of a persistent
-   * failure — a transient/generic GraphQL error that outlasted the bounded
-   * retries, an inaccessible repository, or an unexpected error. Their
-   * watermark is left exactly where it was after the last successfully
-   * appended page, so they resume from there next run rather than being
-   * marked complete or restarted.
+   * Repositories still incomplete purely because this run's page budget
+   * (organisation-wide `pagesPerRun` or per-repository `maxPagesPerRepo`)
+   * was reached — an ordinary, expected state, not a failure. More pages
+   * remain and will be fetched on a later run.
+   */
+  reposIncomplete: number;
+  /**
+   * Repositories where this run stopped early because a transient/generic
+   * GraphQL error outlasted the bounded retries. Their watermark is left
+   * exactly where it was after the last successfully appended page, so they
+   * resume from there next run rather than being marked complete or reset.
    */
   reposDeferred: number;
+  /**
+   * Repositories skipped this run because they were inaccessible (403), not
+   * found (404), or disappeared/were renamed/archived mid-crawl. Their
+   * watermark is likewise left untouched.
+   */
+  reposSkipped: number;
   /** Pages fetched, against the run's budget. */
   pagesFetched: number;
   /** Event rows appended. */
@@ -55,6 +66,7 @@ export interface BackfillResult {
   /** True when every target repository is now fully crawled. */
   allComplete: boolean;
 }
+
 
 /** Detect AI authorship from a login alone (the lean crawl has no commit data). */
 function aiTypeFromLogin(
@@ -195,7 +207,9 @@ export async function runBackfill(
     reposTouched: 0,
     reposCompleted: 0,
     reposAlreadyComplete: 0,
+    reposIncomplete: 0,
     reposDeferred: 0,
+    reposSkipped: 0,
     pagesFetched: 0,
     eventsAppended: 0,
     allComplete: false,
@@ -203,106 +217,149 @@ export async function runBackfill(
 
   let budget = config.pagesPerRun;
 
-  for (const { fullName } of targets) {
-    const mark = state.repos[fullName] ?? emptyWatermark();
-    if (mark.complete) {
-      state.repos[fullName] = mark;
-      result.reposAlreadyComplete++;
-      continue;
-    }
-    if (budget <= 0) {
-      // Out of budget — leave the watermark untouched so the next run resumes here.
-      state.repos[fullName] = mark;
-      continue;
-    }
-
-    const slashIndex = fullName.indexOf("/");
-    if (slashIndex <= 0 || slashIndex === fullName.length - 1) {
-      console.warn(`  ⚠ backfill: skipping malformed repo name ${fullName}`);
-      continue;
-    }
-    const owner = fullName.slice(0, slashIndex);
-    const repo = fullName.slice(slashIndex + 1);
-
-    let current = mark;
-    let pagesThisRepo = 0;
-    let touched = false;
-    let deferred = false;
-
-    try {
-      while (
-        budget > 0 &&
-        pagesThisRepo < config.maxPagesPerRepo &&
-        !current.complete
-      ) {
-        const page = await fetchHistoricalPRPage(owner, repo, current.cursor);
-        budget--;
-        pagesThisRepo++;
-
-        if (page === null) {
-          // Inaccessible, or a transient/generic GraphQL execution error that
-          // outlasted the bounded retries in fetchHistoricalPRPage. `current`
-          // still holds the last cursor whose events were durably appended,
-          // so this repository resumes from exactly that point next run —
-          // never advanced past an unrecorded page, never reset.
-          deferred = true;
-          break;
-        }
-
-        touched = true;
-        result.pagesFetched++;
-
-        if (page.nodes.length > 0) {
-          const rows = page.nodes.map((node) => toEventRow(scope, fullName, node));
-          result.eventsAppended += appendEventRows(historyDir, scope, rows).appended;
-        }
-
-        // Cursor only moves forward once this page's events are appended —
-        // fetch, then append, then advance, in that order.
-        current = advance(current, page.nodes, page.endCursor, page.hasNextPage);
-
-        if (current.complete) {
-          result.reposCompleted++;
-          console.log(
-            `  ✓ ${fullName} fully crawled — ${current.prsSeen} PRs back to ` +
-              `${current.oldestCreatedAt?.slice(0, 10) ?? "unknown"}`
-          );
-          break;
-        }
+  // The `finally` below persists whatever progress has accumulated in
+  // `state.repos` regardless of how the loop exits — including an unexpected
+  // exception thrown for a later repository. That way a genuinely fatal
+  // error (auth failure, GraphQL validation error, a local filesystem
+  // failure) still terminates the run by propagating out of runBackfill,
+  // but never costs the durably-appended progress already made on earlier
+  // repositories in the same run.
+  try {
+    for (const { fullName } of targets) {
+      const mark = state.repos[fullName] ?? emptyWatermark();
+      if (mark.complete) {
+        state.repos[fullName] = mark;
+        result.reposAlreadyComplete++;
+        continue;
       }
-    } catch (err: unknown) {
-      // A genuinely unexpected (non-classified) error. Log it in full rather
-      // than swallowing it, but do not let it take down the rest of the
-      // organisation-wide run: defer this repository — its watermark
-      // (`current`) already reflects only pages whose events were
-      // successfully appended — and continue with the next repository.
-      deferred = true;
-      const message = err instanceof Error ? err.message : String(err);
-      console.warn(
-        `  ⚠ backfill: unexpected error crawling ${fullName} after ${pagesThisRepo} page(s) this run ` +
-          `(${message}); leaving its cursor untouched and resuming next run`
-      );
-    }
+      if (budget <= 0) {
+        // Out of budget — leave the watermark untouched so the next run resumes here.
+        state.repos[fullName] = mark;
+        result.reposIncomplete++;
+        continue;
+      }
 
-    if (deferred) {
-      result.reposDeferred++;
-    }
-    if (touched) {
-      result.reposTouched++;
-      if (!current.complete) {
-        console.log(
-          `  → ${fullName} at ${current.prsSeen} PRs ` +
-            `(from ${current.oldestCreatedAt?.slice(0, 10) ?? "unknown"}); more next run`
+      const slashIndex = fullName.indexOf("/");
+      if (slashIndex <= 0 || slashIndex === fullName.length - 1) {
+        console.warn(`  ⚠ backfill: skipping malformed repo name ${fullName}`);
+        continue;
+      }
+      const owner = fullName.slice(0, slashIndex);
+      const repo = fullName.slice(slashIndex + 1);
+
+      let current = mark;
+      let pagesThisRepo = 0;
+      let touched = false;
+      let outcome: "completed" | "deferred" | "skipped" | "incomplete" = "incomplete";
+
+      try {
+        while (
+          budget > 0 &&
+          pagesThisRepo < config.maxPagesPerRepo &&
+          !current.complete
+        ) {
+          // `fetchHistoricalPRPage` resolves a recognized, repository-local,
+          // recoverable condition to `{ ok: false }` instead of throwing (see
+          // HistoricalPageOutcome), so recovering from it below is a plain
+          // branch, not a broad try/catch. Anything else it throws — auth
+          // failures, GraphQL validation/schema errors, or an unexpected
+          // programming error — is not one of those recognized conditions
+          // and is re-thrown by the surrounding catch, unhandled.
+          const pageOutcome = await fetchHistoricalPRPage(owner, repo, current.cursor);
+          budget--;
+          pagesThisRepo++;
+
+          if (!pageOutcome.ok) {
+            // `current` still holds the last cursor whose events were durably
+            // appended, so this repository resumes from exactly that point
+            // next run — never advanced past an unrecorded page, never reset.
+            outcome = pageOutcome.failure.kind === "transient" ? "deferred" : "skipped";
+            logRepoDeferredOrSkipped(fullName, outcome, pageOutcome.failure);
+            break;
+          }
+
+          const page = pageOutcome.page;
+          touched = true;
+          result.pagesFetched++;
+
+          if (page.nodes.length > 0) {
+            const rows = page.nodes.map((node) => toEventRow(scope, fullName, node));
+            result.eventsAppended += appendEventRows(historyDir, scope, rows).appended;
+          }
+
+          // Cursor only moves forward once this page's events are appended —
+          // fetch, then append, then advance, in that order.
+          current = advance(current, page.nodes, page.endCursor, page.hasNextPage);
+
+          if (current.complete) {
+            outcome = "completed";
+            result.reposCompleted++;
+            console.log(
+              `  ✓ ${fullName} fully crawled — ${current.prsSeen} PRs back to ` +
+                `${current.oldestCreatedAt?.slice(0, 10) ?? "unknown"}`
+            );
+            break;
+          }
+        }
+      } catch (err) {
+        // Unrecognized failure: not one of fetchHistoricalPRPage's classified
+        // repository-local outcomes, so it is treated as global/programming
+        // and must terminate the whole run — but `current`/`touched` for
+        // this repository, and every already-processed repository before it,
+        // are still recorded here so the `finally` below can save them.
+        state.repos[fullName] = current;
+        if (touched) result.reposTouched++;
+        const message = err instanceof Error ? err.message : String(err);
+        console.error(
+          `  ✗ backfill: unrecoverable error while crawling ${fullName} after ${pagesThisRepo} ` +
+            `page(s) this run (${message}); aborting run`
         );
+        throw err;
       }
-    }
-    state.repos[fullName] = current;
-  }
 
-  saveBackfillState(historyDir, state);
+      if (outcome === "deferred") result.reposDeferred++;
+      else if (outcome === "skipped") result.reposSkipped++;
+      else if (outcome === "incomplete") {
+        result.reposIncomplete++;
+        if (touched) {
+          console.log(
+            `  → ${fullName} at ${current.prsSeen} PRs ` +
+              `(from ${current.oldestCreatedAt?.slice(0, 10) ?? "unknown"}); more next run`
+          );
+        }
+      }
+      if (touched) result.reposTouched++;
+      state.repos[fullName] = current;
+    }
+  } finally {
+    saveBackfillState(historyDir, state);
+  }
 
   result.allComplete = targets.every((t) => state.repos[t.fullName]?.complete === true);
   return result;
+}
+
+/**
+ * Emit the single, consolidated warning for a repository the run could not
+ * make progress on this time — never anything more than the repository name,
+ * a concise error category, attempt count, and GitHub's support request id;
+ * no tokens, headers, or raw payloads.
+ */
+function logRepoDeferredOrSkipped(
+  fullName: string,
+  outcome: "deferred" | "skipped",
+  failure: HistoricalPageFailure
+): void {
+  const attemptsNote =
+    failure.attempts !== undefined
+      ? ` after ${failure.attempts} failed attempt${failure.attempts === 1 ? "" : "s"}`
+      : "";
+  const requestNote = failure.requestId ? `, request ${failure.requestId}` : "";
+  console.warn(
+    `  ⚠ backfill: ${fullName} ${outcome}${attemptsNote} ` +
+      `(${failure.category}${requestNote}). ` +
+      `Progress preserved; repository will resume next run.`
+  );
 }
 
 /** One-line summary of a backfill run. */
@@ -313,14 +370,14 @@ export function describeBackfill(
   if (result.allComplete) {
     return `History complete — every repository crawled to its first pull request.`;
   }
-  const deferredNote =
-    result.reposDeferred > 0
-      ? ` ${result.reposDeferred} repo(s) deferred after exhausting retries this run.`
-      : "";
   return (
     `Backfill: ${result.pagesFetched}/${config.pagesPerRun} pages spent, ` +
-    `${result.eventsAppended} PRs recorded, ` +
-    `${result.reposCompleted} repo(s) finished this run, ` +
-    `${result.reposAlreadyComplete} already complete.${deferredNote} Continues next run.`
+    `${result.eventsAppended} events appended, ` +
+    `${result.reposCompleted} repositories completed, ` +
+    `${result.reposIncomplete} incomplete, ` +
+    `${result.reposDeferred} deferred, ` +
+    `${result.reposSkipped} skipped ` +
+    `(${result.reposAlreadyComplete} already complete). Continues next run.`
   );
 }
+
