@@ -697,6 +697,16 @@ export interface RepoWatermark {
   newestCreatedAt?: string;
   /** When this watermark was last advanced. */
   updatedAt: string;
+  /**
+   * Optional hint: the historical GraphQL page size that last succeeded for
+   * this repository. Never consulted for cursor or completion decisions —
+   * purely an optimisation so a repository that needed a smaller page (see
+   * `BackfillConfig.adaptivePageSize`) does not repeat the same failed larger
+   * request on every run. Absent on watermarks written before this field
+   * existed; the loader treats that the same as "no hint", clamped/validated
+   * against the current configuration before use.
+   */
+  preferredPageSize?: number;
 }
 
 /** The per-scope watermark file. */

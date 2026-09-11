@@ -45,6 +45,15 @@ export interface BackfillResult {
   eventsAppended: number;
   /** True when every target repository is now fully crawled. */
   allComplete: boolean;
+  /**
+   * Number of times a historical page was retried at a smaller page size
+   * after an expensive-query signal (502/504, or a generic GraphQL execution
+   * error). Counted once per repository per occurrence, not per internal
+   * halving step.
+   */
+  pageSizeReductions: number;
+  /** Full names of repositories that used a page size below the configured default this run. */
+  reposWithReducedPageSize: string[];
 }
 
 /** Detect AI authorship from a login alone (the lean crawl has no commit data). */
@@ -146,7 +155,8 @@ function advance(
   mark: RepoWatermark,
   nodes: readonly HistoricalPRNode[],
   endCursor: string | null,
-  hasNextPage: boolean
+  hasNextPage: boolean,
+  pageSize: number
 ): RepoWatermark {
   let oldest = mark.oldestCreatedAt;
   let newest = mark.newestCreatedAt;
@@ -164,7 +174,28 @@ function advance(
     oldestCreatedAt: oldest,
     newestCreatedAt: newest,
     updatedAt: new Date().toISOString(),
+    preferredPageSize: pageSize,
   };
+}
+
+/**
+ * The page size to start this repository's crawl at this run: its persisted
+ * hint from a previous successful reduced-size page, if still valid under
+ * the current configuration, otherwise the configured default. A stale or
+ * out-of-range hint (e.g. the configuration changed since it was recorded)
+ * is ignored rather than clamped, so behaviour stays predictable.
+ */
+function startingPageSize(mark: RepoWatermark, config: BackfillConfig): number {
+  const hint = mark.preferredPageSize;
+  if (
+    typeof hint === "number" &&
+    Number.isInteger(hint) &&
+    hint >= config.minPageSize &&
+    hint <= config.pageSize
+  ) {
+    return hint;
+  }
+  return config.pageSize;
 }
 
 /**
@@ -189,7 +220,14 @@ export async function runBackfill(
     pagesFetched: 0,
     eventsAppended: 0,
     allComplete: false,
+    pageSizeReductions: 0,
+    reposWithReducedPageSize: [],
   };
+
+  console.log(
+    `Backfill page sizes: initial=${config.pageSize}, min=${config.minPageSize}, ` +
+      `adaptive=${config.adaptivePageSize}`
+  );
 
   let budget = config.pagesPerRun;
 
@@ -217,13 +255,18 @@ export async function runBackfill(
     let current = mark;
     let pagesThisRepo = 0;
     let touched = false;
+    let effectivePageSize = startingPageSize(mark, config);
 
     while (
       budget > 0 &&
       pagesThisRepo < config.maxPagesPerRepo &&
       !current.complete
     ) {
-      const page = await fetchHistoricalPRPage(owner, repo, current.cursor);
+      const page = await fetchHistoricalPRPage(owner, repo, current.cursor, {
+        pageSize: effectivePageSize,
+        minPageSize: config.minPageSize,
+        adaptive: config.adaptivePageSize,
+      });
       budget--;
       pagesThisRepo++;
 
@@ -235,12 +278,23 @@ export async function runBackfill(
       touched = true;
       result.pagesFetched++;
 
+      if (page.pageSize < effectivePageSize) {
+        result.pageSizeReductions++;
+        if (!result.reposWithReducedPageSize.includes(fullName)) {
+          result.reposWithReducedPageSize.push(fullName);
+        }
+      }
+      // Keep the size that just succeeded for the rest of this repository's
+      // run — returning to a larger size would likely reproduce the timeout
+      // on every subsequent page.
+      effectivePageSize = page.pageSize;
+
       if (page.nodes.length > 0) {
         const rows = page.nodes.map((node) => toEventRow(scope, fullName, node));
         result.eventsAppended += appendEventRows(historyDir, scope, rows).appended;
       }
 
-      current = advance(current, page.nodes, page.endCursor, page.hasNextPage);
+      current = advance(current, page.nodes, page.endCursor, page.hasNextPage, effectivePageSize);
 
       if (current.complete) {
         result.reposCompleted++;
@@ -278,10 +332,16 @@ export function describeBackfill(
   if (result.allComplete) {
     return `History complete — every repository crawled to its first pull request.`;
   }
-  return (
+  let line =
     `Backfill: ${result.pagesFetched}/${config.pagesPerRun} pages spent, ` +
     `${result.eventsAppended} PRs recorded, ` +
     `${result.reposCompleted} repo(s) finished this run, ` +
-    `${result.reposAlreadyComplete} already complete. Continues next run.`
-  );
+    `${result.reposAlreadyComplete} already complete. Continues next run.`;
+  if (result.pageSizeReductions > 0) {
+    line +=
+      ` Page size: initial=${config.pageSize}, min=${config.minPageSize}, ` +
+      `${result.pageSizeReductions} reduction(s) across ` +
+      `${result.reposWithReducedPageSize.length} repo(s).`;
+  }
+  return line;
 }
