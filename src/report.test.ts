@@ -2,6 +2,49 @@ import { describe, it, expect } from "vitest";
 import { generateReport } from "./report.js";
 import type { OrgMetrics, RepoMetrics } from "./types.js";
 
+/**
+ * Split a single Markdown table row into its cell contents, honoring `\|`
+ * as escaped (non-structural) pipe content rather than a column boundary.
+ * Mirrors the parsing rules exercised in markdown.test.ts, duplicated here
+ * (rather than imported across test files) to keep this a self-contained
+ * structural assertion for generated reports.
+ */
+function splitStructuralCells(row: string): string[] {
+  const trimmed = row.trim().replace(/^\|/, "").replace(/\|$/, "");
+  const cells: string[] = [];
+  let current = "";
+  for (let i = 0; i < trimmed.length; i++) {
+    const ch = trimmed[i];
+    if (ch === "\\" && trimmed[i + 1] === "|") {
+      current += "\\|";
+      i++;
+      continue;
+    }
+    if (ch === "|") {
+      cells.push(current.trim());
+      current = "";
+      continue;
+    }
+    current += ch;
+  }
+  cells.push(current.trim());
+  return cells;
+}
+
+/**
+ * Return the number of structural (unescaped) `|` columns in every
+ * generated PR-table data row (`| #123 ... |`), the one table in this
+ * report that carries untrusted dynamic text (the PR title). Skips summary
+ * tables, headers, and separator rows, which have a different column count
+ * and aren't the concern under test here.
+ */
+function prTableRowColumnCounts(markdown: string): number[] {
+  return markdown
+    .split("\n")
+    .filter((line) => /^\|\s*#\d/.test(line.trim()))
+    .map((line) => splitStructuralCells(line).length);
+}
+
 function makeSampleMetrics(): OrgMetrics {
   return {
     owner: "test-org",
@@ -349,6 +392,176 @@ describe("generateReport", () => {
     const posHasDate = report.indexOf("#6 Has date PR");
     const posNoDate = report.indexOf("#5 No date PR");
     expect(posHasDate).toBeLessThan(posNoDate);
+  });
+
+  it("escapes pipe characters in a PR title so the table structure is preserved", () => {
+    const metrics: OrgMetrics = {
+      owner: "barcoclickshare",
+      ownerType: "org",
+      collectedAt: "2026-09-09T00:00:00Z",
+      repoCount: 1,
+      repos: [
+        {
+          name: "ui-composer-apk",
+          fullName: "barcoclickshare/ui-composer-apk",
+          issues: { open: 0, closed: 0 },
+          pullRequests: { open: 0, closed: 0, merged: 1 },
+          pullRequestDetails: [
+            {
+              number: 3816,
+              title:
+                "ui-composer-apk 0.22.0: UI Composer | Implementation | Side-by-side layout production hardening",
+              state: "merged",
+              mergedAt: "2026-09-09T00:00:00Z",
+              linesAdded: 2,
+              linesDeleted: 2,
+              commentCount: 3,
+              commitCount: 1,
+              actionsMinutes: -0.02,
+            },
+          ],
+          committerCount: 0,
+          reviewerCount: 0,
+          contributorCount: 0,
+          dependentCount: 0,
+        },
+      ],
+    };
+
+    const originalTitle = metrics.repos[0].pullRequestDetails[0].title;
+    const report = generateReport(metrics);
+
+    expect(report).toContain(
+      "#3816 ui-composer-apk 0.22.0: UI Composer \\| Implementation \\| Side-by-side layout production hardening",
+    );
+    // Every generated data row keeps the declared 6-column structure.
+    const counts = prTableRowColumnCounts(report);
+    expect(counts.length).toBeGreaterThan(0);
+    for (const count of counts) expect(count).toBe(6);
+    // Raw source data must not be mutated by report generation.
+    expect(metrics.repos[0].pullRequestDetails[0].title).toBe(originalTitle);
+  });
+
+  it("escapes multiple pipes in a sanitized regression title (BU Event Impl shape)", () => {
+    const metrics: OrgMetrics = {
+      owner: "barcoclickshare",
+      ownerType: "org",
+      collectedAt: "2026-09-09T00:00:00Z",
+      repoCount: 1,
+      repos: [
+        {
+          name: "component",
+          fullName: "barcoclickshare/component",
+          issues: { open: 0, closed: 0 },
+          pullRequests: { open: 0, closed: 0, merged: 1 },
+          pullRequestDetails: [
+            {
+              number: 273,
+              title: "feat: [CS0666-10086] BU Event Impl | BU Part | Share - Sharing to Room",
+              state: "merged",
+              mergedAt: "2026-09-01T00:00:00Z",
+              linesAdded: 10,
+              linesDeleted: 3,
+              commentCount: 1,
+              commitCount: 2,
+              actionsMinutes: 4,
+            },
+          ],
+          committerCount: 0,
+          reviewerCount: 0,
+          contributorCount: 0,
+          dependentCount: 0,
+        },
+      ],
+    };
+
+    const report = generateReport(metrics);
+    expect(report).toContain(
+      "#273 feat: [CS0666-10086] BU Event Impl \\| BU Part \\| Share - Sharing to Room",
+    );
+    for (const count of prTableRowColumnCounts(report)) expect(count).toBe(6);
+  });
+
+  it("collapses a newline embedded in a PR title into one physical table row", () => {
+    const metrics: OrgMetrics = {
+      owner: "barcoclickshare",
+      ownerType: "org",
+      collectedAt: "2026-09-09T00:00:00Z",
+      repoCount: 1,
+      repos: [
+        {
+          name: "wired-source-provider-apk",
+          fullName: "barcoclickshare/wired-source-provider-apk",
+          issues: { open: 0, closed: 0 },
+          pullRequests: { open: 0, closed: 0, merged: 1 },
+          pullRequestDetails: [
+            {
+              number: 3808,
+              title:
+                "wired-source-provider-apk 0.3.0: WSP | Share/unshare video\r\non DP-in plug/unplug",
+              state: "merged",
+              mergedAt: "2026-09-08T00:00:00Z",
+              linesAdded: 4,
+              linesDeleted: 1,
+              commentCount: 0,
+              commitCount: 1,
+              actionsMinutes: 0,
+            },
+          ],
+          committerCount: 0,
+          reviewerCount: 0,
+          contributorCount: 0,
+          dependentCount: 0,
+        },
+      ],
+    };
+
+    const report = generateReport(metrics);
+    // The CRLF must not have created an extra physical row.
+    expect(report).toContain(
+      "#3808 wired-source-provider-apk 0.3.0: WSP \\| Share/unshare video on DP-in plug/unplug",
+    );
+    expect(report).not.toMatch(/WSP \\?\| Share\/unshare video\r?\n/);
+    for (const count of prTableRowColumnCounts(report)) expect(count).toBe(6);
+  });
+
+  it("does not double-escape the title when the report is generated once", () => {
+    const metrics: OrgMetrics = {
+      owner: "acme",
+      ownerType: "org",
+      collectedAt: "2026-09-09T00:00:00Z",
+      repoCount: 1,
+      repos: [
+        {
+          name: "svc",
+          fullName: "acme/svc",
+          issues: { open: 0, closed: 0 },
+          pullRequests: { open: 0, closed: 0, merged: 1 },
+          pullRequestDetails: [
+            {
+              number: 1,
+              title: "a | b",
+              state: "merged",
+              mergedAt: "2026-09-01T00:00:00Z",
+              linesAdded: 1,
+              linesDeleted: 0,
+              commentCount: 0,
+              commitCount: 1,
+              actionsMinutes: 0,
+            },
+          ],
+          committerCount: 0,
+          reviewerCount: 0,
+          contributorCount: 0,
+          dependentCount: 0,
+        },
+      ],
+    };
+
+    const report = generateReport(metrics);
+    expect(report).toContain("#1 a \\| b |");
+    // A double-escaped pipe would render as "a \\| b" (two backslashes).
+    expect(report).not.toContain("a \\\\| b");
   });
 });
 
