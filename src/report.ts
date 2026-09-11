@@ -118,10 +118,33 @@ export function generateReport(metrics: OrgMetrics): string {
         `${formatDuration(rw.p75)} p75 · ${formatDuration(rw.p90)} p90 (n=${rw.n}) | ${WINDOW.collected} |`
     );
   }
-  if (flow.approvalWaits.length > 0) {
+  // A single "first review → approval" median collapses to 0 whenever the
+  // first review submitted is itself an approval, which is indistinguishable
+  // from broken timestamps without more context. These four rows replace it.
+  if (flow.reviewedPRs > 0) {
     lines.push(
-      `| First review → approval | ` +
-        `${formatDuration(quantiles(flow.approvalWaits).p50)} p50 (n=${flow.approvalWaits.length}) | ${WINDOW.collected} |`
+      `| Approved on first review | ` +
+        `${pct(flow.approvedOnFirstReview, flow.reviewedPRs)}% (n=${flow.reviewedPRs}) | ${WINDOW.collected} |`
+    );
+  }
+  if (flow.revisionApprovalWaits.length > 0) {
+    lines.push(
+      `| Time to approval (PRs requiring revisions) | ` +
+        `${formatDuration(quantiles(flow.revisionApprovalWaits).p50)} p50 ` +
+        `(n=${flow.revisionApprovalWaits.length}) | ${WINDOW.collected} |`
+    );
+  }
+  if (flow.reviewRounds.length > 0) {
+    lines.push(
+      `| Median review submissions per PR | ` +
+        `${median(flow.reviewRounds)} (n=${flow.reviewRounds.length}) | ${WINDOW.collected} |`
+    );
+  }
+  if (flow.changesRequestedKnownPRs > 0) {
+    lines.push(
+      `| PRs receiving "changes requested" | ` +
+        `${pct(flow.changesRequestedPRs, flow.changesRequestedKnownPRs)}% ` +
+        `(n=${flow.changesRequestedKnownPRs}) | ${WINDOW.collected} |`
     );
   }
   if (flow.mergeWaits.length > 0) {
@@ -346,13 +369,25 @@ function aggregateAgentMetrics(repos: RepoMetrics[]): CopilotAgentMetrics {
 function aggregateFlow(repos: RepoMetrics[]) {
   const sizes: number[] = [];
   const reviewWaits: number[] = [];
-  const approvalWaits: number[] = [];
   const mergeWaits: number[] = [];
   const openAges: number[] = [];
   const reviewsBy = new Map<string, number>();
   let merged = 0;
   let abandoned = 0;
   const now = Date.now();
+
+  // Review-outcome samples. Population is every merged PR that received at
+  // least one review (`firstReviewAt` present) — a raw "first review →
+  // approval" median collapses to 0 whenever the first review submitted is
+  // itself an approval, which reads as broken rather than as "reviewers
+  // mostly approve outright". These four numbers replace that single median
+  // with an unambiguous breakdown.
+  let reviewedPRs = 0;
+  let approvedOnFirstReview = 0;
+  const revisionApprovalWaits: number[] = [];
+  const reviewRounds: number[] = [];
+  let changesRequestedPRs = 0;
+  let changesRequestedKnownPRs = 0;
 
   const hours = (from?: string, to?: string): number | undefined => {
     if (!from || !to) return undefined;
@@ -367,10 +402,27 @@ function aggregateFlow(repos: RepoMetrics[]) {
       if (size > 0) sizes.push(size);
       const toReview = hours(pr.createdAt, pr.firstReviewAt);
       if (toReview !== undefined) reviewWaits.push(toReview);
-      const toApproval = hours(pr.firstReviewAt, pr.firstApprovalAt);
-      if (toApproval !== undefined) approvalWaits.push(toApproval);
       const toMerge = hours(pr.firstApprovalAt, pr.mergedAt);
       if (toMerge !== undefined) mergeWaits.push(toMerge);
+
+      if (pr.firstReviewAt !== undefined) {
+        reviewedPRs++;
+        if (pr.firstApprovalAt !== undefined) {
+          if (pr.firstApprovalAt === pr.firstReviewAt) {
+            approvedOnFirstReview++;
+          } else {
+            const toApproval = hours(pr.firstReviewAt, pr.firstApprovalAt);
+            if (toApproval !== undefined) revisionApprovalWaits.push(toApproval);
+          }
+        }
+      }
+      if (pr.reviewCount !== undefined && pr.reviewCount > 0) {
+        reviewRounds.push(pr.reviewCount);
+      }
+      if (pr.changesRequestedCount !== undefined) {
+        changesRequestedKnownPRs++;
+        if (pr.changesRequestedCount > 0) changesRequestedPRs++;
+      }
     }
     abandoned += (repo.closedPRTimeline ?? []).length;
     for (const pr of repo.openPRTimeline ?? []) {
@@ -382,7 +434,21 @@ function aggregateFlow(repos: RepoMetrics[]) {
     }
   }
 
-  return { sizes, reviewWaits, approvalWaits, mergeWaits, openAges, reviewsBy, merged, abandoned };
+  return {
+    sizes,
+    reviewWaits,
+    mergeWaits,
+    openAges,
+    reviewsBy,
+    merged,
+    abandoned,
+    reviewedPRs,
+    approvedOnFirstReview,
+    revisionApprovalWaits,
+    reviewRounds,
+    changesRequestedPRs,
+    changesRequestedKnownPRs,
+  };
 }
 
 function median(values: number[]): number {

@@ -498,7 +498,7 @@ describe("generateReport flow metrics", () => {
     expect(md).toContain("| PRs over 400 lines | 50.0% |");
   });
 
-  it("reports the three review legs with their sample sizes", () => {
+  it("reports the review-outcome breakdown for PRs that received a review", () => {
     const md = reportFor([
       repoWith({
         mergedPRTimeline: [
@@ -514,8 +514,41 @@ describe("generateReport flow metrics", () => {
     ]);
     expect(md).toContain("| Wait for first review |");
     expect(md).toContain("(n=1)");
-    expect(md).toContain("| First review → approval |");
+    // First review and first approval differ, so this PR required a revision
+    // round before approval — it must not be counted as approved outright.
+    expect(md).toContain("| Approved on first review | 0.0% (n=1) | Collected history |");
+    expect(md).toContain("| Time to approval (PRs requiring revisions) |");
     expect(md).toContain("| Approval → merge |");
+  });
+
+  it("counts a PR as approved on first review when the earliest review is itself an approval", () => {
+    const md = reportFor([
+      repoWith({
+        mergedPRTimeline: [
+          {
+            ...merged,
+            firstReviewAt: "2026-08-20T06:00:00Z",
+            firstApprovalAt: "2026-08-20T06:00:00Z",
+          },
+        ],
+      }),
+    ]);
+    expect(md).toContain("| Approved on first review | 100.0% (n=1) | Collected history |");
+    // No revision round happened, so it must not appear in that median's sample.
+    expect(md).not.toContain("Time to approval (PRs requiring revisions)");
+  });
+
+  it("reports median review submissions per PR and the changes-requested share", () => {
+    const md = reportFor([
+      repoWith({
+        mergedPRTimeline: [
+          { ...merged, reviewCount: 3, changesRequestedCount: 1 },
+          { ...merged, number: 2, reviewCount: 1, changesRequestedCount: 0 },
+        ],
+      }),
+    ]);
+    expect(md).toContain("| Median review submissions per PR | 2 (n=2) | Collected history |");
+    expect(md).toContain('| PRs receiving "changes requested" | 50.0% (n=2) | Collected history |');
   });
 
   it("omits the review legs entirely when no review data exists", () => {
