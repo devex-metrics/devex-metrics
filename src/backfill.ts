@@ -39,6 +39,15 @@ export interface BackfillResult {
   reposCompleted: number;
   /** Repositories already complete before this run. */
   reposAlreadyComplete: number;
+  /**
+   * Repositories where this run stopped early because of a persistent
+   * failure — a transient/generic GraphQL error that outlasted the bounded
+   * retries, an inaccessible repository, or an unexpected error. Their
+   * watermark is left exactly where it was after the last successfully
+   * appended page, so they resume from there next run rather than being
+   * marked complete or restarted.
+   */
+  reposDeferred: number;
   /** Pages fetched, against the run's budget. */
   pagesFetched: number;
   /** Event rows appended. */
@@ -186,6 +195,7 @@ export async function runBackfill(
     reposTouched: 0,
     reposCompleted: 0,
     reposAlreadyComplete: 0,
+    reposDeferred: 0,
     pagesFetched: 0,
     eventsAppended: 0,
     allComplete: false,
@@ -217,41 +227,66 @@ export async function runBackfill(
     let current = mark;
     let pagesThisRepo = 0;
     let touched = false;
+    let deferred = false;
 
-    while (
-      budget > 0 &&
-      pagesThisRepo < config.maxPagesPerRepo &&
-      !current.complete
-    ) {
-      const page = await fetchHistoricalPRPage(owner, repo, current.cursor);
-      budget--;
-      pagesThisRepo++;
+    try {
+      while (
+        budget > 0 &&
+        pagesThisRepo < config.maxPagesPerRepo &&
+        !current.complete
+      ) {
+        const page = await fetchHistoricalPRPage(owner, repo, current.cursor);
+        budget--;
+        pagesThisRepo++;
 
-      if (page === null) {
-        // Inaccessible or persistently failing — retry on a later run.
-        break;
+        if (page === null) {
+          // Inaccessible, or a transient/generic GraphQL execution error that
+          // outlasted the bounded retries in fetchHistoricalPRPage. `current`
+          // still holds the last cursor whose events were durably appended,
+          // so this repository resumes from exactly that point next run —
+          // never advanced past an unrecorded page, never reset.
+          deferred = true;
+          break;
+        }
+
+        touched = true;
+        result.pagesFetched++;
+
+        if (page.nodes.length > 0) {
+          const rows = page.nodes.map((node) => toEventRow(scope, fullName, node));
+          result.eventsAppended += appendEventRows(historyDir, scope, rows).appended;
+        }
+
+        // Cursor only moves forward once this page's events are appended —
+        // fetch, then append, then advance, in that order.
+        current = advance(current, page.nodes, page.endCursor, page.hasNextPage);
+
+        if (current.complete) {
+          result.reposCompleted++;
+          console.log(
+            `  ✓ ${fullName} fully crawled — ${current.prsSeen} PRs back to ` +
+              `${current.oldestCreatedAt?.slice(0, 10) ?? "unknown"}`
+          );
+          break;
+        }
       }
-
-      touched = true;
-      result.pagesFetched++;
-
-      if (page.nodes.length > 0) {
-        const rows = page.nodes.map((node) => toEventRow(scope, fullName, node));
-        result.eventsAppended += appendEventRows(historyDir, scope, rows).appended;
-      }
-
-      current = advance(current, page.nodes, page.endCursor, page.hasNextPage);
-
-      if (current.complete) {
-        result.reposCompleted++;
-        console.log(
-          `  ✓ ${fullName} fully crawled — ${current.prsSeen} PRs back to ` +
-            `${current.oldestCreatedAt?.slice(0, 10) ?? "unknown"}`
-        );
-        break;
-      }
+    } catch (err: unknown) {
+      // A genuinely unexpected (non-classified) error. Log it in full rather
+      // than swallowing it, but do not let it take down the rest of the
+      // organisation-wide run: defer this repository — its watermark
+      // (`current`) already reflects only pages whose events were
+      // successfully appended — and continue with the next repository.
+      deferred = true;
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(
+        `  ⚠ backfill: unexpected error crawling ${fullName} after ${pagesThisRepo} page(s) this run ` +
+          `(${message}); leaving its cursor untouched and resuming next run`
+      );
     }
 
+    if (deferred) {
+      result.reposDeferred++;
+    }
     if (touched) {
       result.reposTouched++;
       if (!current.complete) {
@@ -278,10 +313,14 @@ export function describeBackfill(
   if (result.allComplete) {
     return `History complete — every repository crawled to its first pull request.`;
   }
+  const deferredNote =
+    result.reposDeferred > 0
+      ? ` ${result.reposDeferred} repo(s) deferred after exhausting retries this run.`
+      : "";
   return (
     `Backfill: ${result.pagesFetched}/${config.pagesPerRun} pages spent, ` +
     `${result.eventsAppended} PRs recorded, ` +
     `${result.reposCompleted} repo(s) finished this run, ` +
-    `${result.reposAlreadyComplete} already complete. Continues next run.`
+    `${result.reposAlreadyComplete} already complete.${deferredNote} Continues next run.`
   );
 }

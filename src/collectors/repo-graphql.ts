@@ -220,6 +220,16 @@ export async function collectRepoGraphQL(
         console.warn(`  ⚠ graphql: giving up on ${owner}/${repo} after repeated 5xx errors, falling back to REST`);
         return null;
       }
+      if (isGenericGraphQLExecutionError(err)) {
+        const requestId = extractGitHubRequestId(err);
+        console.warn(
+          `  ⚠ graphql: giving up on ${owner}/${repo} after ${TRANSIENT_BACKOFF_MS.length} retries of a ` +
+            `generic GitHub execution error` +
+            (requestId ? ` (request ${requestId})` : "") +
+            `, falling back to REST`
+        );
+        return null;
+      }
       throw err;
     }
 
@@ -288,12 +298,60 @@ function isTransientServerError(err: unknown): boolean {
   return typeof httpError.status === "number" && httpError.status >= 500 && httpError.status < 600;
 }
 
+/**
+ * Return true for GitHub's generic GraphQL execution failure — the
+ * "Something went wrong while executing your query" response GitHub sends
+ * for an internal hiccup unrelated to the query itself (distinct from a rate
+ * limit, auth failure, or a validation/field error). It carries no `data`,
+ * only a message and a request id for support, so it is identified by that
+ * message rather than by HTTP status or GraphQL error `type` (it has
+ * neither reliably).
+ */
+function isGenericGraphQLExecutionError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  const graphqlError = err as {
+    errors?: Array<{ message?: string }>;
+    data?: unknown;
+  };
+  const messages = [err.message, ...(graphqlError.errors?.map((e) => e.message) ?? [])];
+  const matchesMessage = messages.some(
+    (m) => typeof m === "string" && m.toLowerCase().includes("something went wrong while executing your query")
+  );
+  if (!matchesMessage) return false;
+  // Guard against ever treating a real, data-bearing response as transient.
+  return graphqlError.data === undefined || graphqlError.data === null;
+}
+
+/** True for any GraphQL failure we treat as transient and worth retrying. */
+function isRetryableTransientError(err: unknown): boolean {
+  return isTransientServerError(err) || isGenericGraphQLExecutionError(err);
+}
+
+/**
+ * Best-effort extraction of the GitHub request id for a failed GraphQL call,
+ * so operators can hand it to GitHub support. Prefers the response header;
+ * falls back to the id GitHub embeds in the generic-execution-error message
+ * itself (`` Please include `XXXX:XXXX:...` when reporting this issue. ``).
+ */
+function extractGitHubRequestId(err: unknown): string | undefined {
+  if (!(err instanceof Error)) return undefined;
+  const graphqlError = err as { headers?: Record<string, string> };
+  const headerId = graphqlError.headers?.["x-github-request-id"];
+  if (headerId) return headerId;
+  const match = err.message.match(/`([0-9A-F]+(?::[0-9A-F]+){2,})`/i);
+  return match?.[1];
+}
+
 const TRANSIENT_BACKOFF_MS = [5_000, 15_000, 30_000];
 
 /**
- * Execute a single GraphQL request with automatic retry on transient 5xx errors.
- * Retries up to TRANSIENT_BACKOFF_MS.length times with increasing delays.
- * Non-transient errors (4xx, GraphQL field errors) are re-thrown immediately.
+ * Execute a single GraphQL request with automatic retry on transient errors:
+ * HTTP 5xx responses and GitHub's generic "something went wrong executing
+ * your query" execution failure (which carries no `data` and no HTTP 5xx
+ * status of its own, so it is otherwise indistinguishable from a permanent
+ * error). Retries up to TRANSIENT_BACKOFF_MS.length times with increasing
+ * delays. Non-transient errors (4xx, GraphQL validation/field errors, auth
+ * failures) are re-thrown immediately without retrying.
  */
 async function fetchGraphQLPage<T>(
   octokit: Awaited<ReturnType<typeof getOctokit>>,
@@ -306,13 +364,16 @@ async function fetchGraphQLPage<T>(
     try {
       return await octokit.graphql<T>(query, variables);
     } catch (err) {
-      if (!isTransientServerError(err) || attempt === TRANSIENT_BACKOFF_MS.length) {
+      if (!isRetryableTransientError(err) || attempt === TRANSIENT_BACKOFF_MS.length) {
         throw err;
       }
       lastErr = err;
       const wait = TRANSIENT_BACKOFF_MS[attempt];
+      const requestId = extractGitHubRequestId(err);
       console.warn(
-        `  ⚠ graphql: transient error for ${label} (attempt ${attempt + 1}/${TRANSIENT_BACKOFF_MS.length}), retrying in ${wait / 1000}s…`
+        `  ⚠ graphql: transient error for ${label} (attempt ${attempt + 1}/${TRANSIENT_BACKOFF_MS.length})` +
+          (requestId ? ` [request ${requestId}]` : "") +
+          `, retrying in ${wait / 1000}s…`
       );
       await sleep(wait);
     }
@@ -449,8 +510,10 @@ interface HistoricalPageResponse {
  * Fetch one page of historical pull requests for `owner/repo`.
  *
  * Returns `null` when the repository is gone or inaccessible, or when GitHub
- * keeps returning 5xx — the caller treats that as "skip this repo for now" and
- * leaves the watermark untouched so the next run retries from the same place.
+ * keeps returning a transient failure — 5xx, or its generic "something went
+ * wrong executing your query" execution error — after exhausting retries.
+ * The caller treats that as "skip this repo for now" and leaves the
+ * watermark untouched so the next run retries from the same place.
  */
 export async function fetchHistoricalPRPage(
   owner: string,
@@ -473,8 +536,15 @@ export async function fetchHistoricalPRPage(
       }
       return null;
     }
-    if (isTransientServerError(err)) {
-      console.warn(`  ⚠ backfill: ${owner}/${repo} still failing after retries; will retry next run`);
+    if (isRetryableTransientError(err)) {
+      const requestId = extractGitHubRequestId(err);
+      const kind = isTransientServerError(err) ? "5xx" : "generic GraphQL execution";
+      console.warn(
+        `  ⚠ backfill: ${owner}/${repo} still failing with a ${kind} error after ` +
+          `${TRANSIENT_BACKOFF_MS.length} retries` +
+          (requestId ? ` (GitHub request ${requestId})` : "") +
+          `; will resume from its saved cursor next run`
+      );
       return null;
     }
     throw err;

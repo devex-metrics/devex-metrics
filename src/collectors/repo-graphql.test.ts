@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { setOctokit, resetOctokit } from "../github-client.js";
 import type { Octokit } from "@octokit/rest";
-import { collectRepoGraphQL } from "./repo-graphql.js";
+import { collectRepoGraphQL, fetchHistoricalPRPage } from "./repo-graphql.js";
 import type { GraphQLPRNode } from "./repo-graphql.js";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -69,6 +69,25 @@ function buildMockOctokit(responses: unknown[]): Octokit {
     return response;
   };
   return { graphql } as unknown as Octokit;
+}
+
+/**
+ * Build an error shaped like GitHub's generic GraphQL execution failure:
+ * `Something went wrong while executing your query`, no usable `data`, and
+ * (usually) a request id embedded in the message for support purposes.
+ */
+function makeGenericExecutionError(
+  requestId = "D6C0:19B1D2:B22842F:AD07EE0:6AA2B655"
+): Error {
+  const message =
+    `Request failed due to following response errors:\n` +
+    ` - Something went wrong while executing your query on 2026-09-10T13:53:33Z.\n` +
+    `   Please include \`${requestId}\` when reporting this issue.`;
+  return Object.assign(new Error(message), {
+    errors: [{ message }],
+    data: undefined,
+    headers: {},
+  });
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -226,6 +245,60 @@ describe("collectRepoGraphQL", () => {
     vi.useRealTimers();
   });
 
+  it("retries a generic 'something went wrong executing your query' error and succeeds on retry", async () => {
+    vi.useFakeTimers();
+    const err = makeGenericExecutionError();
+    const success = makeGraphQLResponse({ nodes: [], hasNextPage: false });
+    setOctokit(buildMockOctokit([err, success]));
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const p = collectRepoGraphQL("owner", "repo");
+    await vi.advanceTimersByTimeAsync(5_001);
+    const result = await p;
+
+    expect(result).not.toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("transient"));
+    warnSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it("returns null and warns with the GitHub request id after exhausting retries on a generic execution error", async () => {
+    vi.useFakeTimers();
+    const err = makeGenericExecutionError("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655");
+    setOctokit(buildMockOctokit([err])); // clamped — all attempts throw
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const resultPromise = collectRepoGraphQL("owner", "repo");
+    await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
+    const result = await resultPromise;
+
+    expect(result).toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655")
+    );
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("falling back to REST"));
+    warnSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it("does not treat a GraphQL validation error as a generic transient execution error", async () => {
+    const err = Object.assign(new Error("Argument 'first' on Field 'pullRequests' has an invalid value"), {
+      errors: [{ type: "UNPROCESSABLE", message: "Argument 'first' on Field 'pullRequests' has an invalid value" }],
+    });
+    setOctokit(buildMockOctokit([err]));
+
+    await expect(collectRepoGraphQL("owner", "repo")).rejects.toThrow(
+      "Argument 'first' on Field 'pullRequests' has an invalid value"
+    );
+  });
+
+  it("does not treat an authentication error as a generic transient execution error", async () => {
+    const err = Object.assign(new Error("Bad credentials"), { status: 401 });
+    setOctokit(buildMockOctokit([err]));
+
+    await expect(collectRepoGraphQL("owner", "repo")).rejects.toMatchObject({ status: 401 });
+  });
+
   it("returns empty prNodes for a repo with no PRs", async () => {
     setOctokit(
       buildMockOctokit([
@@ -350,3 +423,106 @@ describe("collectRepoGraphQL open pull requests", () => {
     expect(result!.openPRNodes).toEqual([]);
   });
 });
+
+describe("fetchHistoricalPRPage", () => {
+  afterEach(() => resetOctokit());
+
+  function makeHistoricalPageResponse(opts: {
+    nodes?: unknown[];
+    hasNextPage?: boolean;
+    endCursor?: string | null;
+  } = {}) {
+    return {
+      repository: {
+        pullRequests: {
+          pageInfo: {
+            hasNextPage: opts.hasNextPage ?? false,
+            endCursor: opts.endCursor ?? null,
+          },
+          nodes: opts.nodes ?? [],
+        },
+      },
+    };
+  }
+
+  it("retries a generic GraphQL execution error and succeeds on a later retry", async () => {
+    vi.useFakeTimers();
+    const err = makeGenericExecutionError();
+    const success = makeHistoricalPageResponse({ nodes: [{ number: 1 }], hasNextPage: false });
+    setOctokit(buildMockOctokit([err, success]));
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const p = fetchHistoricalPRPage("barcoclickshare", "cx_system_tests", null);
+    await vi.advanceTimersByTimeAsync(5_001);
+    const page = await p;
+
+    expect(page).not.toBeNull();
+    expect(page!.nodes).toHaveLength(1);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("transient"));
+    warnSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it("defers the repository (returns null) after exhausting retries on a generic execution error, warning with repo name and request id", async () => {
+    vi.useFakeTimers();
+    const err = makeGenericExecutionError("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655");
+    setOctokit(buildMockOctokit([err])); // every attempt fails
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const p = fetchHistoricalPRPage("barcoclickshare", "cx_system_tests", "cursor-9");
+    await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
+    const page = await p;
+
+    expect(page).toBeNull();
+    const warnings = warnSpy.mock.calls.map((c) => String(c[0]));
+    const giveUpWarning = warnings.find((w) => w.includes("still failing"));
+    expect(giveUpWarning).toBeDefined();
+    expect(giveUpWarning).toContain("barcoclickshare/cx_system_tests");
+    expect(giveUpWarning).toContain("3 retries");
+    expect(giveUpWarning).toContain("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655");
+    expect(giveUpWarning).toContain("resume from its saved cursor next run");
+    warnSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it("does not treat a GraphQL validation error as a generic transient execution error", async () => {
+    const err = Object.assign(new Error("Field 'bogus' doesn't exist on type 'PullRequest'"), {
+      errors: [{ type: "UNPROCESSABLE", message: "Field 'bogus' doesn't exist on type 'PullRequest'" }],
+    });
+    setOctokit(buildMockOctokit([err]));
+
+    await expect(
+      fetchHistoricalPRPage("owner", "repo", null)
+    ).rejects.toThrow("Field 'bogus' doesn't exist on type 'PullRequest'");
+  });
+
+  it("still returns null immediately (no retry) on a 403 access-denied repository", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const err = Object.assign(new Error("Forbidden"), {
+      errors: [{ type: "FORBIDDEN", message: "forbidden" }],
+    });
+    setOctokit(buildMockOctokit([err]));
+
+    const page = await fetchHistoricalPRPage("owner", "private-repo", null);
+    expect(page).toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("access denied"));
+    warnSpy.mockRestore();
+  });
+
+  it("still returns null after exhausting retries on a plain 502", async () => {
+    vi.useFakeTimers();
+    const err = Object.assign(new Error("Bad gateway"), { status: 502 });
+    setOctokit(buildMockOctokit([err]));
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const p = fetchHistoricalPRPage("owner", "repo", null);
+    await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
+    const page = await p;
+
+    expect(page).toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("still failing"));
+    warnSpy.mockRestore();
+    vi.useRealTimers();
+  });
+});
+
