@@ -1,6 +1,7 @@
 import type { OrgMetrics, RepoMetrics, CopilotAdoption, CopilotAgentMetrics } from "./types.js";
 import { gini, quantiles, shareAtLeast } from "./stats.js";
 import { LARGE_PR_LINES } from "./history.js";
+import { renderMarkdownTableRow } from "./markdown.js";
 
 /**
  * Produce a human-readable Markdown report from collected metrics.
@@ -178,8 +179,20 @@ export function generateReport(metrics: OrgMetrics): string {
       );
       for (const pr of sortedPRs) {
         const mergedDate = pr.mergedAt ? pr.mergedAt.slice(0, 10) : "";
+        // The PR title is untrusted, dynamic text (it can contain `|` or line
+        // breaks — see the Barco titles this table is regression-tested
+        // against). renderMarkdownTableRow escapes every cell independently,
+        // so the trusted `#${pr.number}` prefix and the raw title can be
+        // combined into one cell without corrupting the table structure.
         lines.push(
-          `| #${pr.number} ${pr.title} | ${mergedDate} | +${pr.linesAdded}/-${pr.linesDeleted} | ${pr.commentCount} | ${pr.commitCount} | ${pr.actionsMinutes} |`
+          renderMarkdownTableRow([
+            `#${pr.number} ${pr.title}`,
+            mergedDate,
+            `+${pr.linesAdded}/-${pr.linesDeleted}`,
+            pr.commentCount,
+            pr.commitCount,
+            pr.actionsMinutes,
+          ])
         );
       }
       lines.push("");
