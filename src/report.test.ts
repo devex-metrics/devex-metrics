@@ -79,6 +79,25 @@ describe("generateReport", () => {
     expect(report).toContain("Copilot-reviewed PRs | 1 (100.0%)");
   });
 
+  it("should document the differing populations behind reviewer counts", () => {
+    const report = generateReport(makeSampleMetrics());
+
+    // The explanatory note must call out that the two reviewer metrics count
+    // different populations (bots included vs. excluded, different windows).
+    expect(report).toContain("Reviewer counts are two different populations");
+    expect(report).toContain(
+      "| Unique reviewers, incl. bots (collected history — sampled PRs, not a strict 90-day window) | 4 |"
+    );
+  });
+
+  it("should label per-repo reviewer/committer counts with their population and window", () => {
+    const report = generateReport(makeSampleMetrics());
+
+    expect(report).toContain(
+      "Contributors: 4 committers (last 90 days) · 3 reviewers, incl. bots (collected history)"
+    );
+  });
+
   it("should include median cycle time in the summary", () => {
     const report = generateReport(makeSampleMetrics());
 
@@ -453,7 +472,7 @@ describe("generateReport flow metrics", () => {
     const one = reportFor([
       repoWith({ mergedPRTimeline: [{ ...merged }], reviewerLoad: [{ reviewer: "amy", reviews: 4 }] }),
     ]);
-    expect(one).not.toContain("Review load concentration");
+    expect(one).not.toContain("| Review load concentration");
 
     const many = reportFor([
       repoWith({
@@ -464,7 +483,7 @@ describe("generateReport flow metrics", () => {
         ],
       }),
     ]);
-    expect(many).toContain("Review load concentration");
+    expect(many).toContain("| Review load concentration (human reviewers only, bots excluded) |");
     expect(many).toContain("across 2 reviewers");
   });
 

@@ -19,6 +19,16 @@ export function generateReport(metrics: OrgMetrics): string {
   // -- Summary --
   lines.push("## Summary");
   lines.push("");
+  lines.push(
+    "> **Reviewer counts are two different populations.** " +
+      "*Unique reviewers* counts every distinct account that submitted a " +
+      "pull request review — including bot accounts — across the sampled " +
+      "PR history. *Review load concentration* (Gini) counts only " +
+      "individual review submissions by human reviewers (bots excluded), " +
+      "and only from repositories whose enriched review timeline was " +
+      "collected. The two are not meant to add up to the same denominator."
+  );
+  lines.push("");
   lines.push(`| Metric | Value |`);
   lines.push(`| ------ | ----- |`);
   lines.push(`| Repositories | ${metrics.repoCount} |`);
@@ -29,8 +39,10 @@ export function generateReport(metrics: OrgMetrics): string {
   lines.push(`| Open PRs | ${totals.openPRs} |`);
   lines.push(`| Merged PRs | ${totals.mergedPRs} |`);
   lines.push(`| Closed (unmerged) PRs | ${totals.closedPRs} |`);
-  lines.push(`| Unique committers (90 d) | ${totals.committers} |`);
-  lines.push(`| Unique reviewers (90 d) | ${totals.reviewers} |`);
+  lines.push(`| Unique committers (last 90 days) | ${totals.committers} |`);
+  lines.push(
+    `| Unique reviewers, incl. bots (collected history — sampled PRs, not a strict 90-day window) | ${totals.reviewers} |`
+  );
 
   // Copilot adoption summary
   const copilotTotals = aggregateCopilot(metrics.repos);
@@ -107,7 +119,7 @@ export function generateReport(metrics: OrgMetrics): string {
   const reviewCounts = [...flow.reviewsBy.values()];
   if (reviewCounts.length > 1) {
     lines.push(
-      `| Review load concentration | Gini ${gini(reviewCounts).toFixed(2)} ` +
+      `| Review load concentration (human reviewers only, bots excluded) | Gini ${gini(reviewCounts).toFixed(2)} ` +
         `across ${reviewCounts.length} reviewers |`
     );
   }
@@ -136,7 +148,8 @@ export function generateReport(metrics: OrgMetrics): string {
       `PRs: ${repo.pullRequests.open} open / ${repo.pullRequests.merged} merged / ${repo.pullRequests.closed} closed`
     );
     lines.push(
-      `Contributors: ${repo.committerCount} committers · ${repo.reviewerCount} reviewers`
+      `Contributors: ${repo.committerCount} committers (last 90 days) · ` +
+        `${repo.reviewerCount} reviewers, incl. bots (collected history)`
     );
     lines.push(`Dependents: ${repo.dependentCount}`);
     lines.push("");
