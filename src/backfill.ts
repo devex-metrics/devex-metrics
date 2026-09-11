@@ -59,10 +59,16 @@ export interface BackfillResult {
    * watermark is likewise left untouched.
    */
   reposSkipped: number;
+  /** Repositories that began crawling for the first time this run (no prior cursor). */
+  reposStarted: number;
+  /** Repositories that continued this run from a cursor saved by an earlier run. */
+  reposResumed: number;
   /** Pages fetched, against the run's budget. */
   pagesFetched: number;
   /** Event rows appended. */
   eventsAppended: number;
+  /** Event rows seen again (already recorded) — safe, expected on a resumed/repeated page. */
+  duplicateEventsIgnored: number;
   /** True when every target repository is now fully crawled. */
   allComplete: boolean;
 }
@@ -210,8 +216,11 @@ export async function runBackfill(
     reposIncomplete: 0,
     reposDeferred: 0,
     reposSkipped: 0,
+    reposStarted: 0,
+    reposResumed: 0,
     pagesFetched: 0,
     eventsAppended: 0,
+    duplicateEventsIgnored: 0,
     allComplete: false,
   };
 
@@ -251,6 +260,17 @@ export async function runBackfill(
       let pagesThisRepo = 0;
       let touched = false;
       let outcome: "completed" | "deferred" | "skipped" | "incomplete" = "incomplete";
+      // Captured before this run touches the watermark, so a later "recovered"
+      // log line reflects the repository's state coming into this run, not
+      // whatever this run itself just changed it to.
+      const isResume = mark.cursor !== null;
+      const hadPriorFailure = (mark.consecutiveFailedRuns ?? 0) > 0;
+
+      if (config.maxPagesPerRepo > 0) {
+        console.log(
+          `  → ${fullName} ${isResume ? "resuming from saved cursor" : "starting fresh"}`
+        );
+      }
 
       try {
         while (
@@ -273,7 +293,19 @@ export async function runBackfill(
             // `current` still holds the last cursor whose events were durably
             // appended, so this repository resumes from exactly that point
             // next run — never advanced past an unrecorded page, never reset.
+            // Diagnostics are attached alongside it (never consulted to make
+            // cursor/completion decisions) so the next run's operator can see
+            // why, without the cursor itself ever moving.
             outcome = pageOutcome.failure.kind === "transient" ? "deferred" : "skipped";
+            current = {
+              ...current,
+              deferredAt: new Date().toISOString(),
+              lastErrorCategory: pageOutcome.failure.category,
+              lastRequestId: pageOutcome.failure.requestId,
+              consecutiveFailedRuns: (current.consecutiveFailedRuns ?? 0) + 1,
+            };
+            state.repos[fullName] = current;
+            saveBackfillState(historyDir, state);
             logRepoDeferredOrSkipped(fullName, outcome, pageOutcome.failure);
             break;
           }
@@ -284,12 +316,21 @@ export async function runBackfill(
 
           if (page.nodes.length > 0) {
             const rows = page.nodes.map((node) => toEventRow(scope, fullName, node));
-            result.eventsAppended += appendEventRows(historyDir, scope, rows).appended;
+            const appendResult = appendEventRows(historyDir, scope, rows);
+            result.eventsAppended += appendResult.appended;
+            result.duplicateEventsIgnored += rows.length - appendResult.appended;
           }
 
-          // Cursor only moves forward once this page's events are appended —
-          // fetch, then append, then advance, in that order.
+          // Cursor only moves forward once this page's events are durably
+          // appended — fetch, then append, then advance, in that order. The
+          // watermark (including this new cursor) is then persisted before
+          // the next page is requested, so a process that ends here — killed,
+          // crashed, or simply out of time — never loses more than the page
+          // it is currently mid-fetch on, and never re-requests a page whose
+          // events already made it to durable history.
           current = advance(current, page.nodes, page.endCursor, page.hasNextPage);
+          state.repos[fullName] = current;
+          saveBackfillState(historyDir, state);
 
           if (current.complete) {
             outcome = "completed";
@@ -328,7 +369,17 @@ export async function runBackfill(
           );
         }
       }
-      if (touched) result.reposTouched++;
+      if (touched) {
+        result.reposTouched++;
+        if (isResume) result.reposResumed++;
+        else result.reposStarted++;
+        if (hadPriorFailure && (outcome === "completed" || outcome === "incomplete")) {
+          // This repository failed on a previous run but this run fetched at
+          // least one page successfully — the diagnostic fields above have
+          // already been cleared by `advance()`, so this is purely a log line.
+          console.log(`  ✓ ${fullName} recovered — advancing again after a prior failed run`);
+        }
+      }
       state.repos[fullName] = current;
     }
   } finally {
@@ -370,9 +421,12 @@ export function describeBackfill(
   if (result.allComplete) {
     return `History complete — every repository crawled to its first pull request.`;
   }
+  const duplicateNote =
+    result.duplicateEventsIgnored > 0 ? `, ${result.duplicateEventsIgnored} duplicate events ignored` : "";
   return (
     `Backfill: ${result.pagesFetched}/${config.pagesPerRun} pages spent, ` +
-    `${result.eventsAppended} events appended, ` +
+    `${result.eventsAppended} events appended${duplicateNote}, ` +
+    `${result.reposStarted} started, ${result.reposResumed} resumed, ` +
     `${result.reposCompleted} repositories completed, ` +
     `${result.reposIncomplete} incomplete, ` +
     `${result.reposDeferred} deferred, ` +
