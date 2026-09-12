@@ -132,7 +132,7 @@ describe("collectRepoGraphQL", () => {
 
   it("stops paginating when a node's updatedAt is beyond the cutoff", async () => {
     const recentDate = new Date().toISOString();
-    // An old date (2 years ago) — beyond the ~13-month cutoff
+    // An old date (2 years ago) — beyond the ~2-year cutoff
     const oldDate = new Date(Date.now() - 760 * 24 * 60 * 60 * 1000).toISOString();
     const node1 = makePRNode({ number: 1, updatedAt: recentDate });
     const node2 = makePRNode({ number: 2, updatedAt: oldDate });

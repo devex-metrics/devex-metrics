@@ -832,7 +832,7 @@ describe("build-pages", () => {
     // New chart canvases
     expect(html).toContain('id="chartCopilotPRTrend"');
     expect(html).toContain('id="chartAgentTasks"');
-    expect(html).toContain("Copilot-authored PRs merged per week");
+    expect(html).toContain("AI-authored PRs merged per week");
     expect(html).toContain("Agent Tasks by Repository");
   });
 
