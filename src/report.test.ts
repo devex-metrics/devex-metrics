@@ -83,6 +83,8 @@ describe("generateReport", () => {
     expect(report).toContain("| — of which Copilot | 1 |");
     expect(report).toContain("| — of which Claude | 1 |");
     expect(report).toContain("| — of which Codex | 1 |");
+    const aiNoteIndex = report.indexOf("\n\n> An AI-authored PR");
+    expect(aiNoteIndex).toBeGreaterThan(report.indexOf("| Median cycle time |"));
     expect(report).toContain(
       "Copilot-reviewed PRs | 1 (100.0% of 1 sampled PR)"
     );
