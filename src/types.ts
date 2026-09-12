@@ -122,8 +122,9 @@ export interface RepoMetrics {
   /**
    * Unique accounts that submitted at least one pull request review
    * (approval, comment, or changes-requested), sampled from the collected
-   * PR review timeline (roughly the last ~2 years, not a strict 90-day
-   * window despite sharing a row with `committerCount`). Unlike
+   * PR review timeline (GraphQL: roughly the last ~2 years; REST: the 50 most
+   * recently updated PRs; neither is a strict 90-day window despite sharing a
+   * row with `committerCount`). Unlike
    * `reviewerLoad`, this includes bot accounts.
    */
   reviewerCount: number;
