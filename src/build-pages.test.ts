@@ -833,6 +833,8 @@ describe("build-pages", () => {
     expect(html).toContain('id="chartCopilotPRTrend"');
     expect(html).toContain('id="chartAgentTasks"');
     expect(html).toContain("AI-authored PRs merged per week");
+    expect(html).toContain('label:"AI-authored"');
+    expect(html).toContain('label:"AI-authored PRs merged"');
     expect(html).toContain("Agent Tasks by Repository");
   });
 
