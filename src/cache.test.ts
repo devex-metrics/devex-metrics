@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { loadCache, saveCache, loadFixture, saveFixture, loadRawCache, isWithinHours, CURRENT_SCHEMA_VERSION } from "./cache.js";
+import { loadCache, saveCache, loadFixture, saveFixture, loadRawCache, isWithinHours, CURRENT_SCHEMA_VERSION, listDatasetKeys } from "./cache.js";
 import type { OrgMetrics } from "./types.js";
 
 function makeSampleMetrics(): OrgMetrics {
@@ -187,5 +187,36 @@ describe("loadRawCache", () => {
     const loaded = loadRawCache("test-raw");
     expect(loaded).not.toBeNull();
     expect(loaded!.owner).toBe("test-raw");
+  });
+});
+
+describe("listDatasetKeys", () => {
+  const dataDir = path.resolve(process.cwd(), "data");
+  const files = [
+    path.join(dataDir, "dk-owner-a.json"),
+    path.join(dataDir, "dk-group-b.fixture.json"),
+    path.join(dataDir, "agents-dk-owner-a-repo.json"),
+  ];
+
+  afterEach(() => {
+    files.forEach((f) => { if (fs.existsSync(f)) fs.unlinkSync(f); });
+  });
+
+  it("includes both daily-cache and fixture dataset keys, deduplicated", () => {
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(files[0], JSON.stringify({ date: "2020-01-01", data: makeSampleMetrics() }));
+    fs.writeFileSync(files[1], JSON.stringify(makeSampleMetrics()));
+
+    const keys = listDatasetKeys();
+
+    expect(keys).toContain("dk-owner-a");
+    expect(keys).toContain("dk-group-b");
+  });
+
+  it("excludes per-repo Copilot agent cache files", () => {
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(files[2], JSON.stringify({}));
+
+    expect(listDatasetKeys()).not.toContain("agents-dk-owner-a-repo");
   });
 });

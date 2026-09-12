@@ -42,11 +42,22 @@ function aggregate(repos: RepoMetrics[]): Totals {
   };
 }
 
+/** A navigable entry in the dataset switcher shown in the dashboard header. */
+export interface DatasetNavEntry {
+  /** Display label for this dataset (its group name, or owner login). */
+  label: string;
+  /** Href to this dataset's dashboard page, relative to the page being rendered. */
+  href: string;
+  /** Whether this entry is the dataset currently being rendered. */
+  current: boolean;
+}
+
 export function buildDashboardHtml(
   data: OrgMetrics,
   date: string,
   branch?: string,
   runUrl?: string,
+  datasets?: DatasetNavEntry[],
 ): string {
   const totals = aggregate(data.repos);
 
@@ -71,7 +82,9 @@ export function buildDashboardHtml(
     ? `<span class="data-range">&#x1F4C5; ${escapeHtml(oldestDataDate)} &rarr; ${escapeHtml(newestDataDate || data.collectedAt.slice(0, 10))}</span>`
     : '';
   const ownerLink = `<a href="https://github.com/${escapeHtml(data.owner)}" class="hero-owner-link" target="_blank" rel="noopener noreferrer">${escapeHtml(data.owner)}</a>`;
-  const ownerLine = `${ownerLink} &middot; ${escapeHtml(data.ownerType)}`;
+  const ownerLine = data.groupName
+    ? `<span class="hero-group-badge">${escapeHtml(data.groupName)}</span> &middot; ${ownerLink} &middot; ${escapeHtml(data.ownerType)}`
+    : `${ownerLink} &middot; ${escapeHtml(data.ownerType)}`;
   const collectedLine = `collected ${escapeHtml(data.collectedAt)}`;
 
   let deployedFrom = "";
@@ -285,12 +298,25 @@ export function buildDashboardHtml(
     collectedAt: data.collectedAt,
   });
 
+  const datasetSwitcherHtml =
+    datasets && datasets.length > 1
+      ? `<div class="dataset-switcher" role="navigation" aria-label="Dataset">
+        <span class="dataset-switcher-label">&#x1F500; Switch dataset:</span>
+        ${datasets
+          .map(
+            (d) =>
+              `<a class="dataset-link${d.current ? ' active' : ''}" href="${escapeHtml(d.href)}"${d.current ? ' aria-current="page"' : ''}>${escapeHtml(d.label)}</a>`
+          )
+          .join("\n        ")}
+      </div>`
+      : '';
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DevEx Metrics &ndash; ${escapeHtml(data.owner)}</title>
+  <title>DevEx Metrics &ndash; ${escapeHtml(data.groupName ?? data.owner)}</title>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>${getCSS()}</style>
@@ -305,6 +331,7 @@ export function buildDashboardHtml(
       ${dataRangeHtml ? `<div class="subtitle-bottom">${dataRangeHtml}</div>` : ''}
     </div>
     <nav class="hero-nav">
+      ${datasetSwitcherHtml}
       <a href="https://github.com/rajbos" class="hero-nav-link">Made with &#x2764;&#xFE0F; by rajbos</a>
     </nav>
   </div>

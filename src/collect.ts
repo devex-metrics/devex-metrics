@@ -1,4 +1,6 @@
 import { loadCache, loadRawCache, isWithinHours, saveCache, CURRENT_SCHEMA_VERSION } from "./cache.js";
+import { slugifyDatasetKey } from "./dataset-key.js";
+import { getOctokit } from "./github-client.js";
 import {
   collectRepos,
   collectIssueCounts,
@@ -30,6 +32,12 @@ export interface CollectOptions {
   maxRepoAgeHours?: number;
 }
 
+/** A single repo reference (owner/name) used to seed an explicit group collection. */
+export interface GroupRepoRef {
+  owner: string;
+  name: string;
+}
+
 const DEFAULT_MAX_REPO_AGE_HOURS = 8;
 
 /**
@@ -40,8 +48,6 @@ export async function collect(
   ownerType: "org" | "user",
   options: CollectOptions = {}
 ): Promise<OrgMetrics> {
-  const maxAgeHours = options.maxRepoAgeHours ?? DEFAULT_MAX_REPO_AGE_HOURS;
-
   if (!options.skipCache) {
     const cached = loadCache(owner);
     if (cached) {
@@ -52,20 +58,101 @@ export async function collect(
 
   console.log(`Collecting fresh metrics for ${owner} (${ownerType})…`);
 
+  const repoList = await collectRepos(owner, ownerType);
+  console.log(`Found ${repoList.length} repositories`);
+
+  return collectMetricsForRepoList(owner, owner, ownerType, repoList, options);
+}
+
+/**
+ * Collect metrics for an explicit, named list of repos (e.g. discovered from
+ * a local folder of git checkouts) rather than a full org/user listing.
+ *
+ * The resulting data is stored under its own local cache key (derived from
+ * `groupName`), completely separate from any owner-based dataset, so running
+ * a group collection never overwrites existing data.
+ */
+export async function collectGroup(
+  groupName: string,
+  repos: GroupRepoRef[],
+  options: CollectOptions = {}
+): Promise<OrgMetrics> {
+  const cacheKey = slugifyDatasetKey(groupName);
+
+  if (!options.skipCache) {
+    const cached = loadCache(cacheKey);
+    if (cached) {
+      console.log(`Using cached data for group "${groupName}" (collected ${cached.collectedAt})`);
+      return cached;
+    }
+  }
+
+  console.log(`Collecting fresh metrics for group "${groupName}" (${repos.length} repos)…`);
+
+  const octokit = await getOctokit();
+  const repoList: { fullName: string; pushedAt: string }[] = [];
+  for (const { owner: repoOwner, name } of repos) {
+    try {
+      const { data } = await octokit.rest.repos.get({ owner: repoOwner, repo: name });
+      repoList.push({ fullName: data.full_name, pushedAt: data.pushed_at ?? "" });
+    } catch (err: unknown) {
+      const status = (err as { status?: number }).status;
+      console.warn(
+        `  ⚠ Skipping ${repoOwner}/${name}: could not fetch repo metadata (status ${status ?? "unknown"})`
+      );
+    }
+  }
+
+  // Pick the most common owner among the discovered repos for the dataset's
+  // "owner" field (used for the org/user link in the report and dashboard).
+  const ownerCounts = new Map<string, number>();
+  for (const r of repoList) {
+    const slash = r.fullName.indexOf("/");
+    if (slash <= 0) continue;
+    const o = r.fullName.slice(0, slash);
+    ownerCounts.set(o, (ownerCounts.get(o) ?? 0) + 1);
+  }
+  const primaryOwner =
+    [...ownerCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? groupName;
+
+  const metrics = await collectMetricsForRepoList(
+    cacheKey,
+    primaryOwner,
+    "org",
+    repoList,
+    options
+  );
+  metrics.groupName = groupName;
+  saveCache(cacheKey, metrics);
+  return metrics;
+}
+
+/**
+ * Shared collection loop: given a resolved list of repos (fullName +
+ * pushedAt), fetch per-repo metrics (reusing cached entries that are still
+ * fresh), aggregate weekly trends, assemble the `OrgMetrics` result and
+ * persist it under `cacheKey`.
+ */
+async function collectMetricsForRepoList(
+  cacheKey: string,
+  owner: string,
+  ownerType: "org" | "user",
+  repoList: { fullName: string; pushedAt: string }[],
+  options: CollectOptions
+): Promise<OrgMetrics> {
+  const maxAgeHours = options.maxRepoAgeHours ?? DEFAULT_MAX_REPO_AGE_HOURS;
+
   // Build a lookup map from any existing (potentially stale) cache so we can
   // reuse per-repo data that is still within maxAgeHours.
   const cachedRepoMap = new Map<string, RepoMetrics>();
   if (!options.skipCache) {
-    const raw = loadRawCache(owner);
+    const raw = loadRawCache(cacheKey);
     if (raw) {
       for (const repo of raw.repos) {
         cachedRepoMap.set(repo.fullName, repo);
       }
     }
   }
-
-  const repoList = await collectRepos(owner, ownerType);
-  console.log(`Found ${repoList.length} repositories`);
 
   const repos: RepoMetrics[] = [];
   let freshCount = 0;
@@ -166,7 +253,7 @@ export async function collect(
 
   // Reuse cached weekly trends if every repo came from cache and all repos
   // already have per-repo weeklyTrends (i.e. cache was built with this version).
-  let weeklyTrends = loadRawCache(owner)?.weeklyTrends;
+  let weeklyTrends = loadRawCache(cacheKey)?.weeklyTrends;
   const missingRepoTrends = repos.some((r) => !Array.isArray(r.weeklyTrends));
   if (freshCount > 0 || !weeklyTrends || missingRepoTrends) {
     console.log(`Collecting weekly trends… (${freshCount} repos refreshed)`);
@@ -193,6 +280,6 @@ export async function collect(
     weeklyTrends,
   };
 
-  saveCache(owner, metrics);
+  saveCache(cacheKey, metrics);
   return metrics;
 }

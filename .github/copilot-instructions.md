@@ -19,7 +19,11 @@
 src/
   index.ts              # CLI entry point & orchestrator
   build-pages.ts        # Generates static HTML for GitHub Pages
+  build-multi-site.ts   # Local-only: builds a page per discovered dataset/group with a nav switcher
   collect.ts            # Core collection orchestrator (cache-aware, calls all collectors)
+  collect-group.ts       # CLI: collect metrics for repos discovered from a local folder ("group")
+  local-repo-discovery.ts # Scans a folder for local git repos and resolves their GitHub owner/repo
+  dataset-key.ts         # Slugify a group name into a cache/site key
   types.ts              # All shared TypeScript interfaces (source of truth)
   github-client.ts      # Octokit singleton (token or GitHub App auth)
   link-header.ts        # GitHub Link header pagination helper
@@ -34,7 +38,7 @@ src/
     contributors.ts     # Committer & reviewer counts (last 90 days)
     dependents.ts       # Dependent repository count
     trends.ts           # Weekly activity trend aggregation
-data/                   # Local cache (gitignored)
+data/                   # Local cache (gitignored); also holds local "group" datasets
 _site/                  # Generated GitHub Pages output (gitignored)
 .github/workflows/
   ci.yml                # Build + test on PR / push to main
@@ -122,7 +126,7 @@ import { collect } from "./collect.js";
 
 Mutation testing is provided by [Stryker](https://stryker-mutator.io/) with the vitest runner.
 
-- **Config**: `stryker.config.mjs` (ESM). Mutates all `src/**/*.ts` except test files, `types.ts`, `index.ts`, `save-fixture.ts`, and `build-pages.ts` (the last is excluded because its tests run via subprocess and Stryker cannot track coverage that way).
+- **Config**: `stryker.config.mjs` (ESM). Mutates all `src/**/*.ts` except test files, `types.ts`, `index.ts`, `save-fixture.ts`, `build-pages.ts`, `collect-group.ts`, and `build-multi-site.ts` (CLI entry points excluded because they're hard to unit test or are tested via subprocess, so Stryker cannot track coverage that way).
 - **Run locally** (before creating a PR): `npm run mutation` — produces an HTML report at `reports/mutation/index.html` and a text summary in the terminal.
 - **Run in CI mode**: `npm run mutation:ci` — outputs JSON + text (no HTML). The `mutation` job in `ci.yml` reads `reports/mutation/mutation.json` and posts a Markdown summary to the GitHub Actions step summary via `node scripts/mutation-summary.mjs >> $GITHUB_STEP_SUMMARY`.
 - **Thresholds**: `high: 80`, `low: 60` for colour-coding only; `break: null` so the CI job never fails purely on score. Tighten `break` once you have a stable baseline.

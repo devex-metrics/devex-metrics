@@ -164,3 +164,28 @@ export function saveCache(owner: string, data: OrgMetrics): void {
   };
   fs.writeFileSync(cacheFilePath(owner), JSON.stringify(envelope, null, 2));
 }
+
+/**
+ * List all local dataset cache keys found in the data directory — both
+ * owner/user caches (`<key>.json` / `<key>.fixture.json`) and local "group"
+ * caches (e.g. `my-team.json`, collected from an explicit list of repos via
+ * `collectGroup`). Per-repo Copilot agent caches (`agents-*.json`) are
+ * excluded, as are entries whose file is unreadable or fails schema
+ * validation via {@link loadRawCache}.
+ *
+ * Used to auto-detect which datasets are available for the local
+ * multi-dataset dashboard build.
+ */
+export function listDatasetKeys(): string[] {
+  if (!fs.existsSync(DATA_DIR)) return [];
+
+  const keys = new Set<string>();
+  for (const file of fs.readdirSync(DATA_DIR)) {
+    if (!file.endsWith(".json") || file.startsWith("agents-")) continue;
+    const key = file.endsWith(".fixture.json")
+      ? file.slice(0, -".fixture.json".length)
+      : file.slice(0, -".json".length);
+    keys.add(key);
+  }
+  return [...keys].sort((a, b) => a.localeCompare(b));
+}
