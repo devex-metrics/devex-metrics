@@ -213,7 +213,7 @@ export function generateReport(metrics: OrgMetrics): string {
       for (const pr of sortedPRs) {
         const mergedDate = pr.mergedAt ? pr.mergedAt.slice(0, 10) : "";
         lines.push(
-          `| #${pr.number} ${pr.title} | ${mergedDate} | +${pr.linesAdded}/-${pr.linesDeleted} | ${pr.commentCount} | ${pr.commitCount} | ${pr.actionsMinutes} |`
+          `| #${pr.number} ${escapeTableCell(pr.title)} | ${mergedDate} | +${pr.linesAdded}/-${pr.linesDeleted} | ${pr.commentCount} | ${pr.commitCount} | ${pr.actionsMinutes} |`
         );
       }
       lines.push("");
@@ -233,6 +233,11 @@ function pushIf(lines: string[], condition: boolean, line: () => string): void {
 /** Format a part/total ratio as a one-decimal percentage string (without the `%`). */
 function pct(part: number, total: number): string {
   return ((part / total) * 100).toFixed(1);
+}
+
+/** Escape characters that would otherwise break a Markdown table row: `|` and newlines. */
+function escapeTableCell(value: string): string {
+  return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
 }
 
 function aggregate(repos: RepoMetrics[]) {
