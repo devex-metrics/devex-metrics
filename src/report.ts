@@ -92,10 +92,10 @@ export function generateReport(metrics: OrgMetrics): string {
       "> An AI-authored PR is one where a human-opened PR containing even a " +
         "single AI-assisted commit still counts, not only PRs opened by an " +
         "AI account itself. Matched via PR-author login, `Co-authored-by:` " +
-        "commit trailers, or known PR-body phrasing (the latter two only " +
-        "on the GraphQL collection path; the REST fallback checks author " +
-        "login and merge-commit trailers). The denominator is " +
-        "every merged PR in the collected history (~2 years / up to " +
+         "commit trailers, or known PR-body phrasing (for this merged-PR " +
+         "timeline, commit and PR-body inspection are GraphQL-only; the REST " +
+         "fallback checks the PR-author login only). The denominator is " +
+         "every merged PR in the collected history (~2 years / up to " +
         "1,000 PRs per repo), including bot-authored ones such as " +
         "`dependabot[bot]`. Generic dependency bots are not expected to be " +
         "misclassified as AI-authored unless their commit/PR text happens " +
