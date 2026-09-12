@@ -34,7 +34,7 @@ function makeSampleMetrics(): OrgMetrics {
         ],
         mergedPRTimeline: [
           { number: 42, createdAt: "2026-03-01T00:00:00Z", mergedAt: "2026-03-03T00:00:00Z", author: "dev1", isBotAuthor: false, isCopilotAuthored: false, timeToMergeHours: 48, closesIssues: [] },
-          { number: 43, createdAt: "2026-03-02T00:00:00Z", mergedAt: "2026-03-04T00:00:00Z", author: "copilot[bot]", isBotAuthor: true, isCopilotAuthored: true, timeToMergeHours: 48, closesIssues: [] },
+          { number: 43, createdAt: "2026-03-02T00:00:00Z", mergedAt: "2026-03-04T00:00:00Z", author: "copilot[bot]", isBotAuthor: true, isCopilotAuthored: true, aiAuthorType: "copilot", timeToMergeHours: 48, closesIssues: [] },
         ],
         copilotAdoption: { copilotAuthoredPRs: 1, copilotReviewedPRs: 1, totalMergedPRs: 2, totalDetailedPRs: 1 },
         issueLeadTimes: [],
@@ -75,14 +75,79 @@ describe("generateReport", () => {
   it("should include Copilot adoption metrics in the summary", () => {
     const report = generateReport(makeSampleMetrics());
 
-    expect(report).toContain("Copilot-authored PRs | 1 (50.0%)");
-    expect(report).toContain("Copilot-reviewed PRs | 1 (100.0%)");
+    expect(report).toContain(
+      "AI-authored PRs (Copilot + Claude + Codex) | 1 (50.0% of 2 merged PRs in the collected history)"
+    );
+    expect(report).toContain("| — of which Copilot | 1 |");
+    expect(report).toContain(
+      "Copilot-reviewed PRs | 1 (100.0% of 1 sampled PRs)"
+    );
+  });
+
+  it("should explain AI-authorship attribution rules and the reviewed-PR sample size", () => {
+    const report = generateReport(makeSampleMetrics());
+
+    expect(report).toContain("human-opened PR containing even a single AI-assisted commit still counts");
+    expect(report).toContain("dependabot[bot]");
+    expect(report).toContain("this one really is Copilot-only");
+  });
+
+  it("should document the differing populations behind reviewer counts", () => {
+    const report = generateReport(makeSampleMetrics());
+
+    // The explanatory note must call out that the two reviewer metrics count
+    // different populations (bots included vs. excluded, different windows).
+    expect(report).toContain("Reviewer counts are two different populations");
+    expect(report).toContain(
+      "| Unique reviewers, incl. bots | 4 | Collected history |"
+    );
+  });
+
+  it("should label per-repo reviewer/committer counts with their population and window", () => {
+    const report = generateReport(makeSampleMetrics());
+
+    expect(report).toContain(
+      "Contributors: 4 committers (last 90 days) · 3 reviewers, incl. bots (collected history)"
+    );
   });
 
   it("should include median cycle time in the summary", () => {
     const report = generateReport(makeSampleMetrics());
 
     expect(report).toContain("Median cycle time");
+  });
+
+  it("should label each summary metric with its measurement window", () => {
+    const report = generateReport(makeSampleMetrics());
+
+    expect(report).toContain("| Metric | Value | Window |");
+    // Lifetime totals vs. collected-history / snapshot / rolling-window
+    // metrics must be distinguishable so counts from different populations
+    // (e.g. a lifetime total vs. a share of the collected history) are never
+    // mistaken for the same denominator.
+    expect(report).toContain("| Open issues | 5 | Current snapshot |");
+    expect(report).toContain("| Closed issues | 25 | Repository lifetime |");
+    expect(report).toContain("| Open PRs | 2 | Current snapshot |");
+    expect(report).toContain("| Merged PRs | 18 | Repository lifetime |");
+    expect(report).toContain("| Closed (unmerged) PRs | 1 | Repository lifetime |");
+    expect(report).toContain("| Unique committers | 5 | Last 90 days |");
+    expect(report).toContain("| Unique reviewers, incl. bots | 4 | Collected history |");
+    expect(report).toContain("| — of which Copilot | 1 | Collected history |");
+    expect(report).toContain("Copilot-reviewed PRs | 1 (100.0% of 1 sampled PRs) | Collected history |");
+  });
+
+  it("should label per-repo issue, PR and contributor lines with their windows", () => {
+    const report = generateReport(makeSampleMetrics());
+
+    expect(report).toContain(
+      "Issues: 5 open (current snapshot) / 20 closed (repository lifetime)"
+    );
+    expect(report).toContain(
+      "PRs: 2 open (current snapshot) / 15 merged / 1 closed (repository lifetime)"
+    );
+    expect(report).toContain(
+      "Contributors: 4 committers (last 90 days) · 3 reviewers, incl. bots (collected history)"
+    );
   });
 
   it("should list per-repo details", () => {
@@ -322,6 +387,50 @@ describe("generateReport", () => {
     expect(report).toContain("| Total tasks | 5 |");
   });
 
+  it("should escape pipe characters in PR titles so the table is not corrupted", () => {
+    const metrics: OrgMetrics = {
+      owner: "test-org",
+      ownerType: "org",
+      collectedAt: "2026-03-28T12:00:00Z",
+      repoCount: 1,
+      repos: [
+        {
+          name: "repo-a",
+          fullName: "test-org/repo-a",
+          issues: { open: 0, closed: 0 },
+          pullRequests: { open: 0, closed: 0, merged: 1 },
+          pullRequestDetails: [
+            {
+              number: 7,
+              title: "UI Composer | Implementation | Side-by-side layout",
+              state: "merged",
+              mergedAt: "2026-03-01T00:00:00Z",
+              linesAdded: 1,
+              linesDeleted: 0,
+              commentCount: 0,
+              commitCount: 1,
+              actionsMinutes: 0,
+            },
+          ],
+          committerCount: 0,
+          reviewerCount: 0,
+          contributorCount: 0,
+          dependentCount: 0,
+        },
+      ],
+    };
+    const report = generateReport(metrics);
+    expect(report).toContain(
+      "#7 UI Composer \\| Implementation \\| Side-by-side layout"
+    );
+    // Each row of the PR table must have exactly 6 unescaped pipe-delimited cells (7 separators).
+    const row = report
+      .split("\n")
+      .find((line) => line.startsWith("| #7 "));
+    expect(row).toBeDefined();
+    expect((row!.match(/(?<!\\)\|/g) ?? []).length).toBe(7);
+  });
+
   it("should place PRs without mergedAt after those with mergedAt", () => {
     const metrics: OrgMetrics = {
       owner: "test-org",
@@ -402,7 +511,7 @@ describe("generateReport flow metrics", () => {
     expect(md).toContain("| PRs over 400 lines | 50.0% |");
   });
 
-  it("reports the three review legs with their sample sizes", () => {
+  it("reports the review-outcome breakdown for PRs that received a review", () => {
     const md = reportFor([
       repoWith({
         mergedPRTimeline: [
@@ -418,8 +527,41 @@ describe("generateReport flow metrics", () => {
     ]);
     expect(md).toContain("| Wait for first review |");
     expect(md).toContain("(n=1)");
-    expect(md).toContain("| First review → approval |");
+    // First review and first approval differ, so this PR required a revision
+    // round before approval — it must not be counted as approved outright.
+    expect(md).toContain("| Approved on first review | 0.0% (n=1) | Collected history |");
+    expect(md).toContain("| Time to approval (PRs requiring revisions) |");
     expect(md).toContain("| Approval → merge |");
+  });
+
+  it("counts a PR as approved on first review when the earliest review is itself an approval", () => {
+    const md = reportFor([
+      repoWith({
+        mergedPRTimeline: [
+          {
+            ...merged,
+            firstReviewAt: "2026-08-20T06:00:00Z",
+            firstApprovalAt: "2026-08-20T06:00:00Z",
+          },
+        ],
+      }),
+    ]);
+    expect(md).toContain("| Approved on first review | 100.0% (n=1) | Collected history |");
+    // No revision round happened, so it must not appear in that median's sample.
+    expect(md).not.toContain("Time to approval (PRs requiring revisions)");
+  });
+
+  it("reports median review submissions per PR and the changes-requested share", () => {
+    const md = reportFor([
+      repoWith({
+        mergedPRTimeline: [
+          { ...merged, reviewCount: 3, changesRequestedCount: 1 },
+          { ...merged, number: 2, reviewCount: 1, changesRequestedCount: 0 },
+        ],
+      }),
+    ]);
+    expect(md).toContain("| Median review submissions per PR | 2 (n=2) | Collected history |");
+    expect(md).toContain('| PRs receiving "changes requested" | 50.0% (n=2) | Collected history |');
   });
 
   it("omits the review legs entirely when no review data exists", () => {
@@ -453,7 +595,7 @@ describe("generateReport flow metrics", () => {
     const one = reportFor([
       repoWith({ mergedPRTimeline: [{ ...merged }], reviewerLoad: [{ reviewer: "amy", reviews: 4 }] }),
     ]);
-    expect(one).not.toContain("Review load concentration");
+    expect(one).not.toContain("| Review load concentration");
 
     const many = reportFor([
       repoWith({
@@ -464,7 +606,7 @@ describe("generateReport flow metrics", () => {
         ],
       }),
     ]);
-    expect(many).toContain("Review load concentration");
+    expect(many).toContain("| Review load concentration (human reviewers only, bots excluded) |");
     expect(many).toContain("across 2 reviewers");
   });
 

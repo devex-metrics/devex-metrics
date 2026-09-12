@@ -3,6 +3,27 @@ import { gini, quantiles, shareAtLeast } from "./stats.js";
 import { LARGE_PR_LINES } from "./history.js";
 
 /**
+ * Measurement windows a summary metric can be reported over. Metrics counted
+ * from different windows are not directly comparable (e.g. a repository-
+ * lifetime total versus a percentage over the last ~13 months of collected
+ * PRs), so every summary row is explicitly labelled with one of these.
+ */
+const WINDOW = {
+  /** State as of the moment the data was collected (e.g. currently-open PRs). */
+  snapshot: "Current snapshot",
+  /** Cumulative total since the repository was created. */
+  lifetime: "Repository lifetime",
+  /**
+   * The enriched PR timeline the collector keeps: up to ~1,000 most recently
+   * updated PRs per repo, roughly the last ~13 months. Not the full lifetime
+   * for older or very active repositories.
+   */
+  collected: "Collected history",
+  last30d: "Last 30 days",
+  last90d: "Last 90 days",
+} as const;
+
+/**
  * Produce a human-readable Markdown report from collected metrics.
  */
 export function generateReport(metrics: OrgMetrics): string {
@@ -19,38 +40,95 @@ export function generateReport(metrics: OrgMetrics): string {
   // -- Summary --
   lines.push("## Summary");
   lines.push("");
-  lines.push(`| Metric | Value |`);
-  lines.push(`| ------ | ----- |`);
-  lines.push(`| Repositories | ${metrics.repoCount} |`);
+  lines.push(
+    "> Metrics are measured over different windows — see the **Window** " +
+      "column. Counts from different windows are not directly comparable " +
+      "(e.g. a repository-lifetime total versus a share of the collected " +
+      "history)."
+  );
+  lines.push("");
+  lines.push(
+    "> **Reviewer counts are two different populations.** " +
+      "*Unique reviewers* counts every distinct account that submitted a " +
+      "pull request review — including bot accounts — across the sampled " +
+      "PR history. *Review load concentration* (Gini) counts only " +
+      "individual review submissions by human reviewers (bots excluded), " +
+      "and only from repositories whose enriched review timeline was " +
+      "collected. The two are not meant to add up to the same denominator."
+  );
+  lines.push("");
+  lines.push(`| Metric | Value | Window |`);
+  lines.push(`| ------ | ----- | ------ |`);
+  lines.push(`| Repositories | ${metrics.repoCount} | ${WINDOW.snapshot} |`);
 
   const totals = aggregate(metrics.repos);
-  lines.push(`| Open issues | ${totals.openIssues} |`);
-  lines.push(`| Closed issues | ${totals.closedIssues} |`);
-  lines.push(`| Open PRs | ${totals.openPRs} |`);
-  lines.push(`| Merged PRs | ${totals.mergedPRs} |`);
-  lines.push(`| Closed (unmerged) PRs | ${totals.closedPRs} |`);
-  lines.push(`| Unique committers (90 d) | ${totals.committers} |`);
-  lines.push(`| Unique reviewers (90 d) | ${totals.reviewers} |`);
+  lines.push(`| Open issues | ${totals.openIssues} | ${WINDOW.snapshot} |`);
+  lines.push(`| Closed issues | ${totals.closedIssues} | ${WINDOW.lifetime} |`);
+  lines.push(`| Open PRs | ${totals.openPRs} | ${WINDOW.snapshot} |`);
+  lines.push(`| Merged PRs | ${totals.mergedPRs} | ${WINDOW.lifetime} |`);
+  lines.push(`| Closed (unmerged) PRs | ${totals.closedPRs} | ${WINDOW.lifetime} |`);
+  lines.push(`| Unique committers | ${totals.committers} | ${WINDOW.last90d} |`);
+  lines.push(`| Unique reviewers, incl. bots | ${totals.reviewers} | ${WINDOW.collected} |`);
 
-  // Copilot adoption summary
+  // AI authorship summary. "Copilot-authored" is misleading on its own: the
+  // combined figure includes Claude and Codex too, so the tool breakdown and
+  // an explicit note on attribution rules / denominator / window are shown
+  // alongside it rather than leaving readers to guess.
   const copilotTotals = aggregateCopilot(metrics.repos);
   if (copilotTotals.totalMergedPRs > 0) {
-    lines.push(`| Copilot-authored PRs | ${copilotTotals.copilotAuthoredPRs} (${pct(copilotTotals.copilotAuthoredPRs, copilotTotals.totalMergedPRs)}%) |`);
+    lines.push(
+      `| AI-authored PRs (Copilot + Claude + Codex) | ` +
+        `${copilotTotals.copilotAuthoredPRs} (${pct(copilotTotals.copilotAuthoredPRs, copilotTotals.totalMergedPRs)}% ` +
+        `of ${copilotTotals.totalMergedPRs} merged PRs in the collected history) | ${WINDOW.collected} |`
+    );
+    const byTool = aggregateAIAuthorshipByTool(metrics.repos);
+    pushIf(lines, byTool.copilot > 0, () => `| — of which Copilot | ${byTool.copilot} | ${WINDOW.collected} |`);
+    pushIf(lines, byTool.claude > 0, () => `| — of which Claude | ${byTool.claude} | ${WINDOW.collected} |`);
+    pushIf(lines, byTool.codex > 0, () => `| — of which Codex | ${byTool.codex} | ${WINDOW.collected} |`);
+    lines.push(
+      "> An AI-authored PR is one where a human-opened PR containing even a " +
+        "single AI-assisted commit still counts, not only PRs opened by an " +
+        "AI account itself. Matched via PR-author login, `Co-authored-by:` " +
+        "commit trailers, or known PR-body phrasing. The denominator is " +
+        "every merged PR in the collected history (~13 months / up to " +
+        "1,000 PRs per repo), including bot-authored ones such as " +
+        "`dependabot[bot]`. Generic dependency bots are not expected to be " +
+        "misclassified as AI-authored unless their commit/PR text happens " +
+        "to match one of these patterns."
+    );
   }
   if (copilotTotals.totalDetailedPRs > 0) {
-    lines.push(`| Copilot-reviewed PRs | ${copilotTotals.copilotReviewedPRs} (${pct(copilotTotals.copilotReviewedPRs, copilotTotals.totalDetailedPRs)}%) |`);
+    lines.push(
+      `| Copilot-reviewed PRs | ${copilotTotals.copilotReviewedPRs} ` +
+        `(${pct(copilotTotals.copilotReviewedPRs, copilotTotals.totalDetailedPRs)}% ` +
+        `of ${copilotTotals.totalDetailedPRs} sampled PRs) | ${WINDOW.collected} |`
+    );
+    lines.push(
+      "> Unlike the row above, this one really is Copilot-only (a review " +
+        "from `copilot[bot]`) and is sampled from up to 10 of the most " +
+        "recently merged PRs per repository — a much smaller population " +
+        "than the collected-history figure above."
+    );
   }
 
   // Copilot agent tasks summary
   const agentTotals = aggregateAgentMetrics(metrics.repos);
   if (agentTotals.totalTasks > 0) {
-    lines.push(`| Copilot agent tasks | ${agentTotals.totalTasks} |`);
-    lines.push(`| Agent tasks completed | ${agentTotals.completedTasks} |`);
-    lines.push(`| Agent tasks failed | ${agentTotals.failedTasks} |`);
-    lines.push(`| Agent sessions | ${agentTotals.totalSessions} (${agentTotals.cloudAgentSessions} cloud / ${agentTotals.cliRemoteSessions} CLI) |`);
-    pushIf(lines, agentTotals.totalCreditsUsed > 0, () => `| Agent credits used | ${agentTotals.totalCreditsUsed.toFixed(1)} |`);
-    pushIf(lines, agentTotals.agentCreatedPRs > 0, () => `| PRs created by agent | ${agentTotals.agentCreatedPRs} |`);
-    pushIf(lines, agentTotals.agentActionsMinutes > 0, () => `| Agent PR Actions minutes | ${agentTotals.agentActionsMinutes.toFixed(1)} |`);
+    lines.push(`| Copilot agent tasks | ${agentTotals.totalTasks} | ${WINDOW.last30d} |`);
+    lines.push(`| Agent tasks completed | ${agentTotals.completedTasks} | ${WINDOW.last30d} |`);
+    lines.push(`| Agent tasks failed | ${agentTotals.failedTasks} | ${WINDOW.last30d} |`);
+    lines.push(`| Agent sessions | ${agentTotals.totalSessions} (${agentTotals.cloudAgentSessions} cloud / ${agentTotals.cliRemoteSessions} CLI) | ${WINDOW.last30d} |`);
+    pushIf(lines, agentTotals.totalCreditsUsed > 0, () => `| Agent credits used | ${agentTotals.totalCreditsUsed.toFixed(1)} | ${WINDOW.last30d} |`);
+    if (agentTotals.agentCreatedPRs > 0) {
+      lines.push(`| PRs created by agent | ${agentTotals.agentCreatedPRs} | ${WINDOW.last30d} |`);
+      lines.push(
+        "> A different measurement from the AI-authored row above: this " +
+          "counts only PRs traced to a Copilot coding-agent task (via the " +
+          "Task API, not commit/PR text matching), over the last 30 days " +
+          "only, and Copilot-agent specifically — not Claude or Codex."
+      );
+    }
+    pushIf(lines, agentTotals.agentActionsMinutes > 0, () => `| Agent PR Actions minutes | ${agentTotals.agentActionsMinutes.toFixed(1)} | ${WINDOW.last30d} |`);
   }
 
   // Median cycle time
@@ -59,7 +137,7 @@ export function generateReport(metrics: OrgMetrics): string {
   );
   if (allCycleTimes.length > 0) {
     const medianHrs = median(allCycleTimes);
-    lines.push(`| Median cycle time | ${formatDuration(medianHrs)} |`);
+    lines.push(`| Median cycle time | ${formatDuration(medianHrs)} | ${WINDOW.collected} |`);
   }
 
   // Size, review latency, abandonment and review concentration. Every one of
@@ -67,54 +145,77 @@ export function generateReport(metrics: OrgMetrics): string {
   // emitted only when there is something behind it rather than a hopeful zero.
   const flow = aggregateFlow(metrics.repos);
   if (flow.sizes.length > 0) {
-    lines.push(`| Median PR size | ${Math.round(quantiles(flow.sizes).p50)} lines |`);
+    lines.push(`| Median PR size | ${Math.round(quantiles(flow.sizes).p50)} lines | ${WINDOW.collected} |`);
     lines.push(
       `| PRs over ${LARGE_PR_LINES} lines | ` +
-        `${shareAtLeast(flow.sizes, LARGE_PR_LINES).toFixed(1)}% |`
+        `${shareAtLeast(flow.sizes, LARGE_PR_LINES).toFixed(1)}% | ${WINDOW.collected} |`
     );
   }
   if (flow.reviewWaits.length > 0) {
     const rw = quantiles(flow.reviewWaits);
     lines.push(
       `| Wait for first review | ${formatDuration(rw.p50)} p50 · ` +
-        `${formatDuration(rw.p75)} p75 · ${formatDuration(rw.p90)} p90 (n=${rw.n}) |`
+        `${formatDuration(rw.p75)} p75 · ${formatDuration(rw.p90)} p90 (n=${rw.n}) | ${WINDOW.collected} |`
     );
   }
-  if (flow.approvalWaits.length > 0) {
+  // A single "first review → approval" median collapses to 0 whenever the
+  // first review submitted is itself an approval, which is indistinguishable
+  // from broken timestamps without more context. These four rows replace it.
+  if (flow.reviewedPRs > 0) {
     lines.push(
-      `| First review → approval | ` +
-        `${formatDuration(quantiles(flow.approvalWaits).p50)} p50 (n=${flow.approvalWaits.length}) |`
+      `| Approved on first review | ` +
+        `${pct(flow.approvedOnFirstReview, flow.reviewedPRs)}% (n=${flow.reviewedPRs}) | ${WINDOW.collected} |`
+    );
+  }
+  if (flow.revisionApprovalWaits.length > 0) {
+    lines.push(
+      `| Time to approval (PRs requiring revisions) | ` +
+        `${formatDuration(quantiles(flow.revisionApprovalWaits).p50)} p50 ` +
+        `(n=${flow.revisionApprovalWaits.length}) | ${WINDOW.collected} |`
+    );
+  }
+  if (flow.reviewRounds.length > 0) {
+    lines.push(
+      `| Median review submissions per PR | ` +
+        `${median(flow.reviewRounds)} (n=${flow.reviewRounds.length}) | ${WINDOW.collected} |`
+    );
+  }
+  if (flow.changesRequestedKnownPRs > 0) {
+    lines.push(
+      `| PRs receiving "changes requested" | ` +
+        `${pct(flow.changesRequestedPRs, flow.changesRequestedKnownPRs)}% ` +
+        `(n=${flow.changesRequestedKnownPRs}) | ${WINDOW.collected} |`
     );
   }
   if (flow.mergeWaits.length > 0) {
     lines.push(
       `| Approval → merge | ` +
-        `${formatDuration(quantiles(flow.mergeWaits).p50)} p50 (n=${flow.mergeWaits.length}) |`
+        `${formatDuration(quantiles(flow.mergeWaits).p50)} p50 (n=${flow.mergeWaits.length}) | ${WINDOW.collected} |`
     );
   }
   const concluded = flow.merged + flow.abandoned;
   if (concluded > 0 && flow.abandoned > 0) {
     lines.push(
-      `| PRs closed unmerged | ${flow.abandoned} (${pct(flow.abandoned, concluded)}%) |`
+      `| PRs closed unmerged | ${flow.abandoned} (${pct(flow.abandoned, concluded)}%) | ${WINDOW.collected} |`
     );
   }
   if (flow.openAges.length > 0) {
     lines.push(
       `| Median age of open PRs | ` +
-        `${formatDuration(quantiles(flow.openAges).p50)} (${flow.openAges.length} open) |`
+        `${formatDuration(quantiles(flow.openAges).p50)} (${flow.openAges.length} open) | ${WINDOW.snapshot} |`
     );
   }
   const reviewCounts = [...flow.reviewsBy.values()];
   if (reviewCounts.length > 1) {
     lines.push(
-      `| Review load concentration | Gini ${gini(reviewCounts).toFixed(2)} ` +
-        `across ${reviewCounts.length} reviewers |`
+      `| Review load concentration (human reviewers only, bots excluded) | Gini ${gini(reviewCounts).toFixed(2)} ` +
+        `across ${reviewCounts.length} reviewers | ${WINDOW.collected} |`
     );
   }
   if (agentTotals.agentCreatedPRs > 0 && agentTotals.totalCreditsUsed > 0) {
     lines.push(
       `| Credits per agent PR | ` +
-        `${(agentTotals.totalCreditsUsed / agentTotals.agentCreatedPRs).toFixed(1)} |`
+        `${(agentTotals.totalCreditsUsed / agentTotals.agentCreatedPRs).toFixed(1)} | ${WINDOW.last30d} |`
     );
   }
 
@@ -130,13 +231,17 @@ export function generateReport(metrics: OrgMetrics): string {
       lines.push(`Last pushed: ${repo.pushedAt.slice(0, 10)}`);
     }
     lines.push(
-      `Issues: ${repo.issues.open} open / ${repo.issues.closed} closed`
+      `Issues: ${repo.issues.open} open (${WINDOW.snapshot.toLowerCase()}) / ` +
+        `${repo.issues.closed} closed (${WINDOW.lifetime.toLowerCase()})`
     );
     lines.push(
-      `PRs: ${repo.pullRequests.open} open / ${repo.pullRequests.merged} merged / ${repo.pullRequests.closed} closed`
+      `PRs: ${repo.pullRequests.open} open (${WINDOW.snapshot.toLowerCase()}) / ` +
+        `${repo.pullRequests.merged} merged / ${repo.pullRequests.closed} closed ` +
+        `(${WINDOW.lifetime.toLowerCase()})`
     );
     lines.push(
-      `Contributors: ${repo.committerCount} committers · ${repo.reviewerCount} reviewers`
+      `Contributors: ${repo.committerCount} committers (${WINDOW.last90d.toLowerCase()}) · ` +
+        `${repo.reviewerCount} reviewers, incl. bots (${WINDOW.collected.toLowerCase()})`
     );
     lines.push(`Dependents: ${repo.dependentCount}`);
     lines.push("");
@@ -170,6 +275,8 @@ export function generateReport(metrics: OrgMetrics): string {
         if (!b.mergedAt) return -1;
         return b.mergedAt.localeCompare(a.mergedAt);
       });
+      lines.push(`_Sampled from the most recently updated PRs (${WINDOW.collected.toLowerCase()})._`);
+      lines.push("");
       lines.push(
         "| PR | Merged | Lines +/- | Comments | Commits | Actions min |"
       );
@@ -179,7 +286,7 @@ export function generateReport(metrics: OrgMetrics): string {
       for (const pr of sortedPRs) {
         const mergedDate = pr.mergedAt ? pr.mergedAt.slice(0, 10) : "";
         lines.push(
-          `| #${pr.number} ${pr.title} | ${mergedDate} | +${pr.linesAdded}/-${pr.linesDeleted} | ${pr.commentCount} | ${pr.commitCount} | ${pr.actionsMinutes} |`
+          `| #${pr.number} ${escapeTableCell(pr.title)} | ${mergedDate} | +${pr.linesAdded}/-${pr.linesDeleted} | ${pr.commentCount} | ${pr.commitCount} | ${pr.actionsMinutes} |`
         );
       }
       lines.push("");
@@ -199,6 +306,11 @@ function pushIf(lines: string[], condition: boolean, line: () => string): void {
 /** Format a part/total ratio as a one-decimal percentage string (without the `%`). */
 function pct(part: number, total: number): string {
   return ((part / total) * 100).toFixed(1);
+}
+
+/** Escape characters that would otherwise break a Markdown table row: `|` and newlines. */
+function escapeTableCell(value: string): string {
+  return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
 }
 
 function aggregate(repos: RepoMetrics[]) {
@@ -249,6 +361,27 @@ function aggregateCopilot(repos: RepoMetrics[]): CopilotAdoption {
   return { copilotAuthoredPRs, copilotReviewedPRs, totalMergedPRs, totalDetailedPRs, humanMergedPRs };
 }
 
+/**
+ * Break the "AI-authored" total down by tool, from the same merged-PR
+ * timeline `aggregateCopilot`'s `copilotAuthoredPRs` is summed from. Answers
+ * "which usernames or markers count as Copilot-authored" concretely: only
+ * the `copilot` count below is Copilot specifically — Claude and Codex are
+ * counted separately even though they roll up into the combined AI total.
+ */
+function aggregateAIAuthorshipByTool(repos: RepoMetrics[]) {
+  let copilot = 0;
+  let claude = 0;
+  let codex = 0;
+  for (const r of repos) {
+    for (const pr of r.mergedPRTimeline ?? []) {
+      if (pr.aiAuthorType === "copilot") copilot++;
+      else if (pr.aiAuthorType === "claude") claude++;
+      else if (pr.aiAuthorType === "codex") codex++;
+    }
+  }
+  return { copilot, claude, codex };
+}
+
 function aggregateAgentMetrics(repos: RepoMetrics[]): CopilotAgentMetrics {
   let totalTasks = 0, completedTasks = 0, failedTasks = 0, cancelledTasks = 0,
     timedOutTasks = 0, activeTasksCount = 0, totalSessions = 0,
@@ -297,13 +430,25 @@ function aggregateAgentMetrics(repos: RepoMetrics[]): CopilotAgentMetrics {
 function aggregateFlow(repos: RepoMetrics[]) {
   const sizes: number[] = [];
   const reviewWaits: number[] = [];
-  const approvalWaits: number[] = [];
   const mergeWaits: number[] = [];
   const openAges: number[] = [];
   const reviewsBy = new Map<string, number>();
   let merged = 0;
   let abandoned = 0;
   const now = Date.now();
+
+  // Review-outcome samples. Population is every merged PR that received at
+  // least one review (`firstReviewAt` present) — a raw "first review →
+  // approval" median collapses to 0 whenever the first review submitted is
+  // itself an approval, which reads as broken rather than as "reviewers
+  // mostly approve outright". These four numbers replace that single median
+  // with an unambiguous breakdown.
+  let reviewedPRs = 0;
+  let approvedOnFirstReview = 0;
+  const revisionApprovalWaits: number[] = [];
+  const reviewRounds: number[] = [];
+  let changesRequestedPRs = 0;
+  let changesRequestedKnownPRs = 0;
 
   const hours = (from?: string, to?: string): number | undefined => {
     if (!from || !to) return undefined;
@@ -318,10 +463,27 @@ function aggregateFlow(repos: RepoMetrics[]) {
       if (size > 0) sizes.push(size);
       const toReview = hours(pr.createdAt, pr.firstReviewAt);
       if (toReview !== undefined) reviewWaits.push(toReview);
-      const toApproval = hours(pr.firstReviewAt, pr.firstApprovalAt);
-      if (toApproval !== undefined) approvalWaits.push(toApproval);
       const toMerge = hours(pr.firstApprovalAt, pr.mergedAt);
       if (toMerge !== undefined) mergeWaits.push(toMerge);
+
+      if (pr.firstReviewAt !== undefined) {
+        reviewedPRs++;
+        if (pr.firstApprovalAt !== undefined) {
+          if (pr.firstApprovalAt === pr.firstReviewAt) {
+            approvedOnFirstReview++;
+          } else {
+            const toApproval = hours(pr.firstReviewAt, pr.firstApprovalAt);
+            if (toApproval !== undefined) revisionApprovalWaits.push(toApproval);
+          }
+        }
+      }
+      if (pr.reviewCount !== undefined && pr.reviewCount > 0) {
+        reviewRounds.push(pr.reviewCount);
+      }
+      if (pr.changesRequestedCount !== undefined) {
+        changesRequestedKnownPRs++;
+        if (pr.changesRequestedCount > 0) changesRequestedPRs++;
+      }
     }
     abandoned += (repo.closedPRTimeline ?? []).length;
     for (const pr of repo.openPRTimeline ?? []) {
@@ -333,7 +495,21 @@ function aggregateFlow(repos: RepoMetrics[]) {
     }
   }
 
-  return { sizes, reviewWaits, approvalWaits, mergeWaits, openAges, reviewsBy, merged, abandoned };
+  return {
+    sizes,
+    reviewWaits,
+    mergeWaits,
+    openAges,
+    reviewsBy,
+    merged,
+    abandoned,
+    reviewedPRs,
+    approvedOnFirstReview,
+    revisionApprovalWaits,
+    reviewRounds,
+    changesRequestedPRs,
+    changesRequestedKnownPRs,
+  };
 }
 
 function median(values: number[]): number {
