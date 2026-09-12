@@ -321,11 +321,27 @@ export async function collectActionsMinutesForPRs(
  * @param daysBack  How far back to look for tasks (0 = all history).
  *                  Defaults to 30.
  */
+/**
+ * Set once the agent API rejects our credentials.
+ *
+ * An expired or revoked COPILOT_AGENT_TOKEN fails identically for every
+ * repository, so retrying it across an org would produce one 401 and one
+ * warning per repo. Latch the failure instead: warn once, then skip agent
+ * collection for the rest of the run.
+ */
+let agentAuthFailed = false;
+
+/** Clear the latched agent-auth failure. Exported for tests. */
+export function resetAgentAuthFailure(): void {
+  agentAuthFailed = false;
+}
+
 export async function collectCopilotAgentMetrics(
   owner: string,
   repo: string,
   daysBack = 30,
 ): Promise<CopilotAgentMetrics | null> {
+  if (agentAuthFailed) return null;
   const octokit = getAgentOctokit();
   if (!octokit) return null;
 
@@ -373,6 +389,17 @@ export async function collectCopilotAgentMetrics(
   } catch (err: unknown) {
     const status = (err as { status?: number }).status;
     if (status === 404) return null;
+    if (status === 401) {
+      // Agent metrics are an optional extra; a bad token must not take the
+      // whole collection down with it. Latch so the rest of the run skips it.
+      agentAuthFailed = true;
+      console.warn(
+        `  ⚠ copilot-agent: COPILOT_AGENT_TOKEN was rejected (401 Bad credentials). ` +
+          `Agent metrics are skipped for this run; every other metric is unaffected. ` +
+          `Rotate the token, or set DEVEX_FEATURE_COPILOT_AGENT=false to disable this collector.`,
+      );
+      return null;
+    }
     if (status === 403) {
       console.warn(
         `  ⚠ copilot-agent: skipping ${owner}/${repo}: access denied (403) ` +

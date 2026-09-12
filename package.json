@@ -23,32 +23,32 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "CC0-1.0",
   "type": "module",
   "bugs": {
     "url": "https://github.com/devex-metrics/devex-metrics/issues"
   },
   "homepage": "https://github.com/devex-metrics/devex-metrics#readme",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
-    "@octokit/auth-app": "^8.2.0",
-    "@octokit/plugin-throttling": "^11.0.3",
+    "@octokit/auth-app": "^8.3.0",
+    "@octokit/plugin-throttling": "^11.0.5",
     "@octokit/rest": "^22.0.1"
   },
   "devDependencies": {
-    "@stryker-mutator/core": "^9.6.1",
-    "@stryker-mutator/vitest-runner": "^9.6.1",
-    "@types/jsdom": "^28.0.3",
+    "@stryker-mutator/core": "^10.0.0",
+    "@stryker-mutator/vitest-runner": "^10.0.0",
+    "@types/jsdom": "^30.0.0",
     "@types/node": "^26",
-    "@typescript-eslint/eslint-plugin": "^8.62.1",
-    "@typescript-eslint/parser": "^8.62.1",
-    "eslint": "^10.6.0",
+    "@typescript-eslint/eslint-plugin": "^8.68.0",
+    "@typescript-eslint/parser": "^8.68.0",
+    "eslint": "^10.9.1",
     "eslint-config-prettier": "^10.1.8",
-    "jsdom": "^29.1.1",
-    "prettier": "^3.9.4",
+    "jsdom": "^30.0.1",
+    "prettier": "^3.9.6",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.11"
   }
 }

@@ -1,4 +1,6 @@
 import type { OrgMetrics, RepoMetrics, CopilotAdoption, CopilotAgentMetrics } from "./types.js";
+import { gini, quantiles, shareAtLeast } from "./stats.js";
+import { LARGE_PR_LINES } from "./history.js";
 
 /**
  * Produce a human-readable Markdown report from collected metrics.
@@ -58,6 +60,62 @@ export function generateReport(metrics: OrgMetrics): string {
   if (allCycleTimes.length > 0) {
     const medianHrs = median(allCycleTimes);
     lines.push(`| Median cycle time | ${formatDuration(medianHrs)} |`);
+  }
+
+  // Size, review latency, abandonment and review concentration. Every one of
+  // these is derived from data the collection already holds, so a row is
+  // emitted only when there is something behind it rather than a hopeful zero.
+  const flow = aggregateFlow(metrics.repos);
+  if (flow.sizes.length > 0) {
+    lines.push(`| Median PR size | ${Math.round(quantiles(flow.sizes).p50)} lines |`);
+    lines.push(
+      `| PRs over ${LARGE_PR_LINES} lines | ` +
+        `${shareAtLeast(flow.sizes, LARGE_PR_LINES).toFixed(1)}% |`
+    );
+  }
+  if (flow.reviewWaits.length > 0) {
+    const rw = quantiles(flow.reviewWaits);
+    lines.push(
+      `| Wait for first review | ${formatDuration(rw.p50)} p50 · ` +
+        `${formatDuration(rw.p75)} p75 · ${formatDuration(rw.p90)} p90 (n=${rw.n}) |`
+    );
+  }
+  if (flow.approvalWaits.length > 0) {
+    lines.push(
+      `| First review → approval | ` +
+        `${formatDuration(quantiles(flow.approvalWaits).p50)} p50 (n=${flow.approvalWaits.length}) |`
+    );
+  }
+  if (flow.mergeWaits.length > 0) {
+    lines.push(
+      `| Approval → merge | ` +
+        `${formatDuration(quantiles(flow.mergeWaits).p50)} p50 (n=${flow.mergeWaits.length}) |`
+    );
+  }
+  const concluded = flow.merged + flow.abandoned;
+  if (concluded > 0 && flow.abandoned > 0) {
+    lines.push(
+      `| PRs closed unmerged | ${flow.abandoned} (${pct(flow.abandoned, concluded)}%) |`
+    );
+  }
+  if (flow.openAges.length > 0) {
+    lines.push(
+      `| Median age of open PRs | ` +
+        `${formatDuration(quantiles(flow.openAges).p50)} (${flow.openAges.length} open) |`
+    );
+  }
+  const reviewCounts = [...flow.reviewsBy.values()];
+  if (reviewCounts.length > 1) {
+    lines.push(
+      `| Review load concentration | Gini ${gini(reviewCounts).toFixed(2)} ` +
+        `across ${reviewCounts.length} reviewers |`
+    );
+  }
+  if (agentTotals.agentCreatedPRs > 0 && agentTotals.totalCreditsUsed > 0) {
+    lines.push(
+      `| Credits per agent PR | ` +
+        `${(agentTotals.totalCreditsUsed / agentTotals.agentCreatedPRs).toFixed(1)} |`
+    );
   }
 
   lines.push("");
@@ -227,6 +285,55 @@ function aggregateAgentMetrics(repos: RepoMetrics[]): CopilotAgentMetrics {
     agentCreatedPRs,
     agentActionsMinutes: Math.round(agentActionsMinutes * 100) / 100,
   };
+}
+
+/**
+ * The raw samples behind the flow section of the summary.
+ *
+ * Durations are computed from the stored timestamps here rather than read from
+ * a stored latency, so the report and the dashboard cannot drift apart on what
+ * "wait for review" means.
+ */
+function aggregateFlow(repos: RepoMetrics[]) {
+  const sizes: number[] = [];
+  const reviewWaits: number[] = [];
+  const approvalWaits: number[] = [];
+  const mergeWaits: number[] = [];
+  const openAges: number[] = [];
+  const reviewsBy = new Map<string, number>();
+  let merged = 0;
+  let abandoned = 0;
+  const now = Date.now();
+
+  const hours = (from?: string, to?: string): number | undefined => {
+    if (!from || !to) return undefined;
+    const ms = new Date(to).getTime() - new Date(from).getTime();
+    return Number.isFinite(ms) && ms >= 0 ? ms / 3_600_000 : undefined;
+  };
+
+  for (const repo of repos) {
+    for (const pr of repo.mergedPRTimeline ?? []) {
+      merged++;
+      const size = (pr.linesAdded ?? 0) + (pr.linesDeleted ?? 0);
+      if (size > 0) sizes.push(size);
+      const toReview = hours(pr.createdAt, pr.firstReviewAt);
+      if (toReview !== undefined) reviewWaits.push(toReview);
+      const toApproval = hours(pr.firstReviewAt, pr.firstApprovalAt);
+      if (toApproval !== undefined) approvalWaits.push(toApproval);
+      const toMerge = hours(pr.firstApprovalAt, pr.mergedAt);
+      if (toMerge !== undefined) mergeWaits.push(toMerge);
+    }
+    abandoned += (repo.closedPRTimeline ?? []).length;
+    for (const pr of repo.openPRTimeline ?? []) {
+      const age = (now - new Date(pr.createdAt).getTime()) / 3_600_000;
+      if (Number.isFinite(age) && age >= 0) openAges.push(age);
+    }
+    for (const entry of repo.reviewerLoad ?? []) {
+      reviewsBy.set(entry.reviewer, (reviewsBy.get(entry.reviewer) ?? 0) + entry.reviews);
+    }
+  }
+
+  return { sizes, reviewWaits, approvalWaits, mergeWaits, openAges, reviewsBy, merged, abandoned };
 }
 
 function median(values: number[]): number {

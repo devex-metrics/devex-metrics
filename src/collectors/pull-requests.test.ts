@@ -863,6 +863,11 @@ import {
   buildMergedPRTimeline,
   collectPullRequestDetailsFromNodes,
   extractReviewerLogins,
+  parseRevertRef,
+  summariseReviews,
+  countReviewerLoad,
+  buildClosedPRTimeline,
+  buildOpenPRTimeline,
 } from "./pull-requests.js";
 import type { GraphQLPRNode, GraphQLRepoData } from "./repo-graphql.js";
 
@@ -1328,3 +1333,292 @@ describe("extractReviewerLogins", () => {
 
 
 
+
+describe("parseRevertRef", () => {
+  it("returns undefined for an empty body", () => {
+    expect(parseRevertRef(null)).toBeUndefined();
+    expect(parseRevertRef(undefined)).toBeUndefined();
+    expect(parseRevertRef("")).toBeUndefined();
+  });
+
+  it("reads GitHub's fully qualified revert reference", () => {
+    expect(parseRevertRef("Reverts rajbos/devex-metrics#123")).toBe(123);
+  });
+
+  it("reads a bare revert reference", () => {
+    expect(parseRevertRef("Reverts #45")).toBe(45);
+  });
+
+  it("is case insensitive", () => {
+    expect(parseRevertRef("reverts #9")).toBe(9);
+  });
+
+  it("ignores a body that only mentions reverting in prose", () => {
+    expect(parseRevertRef("We should revert this someday")).toBeUndefined();
+  });
+
+  it("ignores an issue reference that is not a revert", () => {
+    expect(parseRevertRef("Fixes #12")).toBeUndefined();
+  });
+
+  it("takes the first reference when several are present", () => {
+    expect(parseRevertRef("Reverts #4\nReverts #5")).toBe(4);
+  });
+});
+
+describe("summariseReviews", () => {
+  it("returns zeroes for no reviews", () => {
+    expect(summariseReviews([])).toEqual({
+      reviewCount: 0,
+      changesRequestedCount: 0,
+    });
+  });
+
+  it("treats an undefined connection as no reviews", () => {
+    expect(summariseReviews(undefined).reviewCount).toBe(0);
+  });
+
+  it("takes the earliest submission as the first review", () => {
+    const facts = summariseReviews([
+      { author: { login: "bob" }, submittedAt: "2026-03-02T00:00:00Z", state: "COMMENTED" },
+      { author: { login: "amy" }, submittedAt: "2026-03-01T00:00:00Z", state: "COMMENTED" },
+    ]);
+    expect(facts.firstReviewAt).toBe("2026-03-01T00:00:00Z");
+    expect(facts.reviewCount).toBe(2);
+  });
+
+  it("takes the earliest approval as the first approval", () => {
+    const facts = summariseReviews([
+      { author: { login: "amy" }, submittedAt: "2026-03-01T00:00:00Z", state: "CHANGES_REQUESTED" },
+      { author: { login: "bob" }, submittedAt: "2026-03-03T00:00:00Z", state: "APPROVED" },
+      { author: { login: "cat" }, submittedAt: "2026-03-04T00:00:00Z", state: "APPROVED" },
+    ]);
+    expect(facts.firstReviewAt).toBe("2026-03-01T00:00:00Z");
+    expect(facts.firstApprovalAt).toBe("2026-03-03T00:00:00Z");
+    expect(facts.changesRequestedCount).toBe(1);
+  });
+
+  it("counts every changes-requested review as a round", () => {
+    const facts = summariseReviews([
+      { author: { login: "amy" }, submittedAt: "2026-03-01T00:00:00Z", state: "CHANGES_REQUESTED" },
+      { author: { login: "amy" }, submittedAt: "2026-03-02T00:00:00Z", state: "CHANGES_REQUESTED" },
+    ]);
+    expect(facts.changesRequestedCount).toBe(2);
+    expect(facts.firstApprovalAt).toBeUndefined();
+  });
+
+  it("counts a pending review but does not let it set a timestamp", () => {
+    const facts = summariseReviews([
+      { author: { login: "amy" }, submittedAt: null, state: "PENDING" },
+    ]);
+    expect(facts.reviewCount).toBe(1);
+    expect(facts.firstReviewAt).toBeUndefined();
+  });
+
+  it("survives review nodes with no state at all", () => {
+    const facts = summariseReviews([
+      { author: { login: "amy" }, submittedAt: "2026-03-01T00:00:00Z" },
+    ]);
+    expect(facts.firstReviewAt).toBe("2026-03-01T00:00:00Z");
+    expect(facts.changesRequestedCount).toBe(0);
+  });
+});
+
+describe("countReviewerLoad", () => {
+  it("returns an empty list when nothing was reviewed", () => {
+    expect(countReviewerLoad([makePRNode({ reviews: { nodes: [] } })])).toEqual([]);
+  });
+
+  it("counts every review, not every reviewer", () => {
+    const load = countReviewerLoad([
+      makePRNode({
+        reviews: {
+          nodes: [
+            { author: { login: "amy" } },
+            { author: { login: "amy" } },
+            { author: { login: "bob" } },
+          ],
+        },
+      }),
+    ]);
+    expect(load).toEqual([
+      { reviewer: "amy", reviews: 2 },
+      { reviewer: "bob", reviews: 1 },
+    ]);
+  });
+
+  it("accumulates across pull requests, heaviest reviewer first", () => {
+    const load = countReviewerLoad([
+      makePRNode({ number: 1, reviews: { nodes: [{ author: { login: "bob" } }] } }),
+      makePRNode({ number: 2, reviews: { nodes: [{ author: { login: "amy" } }] } }),
+      makePRNode({ number: 3, reviews: { nodes: [{ author: { login: "amy" } }] } }),
+    ]);
+    expect(load[0]).toEqual({ reviewer: "amy", reviews: 2 });
+    expect(load[1]).toEqual({ reviewer: "bob", reviews: 1 });
+  });
+
+  it("leaves bots out — an automated reviewer is not review load", () => {
+    const load = countReviewerLoad([
+      makePRNode({
+        reviews: {
+          nodes: [{ author: { login: "copilot[bot]" } }, { author: { login: "amy" } }],
+        },
+      }),
+    ]);
+    expect(load).toEqual([{ reviewer: "amy", reviews: 1 }]);
+  });
+
+  it("ignores reviews whose author is gone", () => {
+    const load = countReviewerLoad([
+      makePRNode({ reviews: { nodes: [{ author: null }] } }),
+    ]);
+    expect(load).toEqual([]);
+  });
+});
+
+describe("buildMergedPRTimeline review facts", () => {
+  it("carries the raw review timestamps onto the timeline entry", () => {
+    const [entry] = buildMergedPRTimeline([
+      makePRNode({
+        createdAt: "2026-03-01T00:00:00Z",
+        mergedAt: "2026-03-05T00:00:00Z",
+        reviews: {
+          nodes: [
+            { author: { login: "amy" }, submittedAt: "2026-03-02T00:00:00Z", state: "CHANGES_REQUESTED" },
+            { author: { login: "bob" }, submittedAt: "2026-03-04T00:00:00Z", state: "APPROVED" },
+          ],
+        },
+      }),
+    ]);
+    expect(entry.firstReviewAt).toBe("2026-03-02T00:00:00Z");
+    expect(entry.firstApprovalAt).toBe("2026-03-04T00:00:00Z");
+    expect(entry.reviewCount).toBe(2);
+    expect(entry.changesRequestedCount).toBe(1);
+  });
+
+  it("records the pull request a revert refers to", () => {
+    const [entry] = buildMergedPRTimeline([
+      makePRNode({ body: "Reverts rajbos/devex-metrics#41" }),
+    ]);
+    expect(entry.revertsPR).toBe(41);
+  });
+
+  it("leaves the revert reference undefined for an ordinary PR", () => {
+    const [entry] = buildMergedPRTimeline([makePRNode({ body: "Fixes #41" })]);
+    expect(entry.revertsPR).toBeUndefined();
+  });
+});
+
+describe("buildClosedPRTimeline", () => {
+  it("keeps only pull requests closed without merging", () => {
+    const closed = buildClosedPRTimeline([
+      makePRNode({ number: 1, state: "MERGED", mergedAt: "2026-03-01T00:00:00Z" }),
+      makePRNode({
+        number: 2,
+        state: "CLOSED",
+        mergedAt: null,
+        closedAt: "2026-03-02T00:00:00Z",
+      }),
+    ]);
+    expect(closed.map((p) => p.number)).toEqual([2]);
+  });
+
+  it("carries author, size and timing through", () => {
+    const [entry] = buildClosedPRTimeline([
+      makePRNode({
+        number: 8,
+        state: "CLOSED",
+        mergedAt: null,
+        createdAt: "2026-03-01T00:00:00Z",
+        closedAt: "2026-03-04T00:00:00Z",
+        author: { login: "amy", __typename: "User" },
+        additions: 30,
+        deletions: 4,
+      }),
+    ]);
+    expect(entry).toMatchObject({
+      number: 8,
+      createdAt: "2026-03-01T00:00:00Z",
+      closedAt: "2026-03-04T00:00:00Z",
+      author: "amy",
+      isBotAuthor: false,
+      linesAdded: 30,
+      linesDeleted: 4,
+    });
+  });
+
+  it("flags a bot author", () => {
+    const [entry] = buildClosedPRTimeline([
+      makePRNode({
+        state: "CLOSED",
+        mergedAt: null,
+        closedAt: "2026-03-02T00:00:00Z",
+        author: { login: "dependabot[bot]", __typename: "Bot" },
+      }),
+    ]);
+    expect(entry.isBotAuthor).toBe(true);
+  });
+
+  it("labels an AI-authored abandoned PR", () => {
+    const [entry] = buildClosedPRTimeline([
+      makePRNode({
+        state: "CLOSED",
+        mergedAt: null,
+        closedAt: "2026-03-02T00:00:00Z",
+        author: { login: "Copilot", __typename: "Bot" },
+      }),
+    ]);
+    expect(entry.aiAuthorType).toBe("copilot");
+  });
+
+  it("skips a closed PR with no close timestamp", () => {
+    const closed = buildClosedPRTimeline([
+      makePRNode({ state: "CLOSED", mergedAt: null, closedAt: null }),
+    ]);
+    expect(closed).toEqual([]);
+  });
+
+  it("returns an empty list for no nodes", () => {
+    expect(buildClosedPRTimeline([])).toEqual([]);
+  });
+
+  it("sorts newest close first", () => {
+    const closed = buildClosedPRTimeline([
+      makePRNode({ number: 1, state: "CLOSED", mergedAt: null, closedAt: "2026-01-01T00:00:00Z" }),
+      makePRNode({ number: 2, state: "CLOSED", mergedAt: null, closedAt: "2026-05-01T00:00:00Z" }),
+    ]);
+    expect(closed.map((p) => p.number)).toEqual([2, 1]);
+  });
+});
+
+describe("buildOpenPRTimeline", () => {
+  it("returns an empty list for no open pull requests", () => {
+    expect(buildOpenPRTimeline([])).toEqual([]);
+  });
+
+  it("keeps the query's oldest-first order", () => {
+    const open = buildOpenPRTimeline([
+      { number: 1, createdAt: "2025-01-01T00:00:00Z", author: { login: "amy", __typename: "User" } },
+      { number: 2, createdAt: "2026-01-01T00:00:00Z", author: { login: "bob", __typename: "User" } },
+    ]);
+    expect(open.map((p) => p.number)).toEqual([1, 2]);
+  });
+
+  it("flags bot and AI authors", () => {
+    const open = buildOpenPRTimeline([
+      { number: 1, createdAt: "2026-01-01T00:00:00Z", author: { login: "dependabot[bot]", __typename: "Bot" } },
+      { number: 2, createdAt: "2026-01-02T00:00:00Z", author: { login: "Copilot", __typename: "Bot" } },
+    ]);
+    expect(open[0].isBotAuthor).toBe(true);
+    expect(open[0].aiAuthorType).toBeUndefined();
+    expect(open[1].aiAuthorType).toBe("copilot");
+  });
+
+  it("falls back to 'unknown' for a deleted account", () => {
+    const open = buildOpenPRTimeline([
+      { number: 1, createdAt: "2026-01-01T00:00:00Z", author: null },
+    ]);
+    expect(open[0].author).toBe("unknown");
+    expect(open[0].isBotAuthor).toBe(false);
+  });
+});

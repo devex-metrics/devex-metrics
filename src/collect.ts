@@ -16,20 +16,39 @@ import {
   buildPullRequestCounts,
   buildMergedPRTimeline,
   collectPullRequestDetailsFromNodes,
+  buildClosedPRTimeline,
+  buildOpenPRTimeline,
+  countReviewerLoad,
   extractReviewerLogins,
   collectCopilotAgentMetrics,
 } from "./collectors/index.js";
+import { filterRepos, describeFiltering } from "./collectors/repos.js";
+import { loadConfig, describeConfig } from "./config.js";
+import type { DevexConfig } from "./config.js";
 import type { GraphQLPRNode } from "./collectors/index.js";
-import type { OrgMetrics, RepoMetrics } from "./types.js";
+import type { OrgMetrics, RepoMetrics, TeamSummary, TrialSummary } from "./types.js";
+
+interface ResolvedRepoRef {
+  fullName: string;
+  pushedAt: string;
+  isTeamRepo: boolean;
+  defaultBranch: string;
+}
 
 export interface CollectOptions {
   /** Skip all cached/fixture data and force a fresh API fetch. */
   skipCache?: boolean;
   /**
    * Maximum age in hours before a per-repo cache entry is considered stale
-   * and re-fetched. Defaults to 8 hours. Only applies when skipCache is false.
+   * and re-fetched. Defaults to the configured value (8 hours). Only applies
+   * when skipCache is false.
    */
   maxRepoAgeHours?: number;
+  /**
+   * Deployment configuration. Defaults to `loadConfig()`, which reads the
+   * GitHub Actions variables; pass an explicit config in tests.
+   */
+  config?: DevexConfig;
 }
 
 /** A single repo reference (owner/name) used to seed an explicit group collection. */
@@ -48,6 +67,11 @@ export async function collect(
   ownerType: "org" | "user",
   options: CollectOptions = {}
 ): Promise<OrgMetrics> {
+  const config = options.config ?? loadConfig();
+  const maxAgeHours =
+    options.maxRepoAgeHours ??
+    config.collection.maxRepoAgeHours ??
+    DEFAULT_MAX_REPO_AGE_HOURS;
   if (!options.skipCache) {
     const cached = loadCache(owner);
     if (cached) {
@@ -57,11 +81,20 @@ export async function collect(
   }
 
   console.log(`Collecting fresh metrics for ${owner} (${ownerType})…`);
+  console.log(`  config: ${describeConfig({ ...config, owner, ownerType })}`);
 
-  const repoList = await collectRepos(owner, ownerType);
-  console.log(`Found ${repoList.length} repositories`);
+  const discovered = await collectRepos(owner, ownerType);
+  const filtered = filterRepos(discovered, config);
+  console.log(`Found ${discovered.length} repositories`);
+  console.log(`  ${describeFiltering(discovered.length, filtered)}`);
 
-  return collectMetricsForRepoList(owner, owner, ownerType, repoList, options);
+  return collectMetricsForRepoList(
+    owner,
+    owner,
+    ownerType,
+    filtered.repos,
+    { ...options, config, maxRepoAgeHours: maxAgeHours }
+  );
 }
 
 /**
@@ -77,6 +110,11 @@ export async function collectGroup(
   repos: GroupRepoRef[],
   options: CollectOptions = {}
 ): Promise<OrgMetrics> {
+  const config = options.config ?? loadConfig();
+  const maxAgeHours =
+    options.maxRepoAgeHours ??
+    config.collection.maxRepoAgeHours ??
+    DEFAULT_MAX_REPO_AGE_HOURS;
   const cacheKey = slugifyDatasetKey(groupName);
 
   if (!options.skipCache) {
@@ -90,11 +128,16 @@ export async function collectGroup(
   console.log(`Collecting fresh metrics for group "${groupName}" (${repos.length} repos)…`);
 
   const octokit = await getOctokit();
-  const repoList: { fullName: string; pushedAt: string }[] = [];
+  const repoList: ResolvedRepoRef[] = [];
   for (const { owner: repoOwner, name } of repos) {
     try {
       const { data } = await octokit.rest.repos.get({ owner: repoOwner, repo: name });
-      repoList.push({ fullName: data.full_name, pushedAt: data.pushed_at ?? "" });
+      repoList.push({
+        fullName: data.full_name,
+        pushedAt: data.pushed_at ?? "",
+        isTeamRepo: false,
+        defaultBranch: data.default_branch ?? "",
+      });
     } catch (err: unknown) {
       const status = (err as { status?: number }).status;
       console.warn(
@@ -120,7 +163,7 @@ export async function collectGroup(
     primaryOwner,
     "org",
     repoList,
-    options
+    { ...options, config, maxRepoAgeHours: maxAgeHours }
   );
   metrics.groupName = groupName;
   saveCache(cacheKey, metrics);
@@ -137,10 +180,14 @@ async function collectMetricsForRepoList(
   cacheKey: string,
   owner: string,
   ownerType: "org" | "user",
-  repoList: { fullName: string; pushedAt: string }[],
+  repoList: ResolvedRepoRef[],
   options: CollectOptions
 ): Promise<OrgMetrics> {
-  const maxAgeHours = options.maxRepoAgeHours ?? DEFAULT_MAX_REPO_AGE_HOURS;
+  const config = options.config ?? loadConfig();
+  const maxAgeHours =
+    options.maxRepoAgeHours ??
+    config.collection.maxRepoAgeHours ??
+    DEFAULT_MAX_REPO_AGE_HOURS;
 
   // Build a lookup map from any existing (potentially stale) cache so we can
   // reuse per-repo data that is still within maxAgeHours.
@@ -159,13 +206,17 @@ async function collectMetricsForRepoList(
   // Collects pre-fetched GraphQL PR nodes per repo for the trends collector.
   const prDataByRepo = new Map<string, GraphQLPRNode[]>();
 
-  for (const { fullName, pushedAt } of repoList) {
-    // Reuse per-repo data if it is recent enough.
+  for (const { fullName, pushedAt, isTeamRepo, defaultBranch } of repoList) {
+    // Reuse per-repo data if it is recent enough. The team flag comes from the
+    // current config rather than the cache, so re-scoping a trial takes effect
+    // without discarding collected data.
     if (!options.skipCache) {
       const cached = cachedRepoMap.get(fullName);
       if (cached && isWithinHours(cached.collectedAt, maxAgeHours)) {
         console.log(`  → ${fullName} (cached)`);
-        repos.push(cached);
+        // The default branch, like the team flag, comes from this run's
+        // discovery rather than from whatever the cache was written with.
+        repos.push({ ...cached, isTeamRepo, defaultBranch: defaultBranch || cached.defaultBranch });
         continue;
       }
     }
@@ -185,6 +236,12 @@ async function collectMetricsForRepoList(
     const graphqlData = await collectRepoGraphQL(repoOwner, repoName);
 
     let issues, prCounts, prDetails, mergedPRTimeline, contributors, dependentCount;
+    // Abandonment, open-PR age and review-load concentration are derived from
+    // nodes the GraphQL path already fetched; the REST fallback has no cheap
+    // equivalent, so they stay absent there rather than costing extra calls.
+    let closedPRTimeline: RepoMetrics["closedPRTimeline"];
+    let openPRTimeline: RepoMetrics["openPRTimeline"];
+    let reviewerLoad: RepoMetrics["reviewerLoad"];
 
     if (graphqlData !== null) {
       // Fast path: derive most data from the pre-fetched GraphQL result.
@@ -199,10 +256,15 @@ async function collectMetricsForRepoList(
         repoName,
         graphqlData.prNodes
       );
+      closedPRTimeline = buildClosedPRTimeline(graphqlData.prNodes);
+      openPRTimeline = buildOpenPRTimeline(graphqlData.openPRNodes ?? []);
+      reviewerLoad = countReviewerLoad(graphqlData.prNodes);
       const reviewerLogins = extractReviewerLogins(graphqlData.prNodes);
       [contributors, dependentCount] = await Promise.all([
         collectContributors(repoOwner, repoName, reviewerLogins),
-        collectDependentCount(repoOwner, repoName),
+        config.collection.features.dependents
+          ? collectDependentCount(repoOwner, repoName)
+          : Promise.resolve(0),
       ]);
       // Store PR nodes for the trends collector (avoids pulls.get detail fetches).
       prDataByRepo.set(fullName, graphqlData.prNodes);
@@ -215,7 +277,9 @@ async function collectMetricsForRepoList(
           collectPullRequestDetails(repoOwner, repoName),
           collectMergedPRTimeline(repoOwner, repoName),
           collectContributors(repoOwner, repoName),
-          collectDependentCount(repoOwner, repoName),
+          config.collection.features.dependents
+            ? collectDependentCount(repoOwner, repoName)
+            : Promise.resolve(0),
         ]);
     }
 
@@ -229,18 +293,24 @@ async function collectMetricsForRepoList(
     const copilotAdoption = computeCopilotAdoption(mergedPRTimeline, prDetails);
 
     // Collect Copilot agent metrics (heavy, per-repo; uses its own cache).
-    const copilotAgentMetrics =
-      (await collectCopilotAgentMetrics(repoOwner, repoName)) ?? undefined;
+    const copilotAgentMetrics = config.collection.features.copilotAgent
+      ? ((await collectCopilotAgentMetrics(repoOwner, repoName)) ?? undefined)
+      : undefined;
 
     repos.push({
       name: repoName,
       fullName,
       pushedAt,
+      isTeamRepo,
+      defaultBranch: defaultBranch || undefined,
       collectedAt: new Date().toISOString(),
       issues,
       pullRequests: prCounts,
       pullRequestDetails: prDetails,
       mergedPRTimeline,
+      closedPRTimeline,
+      openPRTimeline,
+      reviewerLoad,
       copilotAdoption,
       issueLeadTimes,
       committerCount: contributors.committerCount,
@@ -261,7 +331,12 @@ async function collectMetricsForRepoList(
       const slash = r.fullName.indexOf("/");
       return { owner: r.fullName.slice(0, slash), name: r.name };
     });
-    const result = await collectWeeklyTrends(trendRepos, 104, 200, prDataByRepo);
+    const result = await collectWeeklyTrends(
+      trendRepos,
+      config.collection.historyWeeks,
+      200,
+      prDataByRepo
+    );
     weeklyTrends = result.orgTrends;
     for (const repo of repos) {
       repo.weeklyTrends = result.repoTrends.get(repo.fullName) ?? [];
@@ -278,8 +353,38 @@ async function collectMetricsForRepoList(
     repoCount: repos.length,
     repos,
     weeklyTrends,
+    dataSource: "fresh",
+    team: toTeamSummary(config, repos),
+    trial: toTrialSummary(config),
   };
 
   saveCache(cacheKey, metrics);
   return metrics;
+}
+
+/** Copy the configured team into the dataset, resolved to real repo names. */
+function toTeamSummary(
+  config: DevexConfig,
+  repos: readonly RepoMetrics[]
+): TeamSummary | undefined {
+  if (!config.team) return undefined;
+  return {
+    id: config.team.id,
+    name: config.team.name,
+    repos: repos.filter((r) => r.isTeamRepo).map((r) => r.fullName),
+    discoverAll: config.team.discoverAll,
+  };
+}
+
+/** Copy the configured trial into the dataset. */
+function toTrialSummary(config: DevexConfig): TrialSummary | undefined {
+  if (!config.trial) return undefined;
+  return {
+    title: config.trial.title,
+    hypothesis: config.trial.hypothesis,
+    interventionStart: config.trial.interventionStart,
+    baselineFrom: config.trial.baselineFrom,
+    baselineTo: config.trial.baselineTo,
+    milestones: config.trial.milestones,
+  };
 }

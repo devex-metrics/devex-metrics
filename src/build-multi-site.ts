@@ -112,7 +112,7 @@ function writeDatasetPage(
     ds.data.collectedAt.slice(0, 10),
     branch,
     runUrl,
-    nav
+    { datasets: nav }
   );
   fs.writeFileSync(path.join(folder, "index.html"), html);
 }

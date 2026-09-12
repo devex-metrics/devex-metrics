@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { generateReport } from "./report.js";
-import type { OrgMetrics } from "./types.js";
+import type { OrgMetrics, RepoMetrics } from "./types.js";
 
 function makeSampleMetrics(): OrgMetrics {
   return {
@@ -349,5 +349,168 @@ describe("generateReport", () => {
     const posHasDate = report.indexOf("#6 Has date PR");
     const posNoDate = report.indexOf("#5 No date PR");
     expect(posHasDate).toBeLessThan(posNoDate);
+  });
+});
+
+describe("generateReport flow metrics", () => {
+  function repoWith(extra: Partial<RepoMetrics>): RepoMetrics {
+    return {
+      name: "api",
+      fullName: "acme/api",
+      issues: { open: 0, closed: 0 },
+      pullRequests: { open: 0, closed: 0, merged: 1 },
+      pullRequestDetails: [],
+      committerCount: 1,
+      reviewerCount: 1,
+      contributorCount: 1,
+      dependentCount: 0,
+      ...extra,
+    };
+  }
+
+  function reportFor(repos: RepoMetrics[]): string {
+    return generateReport({
+      owner: "acme",
+      ownerType: "org",
+      collectedAt: "2026-08-30T00:00:00Z",
+      repoCount: repos.length,
+      repos,
+    });
+  }
+
+  const merged = {
+    number: 1,
+    createdAt: "2026-08-20T00:00:00Z",
+    mergedAt: "2026-08-22T00:00:00Z",
+    author: "amy",
+    isBotAuthor: false,
+    isCopilotAuthored: false,
+    timeToMergeHours: 48,
+    closesIssues: [],
+  };
+
+  it("reports PR size and the share of large changes", () => {
+    const md = reportFor([
+      repoWith({
+        mergedPRTimeline: [
+          { ...merged, linesAdded: 500, linesDeleted: 10 },
+          { ...merged, number: 2, linesAdded: 10, linesDeleted: 2 },
+        ],
+      }),
+    ]);
+    expect(md).toContain("| Median PR size |");
+    expect(md).toContain("| PRs over 400 lines | 50.0% |");
+  });
+
+  it("reports the three review legs with their sample sizes", () => {
+    const md = reportFor([
+      repoWith({
+        mergedPRTimeline: [
+          {
+            ...merged,
+            linesAdded: 5,
+            linesDeleted: 1,
+            firstReviewAt: "2026-08-20T06:00:00Z",
+            firstApprovalAt: "2026-08-21T00:00:00Z",
+          },
+        ],
+      }),
+    ]);
+    expect(md).toContain("| Wait for first review |");
+    expect(md).toContain("(n=1)");
+    expect(md).toContain("| First review → approval |");
+    expect(md).toContain("| Approval → merge |");
+  });
+
+  it("omits the review legs entirely when no review data exists", () => {
+    const md = reportFor([repoWith({ mergedPRTimeline: [{ ...merged }] })]);
+    expect(md).not.toContain("Wait for first review");
+  });
+
+  it("reports abandonment and the age of open work", () => {
+    const md = reportFor([
+      repoWith({
+        mergedPRTimeline: [{ ...merged }],
+        closedPRTimeline: [
+          {
+            number: 9,
+            createdAt: "2026-08-01T00:00:00Z",
+            closedAt: "2026-08-05T00:00:00Z",
+            author: "bob",
+            isBotAuthor: false,
+          },
+        ],
+        openPRTimeline: [
+          { number: 10, createdAt: "2026-08-01T00:00:00Z", author: "cat", isBotAuthor: false },
+        ],
+      }),
+    ]);
+    expect(md).toContain("| PRs closed unmerged | 1 (50.0%) |");
+    expect(md).toContain("| Median age of open PRs |");
+  });
+
+  it("reports review concentration only when there is more than one reviewer", () => {
+    const one = reportFor([
+      repoWith({ mergedPRTimeline: [{ ...merged }], reviewerLoad: [{ reviewer: "amy", reviews: 4 }] }),
+    ]);
+    expect(one).not.toContain("Review load concentration");
+
+    const many = reportFor([
+      repoWith({
+        mergedPRTimeline: [{ ...merged }],
+        reviewerLoad: [
+          { reviewer: "amy", reviews: 4 },
+          { reviewer: "bob", reviews: 1 },
+        ],
+      }),
+    ]);
+    expect(many).toContain("Review load concentration");
+    expect(many).toContain("across 2 reviewers");
+  });
+
+  it("reports credits per agent PR when both sides of the division exist", () => {
+    const md = reportFor([
+      repoWith({
+        mergedPRTimeline: [{ ...merged }],
+        copilotAgentMetrics: {
+          totalTasks: 4,
+          completedTasks: 4,
+          failedTasks: 0,
+          cancelledTasks: 0,
+          timedOutTasks: 0,
+          activeTasksCount: 0,
+          totalSessions: 4,
+          cloudAgentSessions: 4,
+          cliRemoteSessions: 0,
+          totalCreditsUsed: 20,
+          agentCreatedPRs: 4,
+          agentActionsMinutes: 8,
+        },
+      }),
+    ]);
+    expect(md).toContain("| Credits per agent PR | 5.0 |");
+  });
+
+  it("omits credits per agent PR when the agent produced no PRs", () => {
+    const md = reportFor([
+      repoWith({
+        mergedPRTimeline: [{ ...merged }],
+        copilotAgentMetrics: {
+          totalTasks: 1,
+          completedTasks: 0,
+          failedTasks: 1,
+          cancelledTasks: 0,
+          timedOutTasks: 0,
+          activeTasksCount: 0,
+          totalSessions: 1,
+          cloudAgentSessions: 1,
+          cliRemoteSessions: 0,
+          totalCreditsUsed: 3,
+          agentCreatedPRs: 0,
+          agentActionsMinutes: 0,
+        },
+      }),
+    ]);
+    expect(md).not.toContain("Credits per agent PR");
   });
 });

@@ -4,6 +4,8 @@ var charts={};
 var reposVisibility=[true,true];
 var cssColors={};
 var selectedRepos=new Set();
+var repoScope="all";
+var restoringState=false;
 document.addEventListener("DOMContentLoaded",function(){
   var cs=getComputedStyle(document.documentElement);
   var cv=function(v){return cs.getPropertyValue(v).trim();};
@@ -17,9 +19,130 @@ document.addEventListener("DOMContentLoaded",function(){
   setupSortHeaders();
   setupFilter();
   setupRepoPicker();
+  setupScopeButtons();
+  setupShare();
   formatLineNumbers();
-  applyFilter("30days");
+  applyFilter(readStateFromUrl());
 });
+
+// ── Shareable slice URLs ──
+// The filter bar's state lives in the query string so any view can be pasted
+// into a message or a deck and reopen exactly as it was.
+function readStateFromUrl(){
+  var params=new URLSearchParams(window.location.search);
+  var period=params.get("period");
+  if(["all","year","90days","30days"].indexOf(period)===-1)period="30days";
+
+  var bots=params.get("bots");
+  var botCb=document.getElementById("excludeBots");
+  if(botCb)botCb.checked=(bots==="exclude");
+
+  var scope=params.get("scope");
+  repoScope=(scope==="team"&&(CHART_DATA.teamRepos||[]).length>0)?"team":"all";
+
+  var repos=params.get("repos");
+  if(repos){
+    var known={};
+    (CHART_DATA.repoNames||[]).forEach(function(n){known[n]=true;});
+    // Drop names that are no longer collected rather than filtering to nothing.
+    repos.split(",").forEach(function(n){
+      var name=n.trim();
+      if(name&&known[name])selectedRepos.add(name);
+    });
+  }
+
+  restoringState=true;
+  syncScopeButtons();
+  syncRepoCheckboxes();
+  document.querySelectorAll(".filter-btn").forEach(function(b){
+    b.classList.toggle("active",b.dataset.period===period);
+  });
+  restoringState=false;
+  return period;
+}
+function writeStateToUrl(period){
+  if(restoringState)return;
+  var params=new URLSearchParams();
+  if(period&&period!=="30days")params.set("period",period);
+  var botCb=document.getElementById("excludeBots");
+  if(botCb&&botCb.checked)params.set("bots","exclude");
+  if(repoScope==="team")params.set("scope","team");
+  if(selectedRepos.size>0)params.set("repos",Array.from(selectedRepos).join(","));
+  var qs=params.toString();
+  var url=window.location.pathname+(qs?"?"+qs:"")+window.location.hash;
+  window.history.replaceState(null,"",url);
+}
+function setupShare(){
+  var btn=document.getElementById("shareBtn");
+  var lbl=document.getElementById("shareBtnLabel");
+  if(!btn||!lbl)return;
+  btn.addEventListener("click",function(){
+    var url=window.location.href;
+    var done=function(ok){
+      lbl.textContent=ok?"Link copied":"Press Ctrl+C";
+      btn.classList.toggle("copied",ok);
+      setTimeout(function(){lbl.textContent="Copy link";btn.classList.remove("copied");},2400);
+    };
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(function(){done(true);},function(){done(false);});
+    }else{
+      // Older browsers and non-secure contexts have no clipboard API; select
+      // the URL so the keyboard shortcut still works.
+      var input=document.createElement("input");
+      input.value=url;
+      document.body.appendChild(input);
+      input.select();
+      var ok=false;
+      try{ok=document.execCommand("copy");}catch(e){ok=false;}
+      document.body.removeChild(input);
+      done(ok);
+    }
+  });
+}
+
+// ── Repository scope: the whole org (baseline) or the trial team ──
+function setupScopeButtons(){
+  var btns=document.querySelectorAll(".scope-btn");
+  if(btns.length===0)return;
+  btns.forEach(function(btn){
+    btn.addEventListener("click",function(){
+      repoScope=btn.dataset.scope==="team"?"team":"all";
+      syncScopeButtons();
+      syncRepoCheckboxes();
+      var activeBtn=document.querySelector(".filter-btn.active");
+      applyFilter(activeBtn?activeBtn.dataset.period:"30days");
+    });
+  });
+}
+function syncScopeButtons(){
+  document.querySelectorAll(".scope-btn").forEach(function(b){
+    b.classList.toggle("active",b.dataset.scope===repoScope);
+  });
+  // Selecting the team scope selects exactly the team's repos; going back to
+  // "All repos" clears the selection rather than leaving a stale subset.
+  if(repoScope==="team"){
+    selectedRepos=new Set(CHART_DATA.teamRepos||[]);
+  }else if((CHART_DATA.teamRepos||[]).length>0&&sameSet(selectedRepos,CHART_DATA.teamRepos)){
+    selectedRepos=new Set();
+  }
+}
+function sameSet(set,arr){
+  if(set.size!==arr.length)return false;
+  for(var i=0;i<arr.length;i++){if(!set.has(arr[i]))return false;}
+  return true;
+}
+function syncRepoCheckboxes(){
+  var list=document.getElementById("repoPickerList");
+  if(!list)return;
+  list.querySelectorAll("input[type=checkbox]").forEach(function(cb){
+    cb.checked=selectedRepos.has(cb.value);
+  });
+  var lbl=document.getElementById("repoPickerLabel");
+  var btn=document.getElementById("repoPickerBtn");
+  var active=isRepoFilterActive();
+  if(lbl)lbl.textContent=active?selectedRepos.size+" repo"+(selectedRepos.size===1?"":"s"):"All repos";
+  if(btn)btn.classList.toggle("active",active);
+}
 function formatLineNumbers(){
   document.querySelectorAll(".td-lines .add,.td-lines .del").forEach(function(el){
     var t=el.textContent||"";
@@ -257,6 +380,35 @@ function renderDeliveryCharts(){
         options:lineOpts});
     }
   }
+  // Wait-for-first-review trend. Built from the same merged PRs as the cycle
+  // time chart, but only those that actually received a review.
+  if(prs.length>0){
+    var weekWaits={};
+    prs.forEach(function(p){
+      var h=hoursBetweenISO(p.createdAt,p.firstReviewAt);
+      if(h===null)return;
+      var w=getISOWeek(p.mergedAt);
+      if(!weekWaits[w])weekWaits[w]=[];
+      weekWaits[w].push(h);
+    });
+    var waitWeeks=Object.keys(weekWaits).sort();
+    charts.reviewWait=new Chart(document.getElementById("chartReviewWait"),{type:"line",
+      data:{labels:waitWeeks,datasets:[
+        {label:"Median wait for first review (hours)",data:waitWeeks.map(function(w){return Math.round(medianOf(weekWaits[w])*10)/10;}),
+          borderColor:cssColors.warn,backgroundColor:cssColors.warnS,tension:0.3,fill:true,pointRadius:3}]},
+      options:lineOpts});
+  }
+  // Review load per reviewer — the distribution behind the Gini figure.
+  var loadPairs=aggregateReviewerLoad(null);
+  if(loadPairs.length>0){
+    charts.reviewerLoad=new Chart(document.getElementById("chartReviewerLoad"),{type:"bar",
+      data:{labels:loadPairs.slice(0,15).map(function(r){return r[0];}),datasets:[
+        {label:"Reviews",data:loadPairs.slice(0,15).map(function(r){return r[1];}),
+          backgroundColor:cssColors.accent,borderRadius:2}]},
+      options:{indexAxis:"y",responsive:true,maintainAspectRatio:true,
+        scales:{x:{grid:{display:false},beginAtZero:true},y:{grid:{display:false}}},
+        plugins:{legend:{display:false}}}});
+  }
   // Agent tasks by repo — horizontal stacked bar (30d window, static)
   var agentByRepo=(CHART_DATA.copilotAgent||{}).byRepo||{};
   var agentRepoNames=Object.keys(agentByRepo).filter(function(n){return agentByRepo[n].totalTasks>0;})
@@ -305,6 +457,57 @@ function renderDeliveryCharts(){
           }
           e.chart.canvas.style.cursor=cursor;}}});
   }
+}
+// ── Duration and distribution helpers ──
+// Every duration below is derived from raw timestamps at render time, never
+// read from a stored latency, so a change of definition needs a redeploy of
+// the page rather than a re-collection of the history.
+function hoursBetweenISO(from,to){
+  if(!from||!to)return null;
+  var ms=new Date(to).getTime()-new Date(from).getTime();
+  if(!isFinite(ms)||ms<0)return null;
+  return ms/3600000;
+}
+function quantilesOf(values){
+  return {p50:pctl(values,50),p75:pctl(values,75),p90:pctl(values,90),n:values.length};
+}
+/** Gini coefficient — mirrors gini() in src/stats.ts. */
+function giniOf(values){
+  var clean=values.filter(function(v){return isFinite(v)&&v>=0;});
+  var n=clean.length;
+  if(n<2)return 0;
+  var sorted=clean.slice().sort(function(a,b){return a-b;});
+  var total=0,weighted=0;
+  for(var i=0;i<n;i++){total+=sorted[i];weighted+=(i+1)*sorted[i];}
+  if(total===0)return 0;
+  return (2*weighted)/(n*total)-(n+1)/n;
+}
+function prSize(p){return (p.linesAdded||0)+(p.linesDeleted||0);}
+/**
+ * Reviews per reviewer across the selected repositories, heaviest first.
+ * Pass a repo name array to restrict it, or null for every collected repo.
+ */
+function aggregateReviewerLoad(repoNames){
+  var byRepo=CHART_DATA.reviewerLoadByRepo||{};
+  var totals={};
+  Object.keys(byRepo).forEach(function(name){
+    if(repoNames&&repoNames.indexOf(name)===-1)return;
+    (byRepo[name]||[]).forEach(function(entry){
+      totals[entry.reviewer]=(totals[entry.reviewer]||0)+entry.reviews;
+    });
+  });
+  return Object.keys(totals).map(function(k){return [k,totals[k]];})
+    .sort(function(a,b){return b[1]-a[1]||(a[0]<b[0]?-1:1);});
+}
+function getRepoFilteredClosedPRs(){
+  var all=CHART_DATA.allClosedPRs||[];
+  if(selectedRepos.size===0)return all;
+  return all.filter(function(p){return selectedRepos.has(p.repo);});
+}
+function getRepoFilteredOpenPRs(){
+  var all=CHART_DATA.allOpenPRs||[];
+  if(selectedRepos.size===0)return all;
+  return all.filter(function(p){return selectedRepos.has(p.repo);});
 }
 function setupFilter(){
   document.querySelectorAll(".filter-btn").forEach(function(btn){
@@ -409,6 +612,7 @@ function setupRepoPicker(){
     cb.addEventListener("change",function(){
       if(cb.checked)selectedRepos.add(name);
       else selectedRepos.delete(name);
+      reconcileScope();
       updatePickerLabel();
       triggerRepoFilter();
     });
@@ -432,6 +636,8 @@ function setupRepoPicker(){
   var clearBtn=document.getElementById("repoPickerClear");
   if(resetBtn)resetBtn.addEventListener("click",function(){
     selectedRepos=new Set();
+    repoScope="all";
+    syncScopeButtons();
     list.querySelectorAll("input[type=checkbox]").forEach(function(cb){cb.checked=false;});
     if(searchInput){searchInput.value="";list.querySelectorAll(".repo-picker-item").forEach(function(it){it.style.display="";});}
     updatePickerLabel();
@@ -439,6 +645,7 @@ function setupRepoPicker(){
   });
   if(clearBtn)clearBtn.addEventListener("click",function(){
     list.querySelectorAll("input[type=checkbox]:checked").forEach(function(cb){cb.checked=false;selectedRepos.delete(cb.value);});
+    reconcileScope();
     updatePickerLabel();
     triggerRepoFilter();
   });
@@ -478,8 +685,20 @@ function weekToDate(weekStr){
   mon.setUTCDate(jan4.getUTCDate()-dow+1+(week-1)*7);
   return mon;
 }
+/** Mark the scope as custom once a hand-picked selection stops matching the team. */
+function reconcileScope(){
+  var team=CHART_DATA.teamRepos||[];
+  var next=(team.length>0&&sameSet(selectedRepos,team))?"team":"all";
+  if(next!==repoScope){
+    repoScope=next;
+    document.querySelectorAll(".scope-btn").forEach(function(b){
+      b.classList.toggle("active",b.dataset.scope===repoScope);
+    });
+  }
+}
 function applyFilter(period){
   var cutoff=getCutoffDate(period);
+  writeStateToUrl(period);
   var excludeBots=!!document.getElementById("excludeBots")&&document.getElementById("excludeBots").checked;
   var repoFiltered=isRepoFilterActive();
 
@@ -508,7 +727,7 @@ function applyFilter(period){
     charts.prTrends.data.datasets[0].data=prTrendsPeriod.map(function(t){return t.prsOpened;});
     charts.prTrends.data.datasets[1].data=prTrendsPeriod.map(function(t){return t.prsMerged;});
     charts.prTrends.setDatasetVisibility(0,!repoFiltered||allSelectedHaveRepoTrends);
-    charts.prTrends.options.plugins.annotation=(yearBoundaryAnnotations(prTrendLabels).annotation||{annotations:{}});
+    charts.prTrends.options.plugins.annotation=trendAnnotations(prTrendLabels);
     charts.prTrends.update();
   }
   if(charts.issueTrends){
@@ -516,7 +735,7 @@ function applyFilter(period){
     charts.issueTrends.data.labels=issueTrendLabels;
     charts.issueTrends.data.datasets[0].data=issueTrendsPeriod.map(function(t){return t.issuesOpened;});
     charts.issueTrends.data.datasets[1].data=issueTrendsPeriod.map(function(t){return t.issuesClosed;});
-    charts.issueTrends.options.plugins.annotation=(yearBoundaryAnnotations(issueTrendLabels).annotation||{annotations:{}});
+    charts.issueTrends.options.plugins.annotation=trendAnnotations(issueTrendLabels);
     charts.issueTrends.update();
   }
   if(charts.prSizeTrends){
@@ -524,7 +743,7 @@ function applyFilter(period){
     charts.prSizeTrends.data.labels=prSizeLabels;
     charts.prSizeTrends.data.datasets[0].data=prTrendsPeriod.map(function(t){return t.linesAdded;});
     charts.prSizeTrends.data.datasets[1].data=prTrendsPeriod.map(function(t){return t.linesDeleted;});
-    charts.prSizeTrends.options.plugins.annotation=(yearBoundaryAnnotations(prSizeLabels).annotation||{annotations:{}});
+    charts.prSizeTrends.options.plugins.annotation=trendAnnotations(prSizeLabels);
     charts.prSizeTrends.update();
   }
 
@@ -765,6 +984,510 @@ function applyFilter(period){
   }
   var note=document.getElementById("reposPeriodNote");
   if(note)note.style.display=(period==="all"&&!repoFiltered)?"none":"";
+
+  // ── Wait-for-review trend chart ──
+  if(charts.reviewWait){
+    var wRW={};
+    filteredPR.forEach(function(p){
+      var h=hoursBetweenISO(p.createdAt,p.firstReviewAt);
+      if(h===null)return;
+      var w=getISOWeek(p.mergedAt);
+      if(!wRW[w])wRW[w]=[];
+      wRW[w].push(h);
+    });
+    var rwWeeks=Object.keys(wRW).sort();
+    charts.reviewWait.data.labels=rwWeeks;
+    charts.reviewWait.data.datasets[0].data=rwWeeks.map(function(w){return Math.round(medianOf(wRW[w])*10)/10;});
+    charts.reviewWait.options.plugins.annotation=(yearBoundaryAnnotations(rwWeeks).annotation||{annotations:{}});
+    charts.reviewWait.update();
+  }
+
+  var closedInPeriod=getRepoFilteredClosedPRs();
+  if(excludeBots)closedInPeriod=closedInPeriod.filter(function(p){return !p.isBotAuthor;});
+  if(cutoff)closedInPeriod=closedInPeriod.filter(function(p){return new Date(p.closedAt)>=cutoff;});
+  var openNow=getRepoFilteredOpenPRs();
+  if(excludeBots)openNow=openNow.filter(function(p){return !p.isBotAuthor;});
+
+  updateSizeKPI(filteredPR);
+  updateFlow(filteredPR,period);
+  updateAbandonment(filteredPR,closedInPeriod,openNow);
+  updateAgentCost(repoFiltered);
+  updateAIHuman(filteredPR,allPRBase,period,excludeBots);
+  updateReviewLoad(repoFiltered?Array.from(selectedRepos):null);
+  updateCiHealth(cutoff,repoFiltered,period);
+
+  updateTrial(cutoff,excludeBots,period);
+}
+
+// ── PR size distribution ──
+// The median says how big a typical change is; the share over the large-change
+// threshold says how often the team ships one nobody can review properly.
+var LARGE_PR_LINES=400;
+function updateSizeKPI(prs){
+  var sizes=[];
+  prs.forEach(function(p){var s=prSize(p);if(s>0)sizes.push(s);});
+  var val=document.getElementById("kpiSizeVal");
+  var sub=document.getElementById("kpiSizeSub");
+  if(val)val.textContent=sizes.length>0?Math.round(pctl(sizes,50)).toLocaleString():"–";
+  if(sub){
+    if(sizes.length===0){sub.textContent="no sized PRs";}
+    else{
+      var large=sizes.filter(function(s){return s>=LARGE_PR_LINES;}).length;
+      sub.textContent=Math.round(large/sizes.length*100)+"% over "+LARGE_PR_LINES+" lines";
+    }
+  }
+}
+
+// ── The three legs of review ──
+// Reported as order statistics with the sample size beside them: a p90 over
+// four pull requests is noise wearing a percentile's clothes, and the table
+// says so rather than letting the number stand on its own.
+var FLOW_LEGS=[
+  {id:"review",from:"createdAt",to:"firstReviewAt"},
+  {id:"approval",from:"firstReviewAt",to:"firstApprovalAt"},
+  {id:"merge",from:"firstApprovalAt",to:"mergedAt"}
+];
+var SMALL_SAMPLE=10;
+function updateFlow(prs,period){
+  var counts={};
+  FLOW_LEGS.forEach(function(leg){
+    var values=[];
+    prs.forEach(function(p){
+      var h=hoursBetweenISO(p[leg.from],p[leg.to]);
+      if(h!==null)values.push(h);
+    });
+    var q=quantilesOf(values);
+    counts[leg.id]=q.n;
+    var set=function(id,text,thin){
+      var el=document.getElementById(id);
+      if(!el)return;
+      el.textContent=text;
+      el.className=thin?"thin":"";
+    };
+    if(q.n===0){
+      set("flowP50-"+leg.id,"–",true);
+      set("flowP75-"+leg.id,"–",true);
+      set("flowP90-"+leg.id,"–",true);
+      set("flowN-"+leg.id,"0",true);
+      return;
+    }
+    // Below the small-sample line the quantiles are still shown, but muted and
+    // with the count beside them, so nobody reads four PRs as a trend.
+    var thin=q.n<SMALL_SAMPLE;
+    set("flowP50-"+leg.id,fmtHours(q.p50),thin);
+    set("flowP75-"+leg.id,fmtHours(q.p75),thin);
+    set("flowP90-"+leg.id,fmtHours(q.p90),thin);
+    set("flowN-"+leg.id,String(q.n),true);
+  });
+  var note=document.getElementById("flowNote");
+  if(!note)return;
+  var pLabel=period==="all"?"all time":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
+  var parts=[];
+  if(counts.review===0){
+    parts.push("No reviewed pull requests in "+pLabel+" — review timestamps are collected from "+
+      "the day this deployment started, and filled in backwards by the historical crawl.");
+  }else{
+    parts.push("Measured over "+counts.review+" reviewed pull request"+(counts.review===1?"":"s")+" in "+pLabel+".");
+    if(counts.review<SMALL_SAMPLE)parts.push("Too few to read as a rate — treat these as anecdotes, not percentiles.");
+    if(counts.approval===0)parts.push("No approving reviews recorded, so the last two legs are empty.");
+  }
+  note.textContent=parts.join(" ");
+}
+
+// ── Abandonment ──
+function updateAbandonment(mergedPRs,closedPRs,openPRs){
+  var val=document.getElementById("kpiAbandonVal");
+  var sub=document.getElementById("kpiAbandonSub");
+  var concluded=mergedPRs.length+closedPRs.length;
+  if(val)val.textContent=concluded>0?(closedPRs.length/concluded*100).toFixed(1)+"%":"–";
+  if(sub){
+    if(openPRs.length>0){
+      var now=new Date(CHART_DATA.collectedAt).getTime();
+      var ages=[];
+      openPRs.forEach(function(p){
+        var h=(now-new Date(p.createdAt).getTime())/3600000;
+        if(isFinite(h)&&h>=0)ages.push(h);
+      });
+      sub.textContent=openPRs.length+" open · median age "+(ages.length>0?fmtHours(pctl(ages,50)):"–");
+    }else{
+      sub.textContent=closedPRs.length+" closed unmerged";
+    }
+  }
+}
+
+// ── Cost per merged agent pull request ──
+// Credits divided by the pull requests the agent actually produced. A run with
+// no agent PRs has no cost per PR — it renders as a dash rather than as a zero
+// or an infinity.
+function updateAgentCost(repoFiltered){
+  var agent=CHART_DATA.copilotAgent||{};
+  var credits=agent.totalCredits||0;
+  var prs=agent.agentPRs||0;
+  var minutes=agent.totalActionsMinutes||0;
+  if(repoFiltered){
+    credits=0;prs=0;minutes=0;
+    var byRepo=agent.byRepo||{};
+    Array.from(selectedRepos).forEach(function(name){
+      var rd=byRepo[name];
+      if(!rd)return;
+      credits+=rd.credits||0;
+      prs+=rd.agentPRs||0;
+      minutes+=rd.actionsMinutes||0;
+    });
+  }
+  var val=document.getElementById("kpiAgentCostVal");
+  var sub=document.getElementById("kpiAgentCostSub");
+  if(val)val.textContent=prs>0?(credits/prs).toFixed(1):"–";
+  if(sub){
+    if(prs>0){
+      sub.textContent=credits.toFixed(1)+" credits · "+prs+" PRs"+
+        (minutes>0?" · "+(minutes/prs).toFixed(1)+" CI min/PR":"");
+    }else{
+      sub.textContent="no agent data";
+    }
+  }
+}
+
+// ── AI versus human ──
+// One row per measurement, both columns computed from the same filtered set so
+// authorship is the only thing that differs between them.
+function fmtRounds(n){return n===null?"–":n.toFixed(1);}
+var AI_HUMAN_METRICS=[
+  {id:"merged",fmt:fmtCount,lowerIsBetter:null},
+  {id:"cycle",fmt:fmtHours,lowerIsBetter:true},
+  {id:"cycle75",fmt:fmtHours,lowerIsBetter:true},
+  {id:"size",fmt:fmtLines,lowerIsBetter:true},
+  {id:"large",fmt:fmtPct,lowerIsBetter:true},
+  {id:"reviewWait",fmt:fmtHours,lowerIsBetter:true},
+  {id:"rounds",fmt:fmtRounds,lowerIsBetter:true},
+  {id:"revert",fmt:fmtPct,lowerIsBetter:true}
+];
+/** Summarise one authorship class into the row values the table shows. */
+function summariseClass(prs,revertedKeys){
+  var cycles=[],sizes=[],waits=[],rounds=[];
+  var large=0,sized=0,reverted=0;
+  prs.forEach(function(p){
+    if(p.timeToMergeHours>0)cycles.push(p.timeToMergeHours);
+    var size=prSize(p);
+    if(size>0){sizes.push(size);sized++;if(size>=LARGE_PR_LINES)large++;}
+    var wait=hoursBetweenISO(p.createdAt,p.firstReviewAt);
+    if(wait!==null)waits.push(wait);
+    if(typeof p.changesRequestedCount==="number")rounds.push(p.changesRequestedCount);
+    if(revertedKeys[p.repo+"#"+p.number])reverted++;
+  });
+  return {
+    merged:prs.length,
+    cycle:pctl(cycles,50),cycle75:pctl(cycles,75),
+    size:pctl(sizes,50),
+    large:sized>0?(large/sized)*100:null,
+    reviewWait:pctl(waits,50),
+    rounds:pctl(rounds,50),
+    revert:prs.length>0?(reverted/prs.length)*100:null,
+    n:prs.length,
+    reviewedN:waits.length
+  };
+}
+function updateAIHuman(filteredPR,allPRBase,period,excludeBots){
+  // Revert references are taken from every collected pull request, not just the
+  // ones in the selected period: a change reverted next month was still a
+  // change that had to be reverted.
+  var revertedKeys={};
+  (allPRBase||[]).forEach(function(p){
+    if(typeof p.revertsPR==="number")revertedKeys[p.repo+"#"+p.revertsPR]=true;
+  });
+  var ai=filteredPR.filter(function(p){return p.isCopilotAuthored;});
+  var human=filteredPR.filter(function(p){return !p.isBotAuthor&&!p.isCopilotAuthored;});
+  var aiSum=summariseClass(ai,revertedKeys);
+  var humanSum=summariseClass(human,revertedKeys);
+
+  AI_HUMAN_METRICS.forEach(function(m){
+    var aEl=document.getElementById("aiHumanAI-"+m.id);
+    var hEl=document.getElementById("aiHumanHuman-"+m.id);
+    var dEl=document.getElementById("aiHumanDelta-"+m.id);
+    if(!aEl||!hEl||!dEl)return;
+    var a=aiSum[m.id],h=humanSum[m.id];
+    aEl.textContent=m.fmt(a);
+    hEl.textContent=m.fmt(h);
+    dEl.className="trial-delta";
+    if(a===null||h===null||h===0){dEl.textContent="–";return;}
+    var change=((a-h)/Math.abs(h))*100;
+    var arrow=change>0?"↑":(change<0?"↓":"→");
+    dEl.textContent=arrow+" "+Math.abs(change).toFixed(0)+"%";
+    if(Math.abs(change)<2){dEl.classList.add("flat");}
+    else if(m.lowerIsBetter===null){/* a count has no better direction */}
+    else if((change<0)===m.lowerIsBetter){dEl.classList.add("better");}
+    else{dEl.classList.add("worse");}
+  });
+
+  var note=document.getElementById("aiHumanNote");
+  if(!note)return;
+  var pLabel=period==="all"?"all time":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
+  var parts=["AI n="+aiSum.n+" · human n="+humanSum.n+" merged pull requests over "+pLabel+"."];
+  if(aiSum.n<SMALL_SAMPLE||humanSum.n<SMALL_SAMPLE){
+    parts.push("One side is too small to compare — the difference column is arithmetic, not evidence.");
+  }
+  parts.push("Revert rate counts pull requests later reverted by a PR whose body carries GitHub's "+
+    "“Reverts #n” reference, so it reads as a lower bound.");
+  if(excludeBots)parts.push("Bot-authored PRs are excluded from both columns either way.");
+  note.textContent=parts.join(" ");
+}
+
+// ── CI health ──
+// Every figure comes from the same filtered set of completed runs, so the
+// success rate, the durations and the flaky share always describe the same
+// builds. Cancelled runs were dropped upstream: a human changing their mind
+// is not a broken pipeline.
+function updateCiHealth(cutoff,repoFiltered,period){
+  var all=CHART_DATA.ciSamples||[];
+  if(all.length===0)return;
+  var runs=all;
+  if(repoFiltered)runs=runs.filter(function(r){return selectedRepos.has(r.repo);});
+  if(cutoff)runs=runs.filter(function(r){return new Date(r.finishedAt)>=cutoff;});
+
+  var set=function(id,value,detail){
+    var v=document.getElementById("ciVal-"+id);
+    var d=document.getElementById("ciDetail-"+id);
+    if(v)v.textContent=value;
+    if(d)d.textContent=detail;
+  };
+  if(runs.length===0){
+    ["green","duration","queue","flaky"].forEach(function(id){set(id,"–","no runs");});
+    var emptyNote=document.getElementById("ciNote");
+    if(emptyNote)emptyNote.textContent="No CI runs in the selected slice.";
+    return;
+  }
+
+  var green=runs.filter(function(r){return r.success;}).length;
+  set("green",(green/runs.length*100).toFixed(1)+"%",green+" of "+runs.length+" runs");
+
+  var durations=[],queues=[];
+  runs.forEach(function(r){
+    if(typeof r.durationMinutes==="number")durations.push(r.durationMinutes);
+    if(typeof r.queueMinutes==="number")queues.push(r.queueMinutes);
+  });
+  if(durations.length>0){
+    set("duration",fmtMinutes(pctl(durations,50)),
+      "p75 "+fmtMinutes(pctl(durations,75))+" · p90 "+fmtMinutes(pctl(durations,90))+" · n="+durations.length);
+  }else{
+    set("duration","–","no timing data");
+  }
+  if(queues.length>0){
+    set("queue",fmtMinutes(pctl(queues,50)),
+      "p90 "+fmtMinutes(pctl(queues,90))+" · n="+queues.length);
+  }else{
+    set("queue","–","no queue data");
+  }
+
+  var flaky=runs.filter(function(r){return r.flaky;}).length;
+  set("flaky",(flaky/runs.length*100).toFixed(1)+"%",flaky+" re-run to green");
+
+  var note=document.getElementById("ciNote");
+  if(!note)return;
+  var pLabel=period==="all"?"the collected window":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
+  var parts=["Measured over "+runs.length+" completed default-branch run"+(runs.length===1?"":"s")+" in "+pLabel+"."];
+  if(runs.length<SMALL_SAMPLE)parts.push("Too few runs to read as a rate.");
+  parts.push("A run counts as flaky when it passed only after a re-run of the same commit, "+
+    "so a pipeline that was never re-run cannot appear here.");
+  note.textContent=parts.join(" ");
+}
+function fmtMinutes(m){
+  if(m===null)return "–";
+  if(m<1)return Math.round(m*60)+"s";
+  if(m<60)return m.toFixed(1)+"min";
+  return (m/60).toFixed(1)+"hr";
+}
+
+// ── Review load concentration ──
+function updateReviewLoad(repoNames){
+  var pairs=aggregateReviewerLoad(repoNames);
+  var badge=document.getElementById("giniBadge");
+  var note=document.getElementById("giniNote");
+  var values=pairs.map(function(r){return r[1];});
+  var g=giniOf(values);
+  if(badge){
+    badge.className="gini-badge";
+    if(pairs.length<2){badge.textContent="–";}
+    else{
+      badge.textContent="Gini "+g.toFixed(2);
+      if(g>=0.6)badge.classList.add("high");
+      else if(g<=0.4)badge.classList.add("ok");
+    }
+  }
+  if(note){
+    if(pairs.length===0){
+      note.textContent="No reviews recorded for the selected repositories.";
+    }else if(pairs.length===1){
+      note.textContent="One reviewer ("+pairs[0][0]+") did all "+pairs[0][1]+
+        " recorded review"+(pairs[0][1]===1?"":"s")+" — concentration is undefined with a single reviewer.";
+    }else{
+      var total=values.reduce(function(a,b){return a+b;},0);
+      var topShare=total>0?Math.round(pairs[0][1]/total*100):0;
+      note.textContent=pairs.length+" reviewers, "+total+" reviews. The busiest ("+pairs[0][0]+
+        ") carries "+topShare+"% of them. A Gini near 0 means the load is shared; near 1 means one person carries it.";
+    }
+  }
+  if(charts.reviewerLoad){
+    var top=pairs.slice(0,15);
+    charts.reviewerLoad.data.labels=top.map(function(r){return r[0];});
+    charts.reviewerLoad.data.datasets[0].data=top.map(function(r){return r[1];});
+    charts.reviewerLoad.update();
+  }
+}
+
+// ── Baseline versus focus repositories ──
+// The baseline is every collected repository; the comparison column is the
+// team's repositories over the selected period. Durations are reported as
+// order statistics — delivery metrics are heavily right-skewed, so a mean
+// would be moved by a single pull request left open over a holiday.
+function pctl(values,p){
+  if(values.length===0)return null;
+  var sorted=values.slice().sort(function(a,b){return a-b;});
+  if(sorted.length===1)return sorted[0];
+  var rank=(Math.min(100,Math.max(0,p))/100)*(sorted.length-1);
+  var lo=Math.floor(rank),hi=Math.ceil(rank);
+  if(lo===hi)return sorted[lo];
+  return sorted[lo]+(sorted[hi]-sorted[lo])*(rank-lo);
+}
+function fmtHours(h){
+  if(h===null)return "\u2013";
+  if(h<1)return Math.round(h*60)+"min";
+  if(h<24)return h.toFixed(1)+"hr";
+  return (h/24).toFixed(1)+"d";
+}
+function fmtLines(n){return n===null?"\u2013":Math.round(n).toLocaleString();}
+function fmtCount(n){return n===null?"\u2013":Math.round(n).toLocaleString();}
+function fmtPct(n){return n===null?"\u2013":n.toFixed(1)+"%";}
+/** Summarise one set of merged PRs into the metrics the trial table shows. */
+function summarisePRs(prs){
+  var cycles=[],sizes=[],ai=0,human=0;
+  prs.forEach(function(p){
+    if(p.timeToMergeHours>0)cycles.push(p.timeToMergeHours);
+    var size=(p.linesAdded||0)+(p.linesDeleted||0);
+    if(size>0)sizes.push(size);
+    if(p.isCopilotAuthored)ai++;
+    else if(!p.isBotAuthor)human++;
+  });
+  var aiDenom=ai+human;
+  return {
+    cycle:pctl(cycles,50),cycle75:pctl(cycles,75),cycle90:pctl(cycles,90),
+    size:pctl(sizes,50),
+    merged:prs.length,
+    ai:aiDenom>0?(ai/aiDenom)*100:null,
+    n:cycles.length
+  };
+}
+// Lower is better for durations and PR size; for merged count and AI share a
+// direction would be a value judgement, so those are reported without one.
+var TRIAL_METRICS=[
+  {id:"cycle",fmt:fmtHours,lowerIsBetter:true},
+  {id:"cycle75",fmt:fmtHours,lowerIsBetter:true},
+  {id:"cycle90",fmt:fmtHours,lowerIsBetter:true},
+  {id:"size",fmt:fmtLines,lowerIsBetter:true},
+  {id:"merged",fmt:fmtCount,lowerIsBetter:null},
+  {id:"ai",fmt:fmtPct,lowerIsBetter:null}
+];
+function updateTrial(cutoff,excludeBots,period){
+  var team=CHART_DATA.teamRepos||[];
+  var trial=CHART_DATA.trial;
+  // A configured team is enough to compare against the baseline; the trial is
+  // only an overlay on top of it.
+  if(!trial&&team.length===0)return;
+  var teamSet={};team.forEach(function(n){teamSet[n]=true;});
+
+  var all=(CHART_DATA.allPRDetails||[]).slice();
+  if(excludeBots)all=all.filter(function(p){return !p.isBotAuthor;});
+
+  // Baseline: every repository. Bounded by the configured baseline window when
+  // one is set, otherwise the whole collected history.
+  var baseFrom=trial&&trial.baselineFrom?new Date(trial.baselineFrom+"T00:00:00Z"):null;
+  var baseTo=trial&&trial.baselineTo?new Date(trial.baselineTo+"T23:59:59Z"):null;
+  var basePRs=all.filter(function(p){
+    var t=new Date(p.mergedAt);
+    if(baseFrom&&t<baseFrom)return false;
+    if(baseTo&&t>baseTo)return false;
+    return true;
+  });
+
+  // Comparison: the team's repositories over the selected period.
+  var teamPRs=all.filter(function(p){
+    if(!teamSet[p.repo])return false;
+    return !cutoff||new Date(p.mergedAt)>=cutoff;
+  });
+
+  var base=summarisePRs(basePRs);
+  var cur=summarisePRs(teamPRs);
+
+  TRIAL_METRICS.forEach(function(m){
+    var bEl=document.getElementById("trialBaseline-"+m.id);
+    var tEl=document.getElementById("trialTeam-"+m.id);
+    var dEl=document.getElementById("trialDelta-"+m.id);
+    if(!bEl||!tEl||!dEl)return;
+    var b=base[m.id],c=cur[m.id];
+    bEl.textContent=m.fmt(b);
+    tEl.textContent=m.fmt(c);
+    dEl.className="trial-delta";
+    if(b===null||c===null||b===0){dEl.textContent="\u2013";return;}
+    var change=((c-b)/Math.abs(b))*100;
+    var arrow=change>0?"\u2191":(change<0?"\u2193":"\u2192");
+    dEl.textContent=arrow+" "+Math.abs(change).toFixed(0)+"%";
+    if(Math.abs(change)<2){dEl.classList.add("flat");}
+    else if(m.lowerIsBetter===null){/* no direction to judge */}
+    else if((change<0)===m.lowerIsBetter){dEl.classList.add("better");}
+    else{dEl.classList.add("worse");}
+  });
+
+  // Sample sizes decide whether any of this is worth reading. Say so plainly
+  // rather than letting a two-PR week look like a result.
+  var noteEl=document.getElementById("trialNote");
+  if(noteEl){
+    var pLabel=period==="all"?"all time":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
+    var parts=["Baseline n="+base.n+" merged PRs across all repositories; "+
+      (CHART_DATA.team?CHART_DATA.team.name:"team")+" n="+cur.n+" over "+pLabel+"."];
+    if(cur.n<20){
+      parts.push("Not enough team data yet to read a difference — treat these numbers as provisional.");
+    }
+    if(excludeBots)parts.push("Bot-authored PRs excluded.");
+    noteEl.textContent=parts.join(" ");
+  }
+}
+/** Vertical markers for the intervention date and any configured milestones. */
+function trialAnnotations(labels){
+  var trial=CHART_DATA.trial;
+  if(!trial||!labels||labels.length===0)return {};
+  var out={};
+  var mark=function(key,dateStr,label,solid){
+    if(!dateStr)return;
+    var week=getISOWeek(dateStr+"T00:00:00Z");
+    var idx=labels.indexOf(week);
+    // Only annotate dates the chart's x-axis actually covers.
+    if(idx===-1)return;
+    out[key]={
+      type:"line",
+      xMin:idx,xMax:idx,
+      borderColor:cssColors.err||"#c00",
+      borderWidth:solid?2:1,
+      borderDash:solid?undefined:[3,3],
+      label:{
+        display:true,content:label,position:"start",
+        backgroundColor:cssColors.err||"#c00",color:"#fff",
+        font:{size:10,weight:solid?"bold":"normal"},padding:3
+      }
+    };
+  };
+  mark("interventionLine",trial.interventionStart,trial.title,true);
+  (trial.milestones||[]).forEach(function(m,i){
+    mark("milestoneLine"+i,m.date,m.label,false);
+  });
+  return out;
+}
+/** Merge the year-boundary annotations with the trial markers. */
+function trendAnnotations(labels){
+  var base=yearBoundaryAnnotations(labels).annotation||{annotations:{}};
+  var merged={};
+  Object.keys(base.annotations||{}).forEach(function(k){merged[k]=base.annotations[k];});
+  var trial=trialAnnotations(labels);
+  Object.keys(trial).forEach(function(k){merged[k]=trial[k];});
+  return {annotations:merged};
 }
 function compareRows(a,b,by){
   if(by==="name")return a.dataset.name.localeCompare(b.dataset.name,undefined,{sensitivity:"base"});

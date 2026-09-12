@@ -287,3 +287,66 @@ describe("collectRepoGraphQL", () => {
   });
 });
 
+
+describe("collectRepoGraphQL open pull requests", () => {
+  afterEach(() => resetOctokit());
+
+  it("returns an empty list when the response carries no open-PR connection", async () => {
+    setOctokit(buildMockOctokit([makeGraphQLResponse({ hasNextPage: false })]));
+    const result = await collectRepoGraphQL("owner", "repo");
+    expect(result!.openPRNodes).toEqual([]);
+  });
+
+  it("captures the open pull requests from the first page", async () => {
+    const response = makeGraphQLResponse({ hasNextPage: false }) as {
+      repository: Record<string, unknown>;
+    };
+    response.repository.openPRList = {
+      nodes: [
+        {
+          number: 7,
+          createdAt: "2026-01-01T00:00:00Z",
+          author: { login: "amy", __typename: "User" },
+        },
+      ],
+    };
+    setOctokit(buildMockOctokit([response]));
+    const result = await collectRepoGraphQL("owner", "repo");
+    expect(result!.openPRNodes).toHaveLength(1);
+    expect(result!.openPRNodes[0].number).toBe(7);
+  });
+
+  it("asks for the open-PR list only on the first page", async () => {
+    const recentDate = new Date().toISOString();
+    const seen: boolean[] = [];
+    const responses = [
+      makeGraphQLResponse({
+        nodes: [makePRNode({ number: 1, updatedAt: recentDate })],
+        hasNextPage: true,
+        endCursor: "cursor1",
+      }),
+      makeGraphQLResponse({
+        nodes: [makePRNode({ number: 2, updatedAt: recentDate })],
+        hasNextPage: false,
+      }),
+    ];
+    let callCount = 0;
+    const graphql = async (_query: string, vars: { firstPage?: boolean }) => {
+      seen.push(vars.firstPage === true);
+      const response = responses[Math.min(callCount, responses.length - 1)];
+      callCount++;
+      return response;
+    };
+    setOctokit({ graphql } as unknown as Octokit);
+
+    await collectRepoGraphQL("owner", "repo", 2);
+    expect(seen).toEqual([true, false]);
+  });
+
+  it("returns empty lists when maxPages is zero", async () => {
+    setOctokit(buildMockOctokit([makeGraphQLResponse({ hasNextPage: false })]));
+    const result = await collectRepoGraphQL("owner", "repo", 0);
+    expect(result!.prNodes).toEqual([]);
+    expect(result!.openPRNodes).toEqual([]);
+  });
+});

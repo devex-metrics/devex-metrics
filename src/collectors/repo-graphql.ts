@@ -42,9 +42,31 @@ export interface GraphQLPRNode {
   comments: { totalCount: number };
   /** Inline review comment threads (maps to REST `review_comments` count). */
   reviewThreads: { totalCount: number };
-  reviews: { nodes: Array<{ author: { login: string } | null }> };
+  /**
+   * Submitted reviews. `submittedAt` and `state` are requested by the daily
+   * query but typed optional: the connection is also populated from fixtures
+   * and older cached responses that predate them.
+   */
+  reviews: { nodes: ReviewNode[] };
   /** Merge commit for MERGED PRs — null for CLOSED/OPEN PRs. */
   mergeCommit: { message: string } | null;
+}
+
+/** One submitted review on a pull request. */
+export interface ReviewNode {
+  /** Reviewer, or null when the account is gone. */
+  author: { login: string } | null;
+  /** When the review was submitted; null for a review still in progress. */
+  submittedAt?: string | null;
+  /** APPROVED | CHANGES_REQUESTED | COMMENTED | DISMISSED | PENDING. */
+  state?: string;
+}
+
+/** A pull request still open, from the daily query's first page. */
+export interface OpenPRNode {
+  number: number;
+  createdAt: string;
+  author: { login: string; __typename: string } | null;
 }
 
 /** Aggregated repository data returned from the GraphQL query. */
@@ -57,6 +79,12 @@ export interface GraphQLRepoData {
   mergedPRCount: number;
   /** PR nodes, sorted by updatedAt descending, up to maxPages*100. */
   prNodes: GraphQLPRNode[];
+  /**
+   * Up to 100 of the oldest still-open pull requests. Requested only on the
+   * first page (`@include(if: $firstPage)`), so paginating a busy repository
+   * does not pay for the same list again on every page.
+   */
+  openPRNodes: OpenPRNode[];
 }
 
 /** Shape of one GraphQL page response. */
@@ -68,6 +96,7 @@ interface GraphQLPageResponse {
     openPRs: { totalCount: number };
     closedPRs: { totalCount: number };
     mergedPRs: { totalCount: number };
+    openPRList?: { nodes: OpenPRNode[] };
     pullRequests: {
       pageInfo: { hasNextPage: boolean; endCursor: string | null };
       nodes: GraphQLPRNode[];
@@ -76,7 +105,7 @@ interface GraphQLPageResponse {
 }
 
 const REPO_DATA_QUERY = `
-  query RepoData($owner: String!, $name: String!, $cursor: String) {
+  query RepoData($owner: String!, $name: String!, $cursor: String, $firstPage: Boolean!) {
     repository(owner: $owner, name: $name) {
       isFork
       openIssues: issues(states: [OPEN], first: 1) { totalCount }
@@ -84,6 +113,17 @@ const REPO_DATA_QUERY = `
       openPRs: pullRequests(states: [OPEN], first: 1) { totalCount }
       closedPRs: pullRequests(states: [CLOSED], first: 1) { totalCount }
       mergedPRs: pullRequests(states: [MERGED], first: 1) { totalCount }
+      openPRList: pullRequests(
+        first: 100
+        states: [OPEN]
+        orderBy: { field: CREATED_AT, direction: ASC }
+      ) @include(if: $firstPage) {
+        nodes {
+          number
+          createdAt
+          author { login __typename }
+        }
+      }
       pullRequests(
         first: 100
         states: [CLOSED, MERGED]
@@ -117,7 +157,7 @@ const REPO_DATA_QUERY = `
           comments(first: 1) { totalCount }
           reviewThreads(first: 1) { totalCount }
           reviews(first: 100) {
-            nodes { author { login } }
+            nodes { author { login } submittedAt state }
           }
           mergeCommit { message }
         }
@@ -166,7 +206,7 @@ export async function collectRepoGraphQL(
       response = await fetchGraphQLPage<GraphQLPageResponse>(
         octokit,
         REPO_DATA_QUERY,
-        { owner, name: repo, cursor },
+        { owner, name: repo, cursor, firstPage },
         `${owner}/${repo}`
       );
     } catch (err: unknown) {
@@ -199,6 +239,7 @@ export async function collectRepoGraphQL(
         closedPRCount: repoData.closedPRs.totalCount,
         mergedPRCount: repoData.mergedPRs.totalCount,
         prNodes: [],
+        openPRNodes: repoData.openPRList?.nodes ?? [],
       };
       firstPage = false;
     }
@@ -228,6 +269,7 @@ export async function collectRepoGraphQL(
       closedPRCount: 0,
       mergedPRCount: 0,
       prNodes: [],
+      openPRNodes: [],
     };
   }
 
@@ -311,4 +353,139 @@ function hasGraphQLForbiddenError(err: unknown): boolean {
     );
   }
   return false;
+}
+
+// ── Historical backfill ───────────────────────────────────────────────────────
+
+/**
+ * A pull request as returned by the lean historical query.
+ *
+ * The daily query carries nested commit and review-thread data for AI-authorship
+ * detection, which makes each page expensive. Walking a repository back to its
+ * first commit multiplies that cost by every page of its life, so the historical
+ * crawl asks only for facts that cannot be derived later — and skips commit-level
+ * AI detection entirely, which costs nothing real: Copilot, Claude and Codex did
+ * not exist before 2023, so PRs older than that are human-authored by definition.
+ */
+export interface HistoricalPRNode {
+  number: number;
+  state: "CLOSED" | "MERGED";
+  createdAt: string;
+  mergedAt: string | null;
+  closedAt: string | null;
+  author: { login: string; __typename: string } | null;
+  additions: number;
+  deletions: number;
+  body: string | null;
+  reviews: {
+    totalCount: number;
+    nodes: Array<{
+      submittedAt: string | null;
+      author: { login: string } | null;
+      /** APPROVED | CHANGES_REQUESTED | COMMENTED | DISMISSED. */
+      state?: string;
+    }>;
+  };
+}
+
+/** One page of the historical crawl. */
+export interface HistoricalPRPage {
+  nodes: HistoricalPRNode[];
+  hasNextPage: boolean;
+  endCursor: string | null;
+}
+
+/**
+ * Ordered CREATED_AT ascending on purpose: the crawl walks *forward* from the
+ * repository's first pull request, so the oldest history — the part that is
+ * missing — arrives first, and new pull requests are only ever appended beyond
+ * the stored cursor. A cursor saved today therefore stays valid tomorrow, which
+ * is what makes the crawl resumable across runs.
+ *
+ * Only the first review is needed per PR (`submittedAt` ascending gives the
+ * earliest), but the connection is fetched small rather than filtered so the
+ * reviewer set stays available for historical reviewer counts.
+ */
+const HISTORICAL_PR_QUERY = `
+  query HistoricalPRs($owner: String!, $name: String!, $cursor: String) {
+    repository(owner: $owner, name: $name) {
+      pullRequests(
+        first: 100
+        states: [CLOSED, MERGED]
+        orderBy: { field: CREATED_AT, direction: ASC }
+        after: $cursor
+      ) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          number
+          state
+          createdAt
+          mergedAt
+          closedAt
+          author { login __typename }
+          additions
+          deletions
+          body
+          reviews(first: 20) {
+            totalCount
+            nodes { submittedAt author { login } state }
+          }
+        }
+      }
+    }
+  }
+`;
+
+interface HistoricalPageResponse {
+  repository: {
+    pullRequests: {
+      pageInfo: { hasNextPage: boolean; endCursor: string | null };
+      nodes: HistoricalPRNode[];
+    };
+  } | null;
+}
+
+/**
+ * Fetch one page of historical pull requests for `owner/repo`.
+ *
+ * Returns `null` when the repository is gone or inaccessible, or when GitHub
+ * keeps returning 5xx — the caller treats that as "skip this repo for now" and
+ * leaves the watermark untouched so the next run retries from the same place.
+ */
+export async function fetchHistoricalPRPage(
+  owner: string,
+  repo: string,
+  cursor: string | null
+): Promise<HistoricalPRPage | null> {
+  const octokit = await getOctokit();
+  let response: HistoricalPageResponse;
+  try {
+    response = await fetchGraphQLPage<HistoricalPageResponse>(
+      octokit,
+      HISTORICAL_PR_QUERY,
+      { owner, name: repo, cursor },
+      `${owner}/${repo}`
+    );
+  } catch (err: unknown) {
+    if (isGraphQLNotFoundOrForbidden(err)) {
+      if (hasGraphQLForbiddenError(err)) {
+        console.warn(`  ⚠ backfill: skipping ${owner}/${repo}: access denied (403)`);
+      }
+      return null;
+    }
+    if (isTransientServerError(err)) {
+      console.warn(`  ⚠ backfill: ${owner}/${repo} still failing after retries; will retry next run`);
+      return null;
+    }
+    throw err;
+  }
+
+  if (!response?.repository) return null;
+
+  const { nodes, pageInfo } = response.repository.pullRequests;
+  return {
+    nodes: nodes ?? [],
+    hasNextPage: pageInfo.hasNextPage,
+    endCursor: pageInfo.endCursor,
+  };
 }
