@@ -220,6 +220,16 @@ export async function collectRepoGraphQL(
         console.warn(`  ⚠ graphql: giving up on ${owner}/${repo} after repeated 5xx errors, falling back to REST`);
         return null;
       }
+      if (isGenericGraphQLExecutionError(err)) {
+        const requestId = extractGitHubRequestId(err);
+        console.warn(
+          `  ⚠ graphql: giving up on ${owner}/${repo} after ${TRANSIENT_BACKOFF_MS.length} retries of a ` +
+            `generic GitHub execution error` +
+            (requestId ? ` (request ${requestId})` : "") +
+            `, falling back to REST`
+        );
+        return null;
+      }
       throw err;
     }
 
@@ -288,12 +298,60 @@ function isTransientServerError(err: unknown): boolean {
   return typeof httpError.status === "number" && httpError.status >= 500 && httpError.status < 600;
 }
 
+/**
+ * Return true for GitHub's generic GraphQL execution failure — the
+ * "Something went wrong while executing your query" response GitHub sends
+ * for an internal hiccup unrelated to the query itself (distinct from a rate
+ * limit, auth failure, or a validation/field error). It carries no `data`,
+ * only a message and a request id for support, so it is identified by that
+ * message rather than by HTTP status or GraphQL error `type` (it has
+ * neither reliably).
+ */
+function isGenericGraphQLExecutionError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  const graphqlError = err as {
+    errors?: Array<{ message?: string }>;
+    data?: unknown;
+  };
+  const messages = [err.message, ...(graphqlError.errors?.map((e) => e.message) ?? [])];
+  const matchesMessage = messages.some(
+    (m) => typeof m === "string" && m.toLowerCase().includes("something went wrong while executing your query")
+  );
+  if (!matchesMessage) return false;
+  // Guard against ever treating a real, data-bearing response as transient.
+  return graphqlError.data === undefined || graphqlError.data === null;
+}
+
+/** True for any GraphQL failure we treat as transient and worth retrying. */
+function isRetryableTransientError(err: unknown): boolean {
+  return isTransientServerError(err) || isGenericGraphQLExecutionError(err);
+}
+
+/**
+ * Best-effort extraction of the GitHub request id for a failed GraphQL call,
+ * so operators can hand it to GitHub support. Prefers the response header;
+ * falls back to the id GitHub embeds in the generic-execution-error message
+ * itself (`` Please include `XXXX:XXXX:...` when reporting this issue. ``).
+ */
+function extractGitHubRequestId(err: unknown): string | undefined {
+  if (!(err instanceof Error)) return undefined;
+  const graphqlError = err as { headers?: Record<string, string> };
+  const headerId = graphqlError.headers?.["x-github-request-id"];
+  if (headerId) return headerId;
+  const match = err.message.match(/`([0-9A-F]+(?::[0-9A-F]+){2,})`/i);
+  return match?.[1];
+}
+
 const TRANSIENT_BACKOFF_MS = [5_000, 15_000, 30_000];
 
 /**
- * Execute a single GraphQL request with automatic retry on transient 5xx errors.
- * Retries up to TRANSIENT_BACKOFF_MS.length times with increasing delays.
- * Non-transient errors (4xx, GraphQL field errors) are re-thrown immediately.
+ * Execute a single GraphQL request with automatic retry on transient errors:
+ * HTTP 5xx responses and GitHub's generic "something went wrong executing
+ * your query" execution failure (which carries no `data` and no HTTP 5xx
+ * status of its own, so it is otherwise indistinguishable from a permanent
+ * error). Retries up to TRANSIENT_BACKOFF_MS.length times with increasing
+ * delays. Non-transient errors (4xx, GraphQL validation/field errors, auth
+ * failures) are re-thrown immediately without retrying.
  */
 async function fetchGraphQLPage<T>(
   octokit: Awaited<ReturnType<typeof getOctokit>>,
@@ -306,13 +364,16 @@ async function fetchGraphQLPage<T>(
     try {
       return await octokit.graphql<T>(query, variables);
     } catch (err) {
-      if (!isTransientServerError(err) || attempt === TRANSIENT_BACKOFF_MS.length) {
+      if (!isRetryableTransientError(err) || attempt === TRANSIENT_BACKOFF_MS.length) {
         throw err;
       }
       lastErr = err;
       const wait = TRANSIENT_BACKOFF_MS[attempt];
+      const requestId = extractGitHubRequestId(err);
       console.warn(
-        `  ⚠ graphql: transient error for ${label} (attempt ${attempt + 1}/${TRANSIENT_BACKOFF_MS.length}), retrying in ${wait / 1000}s…`
+        `  ⚠ graphql: transient error for ${label} (attempt ${attempt + 1}/${TRANSIENT_BACKOFF_MS.length})` +
+          (requestId ? ` [request ${requestId}]` : "") +
+          `, retrying in ${wait / 1000}s…`
       );
       await sleep(wait);
     }
@@ -396,6 +457,36 @@ export interface HistoricalPRPage {
 }
 
 /**
+ * Why a historical page fetch could not return data — always a repository-
+ * local, recoverable condition. Anything that is *not* one of these (auth
+ * failure, GraphQL validation/schema error, an unexpected/programming error)
+ * is thrown instead, so the caller can tell the two apart without having to
+ * inspect error internals itself.
+ */
+export type HistoricalPageFailureKind = "not-found" | "forbidden" | "transient";
+
+/** Repository-local, recoverable page-fetch failure detail for logging/reporting. */
+export interface HistoricalPageFailure {
+  kind: HistoricalPageFailureKind;
+  /** Concise, human-readable category for logs — never a raw payload. */
+  category: string;
+  /** Total attempts made before giving up, when the bounded retry policy applied. */
+  attempts?: number;
+  /** GitHub's support request id, when the response carried one. */
+  requestId?: string;
+}
+
+/**
+ * Outcome of one historical page fetch. `ok: false` always means a
+ * classified, repository-local, recoverable failure (see
+ * `HistoricalPageFailureKind`) — never an auth failure, validation error, or
+ * unexpected bug, which are thrown instead and must propagate.
+ */
+export type HistoricalPageOutcome =
+  | { ok: true; page: HistoricalPRPage }
+  | { ok: false; failure: HistoricalPageFailure };
+
+/**
  * Ordered CREATED_AT ascending on purpose: the crawl walks *forward* from the
  * repository's first pull request, so the oldest history — the part that is
  * missing — arrives first, and new pull requests are only ever appended beyond
@@ -448,44 +539,83 @@ interface HistoricalPageResponse {
 /**
  * Fetch one page of historical pull requests for `owner/repo`.
  *
- * Returns `null` when the repository is gone or inaccessible, or when GitHub
- * keeps returning 5xx — the caller treats that as "skip this repo for now" and
- * leaves the watermark untouched so the next run retries from the same place.
+ * Resolves to `{ ok: true, page }` on success, or `{ ok: false, failure }`
+ * for a classified, repository-local, recoverable condition — the
+ * repository gone/renamed/inaccessible, access denied, or GitHub still
+ * returning a transient failure (5xx, or its generic "something went wrong
+ * executing your query" execution error) after exhausting the bounded
+ * retries. The caller treats that as "defer this repository for now" and
+ * leaves its watermark untouched so the next run resumes from the same
+ * place. Anything else — auth failures, GraphQL validation/schema errors,
+ * or an unexpected/programming error — is thrown, not returned, so it
+ * cannot be mistaken for a recoverable per-repository condition.
  */
 export async function fetchHistoricalPRPage(
   owner: string,
   repo: string,
   cursor: string | null
-): Promise<HistoricalPRPage | null> {
+): Promise<HistoricalPageOutcome> {
   const octokit = await getOctokit();
+  const label = `${owner}/${repo}`;
   let response: HistoricalPageResponse;
   try {
     response = await fetchGraphQLPage<HistoricalPageResponse>(
       octokit,
       HISTORICAL_PR_QUERY,
       { owner, name: repo, cursor },
-      `${owner}/${repo}`
+      label
     );
   } catch (err: unknown) {
     if (isGraphQLNotFoundOrForbidden(err)) {
-      if (hasGraphQLForbiddenError(err)) {
-        console.warn(`  ⚠ backfill: skipping ${owner}/${repo}: access denied (403)`);
-      }
-      return null;
+      const forbidden = hasGraphQLForbiddenError(err);
+      return {
+        ok: false,
+        failure: {
+          kind: forbidden ? "forbidden" : "not-found",
+          category: forbidden
+            ? "repository access denied (403)"
+            : "repository not found",
+          requestId: extractGitHubRequestId(err),
+        },
+      };
     }
-    if (isTransientServerError(err)) {
-      console.warn(`  ⚠ backfill: ${owner}/${repo} still failing after retries; will retry next run`);
-      return null;
+    if (isRetryableTransientError(err)) {
+      const requestId = extractGitHubRequestId(err);
+      const category = isTransientServerError(err)
+        ? "repeated HTTP 5xx gateway error"
+        : "GitHub GraphQL transient execution error";
+      return {
+        ok: false,
+        failure: {
+          kind: "transient",
+          category,
+          attempts: TRANSIENT_BACKOFF_MS.length + 1,
+          requestId,
+        },
+      };
     }
     throw err;
   }
 
-  if (!response?.repository) return null;
+  if (!response?.repository) {
+    // A successful HTTP response with no repository payload: the repository
+    // disappeared, was renamed, or was archived/made inaccessible mid-crawl.
+    return {
+      ok: false,
+      failure: {
+        kind: "not-found",
+        category: "repository disappeared or became inaccessible during collection",
+      },
+    };
+  }
 
   const { nodes, pageInfo } = response.repository.pullRequests;
   return {
-    nodes: nodes ?? [],
-    hasNextPage: pageInfo.hasNextPage,
-    endCursor: pageInfo.endCursor,
+    ok: true,
+    page: {
+      nodes: nodes ?? [],
+      hasNextPage: pageInfo.hasNextPage,
+      endCursor: pageInfo.endCursor,
+    },
   };
 }

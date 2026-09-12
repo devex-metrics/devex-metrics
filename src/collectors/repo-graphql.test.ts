@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { setOctokit, resetOctokit } from "../github-client.js";
 import type { Octokit } from "@octokit/rest";
-import { collectRepoGraphQL } from "./repo-graphql.js";
+import { collectRepoGraphQL, fetchHistoricalPRPage } from "./repo-graphql.js";
 import type { GraphQLPRNode } from "./repo-graphql.js";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -69,6 +69,25 @@ function buildMockOctokit(responses: unknown[]): Octokit {
     return response;
   };
   return { graphql } as unknown as Octokit;
+}
+
+/**
+ * Build an error shaped like GitHub's generic GraphQL execution failure:
+ * `Something went wrong while executing your query`, no usable `data`, and
+ * (usually) a request id embedded in the message for support purposes.
+ */
+function makeGenericExecutionError(
+  requestId = "D6C0:19B1D2:B22842F:AD07EE0:6AA2B655"
+): Error {
+  const message =
+    `Request failed due to following response errors:\n` +
+    ` - Something went wrong while executing your query on 2026-09-10T13:53:33Z.\n` +
+    `   Please include \`${requestId}\` when reporting this issue.`;
+  return Object.assign(new Error(message), {
+    errors: [{ message }],
+    data: undefined,
+    headers: {},
+  });
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -226,6 +245,60 @@ describe("collectRepoGraphQL", () => {
     vi.useRealTimers();
   });
 
+  it("retries a generic 'something went wrong executing your query' error and succeeds on retry", async () => {
+    vi.useFakeTimers();
+    const err = makeGenericExecutionError();
+    const success = makeGraphQLResponse({ nodes: [], hasNextPage: false });
+    setOctokit(buildMockOctokit([err, success]));
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const p = collectRepoGraphQL("owner", "repo");
+    await vi.advanceTimersByTimeAsync(5_001);
+    const result = await p;
+
+    expect(result).not.toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("transient"));
+    warnSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it("returns null and warns with the GitHub request id after exhausting retries on a generic execution error", async () => {
+    vi.useFakeTimers();
+    const err = makeGenericExecutionError("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655");
+    setOctokit(buildMockOctokit([err])); // clamped — all attempts throw
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const resultPromise = collectRepoGraphQL("owner", "repo");
+    await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
+    const result = await resultPromise;
+
+    expect(result).toBeNull();
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655")
+    );
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("falling back to REST"));
+    warnSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it("does not treat a GraphQL validation error as a generic transient execution error", async () => {
+    const err = Object.assign(new Error("Argument 'first' on Field 'pullRequests' has an invalid value"), {
+      errors: [{ type: "UNPROCESSABLE", message: "Argument 'first' on Field 'pullRequests' has an invalid value" }],
+    });
+    setOctokit(buildMockOctokit([err]));
+
+    await expect(collectRepoGraphQL("owner", "repo")).rejects.toThrow(
+      "Argument 'first' on Field 'pullRequests' has an invalid value"
+    );
+  });
+
+  it("does not treat an authentication error as a generic transient execution error", async () => {
+    const err = Object.assign(new Error("Bad credentials"), { status: 401 });
+    setOctokit(buildMockOctokit([err]));
+
+    await expect(collectRepoGraphQL("owner", "repo")).rejects.toMatchObject({ status: 401 });
+  });
+
   it("returns empty prNodes for a repo with no PRs", async () => {
     setOctokit(
       buildMockOctokit([
@@ -350,3 +423,115 @@ describe("collectRepoGraphQL open pull requests", () => {
     expect(result!.openPRNodes).toEqual([]);
   });
 });
+
+describe("fetchHistoricalPRPage", () => {
+  afterEach(() => resetOctokit());
+
+  function makeHistoricalPageResponse(opts: {
+    nodes?: unknown[];
+    hasNextPage?: boolean;
+    endCursor?: string | null;
+  } = {}) {
+    return {
+      repository: {
+        pullRequests: {
+          pageInfo: {
+            hasNextPage: opts.hasNextPage ?? false,
+            endCursor: opts.endCursor ?? null,
+          },
+          nodes: opts.nodes ?? [],
+        },
+      },
+    };
+  }
+
+  it("retries a generic GraphQL execution error and succeeds on a later retry", async () => {
+    vi.useFakeTimers();
+    const err = makeGenericExecutionError();
+    const success = makeHistoricalPageResponse({ nodes: [{ number: 1 }], hasNextPage: false });
+    setOctokit(buildMockOctokit([err, success]));
+
+    const p = fetchHistoricalPRPage("barcoclickshare", "cx_system_tests", null);
+    await vi.advanceTimersByTimeAsync(5_001);
+    const outcome = await p;
+
+    expect(outcome.ok).toBe(true);
+    if (outcome.ok) {
+      expect(outcome.page.nodes).toHaveLength(1);
+    }
+    vi.useRealTimers();
+  });
+
+  it("defers the repository (returns a transient failure outcome) after exhausting retries on a generic execution error, carrying the attempt count and request id", async () => {
+    vi.useFakeTimers();
+    const err = makeGenericExecutionError("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655");
+    setOctokit(buildMockOctokit([err])); // every attempt fails
+
+    const p = fetchHistoricalPRPage("barcoclickshare", "cx_system_tests", "cursor-9");
+    await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
+    const outcome = await p;
+
+    expect(outcome.ok).toBe(false);
+    if (!outcome.ok) {
+      expect(outcome.failure.kind).toBe("transient");
+      expect(outcome.failure.category).toContain("GraphQL transient execution error");
+      expect(outcome.failure.attempts).toBe(4);
+      expect(outcome.failure.requestId).toBe("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655");
+    }
+    vi.useRealTimers();
+  });
+
+  it("does not treat a GraphQL validation error as a generic transient execution error", async () => {
+    const err = Object.assign(new Error("Field 'bogus' doesn't exist on type 'PullRequest'"), {
+      errors: [{ type: "UNPROCESSABLE", message: "Field 'bogus' doesn't exist on type 'PullRequest'" }],
+    });
+    setOctokit(buildMockOctokit([err]));
+
+    await expect(
+      fetchHistoricalPRPage("owner", "repo", null)
+    ).rejects.toThrow("Field 'bogus' doesn't exist on type 'PullRequest'");
+  });
+
+  it("still resolves immediately (no retry) on a 403 access-denied repository, classified as forbidden", async () => {
+    const err = Object.assign(new Error("Forbidden"), {
+      errors: [{ type: "FORBIDDEN", message: "forbidden" }],
+    });
+    setOctokit(buildMockOctokit([err]));
+
+    const outcome = await fetchHistoricalPRPage("owner", "private-repo", null);
+    expect(outcome.ok).toBe(false);
+    if (!outcome.ok) {
+      expect(outcome.failure.kind).toBe("forbidden");
+      expect(outcome.failure.category).toContain("access denied");
+    }
+  });
+
+  it("still resolves as a transient failure after exhausting retries on a plain 502", async () => {
+    vi.useFakeTimers();
+    const err = Object.assign(new Error("Bad gateway"), { status: 502 });
+    setOctokit(buildMockOctokit([err]));
+
+    const p = fetchHistoricalPRPage("owner", "repo", null);
+    await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
+    const outcome = await p;
+
+    expect(outcome.ok).toBe(false);
+    if (!outcome.ok) {
+      expect(outcome.failure.kind).toBe("transient");
+      expect(outcome.failure.category).toContain("5xx");
+    }
+    vi.useRealTimers();
+  });
+
+  it("classifies a repository that disappeared or became inaccessible mid-crawl as not-found", async () => {
+    setOctokit(buildMockOctokit([{ repository: null }]));
+
+    const outcome = await fetchHistoricalPRPage("owner", "repo", null);
+    expect(outcome.ok).toBe(false);
+    if (!outcome.ok) {
+      expect(outcome.failure.kind).toBe("not-found");
+      expect(outcome.failure.category.toLowerCase()).toContain("disappeared");
+    }
+  });
+});
+
