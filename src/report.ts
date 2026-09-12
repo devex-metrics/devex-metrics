@@ -203,7 +203,7 @@ function pct(part: number, total: number): string {
 
 /** Escape characters that would otherwise break a Markdown table row: `|` and newlines. */
 function escapeTableCell(value: string): string {
-  return value.replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
+  return value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|").replace(/\r?\n/g, " ");
 }
 
 function aggregate(repos: RepoMetrics[]) {
