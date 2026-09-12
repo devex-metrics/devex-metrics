@@ -325,7 +325,7 @@ function renderDeliveryCharts(){
     charts.actorBreakdown=new Chart(document.getElementById("chartActorBreakdown"),{type:"bar",
       data:{labels:aWeeks,datasets:[
         {label:"Human",data:aWeeks.map(function(w){return weekActors[w].human;}),backgroundColor:cssColors.accent,borderRadius:2},
-        {label:"Copilot",data:aWeeks.map(function(w){return weekActors[w].copilot;}),backgroundColor:cssColors.purple||"#8250df",borderRadius:2},
+        {label:"AI-authored",data:aWeeks.map(function(w){return weekActors[w].copilot;}),backgroundColor:cssColors.purple||"#8250df",borderRadius:2},
         {label:"Dependabot",data:aWeeks.map(function(w){return weekActors[w].dependabot;}),backgroundColor:cssColors.warn,borderRadius:2},
         {label:"Other bots",data:aWeeks.map(function(w){return weekActors[w].otherBot;}),backgroundColor:cssColors.muted,borderRadius:2}]},
       options:{responsive:true,maintainAspectRatio:true,
