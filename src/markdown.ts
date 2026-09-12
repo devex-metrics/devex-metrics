@@ -26,8 +26,9 @@
  * 2. The value is converted to text: `String(value)` for primitives,
  *    functions, and symbols; `JSON.stringify(value)` for everything else
  *    (objects/arrays), falling back to the literal `"[object Object]"` when
- *    `JSON.stringify` itself returns `undefined` — as it does for an object
- *    whose `toJSON()` returns `undefined` — so serialization never throws.
+ *    `JSON.stringify` itself returns `undefined` (an object whose `toJSON()`
+ *    returns `undefined`) or throws (a circular reference, a nested
+ *    `bigint`, a `toJSON()` that throws) — so serialization never throws.
  * 3. CRLF, LF, CR, and tab characters are each replaced with a single
  *    space, so one logical cell can never introduce another physical
  *    Markdown row or a stray tab.
@@ -56,12 +57,27 @@ export function escapeMarkdownTableCell(value: unknown): string {
         ? String(value)
         : typeof value === "function" || typeof value === "symbol"
           ? String(value)
-          : (JSON.stringify(value) ?? "[object Object]");
+          : stringifyObject(value);
   const normalized = text
     .replace(/\r\n|\r|\n|\t/g, " ")
     .replace(/ {2,}/g, " ")
     .trim();
   return normalized.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
+}
+
+/**
+ * `JSON.stringify` for an object/array value, tolerant of every way it can
+ * fail to produce a string: it returns `undefined` for an object whose
+ * `toJSON()` returns `undefined`, and it throws for a circular reference, a
+ * nested `bigint`, or a `toJSON()` that itself throws. Either case falls
+ * back to the literal `"[object Object]"` rather than propagating.
+ */
+function stringifyObject(value: object): string {
+  try {
+    return JSON.stringify(value) ?? "[object Object]";
+  } catch {
+    return "[object Object]";
+  }
 }
 
 /**

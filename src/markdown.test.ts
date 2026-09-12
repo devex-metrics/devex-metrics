@@ -58,7 +58,7 @@ describe("escapeMarkdownTableCell", () => {
     expect(result).toBe("value\\\\\\|other");
   });
 
-  it("is idempotent-safe: escaping the already-escaped output again would double-process, so callers must escape only once", () => {
+  it("is not idempotent: escaping the already-escaped output again would double-process, so callers must escape only once", () => {
     const once = escapeMarkdownTableCell("a|b");
     expect(once).toBe("a\\|b");
     // Demonstrates why the helper must be applied exactly once: escaping an
@@ -100,6 +100,27 @@ describe("escapeMarkdownTableCell", () => {
     expect(() => escapeMarkdownTableCell(Symbol("x"))).not.toThrow();
     expect(() => escapeMarkdownTableCell({ toJSON: () => undefined })).not.toThrow();
     expect(escapeMarkdownTableCell({ toJSON: () => undefined })).toBe("[object Object]");
+  });
+
+  it("does not throw when JSON.stringify itself would throw for a valid unknown value", () => {
+    // JSON.stringify throws (rather than returning undefined) for a circular
+    // reference, an object containing a nested bigint, or a toJSON() that
+    // itself throws. All three must still fall back to "[object Object]".
+    const circular: Record<string, unknown> = { name: "self" };
+    circular.self = circular;
+    expect(() => escapeMarkdownTableCell(circular)).not.toThrow();
+    expect(escapeMarkdownTableCell(circular)).toBe("[object Object]");
+
+    expect(() => escapeMarkdownTableCell({ n: 1n })).not.toThrow();
+    expect(escapeMarkdownTableCell({ n: 1n })).toBe("[object Object]");
+
+    const throwingToJSON = {
+      toJSON() {
+        throw new Error("boom");
+      },
+    };
+    expect(() => escapeMarkdownTableCell(throwingToJSON)).not.toThrow();
+    expect(escapeMarkdownTableCell(throwingToJSON)).toBe("[object Object]");
   });
 });
 
