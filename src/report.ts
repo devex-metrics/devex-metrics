@@ -5,7 +5,7 @@ import { LARGE_PR_LINES } from "./history.js";
 /**
  * Measurement windows a summary metric can be reported over. Metrics counted
  * from different windows are not directly comparable (e.g. a repository-
- * lifetime total versus a percentage over the last ~13 months of collected
+ * lifetime total versus a percentage over the last ~2 years of collected
  * PRs), so every summary row is explicitly labelled with one of these.
  */
 const WINDOW = {
@@ -15,7 +15,7 @@ const WINDOW = {
   lifetime: "Repository lifetime",
   /**
    * The enriched PR timeline the collector keeps: up to ~1,000 most recently
-   * updated PRs per repo, roughly the last ~13 months. Not the full lifetime
+   * updated PRs per repo, roughly the last ~2 years. Not the full lifetime
    * for older or very active repositories.
    */
   collected: "Collected history",
@@ -74,23 +74,28 @@ export function generateReport(metrics: OrgMetrics): string {
   // combined figure includes Claude and Codex too, so the tool breakdown and
   // an explicit note on attribution rules / denominator / window are shown
   // alongside it rather than leaving readers to guess.
+  // Notes are collected separately and emitted after the summary table to
+  // avoid breaking GitHub-flavored Markdown table rendering.
+  const summaryNotes: string[] = [];
   const copilotTotals = aggregateCopilot(metrics.repos);
   if (copilotTotals.totalMergedPRs > 0) {
     lines.push(
       `| AI-authored PRs (Copilot + Claude + Codex) | ` +
         `${copilotTotals.copilotAuthoredPRs} (${pct(copilotTotals.copilotAuthoredPRs, copilotTotals.totalMergedPRs)}% ` +
-        `of ${copilotTotals.totalMergedPRs} merged PRs in the collected history) | ${WINDOW.collected} |`
+        `of ${copilotTotals.totalMergedPRs} ${copilotTotals.totalMergedPRs === 1 ? "merged PR" : "merged PRs"} in the collected history) | ${WINDOW.collected} |`
     );
     const byTool = aggregateAIAuthorshipByTool(metrics.repos);
     pushIf(lines, byTool.copilot > 0, () => `| — of which Copilot | ${byTool.copilot} | ${WINDOW.collected} |`);
     pushIf(lines, byTool.claude > 0, () => `| — of which Claude | ${byTool.claude} | ${WINDOW.collected} |`);
     pushIf(lines, byTool.codex > 0, () => `| — of which Codex | ${byTool.codex} | ${WINDOW.collected} |`);
-    lines.push(
+    summaryNotes.push(
       "> An AI-authored PR is one where a human-opened PR containing even a " +
         "single AI-assisted commit still counts, not only PRs opened by an " +
         "AI account itself. Matched via PR-author login, `Co-authored-by:` " +
-        "commit trailers, or known PR-body phrasing. The denominator is " +
-        "every merged PR in the collected history (~13 months / up to " +
+         "commit trailers, or known PR-body phrasing (for this merged-PR " +
+         "timeline, commit and PR-body inspection are GraphQL-only; the REST " +
+         "fallback checks the PR-author login only). The denominator is " +
+         "every merged PR in the collected history (~2 years / up to " +
         "1,000 PRs per repo), including bot-authored ones such as " +
         "`dependabot[bot]`. Generic dependency bots are not expected to be " +
         "misclassified as AI-authored unless their commit/PR text happens " +
@@ -101,13 +106,14 @@ export function generateReport(metrics: OrgMetrics): string {
     lines.push(
       `| Copilot-reviewed PRs | ${copilotTotals.copilotReviewedPRs} ` +
         `(${pct(copilotTotals.copilotReviewedPRs, copilotTotals.totalDetailedPRs)}% ` +
-        `of ${copilotTotals.totalDetailedPRs} sampled PRs) | ${WINDOW.collected} |`
+        `of ${copilotTotals.totalDetailedPRs} ${copilotTotals.totalDetailedPRs === 1 ? "sampled PR" : "sampled PRs"}) | ${WINDOW.collected} |`
     );
-    lines.push(
+    summaryNotes.push(
       "> Unlike the row above, this one really is Copilot-only (a review " +
         "from `copilot[bot]`) and is sampled from up to 10 of the most " +
-        "recently merged PRs per repository — a much smaller population " +
-        "than the collected-history figure above."
+        "recently updated closed PRs per repository (filtered to merged), " +
+        "not necessarily the most recently merged — a much smaller " +
+        "population than the collected-history figure above."
     );
   }
 
@@ -121,7 +127,7 @@ export function generateReport(metrics: OrgMetrics): string {
     pushIf(lines, agentTotals.totalCreditsUsed > 0, () => `| Agent credits used | ${agentTotals.totalCreditsUsed.toFixed(1)} | ${WINDOW.last30d} |`);
     if (agentTotals.agentCreatedPRs > 0) {
       lines.push(`| PRs created by agent | ${agentTotals.agentCreatedPRs} | ${WINDOW.last30d} |`);
-      lines.push(
+      summaryNotes.push(
         "> A different measurement from the AI-authored row above: this " +
           "counts only PRs traced to a Copilot coding-agent task (via the " +
           "Task API, not commit/PR text matching), over the last 30 days " +
@@ -219,6 +225,13 @@ export function generateReport(metrics: OrgMetrics): string {
     );
   }
 
+  lines.push("");
+
+  // Emit explanatory notes after the summary table to avoid breaking
+  // GitHub-flavored Markdown table rendering.
+  for (const note of summaryNotes) {
+    lines.push(note);
+  }
   lines.push("");
 
   // -- Per-repo --

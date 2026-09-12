@@ -182,7 +182,7 @@ export function isCopilotLogin(login: string, typename?: string): boolean {
  *
  * Returns issue counts, PR counts, and an array of PR nodes (CLOSED+MERGED,
  * sorted by updatedAt descending). Stops paginating when all PRs on a page
- * were updated before the ~13-month cutoff, or when maxPages is reached.
+ * were updated before the ~2-year cutoff, or when maxPages is reached.
  *
  * Returns null on 404 (repo not found) or 403 (access denied).
  * Re-throws other errors.

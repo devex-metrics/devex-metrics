@@ -325,7 +325,7 @@ function renderDeliveryCharts(){
     charts.actorBreakdown=new Chart(document.getElementById("chartActorBreakdown"),{type:"bar",
       data:{labels:aWeeks,datasets:[
         {label:"Human",data:aWeeks.map(function(w){return weekActors[w].human;}),backgroundColor:cssColors.accent,borderRadius:2},
-        {label:"Copilot",data:aWeeks.map(function(w){return weekActors[w].copilot;}),backgroundColor:cssColors.purple||"#8250df",borderRadius:2},
+        {label:"AI-authored",data:aWeeks.map(function(w){return weekActors[w].copilot;}),backgroundColor:cssColors.purple||"#8250df",borderRadius:2},
         {label:"Dependabot",data:aWeeks.map(function(w){return weekActors[w].dependabot;}),backgroundColor:cssColors.warn,borderRadius:2},
         {label:"Other bots",data:aWeeks.map(function(w){return weekActors[w].otherBot;}),backgroundColor:cssColors.muted,borderRadius:2}]},
       options:{responsive:true,maintainAspectRatio:true,
@@ -366,7 +366,7 @@ function renderDeliveryCharts(){
         scales:{x:{grid:{display:false}},y:{beginAtZero:true,title:{display:true,text:"Days"},grid:{color:cssColors.border}}},
         plugins:{legend:{display:false}}}});
   }
-  // Copilot-authored PRs merged per week (line chart)
+  // AI-authored PRs merged per week (line chart)
   var copPRs=CHART_DATA.allPRDetails||[];
   if(copPRs.length>0){
     var wCopPR={};
@@ -375,7 +375,7 @@ function renderDeliveryCharts(){
     if(copWeeks.length>0){
       charts.copilotPRTrend=new Chart(document.getElementById("chartCopilotPRTrend"),{type:"line",
         data:{labels:copWeeks,datasets:[
-          {label:"Copilot-authored PRs merged",data:copWeeks.map(function(w){return wCopPR[w];}),
+          {label:"AI-authored PRs merged",data:copWeeks.map(function(w){return wCopPR[w];}),
             borderColor:cssColors.purple||"#8250df",backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3}]},
         options:lineOpts});
     }
