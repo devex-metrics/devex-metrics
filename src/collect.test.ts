@@ -27,7 +27,8 @@ vi.mock("./collectors/index.js", () => ({
   collectCopilotAgentMetrics: vi.fn(),
 }));
 
-import { collect } from "./collect.js";
+import { collect, collectGroup } from "./collect.js";
+import { setOctokit, resetOctokit } from "./github-client.js";
 import { loadCache, loadRawCache, isWithinHours, saveCache } from "./cache.js";
 import {
   collectRepos,
@@ -226,5 +227,68 @@ describe("collect", () => {
 
     // Trends should NOT be recollected since per-repo data already exists
     expect(collectWeeklyTrends).not.toHaveBeenCalled();
+  });
+});
+
+describe("collectGroup", () => {
+  afterEach(() => {
+    vi.resetAllMocks();
+    resetOctokit();
+  });
+
+  it("returns cached data immediately without calling getOctokit", async () => {
+    const cached: OrgMetrics = {
+      owner: "acme-corp",
+      ownerType: "org",
+      groupName: "Acme",
+      collectedAt: "2026-01-01T00:00:00Z",
+      repoCount: 1,
+      repos: [],
+    };
+    vi.mocked(loadCache).mockReturnValue(cached);
+
+    const result = await collectGroup("Acme", [{ owner: "acme-corp", name: "repo-a" }]);
+
+    expect(result).toBe(cached);
+  });
+
+  it("stores the result under a slugified cache key derived from groupName", async () => {
+    setupDefaultMocks();
+    setOctokit({
+      rest: {
+        repos: {
+          get: vi.fn().mockResolvedValue({
+            data: { full_name: "acme-corp/repo-a", pushed_at: "2026-01-01T00:00:00Z" },
+          }),
+        },
+      },
+    } as never);
+
+    const result = await collectGroup("Acme", [{ owner: "acme-corp", name: "repo-a" }]);
+
+    expect(saveCache).toHaveBeenCalledWith(
+      "acme",
+      expect.objectContaining({ groupName: "Acme", owner: "acme-corp" })
+    );
+    expect(result.groupName).toBe("Acme");
+    expect(result.repoCount).toBe(1);
+  });
+
+  it("skips repos that can't be fetched and logs a warning", async () => {
+    setupDefaultMocks();
+    const getMock = vi.fn()
+      .mockResolvedValueOnce({ data: { full_name: "acme-corp/repo-a", pushed_at: "" } })
+      .mockRejectedValueOnce({ status: 404 });
+    setOctokit({ rest: { repos: { get: getMock } } } as never);
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const result = await collectGroup("Acme", [
+      { owner: "acme-corp", name: "repo-a" },
+      { owner: "acme-corp", name: "missing-repo" },
+    ]);
+
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("missing-repo"));
+    expect(result.repoCount).toBe(1);
+    warnSpy.mockRestore();
   });
 });

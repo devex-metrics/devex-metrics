@@ -45,6 +45,16 @@ function aggregate(repos: RepoMetrics[]): Totals {
   };
 }
 
+/** A navigable entry in the dataset switcher shown in the dashboard header. */
+export interface DatasetNavEntry {
+  /** Display label for this dataset (its group name, or owner login). */
+  label: string;
+  /** Href to this dataset's dashboard page, relative to the page being rendered. */
+  href: string;
+  /** Whether this entry is the dataset currently being rendered. */
+  current: boolean;
+}
+
 /** Optional extras threaded in from the site build. */
 export interface DashboardExtras {
   /** Site branding. Falls back to the built-in defaults when absent. */
@@ -58,6 +68,8 @@ export interface DashboardExtras {
   ciSamples?: CiRunSample[];
   /** How many days of CI history `ciSamples` covers, for the card's label. */
   ciWindowDays?: number;
+  /** Dataset navigation entries for the local multi-dataset site. */
+  datasets?: DatasetNavEntry[];
 }
 
 const DEFAULT_BRANDING: BrandingConfig = {
@@ -65,7 +77,6 @@ const DEFAULT_BRANDING: BrandingConfig = {
   attribution: "Made with \u2764\uFE0F by rajbos",
   attributionUrl: "https://github.com/rajbos",
 };
-
 export function buildDashboardHtml(
   data: OrgMetrics,
   date: string,
@@ -77,6 +88,7 @@ export function buildDashboardHtml(
   const history = extras.history ?? [];
   const ciSamples = extras.ciSamples ?? [];
   const ciWindowDays = extras.ciWindowDays ?? 90;
+  const datasets = extras.datasets;
   const totals = aggregate(data.repos);
   const teamRepos = data.repos.filter((r) => r.isTeamRepo);
   const teamRepoNames = teamRepos.map((r) => r.name);
@@ -106,7 +118,9 @@ export function buildDashboardHtml(
     ? `<span class="data-range">&#x1F4C5; ${escapeHtml(oldestDataDate)} &rarr; ${escapeHtml(newestDataDate || data.collectedAt.slice(0, 10))}</span>`
     : '';
   const ownerLink = `<a href="https://github.com/${escapeHtml(data.owner)}" class="hero-owner-link" target="_blank" rel="noopener noreferrer">${escapeHtml(data.owner)}</a>`;
-  const ownerLine = `${ownerLink} &middot; ${escapeHtml(data.ownerType)}`;
+  const ownerLine = data.groupName
+    ? `<span class="hero-group-badge">${escapeHtml(data.groupName)}</span> &middot; ${ownerLink} &middot; ${escapeHtml(data.ownerType)}`
+    : `${ownerLink} &middot; ${escapeHtml(data.ownerType)}`;
   const collectedLine = `collected ${escapeHtml(data.collectedAt)}`;
 
   let deployedFrom = "";
@@ -419,12 +433,25 @@ export function buildDashboardHtml(
       })),
   });
 
+  const datasetSwitcherHtml =
+    datasets && datasets.length > 1
+      ? `<div class="dataset-switcher" role="navigation" aria-label="Dataset">
+        <span class="dataset-switcher-label">&#x1F500; Switch dataset:</span>
+        ${datasets
+          .map(
+            (d) =>
+              `<a class="dataset-link${d.current ? ' active' : ''}" href="${escapeHtml(d.href)}"${d.current ? ' aria-current="page"' : ''}>${escapeHtml(d.label)}</a>`
+          )
+          .join("\n        ")}
+      </div>`
+      : '';
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${escapeHtml(branding.title)} &ndash; ${escapeHtml(data.owner)}</title>
+  <title>${escapeHtml(branding.title)} &ndash; ${escapeHtml(data.groupName ?? data.owner)}</title>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
   <style>${getCSS()}</style>
@@ -439,6 +466,7 @@ export function buildDashboardHtml(
       ${dataRangeHtml ? `<div class="subtitle-bottom">${dataRangeHtml}</div>` : ''}
     </div>
     <nav class="hero-nav">
+      ${datasetSwitcherHtml}
       <a href="${escapeHtml(branding.attributionUrl)}" class="hero-nav-link">${escapeHtml(branding.attribution)}</a>
     </nav>
   </div>

@@ -12,6 +12,8 @@ export default {
     "!src/index.ts",          // CLI entry point – hard to unit test
     "!src/save-fixture.ts",   // dev utility script
     "!src/build-pages.ts",    // tested via subprocess (execFileSync) – Stryker cannot track coverage
+    "!src/collect-group.ts",  // CLI entry point – hard to unit test
+    "!src/build-multi-site.ts", // CLI entry point – hard to unit test
   ],
   reporters: ["html", "clear-text", "progress"],
   htmlReporter: {

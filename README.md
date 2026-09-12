@@ -56,6 +56,41 @@ APP_ID=12345 APP_PRIVATE_KEY="$(cat private-key.pem)" node dist/index.js <owner>
 node dist/build-pages.js <owner>
 ```
 
+## Local multi-dataset groups
+
+For local use, you can collect metrics for an explicit list of repos —
+discovered from a folder of local git checkouts — as a separate, named
+**group** dataset, without touching your main owner-based cache:
+
+```bash
+# Discover every GitHub-backed git repo under a folder (via its "origin"
+# remote) and collect metrics for exactly that list, stored as its own
+# local dataset (data/<slug>.json), e.g. data/my-team.json.
+GITHUB_TOKEN=ghp_xxx node dist/collect-group.js "My Team" ~/code/repos/my-team
+```
+
+Then build a local dashboard site covering **every** dataset found in
+`data/` (owner-based datasets and groups alike). Each dataset gets its own
+page with a dataset switcher in the header so you can flip between them:
+
+```bash
+npm run build:pages:local
+# → _site/index.html            (mirrors one "primary" dataset)
+# → _site/<owner>/index.html
+# → _site/<group-slug>/index.html
+```
+
+To view it in a browser, serve the generated `_site/` folder locally — or
+just run everything (build + generate pages + serve) in one go:
+
+```bash
+npm run serve:local
+# then open the printed local URL (e.g. http://localhost:3000)
+```
+
+This is intended for local use only and isn't part of the CI/Pages
+deployment, which continues to build a single dataset via `build-pages.js`.
+
 The report is written to `data/<owner>-report.md`, and the history store to
 `data/history/<owner>/` unless `DEVEX_HISTORY_DIR` says otherwise.
 
@@ -152,7 +187,13 @@ src/
   index.ts              # CLI entry point, ESM re-export, & orchestrator
   config.ts             # Deployment config from Actions variables / DEVEX_CONFIG
   build-pages.ts        # Generates HTML site for GitHub Pages
+  build-multi-site.ts   # Local-only: builds a page per discovered dataset/group with a nav switcher
   collect.ts            # Core collection orchestrator (cache-aware, calls all collectors)
+  history.ts            # Append-only rollup + event store (metrics-data branch)
+  stats.ts              # Median / percentile helpers
+  collect-group.ts      # CLI: collect metrics for repos discovered from a local folder ("group")
+  local-repo-discovery.ts # Scans a folder for local git repos and resolves their GitHub owner/repo
+  dataset-key.ts        # Slugify a group name into a cache/site key
   history.ts            # Append-only rollup + event store (metrics-data branch)
   stats.ts              # Median / percentile helpers
   types.ts              # TypeScript interfaces
@@ -171,7 +212,7 @@ src/
     trends.ts           # Weekly activity trend aggregation
     repo-graphql.ts     # GraphQL-based merged PR timeline
     copilot-agent.ts    # Copilot coding agent task metrics
-data/                   # Local cache (gitignored)
+data/                   # Local cache (gitignored; also holds local "group" datasets)
 .metrics-data/          # History store checkout (gitignored; the metrics-data branch)
 _site/                  # Generated GitHub Pages site (gitignored)
 scripts/
