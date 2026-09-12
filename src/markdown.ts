@@ -23,7 +23,11 @@
  * 1. `null` and `undefined` become the empty string — this project's
  *    established convention for an absent table value (e.g. a PR with no
  *    merge date already renders as an empty cell).
- * 2. The value is converted to text with `String(value)`.
+ * 2. The value is converted to text: `String(value)` for primitives,
+ *    functions, and symbols; `JSON.stringify(value)` for everything else
+ *    (objects/arrays), falling back to the literal `"[object Object]"` when
+ *    `JSON.stringify` itself returns `undefined` — as it does for an object
+ *    whose `toJSON()` returns `undefined` — so serialization never throws.
  * 3. CRLF, LF, CR, and tab characters are each replaced with a single
  *    space, so one logical cell can never introduce another physical
  *    Markdown row or a stray tab.
@@ -50,7 +54,9 @@ export function escapeMarkdownTableCell(value: unknown): string {
       ? value
       : typeof value === "number" || typeof value === "boolean" || typeof value === "bigint"
         ? String(value)
-        : JSON.stringify(value);
+        : typeof value === "function" || typeof value === "symbol"
+          ? String(value)
+          : (JSON.stringify(value) ?? "[object Object]");
   const normalized = text
     .replace(/\r\n|\r|\n|\t/g, " ")
     .replace(/ {2,}/g, " ")

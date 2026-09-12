@@ -89,6 +89,18 @@ describe("escapeMarkdownTableCell", () => {
     expect(escapeMarkdownTableCell(42)).toBe("42");
     expect(escapeMarkdownTableCell(0)).toBe("0");
   });
+
+  it("does not throw when JSON.stringify would return undefined for a valid unknown value", () => {
+    // JSON.stringify returns the actual value `undefined` (not the string
+    // "undefined") for a function, a Symbol, and an object whose toJSON()
+    // returns undefined. Functions and symbols get their own meaningful
+    // String() representation; a plain object falls back to the literal
+    // "[object Object]" instead of letting the subsequent .replace() throw.
+    expect(() => escapeMarkdownTableCell(() => {})).not.toThrow();
+    expect(() => escapeMarkdownTableCell(Symbol("x"))).not.toThrow();
+    expect(() => escapeMarkdownTableCell({ toJSON: () => undefined })).not.toThrow();
+    expect(escapeMarkdownTableCell({ toJSON: () => undefined })).toBe("[object Object]");
+  });
 });
 
 describe("renderMarkdownTableRow", () => {
