@@ -85,6 +85,39 @@ describe("generateReport", () => {
     expect(report).toContain("Median cycle time");
   });
 
+  it("should label each summary metric with its measurement window", () => {
+    const report = generateReport(makeSampleMetrics());
+
+    expect(report).toContain("| Metric | Value | Window |");
+    // Lifetime totals vs. collected-history / snapshot / rolling-window
+    // metrics must be distinguishable so counts from different populations
+    // (e.g. a lifetime total vs. a share of the collected history) are never
+    // mistaken for the same denominator.
+    expect(report).toContain("| Open issues | 5 | Current snapshot |");
+    expect(report).toContain("| Closed issues | 25 | Repository lifetime |");
+    expect(report).toContain("| Open PRs | 2 | Current snapshot |");
+    expect(report).toContain("| Merged PRs | 18 | Repository lifetime |");
+    expect(report).toContain("| Closed (unmerged) PRs | 1 | Repository lifetime |");
+    expect(report).toContain("| Unique committers | 5 | Last 90 days |");
+    expect(report).toContain("| Unique reviewers | 4 | Last 90 days |");
+    expect(report).toContain("| Copilot-authored PRs | 1 (50.0%) | Collected history |");
+    expect(report).toContain("| Copilot-reviewed PRs | 1 (100.0%) | Collected history |");
+  });
+
+  it("should label per-repo issue, PR and contributor lines with their windows", () => {
+    const report = generateReport(makeSampleMetrics());
+
+    expect(report).toContain(
+      "Issues: 5 open (current snapshot) / 20 closed (repository lifetime)"
+    );
+    expect(report).toContain(
+      "PRs: 2 open (current snapshot) / 15 merged / 1 closed (repository lifetime)"
+    );
+    expect(report).toContain(
+      "Contributors: 4 committers · 3 reviewers (last 90 days)"
+    );
+  });
+
   it("should list per-repo details", () => {
     const report = generateReport(makeSampleMetrics());
 
