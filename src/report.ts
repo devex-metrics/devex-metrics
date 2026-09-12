@@ -70,13 +70,45 @@ export function generateReport(metrics: OrgMetrics): string {
   lines.push(`| Unique committers | ${totals.committers} | ${WINDOW.last90d} |`);
   lines.push(`| Unique reviewers, incl. bots | ${totals.reviewers} | ${WINDOW.collected} |`);
 
-  // Copilot adoption summary
+  // AI authorship summary. "Copilot-authored" is misleading on its own: the
+  // combined figure includes Claude and Codex too, so the tool breakdown and
+  // an explicit note on attribution rules / denominator / window are shown
+  // alongside it rather than leaving readers to guess.
   const copilotTotals = aggregateCopilot(metrics.repos);
   if (copilotTotals.totalMergedPRs > 0) {
-    lines.push(`| Copilot-authored PRs | ${copilotTotals.copilotAuthoredPRs} (${pct(copilotTotals.copilotAuthoredPRs, copilotTotals.totalMergedPRs)}%) | ${WINDOW.collected} |`);
+    lines.push(
+      `| AI-authored PRs (Copilot + Claude + Codex) | ` +
+        `${copilotTotals.copilotAuthoredPRs} (${pct(copilotTotals.copilotAuthoredPRs, copilotTotals.totalMergedPRs)}% ` +
+        `of ${copilotTotals.totalMergedPRs} merged PRs in the collected history) | ${WINDOW.collected} |`
+    );
+    const byTool = aggregateAIAuthorshipByTool(metrics.repos);
+    pushIf(lines, byTool.copilot > 0, () => `| — of which Copilot | ${byTool.copilot} | ${WINDOW.collected} |`);
+    pushIf(lines, byTool.claude > 0, () => `| — of which Claude | ${byTool.claude} | ${WINDOW.collected} |`);
+    pushIf(lines, byTool.codex > 0, () => `| — of which Codex | ${byTool.codex} | ${WINDOW.collected} |`);
+    lines.push(
+      "> An AI-authored PR is one where a human-opened PR containing even a " +
+        "single AI-assisted commit still counts, not only PRs opened by an " +
+        "AI account itself. Matched via PR-author login, `Co-authored-by:` " +
+        "commit trailers, or known PR-body phrasing. The denominator is " +
+        "every merged PR in the collected history (~13 months / up to " +
+        "1,000 PRs per repo), including bot-authored ones such as " +
+        "`dependabot[bot]`. Generic dependency bots are not expected to be " +
+        "misclassified as AI-authored unless their commit/PR text happens " +
+        "to match one of these patterns."
+    );
   }
   if (copilotTotals.totalDetailedPRs > 0) {
-    lines.push(`| Copilot-reviewed PRs | ${copilotTotals.copilotReviewedPRs} (${pct(copilotTotals.copilotReviewedPRs, copilotTotals.totalDetailedPRs)}%) | ${WINDOW.collected} |`);
+    lines.push(
+      `| Copilot-reviewed PRs | ${copilotTotals.copilotReviewedPRs} ` +
+        `(${pct(copilotTotals.copilotReviewedPRs, copilotTotals.totalDetailedPRs)}% ` +
+        `of ${copilotTotals.totalDetailedPRs} sampled PRs) | ${WINDOW.collected} |`
+    );
+    lines.push(
+      "> Unlike the row above, this one really is Copilot-only (a review " +
+        "from `copilot[bot]`) and is sampled from up to 10 of the most " +
+        "recently merged PRs per repository — a much smaller population " +
+        "than the collected-history figure above."
+    );
   }
 
   // Copilot agent tasks summary
@@ -87,7 +119,15 @@ export function generateReport(metrics: OrgMetrics): string {
     lines.push(`| Agent tasks failed | ${agentTotals.failedTasks} | ${WINDOW.last30d} |`);
     lines.push(`| Agent sessions | ${agentTotals.totalSessions} (${agentTotals.cloudAgentSessions} cloud / ${agentTotals.cliRemoteSessions} CLI) | ${WINDOW.last30d} |`);
     pushIf(lines, agentTotals.totalCreditsUsed > 0, () => `| Agent credits used | ${agentTotals.totalCreditsUsed.toFixed(1)} | ${WINDOW.last30d} |`);
-    pushIf(lines, agentTotals.agentCreatedPRs > 0, () => `| PRs created by agent | ${agentTotals.agentCreatedPRs} | ${WINDOW.last30d} |`);
+    if (agentTotals.agentCreatedPRs > 0) {
+      lines.push(`| PRs created by agent | ${agentTotals.agentCreatedPRs} | ${WINDOW.last30d} |`);
+      lines.push(
+        "> A different measurement from the AI-authored row above: this " +
+          "counts only PRs traced to a Copilot coding-agent task (via the " +
+          "Task API, not commit/PR text matching), over the last 30 days " +
+          "only, and Copilot-agent specifically — not Claude or Codex."
+      );
+    }
     pushIf(lines, agentTotals.agentActionsMinutes > 0, () => `| Agent PR Actions minutes | ${agentTotals.agentActionsMinutes.toFixed(1)} | ${WINDOW.last30d} |`);
   }
 
@@ -319,6 +359,27 @@ function aggregateCopilot(repos: RepoMetrics[]): CopilotAdoption {
     }
   }
   return { copilotAuthoredPRs, copilotReviewedPRs, totalMergedPRs, totalDetailedPRs, humanMergedPRs };
+}
+
+/**
+ * Break the "AI-authored" total down by tool, from the same merged-PR
+ * timeline `aggregateCopilot`'s `copilotAuthoredPRs` is summed from. Answers
+ * "which usernames or markers count as Copilot-authored" concretely: only
+ * the `copilot` count below is Copilot specifically — Claude and Codex are
+ * counted separately even though they roll up into the combined AI total.
+ */
+function aggregateAIAuthorshipByTool(repos: RepoMetrics[]) {
+  let copilot = 0;
+  let claude = 0;
+  let codex = 0;
+  for (const r of repos) {
+    for (const pr of r.mergedPRTimeline ?? []) {
+      if (pr.aiAuthorType === "copilot") copilot++;
+      else if (pr.aiAuthorType === "claude") claude++;
+      else if (pr.aiAuthorType === "codex") codex++;
+    }
+  }
+  return { copilot, claude, codex };
 }
 
 function aggregateAgentMetrics(repos: RepoMetrics[]): CopilotAgentMetrics {

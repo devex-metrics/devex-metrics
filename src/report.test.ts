@@ -34,7 +34,7 @@ function makeSampleMetrics(): OrgMetrics {
         ],
         mergedPRTimeline: [
           { number: 42, createdAt: "2026-03-01T00:00:00Z", mergedAt: "2026-03-03T00:00:00Z", author: "dev1", isBotAuthor: false, isCopilotAuthored: false, timeToMergeHours: 48, closesIssues: [] },
-          { number: 43, createdAt: "2026-03-02T00:00:00Z", mergedAt: "2026-03-04T00:00:00Z", author: "copilot[bot]", isBotAuthor: true, isCopilotAuthored: true, timeToMergeHours: 48, closesIssues: [] },
+          { number: 43, createdAt: "2026-03-02T00:00:00Z", mergedAt: "2026-03-04T00:00:00Z", author: "copilot[bot]", isBotAuthor: true, isCopilotAuthored: true, aiAuthorType: "copilot", timeToMergeHours: 48, closesIssues: [] },
         ],
         copilotAdoption: { copilotAuthoredPRs: 1, copilotReviewedPRs: 1, totalMergedPRs: 2, totalDetailedPRs: 1 },
         issueLeadTimes: [],
@@ -75,8 +75,21 @@ describe("generateReport", () => {
   it("should include Copilot adoption metrics in the summary", () => {
     const report = generateReport(makeSampleMetrics());
 
-    expect(report).toContain("Copilot-authored PRs | 1 (50.0%)");
-    expect(report).toContain("Copilot-reviewed PRs | 1 (100.0%)");
+    expect(report).toContain(
+      "AI-authored PRs (Copilot + Claude + Codex) | 1 (50.0% of 2 merged PRs in the collected history)"
+    );
+    expect(report).toContain("| — of which Copilot | 1 |");
+    expect(report).toContain(
+      "Copilot-reviewed PRs | 1 (100.0% of 1 sampled PRs)"
+    );
+  });
+
+  it("should explain AI-authorship attribution rules and the reviewed-PR sample size", () => {
+    const report = generateReport(makeSampleMetrics());
+
+    expect(report).toContain("human-opened PR containing even a single AI-assisted commit still counts");
+    expect(report).toContain("dependabot[bot]");
+    expect(report).toContain("this one really is Copilot-only");
   });
 
   it("should document the differing populations behind reviewer counts", () => {
@@ -119,8 +132,8 @@ describe("generateReport", () => {
     expect(report).toContain("| Closed (unmerged) PRs | 1 | Repository lifetime |");
     expect(report).toContain("| Unique committers | 5 | Last 90 days |");
     expect(report).toContain("| Unique reviewers, incl. bots | 4 | Collected history |");
-    expect(report).toContain("| Copilot-authored PRs | 1 (50.0%) | Collected history |");
-    expect(report).toContain("| Copilot-reviewed PRs | 1 (100.0%) | Collected history |");
+    expect(report).toContain("| — of which Copilot | 1 | Collected history |");
+    expect(report).toContain("Copilot-reviewed PRs | 1 (100.0% of 1 sampled PRs) | Collected history |");
   });
 
   it("should label per-repo issue, PR and contributor lines with their windows", () => {
