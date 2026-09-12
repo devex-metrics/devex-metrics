@@ -29,6 +29,7 @@ export interface OrgMetrics {
    * org/user collections.
    */
   groupName?: string;
+  /**
    * Where this data came from: a fresh API collection, the daily cache, or an
    * explicitly opted-in fixture. Surfaced in the dashboard so a stale page is
    * never mistaken for a fresh one.
