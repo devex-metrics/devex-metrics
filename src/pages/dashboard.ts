@@ -581,7 +581,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
     </div>
   </section>
 
-  <section class="charts" aria-label="Copilot and Agent metrics">
+  <section class="charts" aria-label="AI and Agent metrics">
     <div class="card card-chart card-wide"><h2>AI-authored PRs merged per week</h2><canvas id="chartCopilotPRTrend"></canvas></div>
     <div class="card card-chart card-wide"><h2>Agent Tasks by Repository (30&nbsp;d)</h2><canvas id="chartAgentTasks"></canvas></div>
   </section>
