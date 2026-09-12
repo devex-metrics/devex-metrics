@@ -596,8 +596,17 @@ export function pageSizeReductionSequence(initial: number, min: number): number[
  */
 function isExpensiveQuerySignal(err: unknown): boolean {
   if (isTransientServerError(err)) return true; // covers HTTP 502/504
-  const graphqlError = err as { errors?: Array<{ type?: string; message?: string }> };
-  if (!graphqlError.errors) return false;
+  if (isGenericGraphQLExecutionError(err)) return true;
+  const graphqlError = err as {
+    errors?: Array<{ type?: string; message?: string }>;
+    data?: unknown;
+  };
+  if (
+    !Array.isArray(graphqlError.errors) ||
+    (graphqlError.data !== undefined && graphqlError.data !== null)
+  ) {
+    return false;
+  }
   return graphqlError.errors.some((e) => {
     const msg = e.message?.toLowerCase() ?? "";
     return (
