@@ -340,9 +340,11 @@ export interface CopilotAdoption {
    * Number of detailed PRs that received a review from `copilot[bot]`
    * specifically (unlike `copilotAuthoredPRs`, this one really is
    * Copilot-only — Claude/Codex reviews are not counted). Measured over
-   * `totalDetailedPRs`, a much smaller sample (up to 10 most recently
-   * updated closed PRs per repo, filtered to merged) than the merged-PR
-   * timeline used for authorship.
+   * `totalDetailedPRs`, up to 10 PRs per repo: the REST fallback starts from
+   * the 10 most recently updated closed PRs before filtering to merged, while
+   * the GraphQL path selects the 10 most recently merged from the fetched
+   * timeline, a much smaller population than the merged-PR timeline used for
+   * authorship.
    */
   copilotReviewedPRs: number;
   /** Total merged PRs in the collected timeline (includes bots; denominator for `copilotAuthoredPRs`). */
