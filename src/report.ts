@@ -15,8 +15,9 @@ const WINDOW = {
   lifetime: "Repository lifetime",
   /**
    * The enriched PR timeline the collector keeps: up to ~1,000 most recently
-   * updated PRs per repo, roughly the last ~2 years. Not the full lifetime
-   * for older or very active repositories.
+   * updated PRs per repo (GraphQL: roughly the last ~2 years; REST fallback:
+   * up to 1,000 most recently updated closed PRs filtered to merged, with no
+   * date cutoff). Not the full lifetime for older or very active repositories.
    */
   collected: "Collected history",
   last30d: "Last 30 days",
