@@ -47,6 +47,16 @@ export function generateReport(metrics: OrgMetrics): string {
       "history)."
   );
   lines.push("");
+  lines.push(
+    "> **Reviewer counts are two different populations.** " +
+      "*Unique reviewers* counts every distinct account that submitted a " +
+      "pull request review — including bot accounts — across the sampled " +
+      "PR history. *Review load concentration* (Gini) counts only " +
+      "individual review submissions by human reviewers (bots excluded), " +
+      "and only from repositories whose enriched review timeline was " +
+      "collected. The two are not meant to add up to the same denominator."
+  );
+  lines.push("");
   lines.push(`| Metric | Value | Window |`);
   lines.push(`| ------ | ----- | ------ |`);
   lines.push(`| Repositories | ${metrics.repoCount} | ${WINDOW.snapshot} |`);
@@ -58,7 +68,7 @@ export function generateReport(metrics: OrgMetrics): string {
   lines.push(`| Merged PRs | ${totals.mergedPRs} | ${WINDOW.lifetime} |`);
   lines.push(`| Closed (unmerged) PRs | ${totals.closedPRs} | ${WINDOW.lifetime} |`);
   lines.push(`| Unique committers | ${totals.committers} | ${WINDOW.last90d} |`);
-  lines.push(`| Unique reviewers | ${totals.reviewers} | ${WINDOW.last90d} |`);
+  lines.push(`| Unique reviewers, incl. bots | ${totals.reviewers} | ${WINDOW.collected} |`);
 
   // Copilot adoption summary
   const copilotTotals = aggregateCopilot(metrics.repos);
@@ -135,7 +145,7 @@ export function generateReport(metrics: OrgMetrics): string {
   const reviewCounts = [...flow.reviewsBy.values()];
   if (reviewCounts.length > 1) {
     lines.push(
-      `| Review load concentration | Gini ${gini(reviewCounts).toFixed(2)} ` +
+      `| Review load concentration (human reviewers only, bots excluded) | Gini ${gini(reviewCounts).toFixed(2)} ` +
         `across ${reviewCounts.length} reviewers | ${WINDOW.collected} |`
     );
   }
@@ -167,8 +177,8 @@ export function generateReport(metrics: OrgMetrics): string {
         `(${WINDOW.lifetime.toLowerCase()})`
     );
     lines.push(
-      `Contributors: ${repo.committerCount} committers · ${repo.reviewerCount} reviewers ` +
-        `(${WINDOW.last90d.toLowerCase()})`
+      `Contributors: ${repo.committerCount} committers (${WINDOW.last90d.toLowerCase()}) · ` +
+        `${repo.reviewerCount} reviewers, incl. bots (${WINDOW.collected.toLowerCase()})`
     );
     lines.push(`Dependents: ${repo.dependentCount}`);
     lines.push("");

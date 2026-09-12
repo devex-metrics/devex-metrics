@@ -108,16 +108,26 @@ export interface RepoMetrics {
   openPRTimeline?: OpenPRSummary[];
   /**
    * Reviews per reviewer across the collected pull requests, for review-load
-   * concentration. Absent in older data.
+   * concentration. Bot accounts (e.g. `dependabot[bot]`) are excluded, and
+   * only PRs from the collected review timeline (same population as
+   * `mergedPRTimeline` / `closedPRTimeline`, roughly the last ~13 months)
+   * contribute — a different population from `reviewerCount` below. Absent
+   * in older data.
    */
   reviewerLoad?: ReviewerLoad[];
   /** Lead-time data for issues referenced by merged PRs. */
   issueLeadTimes?: IssueLeadTime[];
-  /** Unique committers in the default branch (last 90 days). */
+  /** Unique committers on the default branch in the last 90 days (by commit author login/email). */
   committerCount: number;
-  /** Unique PR reviewers (last 90 days). */
+  /**
+   * Unique accounts that submitted at least one pull request review
+   * (approval, comment, or changes-requested), sampled from the collected
+   * PR review timeline (roughly the last ~13 months, not a strict 90-day
+   * window despite sharing a row with `committerCount`). Unlike
+   * `reviewerLoad`, this includes bot accounts.
+   */
   reviewerCount: number;
-  /** Unique contributors (union of committers and reviewers, last 90 days). */
+  /** Unique contributors (union of committers and reviewers). See `committerCount` and `reviewerCount` for each side's window and bot-inclusion rules. */
   contributorCount: number;
   /** Number of repositories that depend on this repo (from dependency graph). */
   dependentCount: number;
@@ -274,7 +284,10 @@ export interface CiRunSample {
   queueMinutes?: number;
 }
 
-/** How many reviews one reviewer submitted in the collected window. */
+/**
+ * How many reviews one (human, non-bot) reviewer submitted in the collected
+ * PR review window. See `RepoMetrics.reviewerLoad` for the exact population.
+ */
 export interface ReviewerLoad {
   /** Reviewer's GitHub login. */
   reviewer: string;
