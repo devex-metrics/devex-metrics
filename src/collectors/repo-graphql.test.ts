@@ -521,7 +521,7 @@ describe("fetchHistoricalPRPage", () => {
     expect(outcome.ok).toBe(false);
     if (!outcome.ok) {
       expect(outcome.failure.kind).toBe("transient");
-      expect(outcome.failure.category).toContain("5xx");
+      expect(outcome.failure.category).toContain("502/504");
     }
     vi.useRealTimers();
   });
@@ -695,6 +695,15 @@ describe("fetchHistoricalPRPage (adaptive page sizing)", () => {
     await expect(fetchHistoricalPRPage("owner", "repo", null, PAGE_SIZE_OPTIONS)).rejects.toThrow();
   });
 
+  it("does not reduce the page size for a general 5xx status outside 502/504 — it is fatal instead", async () => {
+    // A plain 500/503 is a general server-side outage, not the documented
+    // "expensive query" signal (502/504 or the generic execution error), so
+    // it must not trigger a page-size reduction and is left fatal instead.
+    const err = Object.assign(new Error("Internal server error"), { status: 500 });
+    setOctokit(buildMockOctokit([err]));
+    await expect(fetchHistoricalPRPage("owner", "repo", null, PAGE_SIZE_OPTIONS)).rejects.toThrow();
+  });
+
   it("returns a not-found failure for a repository-not-found error", async () => {
     const err = Object.assign(new Error("Not found"), {
       errors: [{ type: "NOT_FOUND", message: "Could not resolve to a Repository" }],
@@ -724,7 +733,7 @@ describe("fetchHistoricalPRPage (adaptive page sizing)", () => {
     // Bounded: exactly one attempt per size in the sequence [50, 25, 12, 10] = 4.
     expect((warnSpy.mock.calls as unknown[][]).length).toBe(4);
     expect(warnSpy).toHaveBeenLastCalledWith(
-      expect.stringContaining("still timing out at the minimum page size")
+      expect.stringContaining("still failing at the minimum page size")
     );
     warnSpy.mockRestore();
     vi.useRealTimers();

@@ -177,13 +177,21 @@ function emptyWatermark(): RepoWatermark {
   };
 }
 
-/** Advance a watermark with what one page returned. */
+/**
+ * Advance a watermark with what one page returned. `defaultPageSize` is the
+ * currently configured default (`config.pageSize`): the persisted hint is
+ * only set when `pageSize` is actually below it, so an ordinary page at the
+ * configured default is never mistaken for a reduced-size preference. That
+ * way, raising the configured default later is not silently overridden by a
+ * stale hint recorded when the default itself was that same value.
+ */
 function advance(
   mark: RepoWatermark,
   nodes: readonly HistoricalPRNode[],
   endCursor: string | null,
   hasNextPage: boolean,
-  pageSize: number
+  pageSize: number,
+  defaultPageSize: number
 ): RepoWatermark {
   let oldest = mark.oldestCreatedAt;
   let newest = mark.newestCreatedAt;
@@ -201,7 +209,7 @@ function advance(
     oldestCreatedAt: oldest,
     newestCreatedAt: newest,
     updatedAt: new Date().toISOString(),
-    preferredPageSize: pageSize,
+    preferredPageSize: pageSize < defaultPageSize ? pageSize : undefined,
   };
 }
 
@@ -210,9 +218,13 @@ function advance(
  * hint from a previous successful reduced-size page, if still valid under
  * the current configuration, otherwise the configured default. A stale or
  * out-of-range hint (e.g. the configuration changed since it was recorded)
- * is ignored rather than clamped, so behaviour stays predictable.
+ * is ignored rather than clamped, so behaviour stays predictable. When
+ * adaptive sizing is disabled, any persisted hint is ignored outright so a
+ * single request is always made at the configured default, matching the
+ * documented disabled-mode contract.
  */
 function startingPageSize(mark: RepoWatermark, config: BackfillConfig): number {
+  if (!config.adaptivePageSize) return config.pageSize;
   const hint = mark.preferredPageSize;
   if (
     typeof hint === "number" &&
@@ -340,6 +352,17 @@ export async function runBackfill(
             // cursor/completion decisions) so the next run's operator can see
             // why, without the cursor itself ever moving.
             outcome = pageOutcome.failure.kind === "transient" ? "deferred" : "skipped";
+            // Even though the page ultimately failed, `attempts` counts every
+            // GraphQL request made for it — attempts beyond the first are
+            // page-size reductions that were tried before giving up, and must
+            // still be reflected in the run's reduction summary.
+            const attemptedReductions = (pageOutcome.failure.attempts ?? 1) - 1;
+            if (attemptedReductions > 0) {
+              result.pageSizeReductions += attemptedReductions;
+              if (!result.reposWithReducedPageSize.includes(fullName)) {
+                result.reposWithReducedPageSize.push(fullName);
+              }
+            }
             current = {
               ...current,
               deferredAt: new Date().toISOString(),
@@ -359,9 +382,15 @@ export async function runBackfill(
 
           if (page.pageSize < effectivePageSize) {
             result.pageSizeReductions++;
-            if (!result.reposWithReducedPageSize.includes(fullName)) {
-              result.reposWithReducedPageSize.push(fullName);
-            }
+          }
+          // A page can be below the configured default either because this
+          // run just reduced it (above) or because the repository resumed
+          // from an already-reduced persisted hint — either way the run used
+          // a smaller-than-default size, so report it against `config.pageSize`
+          // independently of `effectivePageSize` (which may already equal the
+          // reduced size on a resumed run and would otherwise miss this).
+          if (page.pageSize < config.pageSize && !result.reposWithReducedPageSize.includes(fullName)) {
+            result.reposWithReducedPageSize.push(fullName);
           }
           // Keep the size that just succeeded for the rest of this repository's
           // run — returning to a larger size would likely reproduce the timeout
@@ -382,7 +411,7 @@ export async function runBackfill(
           // crashed, or simply out of time — never loses more than the page
           // it is currently mid-fetch on, and never re-requests a page whose
           // events already made it to durable history.
-          current = advance(current, page.nodes, page.endCursor, page.hasNextPage, effectivePageSize);
+          current = advance(current, page.nodes, page.endCursor, page.hasNextPage, effectivePageSize, config.pageSize);
           state.repos[fullName] = current;
           saveBackfillState(historyDir, state);
 
@@ -472,12 +501,21 @@ export function describeBackfill(
   result: BackfillResult,
   config: BackfillConfig
 ): string {
+  const reductionSuffix =
+    result.pageSizeReductions > 0
+      ? ` Page size: initial=${config.pageSize}, min=${config.minPageSize}, ` +
+        `${result.pageSizeReductions} reduction(s) across ` +
+        `${result.reposWithReducedPageSize.length} repo(s).`
+      : "";
   if (result.allComplete) {
-    return `History complete — every repository crawled to its first pull request.`;
+    return (
+      `History complete — every repository crawled to its first pull request.` +
+      reductionSuffix
+    );
   }
   const duplicateNote =
     result.duplicateEventsIgnored > 0 ? `, ${result.duplicateEventsIgnored} duplicate events ignored` : "";
-  let line =
+  return (
     `Backfill: ${result.pagesFetched}/${config.pagesPerRun} pages spent, ` +
     `${result.eventsAppended} events appended${duplicateNote}, ` +
     `${result.reposStarted} started, ${result.reposResumed} resumed, ` +
@@ -485,13 +523,8 @@ export function describeBackfill(
     `${result.reposIncomplete} incomplete, ` +
     `${result.reposDeferred} deferred, ` +
     `${result.reposSkipped} skipped ` +
-    `(${result.reposAlreadyComplete} already complete). Continues next run.`;
-  if (result.pageSizeReductions > 0) {
-    line +=
-      ` Page size: initial=${config.pageSize}, min=${config.minPageSize}, ` +
-      `${result.pageSizeReductions} reduction(s) across ` +
-      `${result.reposWithReducedPageSize.length} repo(s).`;
-  }
-  return line;
+    `(${result.reposAlreadyComplete} already complete). Continues next run.` +
+    reductionSuffix
+  );
 }
 

@@ -299,6 +299,20 @@ function isTransientServerError(err: unknown): boolean {
 }
 
 /**
+ * Return true only for the two HTTP gateway statuses (502, 504) that the
+ * adaptive page-size policy documents as an "expensive query" signal.
+ * Deliberately narrower than {@link isTransientServerError}: a general 5xx
+ * outage (500, 503, ...) is a server-side problem unrelated to the size of
+ * this particular query, so it must not trigger a page-size reduction here.
+ * The broader helper remains unchanged for the existing daily-query retry
+ * path.
+ */
+function isExpensiveQueryHttpError(err: unknown): boolean {
+  const httpError = err as { status?: number };
+  return httpError.status === 502 || httpError.status === 504;
+}
+
+/**
  * Return true for GitHub's generic GraphQL execution failure — the
  * "Something went wrong while executing your query" response GitHub sends
  * for an internal hiccup unrelated to the query itself (distinct from a rate
@@ -595,7 +609,7 @@ export function pageSizeReductionSequence(initial: number, min: number): number[
  * skip, or a re-thrown fatal error).
  */
 function isExpensiveQuerySignal(err: unknown): boolean {
-  if (isTransientServerError(err)) return true; // covers HTTP 502/504
+  if (isExpensiveQueryHttpError(err)) return true; // covers HTTP 502/504 only
   if (isGenericGraphQLExecutionError(err)) return true;
   const graphqlError = err as {
     errors?: Array<{ type?: string; message?: string }>;
@@ -684,8 +698,8 @@ export async function fetchHistoricalPRPage(
           continue;
         }
         const requestId = extractGitHubRequestId(err);
-        const category = isTransientServerError(err)
-          ? "repeated HTTP 5xx gateway error"
+        const category = isExpensiveQueryHttpError(err)
+          ? "repeated HTTP 502/504 gateway error"
           : "GitHub GraphQL transient execution error";
         const failureDescription = options.adaptive
           ? `still failing at the minimum page size (${size})`
