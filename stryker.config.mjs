@@ -20,6 +20,9 @@ export default {
   thresholds: {
     high: 80,
     low: 60,
-    break: null, // report results without failing the build on score alone
+    // Ratcheted just under the current baseline (58% as of 2026-09) so CI fails
+    // on regressions without blocking on the pre-existing gap tracked by the
+    // weekly mutation-improvement issue. Raise this as the score improves.
+    break: 55,
   },
 };

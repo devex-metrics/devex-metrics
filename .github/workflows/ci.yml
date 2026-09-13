@@ -20,7 +20,14 @@ jobs:
           node-version-file: ".nvmrc"
           cache: "npm"
 
-      - run: npm ci
+      - id: node-modules-cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+
+      - if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: npm ci
 
       - run: npm run build
 
@@ -36,9 +43,49 @@ jobs:
           node-version-file: ".nvmrc"
           cache: "npm"
 
-      - run: npm ci
+      - id: node-modules-cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+
+      - if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: npm ci
 
       - run: npm run lint
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - id: node-modules-cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+
+      - if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - run: npm run coverage
+
+      - name: Upload Cobertura coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-cobertura
+          path: coverage/cobertura-coverage.xml
+          if-no-files-found: error
+
+      - name: Post coverage summary
+        if: always()
+        run: node scripts/coverage-summary.mjs >> $GITHUB_STEP_SUMMARY
 
   mutation:
     needs: test
@@ -52,9 +99,14 @@ jobs:
           node-version-file: ".nvmrc"
           cache: "npm"
 
-      - run: npm ci
+      - id: node-modules-cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
 
-      - run: npm run build
+      - if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Run mutation tests
         run: npm run mutation:ci

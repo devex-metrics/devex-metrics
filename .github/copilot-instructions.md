@@ -152,13 +152,20 @@ Mutation testing is provided by [Stryker](https://stryker-mutator.io/) with the 
 - **Config**: `stryker.config.mjs` (ESM). Mutates all `src/**/*.ts` except test files, `types.ts`, `index.ts`, `save-fixture.ts`, and `build-pages.ts` (the last is excluded because its tests run via subprocess and Stryker cannot track coverage that way).
 - **Run locally** (before creating a PR): `npm run mutation` — produces an HTML report at `reports/mutation/index.html` and a text summary in the terminal.
 - **Run in CI mode**: `npm run mutation:ci` — outputs JSON + text (no HTML). The `mutation` job in `ci.yml` reads `reports/mutation/mutation.json` and posts a Markdown summary to the GitHub Actions step summary via `node scripts/mutation-summary.mjs >> $GITHUB_STEP_SUMMARY`.
-- **Thresholds**: `high: 80`, `low: 60` for colour-coding only; `break: null` so the CI job never fails purely on score. Tighten `break` once you have a stable baseline.
+- **Thresholds**: `high: 80`, `low: 60` for colour-coding; `break: 55` ratchets just under the current baseline so CI fails on regressions without blocking on the pre-existing gap. Raise `break` as the score improves — never lower it.
 - **Interpreting results**: a survived mutant means a code change was not caught by any test — it may indicate a test gap worth addressing. NoCoverage mutants mean no test exercises that line at all.
 - **reports/** is gitignored — never commit Stryker output.
 
+## Code coverage
+
+- Coverage is collected with Vitest's built-in `@vitest/coverage-v8` provider, configured in `vitest.config.ts`.
+- **Run locally**: `npm run coverage` — writes `coverage/cobertura-coverage.xml`, `coverage/coverage-summary.json`, and an HTML report to `coverage/` (gitignored).
+- **Run in CI**: the `coverage` job in `ci.yml` runs `npm run coverage`, uploads `coverage/cobertura-coverage.xml` as a build artifact (`coverage-cobertura`), and posts a Markdown summary to the step summary via `node scripts/coverage-summary.mjs >> $GITHUB_STEP_SUMMARY`.
+- Coverage is informational only (no enforced threshold) — same "don't chase 100%" philosophy as the Testing section above.
+
 ## GitHub Actions
 
-- **ci.yml**: runs `npm ci`, `npm run build`, `npm test` on every push/PR to `main`. A second `mutation` job (depends on `test`) runs Stryker and posts a step summary; it runs on every PR but does not block merging on score.
+- **ci.yml**: four jobs on every push/PR to `main` — `test` (build + `npm test`), `lint`, `coverage`, and `mutation` (`needs: test`, runs Stryker and posts a step summary; blocks only if the score drops below the `break` threshold in `stryker.config.mjs`). Each job caches `node_modules` (keyed on `package-lock.json`) via `actions/cache` and skips `npm ci` on a cache hit, so repeated installs across jobs don't each pay full install cost.
 - **collect-metrics.yml**: scheduled daily; checks out `metrics-data`, collects metrics, appends to the history store, pushes it back, then calls `pages.yml`. Does **not** commit to `main`.
 - **pages.yml**: reusable (`workflow_call`); builds the site from the `metrics-data` checkout and deploys to Pages.
 - Always pin action versions to a full SHA or major-version tag.
