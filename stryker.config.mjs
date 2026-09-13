@@ -5,6 +5,10 @@ export default {
   testRunner: "vitest",
   plugins: ["@stryker-mutator/vitest-runner"],
   coverageAnalysis: "perTest",
+  // dist/ is gitignored, so Stryker's sandbox (which respects .gitignore when
+  // copying files) never receives it. build-pages.test.ts shells out to
+  // dist/build-pages.js, so it needs a fresh build inside each sandbox.
+  buildCommand: "npm run build",
   mutate: [
     "src/**/*.ts",
     "!src/**/*.test.ts",
