@@ -23,12 +23,15 @@
  * 1. `null` and `undefined` become the empty string — this project's
  *    established convention for an absent table value (e.g. a PR with no
  *    merge date already renders as an empty cell).
- * 2. The value is converted to text: `String(value)` for primitives,
- *    functions, and symbols; `JSON.stringify(value)` for everything else
- *    (objects/arrays), falling back to the literal `"[object Object]"` when
- *    `JSON.stringify` itself returns `undefined` (an object whose `toJSON()`
- *    returns `undefined`) or throws (a circular reference, a nested
- *    `bigint`, a `toJSON()` that throws) — so serialization never throws.
+ * 2. The value is converted to text: `String(value)` for primitives;
+ *    `String(value)` for functions and symbols, falling back to
+ *    `"[Function]"` / `"[Symbol]"` when a hostile custom `toString()` /
+ *    `Symbol.toPrimitive` throws instead of returning text;
+ *    `JSON.stringify(value)` for everything else (objects/arrays), falling
+ *    back to the literal `"[object Object]"` when `JSON.stringify` itself
+ *    returns `undefined` (an object whose `toJSON()` returns `undefined`)
+ *    or throws (a circular reference, a nested `bigint`, a `toJSON()` that
+ *    throws) — so serialization never throws.
  * 3. CRLF, LF, CR, and tab characters are each replaced with a single
  *    space, so one logical cell can never introduce another physical
  *    Markdown row or a stray tab.
@@ -56,13 +59,27 @@ export function escapeMarkdownTableCell(value: unknown): string {
       : typeof value === "number" || typeof value === "boolean" || typeof value === "bigint"
         ? String(value)
         : typeof value === "function" || typeof value === "symbol"
-          ? String(value)
+          ? safeToString(value)
           : stringifyObject(value);
   const normalized = text
     .replace(/\r\n|\r|\n|\t/g, " ")
     .replace(/ {2,}/g, " ")
     .trim();
   return normalized.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
+}
+
+/**
+ * `String()` for a function or symbol value, tolerant of a hostile custom
+ * `toString()` / `Symbol.toPrimitive` that throws instead of returning text.
+ * Falls back to a generic placeholder rather than propagating, matching the
+ * documented no-throw contract of {@link escapeMarkdownTableCell}.
+ */
+function safeToString(value: unknown): string {
+  try {
+    return String(value);
+  } catch {
+    return typeof value === "function" ? "[Function]" : "[Symbol]";
+  }
 }
 
 /**

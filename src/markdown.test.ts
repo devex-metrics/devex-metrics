@@ -122,6 +122,25 @@ describe("escapeMarkdownTableCell", () => {
     expect(() => escapeMarkdownTableCell(throwingToJSON)).not.toThrow();
     expect(escapeMarkdownTableCell(throwingToJSON)).toBe("[object Object]");
   });
+
+  it("does not throw when a function or symbol has a hostile String() conversion", () => {
+    // A function can override toString() to throw, and a symbol-like object
+    // with Symbol.toPrimitive can throw too — String(value) is not
+    // guaranteed to succeed for either. Both must fall back to a generic
+    // placeholder rather than propagating.
+    const throwingFn = () => {};
+    throwingFn.toString = () => {
+      throw new Error("boom");
+    };
+    expect(() => escapeMarkdownTableCell(throwingFn)).not.toThrow();
+    expect(escapeMarkdownTableCell(throwingFn)).toBe("[Function]");
+
+    const ordinaryFn = function namedFn() {};
+    expect(escapeMarkdownTableCell(ordinaryFn)).toContain("namedFn");
+
+    const ordinarySymbol = Symbol("label");
+    expect(escapeMarkdownTableCell(ordinarySymbol)).toBe("Symbol(label)");
+  });
 });
 
 describe("renderMarkdownTableRow", () => {
