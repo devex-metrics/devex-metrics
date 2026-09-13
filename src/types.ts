@@ -22,6 +22,14 @@ export interface OrgMetrics {
   /** Weekly activity trends aggregated across all repos (last ~2 years). */
   weeklyTrends?: WeeklyTrendPoint[];
   /**
+   * Human-friendly name for a custom dataset collected from an explicit list
+   * of repos (e.g. discovered from a local folder) rather than a full
+   * org/user listing. Used to label and store this data as its own local
+   * "group" separate from the main owner-based dataset. Absent for regular
+   * org/user collections.
+   */
+  groupName?: string;
+  /**
    * Where this data came from: a fresh API collection, the daily cache, or an
    * explicitly opted-in fixture. Surfaced in the dashboard so a stale page is
    * never mistaken for a fresh one.
