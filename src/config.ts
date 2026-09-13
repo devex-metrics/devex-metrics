@@ -138,6 +138,26 @@ export interface BackfillConfig {
    * for a run that only needs to advance the crawl.
    */
   recomputeRollups: boolean;
+  /**
+   * GraphQL page size (`first`) requested per historical page. An integer
+   * from 1 through 100. Large repositories can make a page this size take
+   * 10+ seconds and risk a 502/504 or GitHub's secondary rate limit, so the
+   * default is well below the API's own maximum of 100.
+   */
+  pageSize: number;
+  /**
+   * Floor for adaptive page-size reduction (see `adaptivePageSize`). An
+   * integer from 1 through 100, and never greater than `pageSize`.
+   */
+  minPageSize: number;
+  /**
+   * When a historical page repeatedly shows expensive-query behaviour (a
+   * 502/504, or a generic "something went wrong" GraphQL execution error),
+   * retry the same cursor with a smaller page size instead of giving up on
+   * the repository. The size is halved down to `minPageSize` and the
+   * successful size is kept for the rest of the repository's crawl this run.
+   */
+  adaptivePageSize: boolean;
 }
 
 /** Collection tuning. */
@@ -203,6 +223,9 @@ export function defaultConfig(): DevexConfig {
         pagesPerRun: 200,
         maxPagesPerRepo: 20,
         recomputeRollups: true,
+        pageSize: 50,
+        minPageSize: 10,
+        adaptivePageSize: true,
       },
       ciHealth: { pagesPerRun: 20, maxPagesPerRepo: 5, windowDays: 90 },
     },
@@ -249,6 +272,22 @@ function int(env: Env, key: string): number | undefined {
   if (v === undefined) return undefined;
   const n = Number.parseInt(v, 10);
   return Number.isFinite(n) ? n : undefined;
+}
+
+/**
+ * Parse a whole-number environment variable, rejecting anything `int()` would
+ * silently truncate or coerce (decimals, signs-only, empty, non-numeric).
+ * Throws immediately with the offending variable name and value so a
+ * misconfigured page size fails loudly rather than collecting with a
+ * silently wrong number.
+ */
+function strictInt(env: Env, key: string): number | undefined {
+  const v = str(env, key);
+  if (v === undefined) return undefined;
+  if (!/^\d+$/.test(v)) {
+    throw new Error(`${key} must be a whole number from 1 through 100, got "${v}".`);
+  }
+  return Number.parseInt(v, 10);
 }
 
 function assign<T, K extends keyof T>(target: T, key: K, value: T[K] | undefined): void {
@@ -352,6 +391,13 @@ function applyEnv(config: DevexConfig, env: Env): void {
   assign(config.collection.backfill, "pagesPerRun", int(env, "DEVEX_BACKFILL_PAGES_PER_RUN"));
   assign(config.collection.backfill, "maxPagesPerRepo", int(env, "DEVEX_BACKFILL_MAX_PAGES_PER_REPO"));
   assign(config.collection.backfill, "recomputeRollups", bool(env, "DEVEX_BACKFILL_RECOMPUTE"));
+  assign(config.collection.backfill, "pageSize", strictInt(env, "DEVEX_BACKFILL_PAGE_SIZE"));
+  assign(config.collection.backfill, "minPageSize", strictInt(env, "DEVEX_BACKFILL_MIN_PAGE_SIZE"));
+  assign(
+    config.collection.backfill,
+    "adaptivePageSize",
+    bool(env, "DEVEX_BACKFILL_ADAPTIVE_PAGE_SIZE")
+  );
 
   assign(config.history, "enabled", bool(env, "DEVEX_HISTORY_ENABLED"));
   assign(config.history, "dir", str(env, "DEVEX_HISTORY_DIR"));
@@ -395,6 +441,33 @@ function applyEnv(config: DevexConfig, env: Env): void {
     assign(trial, "baselineTo", baselineTo);
     if (milestones !== undefined) trial.milestones = parseMilestones(milestones);
     config.trial = trial;
+  }
+}
+
+/**
+ * Validate the historical backfill page-size configuration.
+ *
+ * Runs unconditionally after every load (defaults always pass) so a bad
+ * value from `DEVEX_BACKFILL_PAGE_SIZE`/`DEVEX_BACKFILL_MIN_PAGE_SIZE`, a
+ * config file, or `DEVEX_CONFIG` fails loudly and specifically, rather than
+ * silently clamping or being accepted and misbehaving during collection.
+ */
+function validateBackfillPageSizes(backfill: BackfillConfig): void {
+  for (const [label, value] of [
+    ["pageSize", backfill.pageSize],
+    ["minPageSize", backfill.minPageSize],
+  ] as const) {
+    if (!Number.isInteger(value) || value < 1 || value > 100) {
+      throw new Error(
+        `Backfill ${label} must be an integer from 1 through 100, got ${value}.`
+      );
+    }
+  }
+  if (backfill.minPageSize > backfill.pageSize) {
+    throw new Error(
+      `Backfill minPageSize (${backfill.minPageSize}) must not exceed pageSize ` +
+        `(${backfill.pageSize}).`
+    );
   }
 }
 
@@ -456,6 +529,7 @@ export function loadConfig(env: Env = process.env): DevexConfig {
   }
 
   applyEnv(config, env);
+  validateBackfillPageSizes(config.collection.backfill);
   return config;
 }
 

@@ -11,8 +11,17 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
  *
  * Version history:
  *   1 — initial version
+ *   2 — `CopilotAgentTask.prNumbers` and the `perPRActionsMinutes` cache keys
+ *       previously stored the "pull" artifact's raw database ID
+ *       (`data.id`) instead of the repository-scoped PR number, producing
+ *       invalid `/pulls/{pull_number}` REST lookups (404s). The bump
+ *       discards cache files written by the older, incorrect mapping so
+ *       every repo recollects task artifacts using the corrected
+ *       GraphQL-resolved PR number. No manual migration is required —
+ *       stale files are simply ignored (`loadAgentCache` returns `null`)
+ *       and rebuilt from a fresh API collection.
  */
-export const AGENT_CACHE_SCHEMA_VERSION = 1;
+export const AGENT_CACHE_SCHEMA_VERSION = 2;
 
 function agentCacheFilePath(owner: string, repo: string): string {
   // Sanitise owner/repo for use in a filename (replace path separators).

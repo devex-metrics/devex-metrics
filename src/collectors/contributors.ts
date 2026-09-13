@@ -4,6 +4,14 @@ import { getOctokit } from "../github-client.js";
  * Count unique committers (last 90 days) and unique PR reviewers
  * for a repository.
  *
+ * `committerCount` is a true 90-day count (commits since a real cutoff
+ * timestamp). `reviewerCount` is not: it is the number of distinct accounts
+ * — including bots — that reviewed a pull request in whichever PR sample was
+ * available (the GraphQL-fetched review timeline, roughly the last ~13
+ * months, when `reviewerLogins` is supplied; otherwise the 50 most recently
+ * updated PRs via the REST fallback). Callers must not treat the two counts
+ * as sharing a time window.
+ *
  * When `reviewerLogins` is provided (pre-fetched from GraphQL), the REST
  * pulls.list + listReviews loop is skipped entirely and the provided set is
  * used directly.

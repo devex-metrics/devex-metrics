@@ -182,7 +182,7 @@ export function isCopilotLogin(login: string, typename?: string): boolean {
  *
  * Returns issue counts, PR counts, and an array of PR nodes (CLOSED+MERGED,
  * sorted by updatedAt descending). Stops paginating when all PRs on a page
- * were updated before the ~13-month cutoff, or when maxPages is reached.
+ * were updated before the ~2-year cutoff, or when maxPages is reached.
  *
  * Returns null on 404 (repo not found) or 403 (access denied).
  * Re-throws other errors.
@@ -218,6 +218,16 @@ export async function collectRepoGraphQL(
       }
       if (isTransientServerError(err)) {
         console.warn(`  ⚠ graphql: giving up on ${owner}/${repo} after repeated 5xx errors, falling back to REST`);
+        return null;
+      }
+      if (isGenericGraphQLExecutionError(err)) {
+        const requestId = extractGitHubRequestId(err);
+        console.warn(
+          `  ⚠ graphql: giving up on ${owner}/${repo} after ${TRANSIENT_BACKOFF_MS.length} retries of a ` +
+            `generic GitHub execution error` +
+            (requestId ? ` (request ${requestId})` : "") +
+            `, falling back to REST`
+        );
         return null;
       }
       throw err;
@@ -288,12 +298,74 @@ function isTransientServerError(err: unknown): boolean {
   return typeof httpError.status === "number" && httpError.status >= 500 && httpError.status < 600;
 }
 
+/**
+ * Return true only for the two HTTP gateway statuses (502, 504) that the
+ * adaptive page-size policy documents as an "expensive query" signal.
+ * Deliberately narrower than {@link isTransientServerError}: a general 5xx
+ * outage (500, 503, ...) is a server-side problem unrelated to the size of
+ * this particular query, so it must not trigger a page-size reduction here.
+ * The broader helper remains unchanged for the existing daily-query retry
+ * path.
+ */
+function isExpensiveQueryHttpError(err: unknown): boolean {
+  const httpError = err as { status?: number };
+  return httpError.status === 502 || httpError.status === 504;
+}
+
+/**
+ * Return true for GitHub's generic GraphQL execution failure — the
+ * "Something went wrong while executing your query" response GitHub sends
+ * for an internal hiccup unrelated to the query itself (distinct from a rate
+ * limit, auth failure, or a validation/field error). It carries no `data`,
+ * only a message and a request id for support, so it is identified by that
+ * message rather than by HTTP status or GraphQL error `type` (it has
+ * neither reliably).
+ */
+function isGenericGraphQLExecutionError(err: unknown): boolean {
+  if (!(err instanceof Error)) return false;
+  const graphqlError = err as {
+    errors?: Array<{ message?: string }>;
+    data?: unknown;
+  };
+  const messages = [err.message, ...(graphqlError.errors?.map((e) => e.message) ?? [])];
+  const matchesMessage = messages.some(
+    (m) => typeof m === "string" && m.toLowerCase().includes("something went wrong while executing your query")
+  );
+  if (!matchesMessage) return false;
+  // Guard against ever treating a real, data-bearing response as transient.
+  return graphqlError.data === undefined || graphqlError.data === null;
+}
+
+/** True for any GraphQL failure we treat as transient and worth retrying. */
+function isRetryableTransientError(err: unknown): boolean {
+  return isTransientServerError(err) || isGenericGraphQLExecutionError(err);
+}
+
+/**
+ * Best-effort extraction of the GitHub request id for a failed GraphQL call,
+ * so operators can hand it to GitHub support. Prefers the response header;
+ * falls back to the id GitHub embeds in the generic-execution-error message
+ * itself (`` Please include `XXXX:XXXX:...` when reporting this issue. ``).
+ */
+function extractGitHubRequestId(err: unknown): string | undefined {
+  if (!(err instanceof Error)) return undefined;
+  const graphqlError = err as { headers?: Record<string, string> };
+  const headerId = graphqlError.headers?.["x-github-request-id"];
+  if (headerId) return headerId;
+  const match = err.message.match(/`([0-9A-F]+(?::[0-9A-F]+){2,})`/i);
+  return match?.[1];
+}
+
 const TRANSIENT_BACKOFF_MS = [5_000, 15_000, 30_000];
 
 /**
- * Execute a single GraphQL request with automatic retry on transient 5xx errors.
- * Retries up to TRANSIENT_BACKOFF_MS.length times with increasing delays.
- * Non-transient errors (4xx, GraphQL field errors) are re-thrown immediately.
+ * Execute a single GraphQL request with automatic retry on transient errors:
+ * HTTP 5xx responses and GitHub's generic "something went wrong executing
+ * your query" execution failure (which carries no `data` and no HTTP 5xx
+ * status of its own, so it is otherwise indistinguishable from a permanent
+ * error). Retries up to TRANSIENT_BACKOFF_MS.length times with increasing
+ * delays. Non-transient errors (4xx, GraphQL validation/field errors, auth
+ * failures) are re-thrown immediately without retrying.
  */
 async function fetchGraphQLPage<T>(
   octokit: Awaited<ReturnType<typeof getOctokit>>,
@@ -306,13 +378,16 @@ async function fetchGraphQLPage<T>(
     try {
       return await octokit.graphql<T>(query, variables);
     } catch (err) {
-      if (!isTransientServerError(err) || attempt === TRANSIENT_BACKOFF_MS.length) {
+      if (!isRetryableTransientError(err) || attempt === TRANSIENT_BACKOFF_MS.length) {
         throw err;
       }
       lastErr = err;
       const wait = TRANSIENT_BACKOFF_MS[attempt];
+      const requestId = extractGitHubRequestId(err);
       console.warn(
-        `  ⚠ graphql: transient error for ${label} (attempt ${attempt + 1}/${TRANSIENT_BACKOFF_MS.length}), retrying in ${wait / 1000}s…`
+        `  ⚠ graphql: transient error for ${label} (attempt ${attempt + 1}/${TRANSIENT_BACKOFF_MS.length})` +
+          (requestId ? ` [request ${requestId}]` : "") +
+          `, retrying in ${wait / 1000}s…`
       );
       await sleep(wait);
     }
@@ -393,7 +468,60 @@ export interface HistoricalPRPage {
   nodes: HistoricalPRNode[];
   hasNextPage: boolean;
   endCursor: string | null;
+  /**
+   * The GraphQL page size that actually succeeded. Equal to the requested
+   * size unless adaptive reduction kicked in, in which case the caller
+   * should keep using this smaller size for the rest of the repository's
+   * crawl this run (see `pageSizeReductionSequence`).
+   */
+  pageSize: number;
 }
+
+/** Effective page-size policy for one historical page request. */
+export interface HistoricalPageSizeOptions {
+  /** Size to request first — the repository's current effective page size. */
+  pageSize: number;
+  /** Floor the adaptive reduction will not go below. */
+  minPageSize: number;
+  /**
+   * Retry the same cursor with a smaller page size on an expensive-query
+   * signal (502/504, or a generic GraphQL execution error). When false, a
+   * single request is made at `pageSize` and any such error behaves exactly
+   * as it did before adaptive sizing existed (the page is abandoned for this
+   * run).
+   */
+  adaptive: boolean;
+}
+
+/**
+ * Why a historical page fetch could not return data — always a repository-
+ * local, recoverable condition. Anything that is *not* one of these (auth
+ * failure, GraphQL validation/schema error, an unexpected/programming error)
+ * is thrown instead, so the caller can tell the two apart without having to
+ * inspect error internals itself.
+ */
+export type HistoricalPageFailureKind = "not-found" | "forbidden" | "transient";
+
+/** Repository-local, recoverable page-fetch failure detail for logging/reporting. */
+export interface HistoricalPageFailure {
+  kind: HistoricalPageFailureKind;
+  /** Concise, human-readable category for logs — never a raw payload. */
+  category: string;
+  /** Total attempts made before giving up, when the bounded retry policy applied. */
+  attempts?: number;
+  /** GitHub's support request id, when the response carried one. */
+  requestId?: string;
+}
+
+/**
+ * Outcome of one historical page fetch. `ok: false` always means a
+ * classified, repository-local, recoverable failure (see
+ * `HistoricalPageFailureKind`) — never an auth failure, validation error, or
+ * unexpected bug, which are thrown instead and must propagate.
+ */
+export type HistoricalPageOutcome =
+  | { ok: true; page: HistoricalPRPage }
+  | { ok: false; failure: HistoricalPageFailure };
 
 /**
  * Ordered CREATED_AT ascending on purpose: the crawl walks *forward* from the
@@ -405,12 +533,16 @@ export interface HistoricalPRPage {
  * Only the first review is needed per PR (`submittedAt` ascending gives the
  * earliest), but the connection is fetched small rather than filtered so the
  * reviewer set stays available for historical reviewer counts.
+ *
+ * `pageSize` is a validated `Int!` variable rather than a literal so a
+ * repository whose pages are too expensive to execute at the configured size
+ * can be retried at a smaller one without building the query text by hand.
  */
 const HISTORICAL_PR_QUERY = `
-  query HistoricalPRs($owner: String!, $name: String!, $cursor: String) {
+  query HistoricalPRs($owner: String!, $name: String!, $cursor: String, $pageSize: Int!) {
     repository(owner: $owner, name: $name) {
       pullRequests(
-        first: 100
+        first: $pageSize
         states: [CLOSED, MERGED]
         orderBy: { field: CREATED_AT, direction: ASC }
         after: $cursor
@@ -446,46 +578,179 @@ interface HistoricalPageResponse {
 }
 
 /**
+ * Deterministic page-size reduction sequence used to retry a historical page
+ * after an expensive-query signal: halve (rounding down), clamp to `min`, and
+ * stop once `min` is reached. For the documented defaults (50, 10) this is
+ * `[50, 25, 12, 10]`.
+ *
+ * This *is* the retry policy for the historical page fetch — each entry is
+ * tried once, so the maximum number of GraphQL attempts for one page equals
+ * `sizes.length` (4 by default). It intentionally does not stack with a
+ * separate same-size backoff-retry loop, which would multiply attempts
+ * unpredictably (e.g. 3 retries × 4 sizes = 12 undocumented attempts).
+ */
+export function pageSizeReductionSequence(initial: number, min: number): number[] {
+  const sizes: number[] = [];
+  let size = Math.max(initial, min);
+  for (;;) {
+    sizes.push(size);
+    if (size <= min) break;
+    size = Math.max(min, Math.floor(size / 2));
+  }
+  return sizes;
+}
+
+/**
+ * True for GitHub responses that indicate the *query itself* was too
+ * expensive to execute — as opposed to a permanent authentication,
+ * authorization, not-found, or validation problem. These are the only
+ * signals that justify retrying the same page with a smaller `pageSize`;
+ * every other error is left to the caller's existing handling (403/404
+ * skip, or a re-thrown fatal error).
+ */
+function isExpensiveQuerySignal(err: unknown): boolean {
+  if (isExpensiveQueryHttpError(err)) return true; // covers HTTP 502/504 only
+  if (isGenericGraphQLExecutionError(err)) return true;
+  const graphqlError = err as {
+    errors?: Array<{ type?: string; message?: string }>;
+    data?: unknown;
+  };
+  if (
+    !Array.isArray(graphqlError.errors) ||
+    (graphqlError.data !== undefined && graphqlError.data !== null)
+  ) {
+    return false;
+  }
+  return graphqlError.errors.some((e) => {
+    const msg = e.message?.toLowerCase() ?? "";
+    return (
+      e.type === "TIMEOUT" ||
+      msg.includes("something went wrong while executing your query") ||
+      msg.includes("something went wrong executing your query") ||
+      msg.includes("query timeout") ||
+      msg.includes("timed out")
+    );
+  });
+}
+
+/**
  * Fetch one page of historical pull requests for `owner/repo`.
  *
- * Returns `null` when the repository is gone or inaccessible, or when GitHub
- * keeps returning 5xx — the caller treats that as "skip this repo for now" and
- * leaves the watermark untouched so the next run retries from the same place.
+ * Resolves to `{ ok: true, page }` on success, or `{ ok: false, failure }`
+ * for a classified, repository-local, recoverable condition — the
+ * repository gone/renamed/inaccessible, access denied, or GitHub still
+ * returning a transient failure (5xx, or its generic "something went wrong
+ * executing your query" execution error) after exhausting the bounded
+ * retries and the adaptive page-size reduction sequence. The caller treats
+ * that as "defer this repository for now" and leaves its watermark
+ * untouched so the next run resumes from the same place. Anything else —
+ * auth failures, GraphQL validation/schema errors, or an
+ * unexpected/programming error — is thrown, not returned, so it cannot be
+ * mistaken for a recoverable per-repository condition.
+ *
+ * The returned page carries the `pageSize` that actually succeeded so the
+ * caller can keep using it for the repository's remaining pages this run,
+ * and optionally persist it as a hint for the next run.
  */
 export async function fetchHistoricalPRPage(
   owner: string,
   repo: string,
-  cursor: string | null
-): Promise<HistoricalPRPage | null> {
+  cursor: string | null,
+  options: HistoricalPageSizeOptions
+): Promise<HistoricalPageOutcome> {
   const octokit = await getOctokit();
-  let response: HistoricalPageResponse;
-  try {
-    response = await fetchGraphQLPage<HistoricalPageResponse>(
-      octokit,
-      HISTORICAL_PR_QUERY,
-      { owner, name: repo, cursor },
-      `${owner}/${repo}`
-    );
-  } catch (err: unknown) {
-    if (isGraphQLNotFoundOrForbidden(err)) {
-      if (hasGraphQLForbiddenError(err)) {
-        console.warn(`  ⚠ backfill: skipping ${owner}/${repo}: access denied (403)`);
+  const sizes = options.adaptive
+    ? pageSizeReductionSequence(options.pageSize, options.minPageSize)
+    : [options.pageSize];
+
+  for (let i = 0; i < sizes.length; i++) {
+    const size = sizes[i];
+    let response: HistoricalPageResponse;
+    try {
+      response = await octokit.graphql<HistoricalPageResponse>(HISTORICAL_PR_QUERY, {
+        owner,
+        name: repo,
+        cursor,
+        pageSize: size,
+      });
+    } catch (err: unknown) {
+      if (isGraphQLNotFoundOrForbidden(err)) {
+        const forbidden = hasGraphQLForbiddenError(err);
+        return {
+          ok: false,
+          failure: {
+            kind: forbidden ? "forbidden" : "not-found",
+            category: forbidden
+              ? "repository access denied (403)"
+              : "repository not found",
+            requestId: extractGitHubRequestId(err),
+          },
+        };
       }
-      return null;
+      if (isExpensiveQuerySignal(err)) {
+        if (i < sizes.length - 1) {
+          const next = sizes[i + 1];
+          console.warn(
+            `  ⚠ backfill: ${owner}/${repo} historical page timed out at size ${size}; ` +
+              `retrying the same cursor with page size ${next}`
+          );
+          await sleep(TRANSIENT_BACKOFF_MS[Math.min(i, TRANSIENT_BACKOFF_MS.length - 1)]);
+          continue;
+        }
+        const requestId = extractGitHubRequestId(err);
+        const category = isExpensiveQueryHttpError(err)
+          ? "repeated HTTP 502/504 gateway error"
+          : "GitHub GraphQL transient execution error";
+        const failureDescription = options.adaptive
+          ? `still failing at the minimum page size (${size})`
+          : `failed at page size ${size} with adaptive sizing disabled`;
+        console.warn(
+          `  ⚠ backfill: ${owner}/${repo} ${failureDescription}; will retry next run`
+        );
+        return {
+          ok: false,
+          failure: {
+            kind: "transient",
+            category,
+            attempts: i + 1,
+            requestId,
+          },
+        };
+      }
+      throw err;
     }
-    if (isTransientServerError(err)) {
-      console.warn(`  ⚠ backfill: ${owner}/${repo} still failing after retries; will retry next run`);
-      return null;
+
+    if (!response?.repository) {
+      // A successful HTTP response with no repository payload: the repository
+      // disappeared, was renamed, or was archived/made inaccessible mid-crawl.
+      return {
+        ok: false,
+        failure: {
+          kind: "not-found",
+          category: "repository disappeared or became inaccessible during collection",
+        },
+      };
     }
-    throw err;
+
+    const { nodes, pageInfo } = response.repository.pullRequests;
+    if (i > 0) {
+      console.log(`  ✓ backfill: ${owner}/${repo} continuing with page size ${size}`);
+    }
+    return {
+      ok: true,
+      page: {
+        nodes: nodes ?? [],
+        hasNextPage: pageInfo.hasNextPage,
+        endCursor: pageInfo.endCursor,
+        pageSize: size,
+      },
+    };
   }
 
-  if (!response?.repository) return null;
-
-  const { nodes, pageInfo } = response.repository.pullRequests;
+  // Unreachable: `sizes` always has at least one entry, and the loop above
+  // always returns or `continue`s. Kept only to satisfy the return type.
   return {
-    nodes: nodes ?? [],
-    hasNextPage: pageInfo.hasNextPage,
-    endCursor: pageInfo.endCursor,
+    ok: false,
+    failure: { kind: "transient", category: "unreachable", attempts: 0 },
   };
 }

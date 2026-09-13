@@ -61,6 +61,9 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_BACKFILL_PAGES_PER_RUN` | int | Crawl budget per run, all repos. Default `200`. |
 | `DEVEX_BACKFILL_MAX_PAGES_PER_REPO` | int | Cap per repo per run. Default `20`. |
 | `DEVEX_BACKFILL_RECOMPUTE` | bool | Rebuild historical rollups from events. Default `true`. |
+| `DEVEX_BACKFILL_PAGE_SIZE` | int | Historical GraphQL page size, 1–100. Default `50`. |
+| `DEVEX_BACKFILL_MIN_PAGE_SIZE` | int | Floor for adaptive reduction, 1–100, ≤ page size. Default `10`. |
+| `DEVEX_BACKFILL_ADAPTIVE_PAGE_SIZE` | bool | Shrink a repo's page size after a timeout instead of giving up. Default `true`. |
 
 Lists accept commas, semicolons or newlines. Booleans accept
 `1/true/yes/on` — anything else is false. Setting a list variable to an empty
@@ -138,6 +141,33 @@ several times cheaper per page than the daily one.
 
 To sprint through it once, run the workflow manually with **backfill_pages** set
 high (say `2000`), then leave the default in place for the steady state.
+
+### Adaptive page sizing
+
+A very large repository can make a single historical page (`first: 50` PRs,
+each with reviews and body text) take 10+ seconds, which risks a GitHub 502/504
+or a generic GraphQL execution error — even though the account's primary
+GraphQL rate limit is nowhere near exhausted. Rather than fail the whole
+repository, the crawl retries the *same* page at a smaller size:
+
+```
+DEVEX_BACKFILL_PAGE_SIZE = 50           # requested `first` per historical page
+DEVEX_BACKFILL_MIN_PAGE_SIZE = 10       # adaptive reduction stops here
+DEVEX_BACKFILL_ADAPTIVE_PAGE_SIZE = true
+```
+
+On a timeout the size is halved (`50 → 25 → 12 → 10`) and the same cursor is
+retried — never the next page, and the watermark never advances until a
+request actually succeeds. Once a smaller size works, the repository keeps
+using it for the rest of the run, and the size is remembered so a later run
+does not repeat the same failed large request. A repository that keeps failing
+even at the minimum size is simply retried on a later run, exactly like any
+other transient backfill failure — no manual intervention is required.
+
+Because a "page" always means one *successful* page regardless of its size,
+shrinking the page size trades some pull requests per budgeted page for a
+crawl that reliably makes progress on expensive repositories; `pagesPerRun`
+and `maxPagesPerRepo` keep their existing meaning.
 
 ## CI health
 

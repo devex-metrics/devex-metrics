@@ -697,6 +697,34 @@ export interface RepoWatermark {
   newestCreatedAt?: string;
   /** When this watermark was last advanced. */
   updatedAt: string;
+  /**
+   * Optional diagnostics from the most recent unrecoverable page failure for
+   * this repository, purely informational — never consulted to decide cursor
+   * or completion behaviour. All are cleared the next time a page for this
+   * repository is fetched successfully. Absent on watermarks written before
+   * these fields existed or on repositories that have never failed; readers
+   * must treat a missing value the same as "no known prior failure".
+   */
+  /** ISO timestamp of the run that most recently deferred/skipped this repository. */
+  deferredAt?: string;
+  /** Concise, non-sensitive category of the most recent failure (see HistoricalPageFailure). */
+  lastErrorCategory?: string;
+  /** GitHub support request id from the most recent failure, when available. */
+  lastRequestId?: string;
+  /** Consecutive runs (not retries within one run) that ended without progress on this repository. */
+  consecutiveFailedRuns?: number;
+  /**
+   * Optional hint: the historical GraphQL page size that last succeeded for
+   * this repository. Never consulted for cursor or completion decisions —
+   * purely an optimisation so a repository that needed a smaller page (see
+   * `BackfillConfig.adaptivePageSize`) does not repeat the same failed larger
+   * request on every run. Absent on watermarks written before this field
+   * existed; the loader treats that the same as "no hint" — validated
+   * against the current configuration before use, and ignored (not
+   * clamped) when it no longer fits, falling back to the configured
+   * default.
+   */
+  preferredPageSize?: number;
 }
 
 /** The per-scope watermark file. */
