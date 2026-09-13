@@ -73,6 +73,8 @@ jobs:
       - if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: npm ci
 
+      - run: npm run build
+
       - run: npm run coverage
 
       - name: Upload Cobertura coverage report
