@@ -1,7 +1,17 @@
 import { describe, it, expect, afterEach } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { loadCache, saveCache, loadFixture, saveFixture, loadRawCache, isWithinHours, fixturesEnabled, CURRENT_SCHEMA_VERSION } from "./cache.js";
+import {
+  loadCache,
+  saveCache,
+  loadFixture,
+  saveFixture,
+  loadRawCache,
+  isWithinHours,
+  fixturesEnabled,
+  CURRENT_SCHEMA_VERSION,
+  listDatasetKeys,
+} from "./cache.js";
 import type { OrgMetrics } from "./types.js";
 
 function makeSampleMetrics(): OrgMetrics {
@@ -51,23 +61,16 @@ describe("fixturesEnabled", () => {
 });
 
 describe("cache", () => {
-  // cache.ts resolves DATA_DIR from process.cwd() + /data at module load,
-  // so we use the actual data dir for these tests.
   const dataDir = path.resolve(process.cwd(), "data");
   const testFile = path.join(dataDir, "test-owner.json");
   const testFixtureFile = path.join(dataDir, "test-owner.fixture.json");
 
   afterEach(() => {
-    if (fs.existsSync(testFile)) {
-      fs.unlinkSync(testFile);
-    }
-    if (fs.existsSync(testFixtureFile)) {
-      fs.unlinkSync(testFixtureFile);
-    }
+    if (fs.existsSync(testFile)) fs.unlinkSync(testFile);
+    if (fs.existsSync(testFixtureFile)) fs.unlinkSync(testFixtureFile);
   });
 
   it("should return null when no cache file exists", () => {
-    // Ensure file doesn't exist
     if (fs.existsSync(testFile)) fs.unlinkSync(testFile);
     expect(loadCache("test-owner")).toBeNull();
   });
@@ -83,11 +86,7 @@ describe("cache", () => {
 
   it("should return null for stale cache", () => {
     const metrics = makeSampleMetrics();
-    // Write an envelope with yesterday's date
-    const envelope = {
-      date: "2020-01-01",
-      data: metrics,
-    };
+    const envelope = { date: "2020-01-01", data: metrics };
     fs.mkdirSync(dataDir, { recursive: true });
     fs.writeFileSync(testFile, JSON.stringify(envelope));
     expect(loadCache("test-owner")).toBeNull();
@@ -99,9 +98,7 @@ describe("fixture", () => {
   const testFixtureFile = path.join(dataDir, "test-owner.fixture.json");
 
   afterEach(() => {
-    if (fs.existsSync(testFixtureFile)) {
-      fs.unlinkSync(testFixtureFile);
-    }
+    if (fs.existsSync(testFixtureFile)) fs.unlinkSync(testFixtureFile);
   });
 
   it("should return null when no fixture file exists", () => {
@@ -124,22 +121,6 @@ describe("fixture", () => {
     expect(loadFixture("test-owner")).toBeNull();
   });
 
-  it("loadCache should prefer fixture over stale daily cache when fixtures are enabled", () => {
-    process.env.DEVEX_USE_FIXTURE = "1";
-    const metrics = makeSampleMetrics();
-    // Write stale daily cache
-    const envelope = { date: "2020-01-01", data: metrics };
-    fs.mkdirSync(dataDir, { recursive: true });
-    fs.writeFileSync(path.join(dataDir, "test-owner.json"), JSON.stringify(envelope));
-    // Write fixture
-    saveFixture("test-owner", metrics);
-    const loaded = loadCache("test-owner");
-    expect(loaded).not.toBeNull();
-    expect(loaded!.owner).toBe("test-owner");
-    // Clean up daily cache
-    fs.unlinkSync(path.join(dataDir, "test-owner.json"));
-  });
-
   it("loadFixture returns null when schema version does not match", () => {
     fs.mkdirSync(dataDir, { recursive: true });
     const stale = { ...makeSampleMetrics(), schemaVersion: 0 };
@@ -151,65 +132,13 @@ describe("fixture", () => {
     fs.mkdirSync(dataDir, { recursive: true });
     const testFile = path.join(dataDir, "test-owner.json");
     const stale = { ...makeSampleMetrics(), schemaVersion: 0 };
-    const envelope = { date: new Date().toISOString().slice(0, 10), data: { ...stale, weeklyTrends: [] } };
+    const envelope = {
+      date: new Date().toISOString().slice(0, 10),
+      data: { ...stale, weeklyTrends: [] },
+    };
     fs.writeFileSync(testFile, JSON.stringify(envelope));
     expect(loadCache("test-owner")).toBeNull();
     fs.unlinkSync(testFile);
-  });
-});
-
-describe("isWithinHours", () => {
-  it("returns false for undefined", () => {
-    expect(isWithinHours(undefined, 8)).toBe(false);
-  });
-
-  it("returns true for a timestamp 1 hour ago when limit is 8", () => {
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    expect(isWithinHours(oneHourAgo, 8)).toBe(true);
-  });
-
-  it("returns false for a timestamp 9 hours ago when limit is 8", () => {
-    const nineHoursAgo = new Date(Date.now() - 9 * 60 * 60 * 1000).toISOString();
-    expect(isWithinHours(nineHoursAgo, 8)).toBe(false);
-  });
-
-  it("returns false for an old timestamp", () => {
-    expect(isWithinHours("2020-01-01T00:00:00.000Z", 8)).toBe(false);
-  });
-});
-
-describe("loadRawCache", () => {
-  const dataDir = path.resolve(process.cwd(), "data");
-  const testFile = path.join(dataDir, "test-raw.json");
-  const testFixture = path.join(dataDir, "test-raw.fixture.json");
-
-  afterEach(() => {
-    [testFile, testFixture].forEach(f => { if (fs.existsSync(f)) fs.unlinkSync(f); });
-  });
-
-  it("returns null when no files exist", () => {
-    expect(loadRawCache("test-raw")).toBeNull();
-  });
-
-  it("loads stale daily cache ignoring date", () => {
-    const metrics = makeSampleMetrics();
-    const envelope = { date: "2020-01-01", data: { ...metrics, owner: "test-raw" } };
-    fs.mkdirSync(dataDir, { recursive: true });
-    fs.writeFileSync(testFile, JSON.stringify(envelope));
-    const loaded = loadRawCache("test-raw");
-    expect(loaded).not.toBeNull();
-    expect(loaded!.owner).toBe("test-raw");
-  });
-
-  it("prefers fixture over stale daily cache", () => {
-    const metrics = { ...makeSampleMetrics(), owner: "test-raw" };
-    const envelope = { date: "2020-01-01", data: metrics };
-    fs.mkdirSync(dataDir, { recursive: true });
-    fs.writeFileSync(testFile, JSON.stringify(envelope));
-    fs.writeFileSync(testFixture, JSON.stringify(metrics));
-    const loaded = loadRawCache("test-raw");
-    expect(loaded).not.toBeNull();
-    expect(loaded!.owner).toBe("test-raw");
   });
 });
 
@@ -219,8 +148,8 @@ describe("fixture opt-in gating", () => {
   const cacheFile = path.join(dataDir, "gated-owner.json");
 
   afterEach(() => {
-    for (const f of [fixtureFile, cacheFile]) {
-      if (fs.existsSync(f)) fs.unlinkSync(f);
+    for (const file of [fixtureFile, cacheFile]) {
+      if (fs.existsSync(file)) fs.unlinkSync(file);
     }
     delete process.env.DEVEX_USE_FIXTURE;
   });
@@ -263,12 +192,101 @@ describe("fixture opt-in gating", () => {
     expect(loadCache("gated-owner")?.dataSource).toBe("cache");
   });
 
-  it("still prefers a same-day cache over a fixture when both are enabled", () => {
+  it("still prefers a fixture over a same-day cache when both are enabled", () => {
     const fixture = writeFixture();
     process.env.DEVEX_USE_FIXTURE = "1";
     saveCache("gated-owner", { ...fixture, repoCount: 99 });
-    // Fixtures win by design when explicitly enabled — assert that contract
-    // holds so a future change to the ordering is a deliberate one.
     expect(loadCache("gated-owner")?.dataSource).toBe("fixture");
+  });
+});
+
+describe("isWithinHours", () => {
+  it("returns false for undefined", () => {
+    expect(isWithinHours(undefined, 8)).toBe(false);
+  });
+
+  it("returns true for a timestamp 1 hour ago when limit is 8", () => {
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    expect(isWithinHours(oneHourAgo, 8)).toBe(true);
+  });
+
+  it("returns false for a timestamp 9 hours ago when limit is 8", () => {
+    const nineHoursAgo = new Date(Date.now() - 9 * 60 * 60 * 1000).toISOString();
+    expect(isWithinHours(nineHoursAgo, 8)).toBe(false);
+  });
+
+  it("returns false for an old timestamp", () => {
+    expect(isWithinHours("2020-01-01T00:00:00.000Z", 8)).toBe(false);
+  });
+});
+
+describe("loadRawCache", () => {
+  const dataDir = path.resolve(process.cwd(), "data");
+  const testFile = path.join(dataDir, "test-raw.json");
+  const testFixture = path.join(dataDir, "test-raw.fixture.json");
+
+  afterEach(() => {
+    for (const file of [testFile, testFixture]) {
+      if (fs.existsSync(file)) fs.unlinkSync(file);
+    }
+  });
+
+  it("returns null when no files exist", () => {
+    expect(loadRawCache("test-raw")).toBeNull();
+  });
+
+  it("loads stale daily cache ignoring date", () => {
+    const metrics = makeSampleMetrics();
+    const envelope = { date: "2020-01-01", data: { ...metrics, owner: "test-raw" } };
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(testFile, JSON.stringify(envelope));
+    const loaded = loadRawCache("test-raw");
+    expect(loaded).not.toBeNull();
+    expect(loaded!.owner).toBe("test-raw");
+  });
+
+  it("prefers fixture over stale daily cache when fixtures are enabled", () => {
+    const metrics = { ...makeSampleMetrics(), owner: "test-raw" };
+    const envelope = { date: "2020-01-01", data: metrics };
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(testFile, JSON.stringify(envelope));
+    fs.writeFileSync(testFixture, JSON.stringify({ ...metrics, owner: "from-fixture" }));
+    process.env.DEVEX_USE_FIXTURE = "1";
+    const loaded = loadRawCache("test-raw");
+    expect(loaded).not.toBeNull();
+    expect(loaded!.owner).toBe("from-fixture");
+  });
+});
+
+describe("listDatasetKeys", () => {
+  const dataDir = path.resolve(process.cwd(), "data");
+  const files = [
+    path.join(dataDir, "dk-owner-a.json"),
+    path.join(dataDir, "dk-group-b.fixture.json"),
+    path.join(dataDir, "agents-dk-owner-a-repo.json"),
+  ];
+
+  afterEach(() => {
+    files.forEach((file) => {
+      if (fs.existsSync(file)) fs.unlinkSync(file);
+    });
+  });
+
+  it("includes both daily-cache and fixture dataset keys, deduplicated", () => {
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(files[0], JSON.stringify({ date: "2020-01-01", data: makeSampleMetrics() }));
+    fs.writeFileSync(files[1], JSON.stringify(makeSampleMetrics()));
+
+    const keys = listDatasetKeys();
+
+    expect(keys).toContain("dk-owner-a");
+    expect(keys).toContain("dk-group-b");
+  });
+
+  it("excludes per-repo Copilot agent cache files", () => {
+    fs.mkdirSync(dataDir, { recursive: true });
+    fs.writeFileSync(files[2], JSON.stringify({}));
+
+    expect(listDatasetKeys()).not.toContain("agents-dk-owner-a-repo");
   });
 });
