@@ -687,9 +687,11 @@ export async function fetchHistoricalPRPage(
         const category = isTransientServerError(err)
           ? "repeated HTTP 5xx gateway error"
           : "GitHub GraphQL transient execution error";
+        const failureDescription = options.adaptive
+          ? `still failing at the minimum page size (${size})`
+          : `failed at page size ${size} with adaptive sizing disabled`;
         console.warn(
-          `  ⚠ backfill: ${owner}/${repo} still timing out at the minimum page size ` +
-            `(${size}); will retry next run`
+          `  ⚠ backfill: ${owner}/${repo} ${failureDescription}; will retry next run`
         );
         return {
           ok: false,
