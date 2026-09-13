@@ -110,6 +110,8 @@ jobs:
       - if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: npm ci
 
+      - run: npm run build
+
       - name: Run mutation tests
         run: npm run mutation:ci
 
