@@ -22,7 +22,7 @@ jobs:
           cache: "npm"
 
       - id: node-modules-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
@@ -47,7 +47,7 @@ jobs:
           cache: "npm"
 
       - id: node-modules-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
@@ -61,7 +61,7 @@ jobs:
 
       - name: Upload Cobertura coverage report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-cobertura
           path: coverage/cobertura-coverage.xml
@@ -84,7 +84,7 @@ jobs:
           cache: "npm"
 
       - id: node-modules-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: node_modules
           key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
