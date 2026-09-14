@@ -156,13 +156,20 @@ Mutation testing is provided by [Stryker](https://stryker-mutator.io/) with the 
 - **Config**: `stryker.config.mjs` (ESM). Mutates all `src/**/*.ts` except test files, `types.ts`, `index.ts`, `save-fixture.ts`, `build-pages.ts`, `collect-group.ts`, and `build-multi-site.ts` (CLI entry points excluded because they're hard to unit test or are tested via subprocess, so Stryker cannot track coverage that way).
 - **Run locally** (before creating a PR): `npm run mutation` — produces an HTML report at `reports/mutation/index.html` and a text summary in the terminal.
 - **Run in CI mode**: `npm run mutation:ci` — outputs JSON + text (no HTML). The `mutation` job in `ci.yml` reads `reports/mutation/mutation.json` and posts a Markdown summary to the GitHub Actions step summary via `node scripts/mutation-summary.mjs >> $GITHUB_STEP_SUMMARY`.
-- **Thresholds**: `high: 80`, `low: 60` for colour-coding only; `break: null` so the CI job never fails purely on score. Tighten `break` once you have a stable baseline.
+- **Thresholds**: `high: 80`, `low: 60` for colour-coding; `break` is currently `null` because `@stryker-mutator/vitest-runner@10.0.0` is incompatible with `vitest@5.0.0` (bumped 2026-09-12) — every real mutant run crashes with `TypeError: Converting circular structure to JSON` inside `VitestTestRunner.init`, collapsing the reported score to ~0% regardless of `coverageAnalysis` mode. This is an upstream tooling bug, not a real regression. Once vitest-runner supports vitest 5 (or vitest is pinned back for mutation testing) and a fresh score is measured, set `break` to a real ratchet just under that baseline — never enable it against the current broken numbers.
 - **Interpreting results**: a survived mutant means a code change was not caught by any test — it may indicate a test gap worth addressing. NoCoverage mutants mean no test exercises that line at all.
 - **reports/** is gitignored — never commit Stryker output.
 
+## Code coverage
+
+- Coverage is collected with Vitest's built-in `@vitest/coverage-v8` provider, configured in `vitest.config.ts`.
+- **Run locally**: `npm run coverage` — writes `coverage/cobertura-coverage.xml`, `coverage/coverage-summary.json`, and an HTML report to `coverage/` (gitignored).
+- **Run in CI**: the `coverage` job in `ci.yml` runs `npm run coverage`, uploads `coverage/cobertura-coverage.xml` as a build artifact (`coverage-cobertura`), and posts a Markdown summary to the step summary via `node scripts/coverage-summary.mjs >> $GITHUB_STEP_SUMMARY`.
+- Coverage is informational only (no enforced threshold) — same "don't chase 100%" philosophy as the Testing section above.
+
 ## GitHub Actions
 
-- **ci.yml**: runs `npm ci`, `npm run build`, `npm test` on every push/PR to `main`. A second `mutation` job (depends on `test`) runs Stryker and posts a step summary; it runs on every PR but does not block merging on score.
+- **ci.yml**: three jobs on every push/PR to `main` — `test` (build + `npm test` + `npm run lint`, combined into one job since each is fast enough that the checkout/setup/install overhead of a separate job outweighs any parallelism benefit), `coverage`, and `mutation` (`needs: test`; Stryker builds `dist` inside its own sandbox via `buildCommand`, since the sandbox copy respects `.gitignore` and never contains a build produced by an outer CI step). Mutation posts a step summary but currently never fails the build on score alone (`break: null` — see the Mutation testing section above for why). Each job caches `node_modules` (keyed on `package-lock.json`) via `actions/cache` and skips `npm ci` on a cache hit, so repeated installs across jobs don't each pay full install cost.
 - **collect-metrics.yml**: scheduled daily; checks out `metrics-data`, collects metrics, appends to the history store, pushes it back, then calls `pages.yml`. Does **not** commit to `main`.
 - **pages.yml**: reusable (`workflow_call`); builds the site from the `metrics-data` checkout and deploys to Pages.
 - Always pin action versions to a full SHA or major-version tag.
