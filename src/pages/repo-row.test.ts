@@ -101,7 +101,7 @@ describe("buildRepoRow", () => {
     expect(idx2).toBeLessThan(idx1);
   });
 
-  it("sorts an unmerged PR after a merged one when it appears earlier in the input", () => {
+  it("sorts an unmerged PR after a merged one when the merged PR appears earlier in the input", () => {
     // With the merged PR first in the input array, the sort comparator is
     // invoked as (unmerged, merged) — the mirror image of the previous test
     // — covering the `!a.mergedAt` early-return branch as well.
