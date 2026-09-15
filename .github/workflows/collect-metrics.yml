@@ -67,19 +67,11 @@ jobs:
           restore-keys: |
             agent-data-${{ github.repository_owner }}-
 
-      - name: Generate GitHub App token
-        id: app-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
-        with:
-          client-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: ${{ inputs.owner || vars.DEVEX_OWNER }}
-
       # Append-only data store on an orphan branch. Nothing is ever committed
       # to the default branch.
       - name: Check out history store
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: scripts/metrics-data.sh checkout .metrics-data
 
       - name: Replay committed snapshots into the history store
@@ -138,7 +130,7 @@ jobs:
 
       - name: Publish history store
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           scripts/metrics-data.sh publish .metrics-data \
             "data: ${{ inputs.owner || vars.DEVEX_OWNER }} ${{ steps.date.outputs.date }}"
