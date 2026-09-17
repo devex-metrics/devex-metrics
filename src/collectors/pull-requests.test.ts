@@ -1423,6 +1423,33 @@ describe("summariseReviews", () => {
     expect(facts).toEqual({ reviewCount: 0, changesRequestedCount: 0 });
   });
 
+  it("uses the connection total when the node page is capped", () => {
+    // `reviews(first: 100)` caps the daily page too, so a pull request with
+    // more submitted reviews than that must not be persisted as exactly 100.
+    const nodes = Array.from({ length: 100 }, (_, i) => ({
+      author: { login: "amy" },
+      submittedAt: `2026-03-${String((i % 28) + 1).padStart(2, "0")}T00:00:00Z`,
+      state: "COMMENTED",
+    }));
+    expect(summariseReviews(nodes, 137).reviewCount).toBe(137);
+  });
+
+  it("subtracts the drafts visible on a capped page", () => {
+    const nodes = [
+      { author: { login: "amy" }, submittedAt: "2026-03-01T00:00:00Z", state: "COMMENTED" },
+      { author: { login: "bob" }, submittedAt: null, state: "PENDING" },
+    ];
+    expect(summariseReviews(nodes, 10).reviewCount).toBe(9);
+  });
+
+  it("prefers the exact node count when the whole connection is present", () => {
+    const nodes = [
+      { author: { login: "amy" }, submittedAt: "2026-03-01T00:00:00Z", state: "COMMENTED" },
+      { author: { login: "bob" }, submittedAt: null, state: "PENDING" },
+    ];
+    expect(summariseReviews(nodes, 2).reviewCount).toBe(1);
+  });
+
   it("survives review nodes with no state at all", () => {
     const facts = summariseReviews([
       { author: { login: "amy" }, submittedAt: "2026-03-01T00:00:00Z" },

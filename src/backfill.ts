@@ -14,7 +14,7 @@
  */
 
 import { fetchHistoricalPRPage } from "./collectors/repo-graphql.js";
-import { parseRevertRef } from "./collectors/pull-requests.js";
+import { countSubmittedReviews, parseRevertRef } from "./collectors/pull-requests.js";
 import type { HistoricalPRNode, HistoricalPageFailure } from "./collectors/repo-graphql.js";
 import {
   appendEventRows,
@@ -156,15 +156,7 @@ export function toEventRow(
     if (Number.isFinite(hours) && hours >= 0) row.timeToMergeHours = round(hours);
   }
   if (node.reviews.totalCount > 0) {
-    // `totalCount`, not `nodes.length`: the node page is capped (20) and pull
-    // requests with more reviews than that are exactly the ones this metric
-    // cares about. Drafts visible on the page are subtracted so an unsubmitted
-    // review does not read as a review round; one beyond the page cap is not
-    // visible here and is accepted as a best effort.
-    const pending = node.reviews.nodes.filter(
-      (r) => typeof r.submittedAt !== "string" || r.submittedAt === ""
-    ).length;
-    const submitted = Math.max(0, node.reviews.totalCount - pending);
+    const submitted = countSubmittedReviews(node.reviews.nodes, node.reviews.totalCount);
     if (submitted > 0) row.reviewCount = submitted;
   }
   if (reviewTimes.length > 0) row.firstReviewAt = reviewTimes[0];

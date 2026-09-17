@@ -189,25 +189,61 @@ export interface ReviewFacts {
 }
 
 /**
+ * How many reviews were actually submitted on a pull request.
+ *
+ * Both collection paths ask for a bounded page of review nodes — 100 for the
+ * daily query, 20 for the historical crawl — so the page alone cannot answer
+ * this for the pull requests that matter most here: the ones that went round
+ * the loop dozens of times. `totalCount` is the only complete number, so it
+ * wins whenever the page was truncated, minus the drafts visible on it.
+ *
+ * A draft is never a review round. It carries no `submittedAt`, and GitHub
+ * returns it only to its own author, so counting one would make the figure
+ * depend on who held the collection token. A draft beyond the page cap stays
+ * invisible and is accepted as a best effort — the alternative, trusting the
+ * page length, silently turns a 37-review pull request into a 20-review one.
+ *
+ * With the whole connection on the page the exact submitted count is used,
+ * which also keeps a caller that has nodes but no `totalCount` correct.
+ */
+export function countSubmittedReviews(
+  nodes: readonly ReviewNode[] | undefined,
+  totalCount?: number
+): number {
+  const all = nodes ?? [];
+  const submitted = all.filter((r) => isSubmitted(r)).length;
+  if (totalCount === undefined || totalCount <= all.length) return submitted;
+  return Math.max(submitted, totalCount - (all.length - submitted));
+}
+
+/** True when a review node carries a submission timestamp. */
+function isSubmitted(review: { submittedAt?: string | null }): boolean {
+  return typeof review.submittedAt === "string" && review.submittedAt !== "";
+}
+
+/**
  * Reduce a review connection to the raw facts stored per pull request.
  *
  * Timestamps, not latencies: storing `firstReviewAt` rather than
  * "hours to first review" keeps the definition free to change later without
  * re-crawling every repository.
  *
- * Only *submitted* reviews are counted. A review still being drafted carries
- * no `submittedAt`, and GitHub returns those only to their own author — so
- * counting them would make the numbers depend on who happened to hold the
- * collection token and on whether they had a draft open at collection time.
- * Automated reviewers are counted like anyone else: a Copilot review really
- * did happen, and callers that want humans only can filter on the reviewer set.
+ * Only *submitted* reviews are counted, via {@link countSubmittedReviews} so
+ * the daily path and the historical crawl share one definition. Automated
+ * reviewers are counted like anyone else: a Copilot review really did happen,
+ * and callers that want humans only can filter on the reviewer set.
  */
-export function summariseReviews(nodes: readonly ReviewNode[] | undefined): ReviewFacts {
-  const facts: ReviewFacts = { reviewCount: 0, changesRequestedCount: 0 };
+export function summariseReviews(
+  nodes: readonly ReviewNode[] | undefined,
+  totalCount?: number
+): ReviewFacts {
+  const facts: ReviewFacts = {
+    reviewCount: countSubmittedReviews(nodes, totalCount),
+    changesRequestedCount: 0,
+  };
   for (const review of nodes ?? []) {
     const at = review.submittedAt;
-    if (typeof at !== "string" || at === "") continue;
-    facts.reviewCount++;
+    if (!isSubmitted(review) || typeof at !== "string") continue;
     const state = review.state;
     if (state === "CHANGES_REQUESTED") facts.changesRequestedCount++;
     if (facts.firstReviewAt === undefined || at < facts.firstReviewAt) {
@@ -541,7 +577,7 @@ export function buildMergedPRTimeline(nodes: GraphQLPRNode[]): MergedPRSummary[]
     const authorLogin = node.author?.login ?? "unknown";
     const isBot = node.author?.__typename === "Bot" || isBotLogin(authorLogin);
     const aiType = resolveAIType(authorLogin, node.author?.__typename, node.mergeCommit?.message, node.commits.nodes, node.body);
-    const reviews = summariseReviews(node.reviews?.nodes);
+    const reviews = summariseReviews(node.reviews?.nodes, node.reviews?.totalCount);
     timeline.push({
       number: node.number,
       createdAt: node.createdAt,
