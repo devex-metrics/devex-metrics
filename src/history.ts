@@ -85,7 +85,17 @@ export interface RollupRow {
   approvalWaitP50?: number;
   /** First approval → merge, in hours. */
   mergeWaitP50?: number;
-  /** Median changes-requested reviews per merged PR — review rounds. */
+  /**
+   * Median reviews submitted per *reviewed* merged PR — review rounds.
+   *
+   * Every submitted review counts, not just the ones with state
+   * `CHANGES_REQUESTED`: almost nobody presses "Request changes", so counting
+   * only those reported a median of 0 for teams that were visibly iterating
+   * over a dozen review rounds. Pull requests that were never reviewed are
+   * left out of the sample entirely — they are the subject of the
+   * reviewed-PR coverage figure, and including their zeros drags this median
+   * to 0 whenever most pull requests merge unreviewed.
+   */
   reviewRoundsP50?: number;
   /**
    * Gini coefficient of reviews per reviewer over the window: 0 when the load
@@ -162,6 +172,7 @@ interface PRFacts {
   linesDeleted?: number;
   firstReviewAt?: string;
   firstApprovalAt?: string;
+  reviewCount?: number;
   changesRequestedCount?: number;
   revertsPR?: number;
   reviewers?: string[];
@@ -228,7 +239,7 @@ export function deriveRollupExtras(
     const toMerge = hoursBetween(pr.firstApprovalAt, pr.mergedAt);
     if (toMerge !== undefined) mergeWaits.push(toMerge);
 
-    if (pr.changesRequestedCount !== undefined) rounds.push(pr.changesRequestedCount);
+    if (pr.reviewCount !== undefined && pr.reviewCount > 0) rounds.push(pr.reviewCount);
     for (const reviewer of pr.reviewers ?? []) {
       reviewsBy.set(reviewer, (reviewsBy.get(reviewer) ?? 0) + 1);
     }
@@ -246,7 +257,7 @@ export function deriveRollupExtras(
     reviewWaitP90: round(rw.p90),
     approvalWaitP50: round(quantiles(approvalWaits).p50),
     mergeWaitP50: round(quantiles(mergeWaits).p50),
-    reviewRoundsP50: round(quantiles(rounds).p50),
+    reviewRoundsP50: rounds.length > 0 ? round(quantiles(rounds).p50) : undefined,
     reviewGini: round(gini([...reviewsBy.values()]), 3),
   };
 }

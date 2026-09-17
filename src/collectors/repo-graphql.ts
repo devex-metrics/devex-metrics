@@ -47,7 +47,7 @@ export interface GraphQLPRNode {
    * query but typed optional: the connection is also populated from fixtures
    * and older cached responses that predate them.
    */
-  reviews: { nodes: ReviewNode[] };
+  reviews: { totalCount?: number; nodes: ReviewNode[] };
   /** Merge commit for MERGED PRs — null for CLOSED/OPEN PRs. */
   mergeCommit: { message: string } | null;
 }
@@ -157,6 +157,7 @@ const REPO_DATA_QUERY = `
           comments(first: 1) { totalCount }
           reviewThreads(first: 1) { totalCount }
           reviews(first: 100) {
+            totalCount
             nodes { author { login } submittedAt state }
           }
           mergeCommit { message }

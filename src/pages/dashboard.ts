@@ -778,7 +778,7 @@ function buildAIHumanSection(): string {
     { id: "size", label: "Median PR size", hint: "lines added + deleted" },
     { id: "large", label: "Large PRs", hint: `share over ${LARGE_PR_LINES} lines` },
     { id: "reviewWait", label: "Wait for first review", hint: "opened → first review" },
-    { id: "rounds", label: "Review rounds", hint: "median changes-requested reviews" },
+    { id: "rounds", label: "Review rounds", hint: "median reviews per reviewed PR" },
     { id: "revert", label: "Reverted", hint: "share later reverted by another PR" },
   ]
     .map(

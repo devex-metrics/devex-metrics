@@ -1407,12 +1407,47 @@ describe("summariseReviews", () => {
     expect(facts.firstApprovalAt).toBeUndefined();
   });
 
-  it("counts a pending review but does not let it set a timestamp", () => {
+  it("leaves a pending review out of the counts", () => {
     const facts = summariseReviews([
       { author: { login: "amy" }, submittedAt: null, state: "PENDING" },
+      { author: { login: "bob" }, submittedAt: "2026-03-01T00:00:00Z", state: "COMMENTED" },
     ]);
     expect(facts.reviewCount).toBe(1);
-    expect(facts.firstReviewAt).toBeUndefined();
+    expect(facts.firstReviewAt).toBe("2026-03-01T00:00:00Z");
+  });
+
+  it("leaves a pending changes-requested draft out of the round count", () => {
+    const facts = summariseReviews([
+      { author: { login: "amy" }, submittedAt: null, state: "CHANGES_REQUESTED" },
+    ]);
+    expect(facts).toEqual({ reviewCount: 0, changesRequestedCount: 0 });
+  });
+
+  it("uses the connection total when the node page is capped", () => {
+    // `reviews(first: 100)` caps the daily page too, so a pull request with
+    // more submitted reviews than that must not be persisted as exactly 100.
+    const nodes = Array.from({ length: 100 }, (_, i) => ({
+      author: { login: "amy" },
+      submittedAt: `2026-03-${String((i % 28) + 1).padStart(2, "0")}T00:00:00Z`,
+      state: "COMMENTED",
+    }));
+    expect(summariseReviews(nodes, 137).reviewCount).toBe(137);
+  });
+
+  it("subtracts the drafts visible on a capped page", () => {
+    const nodes = [
+      { author: { login: "amy" }, submittedAt: "2026-03-01T00:00:00Z", state: "COMMENTED" },
+      { author: { login: "bob" }, submittedAt: null, state: "PENDING" },
+    ];
+    expect(summariseReviews(nodes, 10).reviewCount).toBe(9);
+  });
+
+  it("prefers the exact node count when the whole connection is present", () => {
+    const nodes = [
+      { author: { login: "amy" }, submittedAt: "2026-03-01T00:00:00Z", state: "COMMENTED" },
+      { author: { login: "bob" }, submittedAt: null, state: "PENDING" },
+    ];
+    expect(summariseReviews(nodes, 2).reviewCount).toBe(1);
   });
 
   it("survives review nodes with no state at all", () => {

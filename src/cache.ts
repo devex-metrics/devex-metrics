@@ -33,8 +33,13 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
  *       commit/body checks when a merge commit was present but had no AI trailer
  *  10 — add humanMergedPRs to CopilotAdoption so the AI Adoption chart counts
  *       only human-vs-AI (excluding Dependabot/other bots from the denominator)
+ *  11 — reviewCount on MergedPRSummary now means *submitted* reviews and is no
+ *       longer capped at the daily query's 100-node page: drafts are excluded
+ *       and the connection's totalCount is used when the page was truncated.
+ *       Bumped so a cached per-repo timeline cannot feed the review-rounds
+ *       median a count collected under the old meaning.
  */
-export const CURRENT_SCHEMA_VERSION = 10;
+export const CURRENT_SCHEMA_VERSION = 11;
 
 function cacheFilePath(owner: string): string {
   return path.join(DATA_DIR, `${owner}.json`);

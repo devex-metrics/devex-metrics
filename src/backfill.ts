@@ -14,7 +14,7 @@
  */
 
 import { fetchHistoricalPRPage } from "./collectors/repo-graphql.js";
-import { parseRevertRef } from "./collectors/pull-requests.js";
+import { countSubmittedReviews, parseRevertRef } from "./collectors/pull-requests.js";
 import type { HistoricalPRNode, HistoricalPageFailure } from "./collectors/repo-graphql.js";
 import {
   appendEventRows,
@@ -119,7 +119,10 @@ export function toEventRow(
     .filter((t): t is string => typeof t === "string" && t.length > 0)
     .sort();
   const changesRequested = node.reviews.nodes.filter(
-    (r) => r.state === "CHANGES_REQUESTED"
+    (r) =>
+      r.state === "CHANGES_REQUESTED" &&
+      typeof r.submittedAt === "string" &&
+      r.submittedAt !== ""
   ).length;
   const reviewers = [
     ...new Set(
@@ -152,7 +155,10 @@ export function toEventRow(
       3_600_000;
     if (Number.isFinite(hours) && hours >= 0) row.timeToMergeHours = round(hours);
   }
-  if (node.reviews.totalCount > 0) row.reviewCount = node.reviews.totalCount;
+  if (node.reviews.totalCount > 0) {
+    const submitted = countSubmittedReviews(node.reviews.nodes, node.reviews.totalCount);
+    if (submitted > 0) row.reviewCount = submitted;
+  }
   if (reviewTimes.length > 0) row.firstReviewAt = reviewTimes[0];
   if (approvalTimes.length > 0) row.firstApprovalAt = approvalTimes[0];
   // Only recorded when at least one review carried a state, so a row written

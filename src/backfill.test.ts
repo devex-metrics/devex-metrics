@@ -971,6 +971,59 @@ describe("toEventRow review and revert facts", () => {
     expect(row.firstReviewAt).toBe("2019-03-02T06:00:00Z");
   });
 
+  it("subtracts a visible draft review from the review count", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: {
+          totalCount: 3,
+          nodes: [
+            { submittedAt: "2019-03-02T06:00:00Z", author: { login: "amy" }, state: "COMMENTED" },
+            { submittedAt: "2019-03-02T12:00:00Z", author: { login: "bob" }, state: "APPROVED" },
+            { submittedAt: null, author: { login: "cat" }, state: "PENDING" },
+          ],
+        },
+      })
+    );
+    expect(row.reviewCount).toBe(2);
+  });
+
+  it("keeps the total when the node page is capped below it", () => {
+    // `reviews(first: 20)` caps the nodes, so a pull request with more reviews
+    // than that must still report the real total, not the page length.
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: {
+          totalCount: 37,
+          nodes: [
+            { submittedAt: "2019-03-02T06:00:00Z", author: { login: "amy" }, state: "COMMENTED" },
+          ],
+        },
+      })
+    );
+    expect(row.reviewCount).toBe(37);
+  });
+
+  it("leaves a pending changes-requested draft out of the round count", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: {
+          totalCount: 1,
+          nodes: [
+            { submittedAt: null, author: { login: "amy" }, state: "CHANGES_REQUESTED" },
+          ],
+        },
+      })
+    );
+    expect(row.changesRequestedCount).toBe(0);
+    expect(row.reviewCount).toBeUndefined();
+  });
+
   it("records the pull request a historical revert refers to", () => {
     const row = toEventRow(
       "acme",
