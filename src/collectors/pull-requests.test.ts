@@ -1407,12 +1407,20 @@ describe("summariseReviews", () => {
     expect(facts.firstApprovalAt).toBeUndefined();
   });
 
-  it("counts a pending review but does not let it set a timestamp", () => {
+  it("leaves a pending review out of the counts", () => {
     const facts = summariseReviews([
       { author: { login: "amy" }, submittedAt: null, state: "PENDING" },
+      { author: { login: "bob" }, submittedAt: "2026-03-01T00:00:00Z", state: "COMMENTED" },
     ]);
     expect(facts.reviewCount).toBe(1);
-    expect(facts.firstReviewAt).toBeUndefined();
+    expect(facts.firstReviewAt).toBe("2026-03-01T00:00:00Z");
+  });
+
+  it("leaves a pending changes-requested draft out of the round count", () => {
+    const facts = summariseReviews([
+      { author: { login: "amy" }, submittedAt: null, state: "CHANGES_REQUESTED" },
+    ]);
+    expect(facts).toEqual({ reviewCount: 0, changesRequestedCount: 0 });
   });
 
   it("survives review nodes with no state at all", () => {

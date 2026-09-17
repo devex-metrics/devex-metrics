@@ -182,9 +182,9 @@ export interface ReviewFacts {
   firstReviewAt?: string;
   /** When the first approving review was submitted. */
   firstApprovalAt?: string;
-  /** Reviews submitted on the pull request. */
+  /** Submitted reviews. Drafts still in progress are not counted. */
   reviewCount: number;
-  /** Reviews that requested changes — one per round trip through review. */
+  /** Submitted reviews that requested changes — one per round trip through review. */
   changesRequestedCount: number;
 }
 
@@ -195,19 +195,21 @@ export interface ReviewFacts {
  * "hours to first review" keeps the definition free to change later without
  * re-crawling every repository.
  *
- * Reviews still in progress carry no `submittedAt` and are ignored for timing
- * but still counted, and automated reviewers are counted like anyone else —
- * a Copilot review really did happen, and callers that want humans only can
- * filter on the reviewer set.
+ * Only *submitted* reviews are counted. A review still being drafted carries
+ * no `submittedAt`, and GitHub returns those only to their own author — so
+ * counting them would make the numbers depend on who happened to hold the
+ * collection token and on whether they had a draft open at collection time.
+ * Automated reviewers are counted like anyone else: a Copilot review really
+ * did happen, and callers that want humans only can filter on the reviewer set.
  */
 export function summariseReviews(nodes: readonly ReviewNode[] | undefined): ReviewFacts {
   const facts: ReviewFacts = { reviewCount: 0, changesRequestedCount: 0 };
   for (const review of nodes ?? []) {
+    const at = review.submittedAt;
+    if (typeof at !== "string" || at === "") continue;
     facts.reviewCount++;
     const state = review.state;
     if (state === "CHANGES_REQUESTED") facts.changesRequestedCount++;
-    const at = review.submittedAt;
-    if (typeof at !== "string" || at === "") continue;
     if (facts.firstReviewAt === undefined || at < facts.firstReviewAt) {
       facts.firstReviewAt = at;
     }

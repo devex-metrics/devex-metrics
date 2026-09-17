@@ -119,7 +119,10 @@ export function toEventRow(
     .filter((t): t is string => typeof t === "string" && t.length > 0)
     .sort();
   const changesRequested = node.reviews.nodes.filter(
-    (r) => r.state === "CHANGES_REQUESTED"
+    (r) =>
+      r.state === "CHANGES_REQUESTED" &&
+      typeof r.submittedAt === "string" &&
+      r.submittedAt !== ""
   ).length;
   const reviewers = [
     ...new Set(
@@ -152,7 +155,18 @@ export function toEventRow(
       3_600_000;
     if (Number.isFinite(hours) && hours >= 0) row.timeToMergeHours = round(hours);
   }
-  if (node.reviews.totalCount > 0) row.reviewCount = node.reviews.totalCount;
+  if (node.reviews.totalCount > 0) {
+    // `totalCount`, not `nodes.length`: the node page is capped (20) and pull
+    // requests with more reviews than that are exactly the ones this metric
+    // cares about. Drafts visible on the page are subtracted so an unsubmitted
+    // review does not read as a review round; one beyond the page cap is not
+    // visible here and is accepted as a best effort.
+    const pending = node.reviews.nodes.filter(
+      (r) => typeof r.submittedAt !== "string" || r.submittedAt === ""
+    ).length;
+    const submitted = Math.max(0, node.reviews.totalCount - pending);
+    if (submitted > 0) row.reviewCount = submitted;
+  }
   if (reviewTimes.length > 0) row.firstReviewAt = reviewTimes[0];
   if (approvalTimes.length > 0) row.firstApprovalAt = approvalTimes[0];
   // Only recorded when at least one review carried a state, so a row written
