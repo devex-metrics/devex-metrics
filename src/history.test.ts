@@ -639,16 +639,37 @@ describe("deriveRollupExtras", () => {
     expect(extras.reviewWaitP50).toBe(0);
   });
 
-  it("takes the median of the changes-requested counts as review rounds", () => {
+  it("takes the median review count of the reviewed PRs as review rounds", () => {
     const extras = deriveRollupExtras(
       [
-        { createdAt: "2026-08-01T00:00:00Z", changesRequestedCount: 0 },
-        { createdAt: "2026-08-01T00:00:00Z", changesRequestedCount: 2 },
-        { createdAt: "2026-08-01T00:00:00Z", changesRequestedCount: 4 },
+        { createdAt: "2026-08-01T00:00:00Z", reviewCount: 1 },
+        { createdAt: "2026-08-01T00:00:00Z", reviewCount: 2 },
+        { createdAt: "2026-08-01T00:00:00Z", reviewCount: 4 },
       ],
       0
     );
     expect(extras.reviewRoundsP50).toBe(2);
+  });
+
+  it("leaves unreviewed pull requests out of the review-rounds sample", () => {
+    const extras = deriveRollupExtras(
+      [
+        { createdAt: "2026-08-01T00:00:00Z", reviewCount: 0 },
+        { createdAt: "2026-08-01T00:00:00Z", reviewCount: 0 },
+        { createdAt: "2026-08-01T00:00:00Z", reviewCount: 0 },
+        { createdAt: "2026-08-01T00:00:00Z", reviewCount: 8 },
+      ],
+      0
+    );
+    expect(extras.reviewRoundsP50).toBe(8);
+  });
+
+  it("reports no review rounds when nothing was reviewed", () => {
+    const extras = deriveRollupExtras(
+      [{ createdAt: "2026-08-01T00:00:00Z", reviewCount: 0 }],
+      0
+    );
+    expect(extras.reviewRoundsP50).toBeUndefined();
   });
 
   it("counts pull requests that revert another one", () => {

@@ -1172,7 +1172,7 @@ function summariseClass(prs,revertedKeys){
     if(size>0){sizes.push(size);sized++;if(size>=LARGE_PR_LINES)large++;}
     var wait=hoursBetweenISO(p.createdAt,p.firstReviewAt);
     if(wait!==null)waits.push(wait);
-    if(typeof p.changesRequestedCount==="number")rounds.push(p.changesRequestedCount);
+    if(typeof p.reviewCount==="number"&&p.reviewCount>0)rounds.push(p.reviewCount);
     if(revertedKeys[p.repo+"#"+p.number])reverted++;
   });
   return {
