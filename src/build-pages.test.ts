@@ -1220,6 +1220,19 @@ describe("build-pages · dashboard JS executes", () => {
     return { dom, errors };
   }
 
+  /** Rewrite the fixture's merged-PR review counts, keyed by repo name. */
+  function setReviewCounts(counts: Record<string, number>) {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: { repos: { name: string; mergedPRTimeline: { reviewCount: number }[] }[] };
+    };
+    for (const repo of cache.data.repos) {
+      const count = counts[repo.name];
+      if (count === undefined) continue;
+      for (const pr of repo.mergedPRTimeline) pr.reviewCount = count;
+    }
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+  }
+
   it("runs the dashboard script without throwing", () => {
     const { errors } = run("", {
       DEVEX_TEAM_NAME: "Platform",
@@ -1342,6 +1355,35 @@ describe("build-pages · dashboard JS executes", () => {
     expect(doc.getElementById("aiHumanHuman-merged")?.textContent).toBe("1");
     expect(doc.getElementById("aiHumanAI-cycle")?.textContent).not.toBe("–");
     expect(doc.getElementById("aiHumanNote")?.textContent).toContain("AI n=1");
+  });
+
+  it("reads review rounds from the submitted review count", () => {
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    // Both fixture PRs carry reviewCount 2.
+    const doc = dom.window.document;
+    expect(doc.getElementById("aiHumanAI-rounds")?.textContent).toBe("2.0");
+    expect(doc.getElementById("aiHumanHuman-rounds")?.textContent).toBe("2.0");
+  });
+
+  it("leaves unreviewed pull requests out of the review-rounds median", () => {
+    // The AI-authored PR merged without a review; its zero must not drag the
+    // median down, it must drop out of the sample entirely.
+    setReviewCounts({ api: 0, billing: 4 });
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    const doc = dom.window.document;
+    expect(doc.getElementById("aiHumanAI-rounds")?.textContent).toBe("–");
+    expect(doc.getElementById("aiHumanHuman-rounds")?.textContent).toBe("4.0");
+  });
+
+  it("renders a dash when nothing in the period was reviewed", () => {
+    setReviewCounts({ api: 0, billing: 0 });
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    const doc = dom.window.document;
+    expect(doc.getElementById("aiHumanAI-rounds")?.textContent).toBe("–");
+    expect(doc.getElementById("aiHumanHuman-rounds")?.textContent).toBe("–");
   });
 
   it("reports review-load concentration across the collected reviewers", () => {
