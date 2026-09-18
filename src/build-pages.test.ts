@@ -6,6 +6,12 @@ import { JSDOM, VirtualConsole } from "jsdom";
 import { CURRENT_SCHEMA_VERSION } from "./cache.js";
 import type { CacheEnvelope, WeeklyTrendPoint } from "./types.js";
 
+type TrendDataset = {
+  label: string;
+  data: number[];
+  borderDash?: number[];
+};
+
 describe("build-pages", () => {
   const dataDir = path.resolve(process.cwd(), "data");
   const siteDir = path.resolve(process.cwd(), "_site");
@@ -1169,10 +1175,10 @@ describe("build-pages · dashboard JS executes", () => {
             weeklyTrends: [
               {
                 week: "2026-W34",
-                prsOpened: 1,
-                prsMerged: 1,
-                issuesOpened: 1,
-                issuesClosed: 1,
+                prsOpened: i === 0 ? 1 : 2,
+                prsMerged: i === 0 ? 1 : 3,
+                issuesOpened: i === 0 ? 1 : 4,
+                issuesClosed: i === 0 ? 1 : 5,
                 linesAdded: 10,
                 linesDeleted: 2,
               },
@@ -1185,10 +1191,10 @@ describe("build-pages · dashboard JS executes", () => {
           weeklyTrends: [
             {
               week: "2026-W34",
-              prsOpened: 2,
-              prsMerged: 2,
-              issuesOpened: 2,
-              issuesClosed: 2,
+              prsOpened: 3,
+              prsMerged: 4,
+              issuesOpened: 5,
+              issuesClosed: 6,
               linesAdded: 30,
               linesDeleted: 4,
             },
@@ -1340,19 +1346,31 @@ describe("build-pages · dashboard JS executes", () => {
     const { dom, errors } = run("?period=all&repos=api", {}, true);
     expect(errors).toEqual([]);
     const charts = (dom.window as unknown as { charts: {
-      prTrends: { data: { datasets: { label: string; data: number[] }[] } };
-      issueTrends: { data: { datasets: { label: string; data: number[] }[] } };
-      prSizeTrends: { data: { datasets: { label: string; data: number[] }[] } };
+      prTrends: { data: { datasets: TrendDataset[] } };
+      issueTrends: { data: { datasets: TrendDataset[] } };
+      prSizeTrends: { data: { datasets: TrendDataset[] } };
     } }).charts;
     for (const chart of [charts.prTrends, charts.issueTrends, charts.prSizeTrends]) {
-      expect(chart.data.datasets.map((dataset) => dataset.label)).toEqual(
-        expect.arrayContaining([
-          expect.stringMatching(/^Selected repositories/),
-          expect.stringMatching(/^Other repositories/),
-        ]),
-      );
       expect(chart.data.datasets).toHaveLength(4);
     }
+    expect(charts.prTrends.data.datasets).toMatchObject([
+      { label: "Selected repositories — Opened", data: [1] },
+      { label: "Selected repositories — Merged", data: [1] },
+      { label: "Other repositories — Opened", data: [2], borderDash: [5, 5] },
+      { label: "Other repositories — Merged", data: [3], borderDash: [5, 5] },
+    ]);
+    expect(charts.issueTrends.data.datasets).toMatchObject([
+      { label: "Selected repositories — Opened", data: [1] },
+      { label: "Selected repositories — Closed", data: [1] },
+      { label: "Other repositories — Opened", data: [4], borderDash: [5, 5] },
+      { label: "Other repositories — Closed", data: [5], borderDash: [5, 5] },
+    ]);
+    expect(charts.prSizeTrends.data.datasets).toMatchObject([
+      { label: "Selected repositories — Lines Added", data: [10] },
+      { label: "Selected repositories — Lines Removed", data: [2] },
+      { label: "Other repositories — Lines Added", data: [20], borderDash: [5, 5] },
+      { label: "Other repositories — Lines Removed", data: [2], borderDash: [5, 5] },
+    ]);
   });
 
   it("ignores repo names in the URL that are no longer collected", () => {
