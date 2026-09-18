@@ -44,7 +44,7 @@ jobs:
       - run: npm run build
 
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       # The history store is a data-only orphan branch; it is never built or
       # served, only read here to find the newest snapshot.
