@@ -6,6 +6,12 @@ import { JSDOM, VirtualConsole } from "jsdom";
 import { CURRENT_SCHEMA_VERSION } from "./cache.js";
 import type { CacheEnvelope, WeeklyTrendPoint } from "./types.js";
 
+type TrendDataset = {
+  label: string;
+  data: number[];
+  borderDash?: number[];
+};
+
 describe("build-pages", () => {
   const dataDir = path.resolve(process.cwd(), "data");
   const siteDir = path.resolve(process.cwd(), "_site");
@@ -1340,9 +1346,9 @@ describe("build-pages · dashboard JS executes", () => {
     const { dom, errors } = run("?period=all&repos=api", {}, true);
     expect(errors).toEqual([]);
     const charts = (dom.window as unknown as { charts: {
-      prTrends: { data: { datasets: { label: string; data: number[] }[] } };
-      issueTrends: { data: { datasets: { label: string; data: number[] }[] } };
-      prSizeTrends: { data: { datasets: { label: string; data: number[] }[] } };
+      prTrends: { data: { datasets: TrendDataset[] } };
+      issueTrends: { data: { datasets: TrendDataset[] } };
+      prSizeTrends: { data: { datasets: TrendDataset[] } };
     } }).charts;
     for (const chart of [charts.prTrends, charts.issueTrends, charts.prSizeTrends]) {
       expect(chart.data.datasets.map((dataset) => dataset.label)).toEqual(
@@ -1352,7 +1358,29 @@ describe("build-pages · dashboard JS executes", () => {
         ]),
       );
       expect(chart.data.datasets).toHaveLength(4);
+      expect(chart.data.datasets.slice(2).map((dataset) => dataset.borderDash)).toEqual([
+        [5, 5],
+        [5, 5],
+      ]);
     }
+    expect(charts.prTrends.data.datasets.map((dataset) => dataset.data)).toEqual([
+      [1],
+      [1],
+      [1],
+      [1],
+    ]);
+    expect(charts.issueTrends.data.datasets.map((dataset) => dataset.data)).toEqual([
+      [1],
+      [1],
+      [1],
+      [1],
+    ]);
+    expect(charts.prSizeTrends.data.datasets.map((dataset) => dataset.data)).toEqual([
+      [10],
+      [2],
+      [20],
+      [2],
+    ]);
   });
 
   it("ignores repo names in the URL that are no longer collected", () => {
