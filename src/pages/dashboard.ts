@@ -240,6 +240,9 @@ export function buildDashboardHtml(
   }
 
   // Aggregate Copilot agent metrics
+  const hasCopilotAgentMetrics = data.repos.some(
+    (repo) => repo.copilotAgentMetrics !== undefined,
+  );
   let agentTotalTasks = 0, agentCompleted = 0, agentFailed = 0, agentCancelled = 0,
     agentTimedOut = 0, agentActive = 0, agentTotalSessions = 0, agentCloudSessions = 0,
     agentCliSessions = 0, agentCredits = 0, agentPRs = 0, agentActionsMinutes = 0;
@@ -611,7 +614,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
 
   <section class="charts" aria-label="AI and Agent metrics">
     <div class="card card-chart card-wide"><h2>AI-authored PRs merged per week</h2><canvas id="chartCopilotPRTrend"></canvas></div>
-    <div class="card card-chart card-wide"><h2>Agent Tasks by Repository (30&nbsp;d)</h2><p class="metric-lede">Agent task metrics are optional. Add a fine-grained <code>COPILOT_AGENT_TOKEN</code> with the Agent tasks permission to collect them. <a href="https://github.com/devex-metrics/devex-metrics#deploying" target="_blank" rel="noopener noreferrer">Configure the token</a>.</p><canvas id="chartAgentTasks"></canvas></div>
+    <div class="card card-chart card-wide"><h2>Agent Tasks by Repository (30&nbsp;d)</h2>${hasCopilotAgentMetrics ? "" : '<p class="metric-lede">Agent task metrics are optional. Add a fine-grained <code>COPILOT_AGENT_TOKEN</code> with the Agent tasks permission to collect them. <a href="https://github.com/devex-metrics/devex-metrics#deploying" target="_blank" rel="noopener noreferrer">Configure the token</a>.</p>'}<canvas id="chartAgentTasks"></canvas></div>
   </section>
 
   <section class="repos-section" aria-label="Repositories">
