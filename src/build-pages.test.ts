@@ -824,6 +824,7 @@ describe("build-pages", () => {
     expect(html).toContain('id="kpiAgentVal"');
     expect(html).toContain('id="kpiAgentSub"');
     expect(html).toContain("Agent Tasks (30d)");
+    expect(html).toContain('aria-label="Optional metric. Requires a token with the Agent tasks permission."');
     // KPI should show total task count and summary
     expect(html).toContain(">5<");
     expect(html).toContain("3 completed");

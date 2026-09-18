@@ -88,7 +88,7 @@ export function buildRepoRow(repo: RepoMetrics): string {
     `<div class="sg"><h4>People (90 d)</h4><dl><div class="dr"><dt>Committers</dt><dd>${repo.committerCount}</dd></div><div class="dr"><dt>Reviewers</dt><dd>${repo.reviewerCount}</dd></div></dl></div>` +
     `<div class="sg"><h4>Dependents</h4><dl><div class="dr"><dt>Repos</dt><dd>${repo.dependentCount}</dd></div></dl></div>` +
     (repo.copilotAgentMetrics && repo.copilotAgentMetrics.totalTasks > 0
-      ? `<div class="sg"><h4>Agent Tasks (30 d)</h4><dl>` +
+      ? `<div class="sg"><h4>Agent Tasks (30 d) <span class="metric-hint" role="img" aria-label="Optional metric. Requires a token with the Agent tasks permission." title="Optional metric: requires a token with the Agent tasks permission.">&#9432;</span></h4><dl>` +
         `<div class="dr"><dt>Total</dt><dd>${repo.copilotAgentMetrics.totalTasks}</dd></div>` +
         `<div class="dr"><dt>Completed</dt><dd>${repo.copilotAgentMetrics.completedTasks}</dd></div>` +
         (repo.copilotAgentMetrics.failedTasks > 0 ? `<div class="dr"><dt>Failed</dt><dd>${repo.copilotAgentMetrics.failedTasks}</dd></div>` : "") +
