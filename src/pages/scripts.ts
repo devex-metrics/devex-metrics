@@ -6,6 +6,12 @@ var cssColors={};
 var selectedRepos=new Set();
 var repoScope="all";
 var restoringState=false;
+function hexToRgba(hex,a){
+  var h=(hex||"").replace("#","");
+  if(h.length===3)h=h.split("").map(function(c){return c+c;}).join("");
+  var r=parseInt(h.slice(0,2),16)||0, g=parseInt(h.slice(2,4),16)||0, b=parseInt(h.slice(4,6),16)||0;
+  return "rgba("+r+","+g+","+b+","+a+")";
+}
 document.addEventListener("DOMContentLoaded",function(){
   var cs=getComputedStyle(document.documentElement);
   var cv=function(v){return cs.getPropertyValue(v).trim();};
@@ -152,12 +158,6 @@ function formatLineNumbers(){
   });
 }
 function renderCharts(){
-  function hexToRgba(hex,a){
-    var h=(hex||"").replace("#","");
-    if(h.length===3)h=h.split("").map(function(c){return c+c;}).join("");
-    var r=parseInt(h.slice(0,2),16)||0, g=parseInt(h.slice(2,4),16)||0, b=parseInt(h.slice(4,6),16)||0;
-    return "rgba("+r+","+g+","+b+","+a+")";
-  }
   Chart.register({id:"repoBarGrad",beforeUpdate:function(chart){
     if(chart.canvas.id!=="chartRepos")return;
     var ctx=chart.ctx,ca=chart.chartArea;
@@ -593,6 +593,16 @@ function computeIssueTrendsForRepos(repoNames){
   });
   return Object.keys(weekData).map(function(k){return weekData[k];}).sort(function(a,b){return a.week<b.week?-1:1;});
 }
+function computeOtherRepoTrends(allTrends,selectedTrends,fields){
+  var selectedByWeek={};
+  selectedTrends.forEach(function(t){selectedByWeek[t.week]=t;});
+  return allTrends.map(function(t){
+    var selected=selectedByWeek[t.week]||{};
+    var other={week:t.week};
+    fields.forEach(function(field){other[field]=Math.max(0,(t[field]||0)-(selected[field]||0));});
+    return other;
+  });
+}
 function setupRepoPicker(){
   var names=CHART_DATA.repoNames||[];
   if(names.length===0)return;
@@ -717,15 +727,26 @@ function applyFilter(period){
   var prTrendsPeriod=cutoff?prTrends.filter(function(t){return weekToDate(t.week)>=cutoff;}):prTrends;
   var issueTrends=allSelectedHaveRepoTrends?computeIssueTrendsForRepos(selRepoArr):orgTrends;
   var issueTrendsPeriod=cutoff?issueTrends.filter(function(t){return weekToDate(t.week)>=cutoff;}):issueTrends;
-
-
+  var otherPRTrends=allSelectedHaveRepoTrends?computeOtherRepoTrends(orgTrends,prTrends,["prsOpened","prsMerged","linesAdded","linesDeleted"]):[];
+  var otherPRTrendsPeriod=cutoff?otherPRTrends.filter(function(t){return weekToDate(t.week)>=cutoff;}):otherPRTrends;
+  var otherIssueTrends=allSelectedHaveRepoTrends?computeOtherRepoTrends(orgTrends,issueTrends,["issuesOpened","issuesClosed"]):[];
+  var otherIssueTrendsPeriod=cutoff?otherIssueTrends.filter(function(t){return weekToDate(t.week)>=cutoff;}):otherIssueTrends;
 
   // PR trends: hide "Opened" only when repo-filtered without per-repo trend data
   if(charts.prTrends){
     var prTrendLabels=prTrendsPeriod.map(function(t){return t.week;});
     charts.prTrends.data.labels=prTrendLabels;
-    charts.prTrends.data.datasets[0].data=prTrendsPeriod.map(function(t){return t.prsOpened;});
-    charts.prTrends.data.datasets[1].data=prTrendsPeriod.map(function(t){return t.prsMerged;});
+    if(repoFiltered&&allSelectedHaveRepoTrends){
+      charts.prTrends.data.datasets=[
+        {label:"Selected repositories \u2014 Opened",data:prTrendsPeriod.map(function(t){return t.prsOpened;}),borderColor:cssColors.accent,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3},
+        {label:"Selected repositories \u2014 Merged",data:prTrendsPeriod.map(function(t){return t.prsMerged;}),borderColor:cssColors.ok,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3},
+        {label:"Other repositories \u2014 Opened",data:otherPRTrendsPeriod.map(function(t){return t.prsOpened;}),borderColor:hexToRgba(cssColors.accent,0.55),backgroundColor:"transparent",borderDash:[5,5],tension:0.3,fill:false,pointRadius:2},
+        {label:"Other repositories \u2014 Merged",data:otherPRTrendsPeriod.map(function(t){return t.prsMerged;}),borderColor:hexToRgba(cssColors.ok,0.55),backgroundColor:"transparent",borderDash:[5,5],tension:0.3,fill:false,pointRadius:2}];
+    }else{
+      charts.prTrends.data.datasets=[
+        {label:"Opened",data:prTrendsPeriod.map(function(t){return t.prsOpened;}),borderColor:cssColors.accent,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3},
+        {label:"Merged",data:prTrendsPeriod.map(function(t){return t.prsMerged;}),borderColor:cssColors.ok,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3}];
+    }
     charts.prTrends.setDatasetVisibility(0,!repoFiltered||allSelectedHaveRepoTrends);
     charts.prTrends.options.plugins.annotation=trendAnnotations(prTrendLabels);
     charts.prTrends.update();
@@ -733,16 +754,34 @@ function applyFilter(period){
   if(charts.issueTrends){
     var issueTrendLabels=issueTrendsPeriod.map(function(t){return t.week;});
     charts.issueTrends.data.labels=issueTrendLabels;
-    charts.issueTrends.data.datasets[0].data=issueTrendsPeriod.map(function(t){return t.issuesOpened;});
-    charts.issueTrends.data.datasets[1].data=issueTrendsPeriod.map(function(t){return t.issuesClosed;});
+    if(repoFiltered&&allSelectedHaveRepoTrends){
+      charts.issueTrends.data.datasets=[
+        {label:"Selected repositories \u2014 Opened",data:issueTrendsPeriod.map(function(t){return t.issuesOpened;}),borderColor:cssColors.warn,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3},
+        {label:"Selected repositories \u2014 Closed",data:issueTrendsPeriod.map(function(t){return t.issuesClosed;}),borderColor:cssColors.ok,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3},
+        {label:"Other repositories \u2014 Opened",data:otherIssueTrendsPeriod.map(function(t){return t.issuesOpened;}),borderColor:hexToRgba(cssColors.warn,0.55),backgroundColor:"transparent",borderDash:[5,5],tension:0.3,fill:false,pointRadius:2},
+        {label:"Other repositories \u2014 Closed",data:otherIssueTrendsPeriod.map(function(t){return t.issuesClosed;}),borderColor:hexToRgba(cssColors.ok,0.55),backgroundColor:"transparent",borderDash:[5,5],tension:0.3,fill:false,pointRadius:2}];
+    }else{
+      charts.issueTrends.data.datasets=[
+        {label:"Opened",data:issueTrendsPeriod.map(function(t){return t.issuesOpened;}),borderColor:cssColors.warn,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3},
+        {label:"Closed",data:issueTrendsPeriod.map(function(t){return t.issuesClosed;}),borderColor:cssColors.ok,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3}];
+    }
     charts.issueTrends.options.plugins.annotation=trendAnnotations(issueTrendLabels);
     charts.issueTrends.update();
   }
   if(charts.prSizeTrends){
     var prSizeLabels=prTrendsPeriod.map(function(t){return t.week;});
     charts.prSizeTrends.data.labels=prSizeLabels;
-    charts.prSizeTrends.data.datasets[0].data=prTrendsPeriod.map(function(t){return t.linesAdded;});
-    charts.prSizeTrends.data.datasets[1].data=prTrendsPeriod.map(function(t){return t.linesDeleted;});
+    if(repoFiltered&&allSelectedHaveRepoTrends){
+      charts.prSizeTrends.data.datasets=[
+        {label:"Selected repositories \u2014 Lines Added",data:prTrendsPeriod.map(function(t){return t.linesAdded;}),borderColor:cssColors.ok,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3},
+        {label:"Selected repositories \u2014 Lines Removed",data:prTrendsPeriod.map(function(t){return t.linesDeleted;}),borderColor:cssColors.err,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3},
+        {label:"Other repositories \u2014 Lines Added",data:otherPRTrendsPeriod.map(function(t){return t.linesAdded;}),borderColor:hexToRgba(cssColors.ok,0.55),backgroundColor:"transparent",borderDash:[5,5],tension:0.3,fill:false,pointRadius:2},
+        {label:"Other repositories \u2014 Lines Removed",data:otherPRTrendsPeriod.map(function(t){return t.linesDeleted;}),borderColor:hexToRgba(cssColors.err,0.55),backgroundColor:"transparent",borderDash:[5,5],tension:0.3,fill:false,pointRadius:2}];
+    }else{
+      charts.prSizeTrends.data.datasets=[
+        {label:"Lines Added",data:prTrendsPeriod.map(function(t){return t.linesAdded;}),borderColor:cssColors.ok,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3},
+        {label:"Lines Removed",data:prTrendsPeriod.map(function(t){return t.linesDeleted;}),borderColor:cssColors.err,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3}];
+    }
     charts.prSizeTrends.options.plugins.annotation=trendAnnotations(prSizeLabels);
     charts.prSizeTrends.update();
   }
