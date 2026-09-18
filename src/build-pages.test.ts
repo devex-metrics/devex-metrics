@@ -824,7 +824,8 @@ describe("build-pages", () => {
     expect(html).toContain('id="kpiAgentVal"');
     expect(html).toContain('id="kpiAgentSub"');
     expect(html).toContain("Agent Tasks (30d)");
-    expect(html).toContain('aria-label="Optional metric. Requires a token with the Agent tasks permission."');
+    expect(html).toContain("Agent task metrics are optional.");
+    expect(html).toContain('href="https://github.com/devex-metrics/devex-metrics#deploying"');
     // KPI should show total task count and summary
     expect(html).toContain(">5<");
     expect(html).toContain("3 completed");

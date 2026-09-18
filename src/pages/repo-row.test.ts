@@ -330,7 +330,7 @@ describe("buildRepoRow", () => {
       }),
     );
     expect(html).toContain("Agent Tasks (30 d)");
-    expect(html).toContain('aria-label="Optional metric. Requires a token with the Agent tasks permission."');
+    expect(html).not.toContain('class="metric-hint"');
     expect(html).toContain("<dt>Failed</dt><dd>2</dd>");
     expect(html).toContain("<dt>Cancelled</dt><dd>1</dd>");
     expect(html).toContain("<dt>Timed out</dt><dd>1</dd>");
