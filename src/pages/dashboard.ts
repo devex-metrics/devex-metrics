@@ -544,7 +544,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x1F6E0;&#xFE0F;</div>
       <div class="kpi-val" id="kpiAgentVal">${agentTotalTasks > 0 ? agentTotalTasks : '–'}</div>
-      <div class="kpi-lbl">Agent Tasks (30d) <span class="metric-hint" role="img" aria-label="Optional metric. Requires a token with the Agent tasks permission." title="Optional metric: requires a token with the Agent tasks permission.">&#9432;</span></div>
+      <div class="kpi-lbl">Agent Tasks (30d)</div>
       <div class="kpi-sub" id="kpiAgentSub">${agentTotalTasks > 0 ? `${agentCompleted} completed &middot; ${agentPRs} PRs` : 'no agent data'}</div>
     </div>
     <div class="kpi">
@@ -574,7 +574,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
     <div class="kpi" title="Copilot agent credits divided by the pull requests those agent tasks produced.">
       <div class="kpi-icon" aria-hidden="true">&#x1F4B3;</div>
       <div class="kpi-val" id="kpiAgentCostVal">${agentPRs > 0 ? creditsPerAgentPR.toFixed(1) : '–'}</div>
-      <div class="kpi-lbl">Credits / Agent PR <span class="metric-hint" role="img" aria-label="Optional metric. Requires a token with the Agent tasks permission." title="Optional metric: requires a token with the Agent tasks permission.">&#9432;</span></div>
+      <div class="kpi-lbl">Credits / Agent PR</div>
       <div class="kpi-sub" id="kpiAgentCostSub">${agentPRs > 0 ? `${agentCredits.toFixed(1)} credits &middot; ${agentPRs} PRs` : 'no agent data'}</div>
     </div>
   </section>
@@ -611,7 +611,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
 
   <section class="charts" aria-label="AI and Agent metrics">
     <div class="card card-chart card-wide"><h2>AI-authored PRs merged per week</h2><canvas id="chartCopilotPRTrend"></canvas></div>
-    <div class="card card-chart card-wide"><h2>Agent Tasks by Repository (30&nbsp;d) <span class="metric-hint" role="img" aria-label="Optional metric. Requires a token with the Agent tasks permission." title="Optional metric: requires a token with the Agent tasks permission.">&#9432;</span></h2><canvas id="chartAgentTasks"></canvas></div>
+    <div class="card card-chart card-wide"><h2>Agent Tasks by Repository (30&nbsp;d)</h2><p class="metric-lede">Agent task metrics are optional. Add a fine-grained <code>COPILOT_AGENT_TOKEN</code> with the Agent tasks permission to collect them. <a href="https://github.com/devex-metrics/devex-metrics#deploying" target="_blank" rel="noopener noreferrer">Configure the token</a>.</p><canvas id="chartAgentTasks"></canvas></div>
   </section>
 
   <section class="repos-section" aria-label="Repositories">
@@ -644,7 +644,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
           <th class="col-num th-sortable" data-sort="dependents">Dependents <span class="sort-ind" aria-hidden="true"></span></th>
           <th class="col-date th-sortable" data-sort="pushed">Last Updated <span class="sort-ind" aria-hidden="true"></span></th>
           <th class="col-lines th-sortable" data-sort="linesAdded" title="Total lines added/removed across merged PRs in the last ~13 months (or last 10 detailed PRs when full timeline data is unavailable)">Lines +/- <span class="sort-ind" aria-hidden="true"></span></th>
-          <th class="col-num th-sortable" data-sort="agentTasks" title="Optional metric: Copilot agent tasks in the 30-day collection window require a token with the Agent tasks permission.">Agent Tasks <span class="metric-hint" role="img" aria-label="Optional metric. Requires a token with the Agent tasks permission.">&#9432;</span><span class="sort-ind" aria-hidden="true"></span></th>
+          <th class="col-num th-sortable" data-sort="agentTasks" title="Copilot agent tasks in the 30-day collection window">Agent Tasks <span class="sort-ind" aria-hidden="true"></span></th>
         </tr></thead>
         <tbody id="repoList">${repoRows}</tbody>
       </table>
