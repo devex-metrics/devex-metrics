@@ -1203,7 +1203,11 @@ describe("build-pages · dashboard JS executes", () => {
   });
 
   /** Load the built page in JSDOM and return it plus any script errors. */
-  function run(search = "", env: Record<string, string> = {}) {
+  function run(
+    search = "",
+    env: Record<string, string> = {},
+    withCharts = false,
+  ) {
     execFileSync("node", ["dist/build-pages.js", "js-owner"], {
       cwd: process.cwd(),
       env: { ...process.env, ...env },
@@ -1216,6 +1220,30 @@ describe("build-pages · dashboard JS executes", () => {
       virtualConsole: new VirtualConsole().on("jsdomError", (e: Error) =>
         errors.push(e.message)
       ),
+      beforeParse(window) {
+        if (!withCharts) return;
+        class ChartMock {
+          static defaults = { color: "", plugins: { legend: { labels: {} } } };
+          static register() {}
+          canvas: HTMLCanvasElement;
+          data: { labels: string[]; datasets: unknown[] };
+          options: Record<string, unknown>;
+          constructor(
+            canvas: HTMLCanvasElement,
+            config: {
+              data: { labels: string[]; datasets: unknown[] };
+              options: Record<string, unknown>;
+            },
+          ) {
+            this.canvas = canvas;
+            this.data = config.data;
+            this.options = config.options;
+          }
+          setDatasetVisibility() {}
+          update() {}
+        }
+        Object.assign(window, { Chart: ChartMock });
+      },
     });
     dom.window.document.dispatchEvent(
       new dom.window.Event("DOMContentLoaded", { bubbles: true })
@@ -1306,6 +1334,25 @@ describe("build-pages · dashboard JS executes", () => {
     expect(dom.window.document.getElementById("repoPickerLabel")?.textContent).toBe(
       "1 repo"
     );
+  });
+
+  it("shows selected repository trends alongside other repositories", () => {
+    const { dom, errors } = run("?period=all&repos=api", {}, true);
+    expect(errors).toEqual([]);
+    const charts = (dom.window as unknown as { charts: {
+      prTrends: { data: { datasets: { label: string; data: number[] }[] } };
+      issueTrends: { data: { datasets: { label: string; data: number[] }[] } };
+      prSizeTrends: { data: { datasets: { label: string; data: number[] }[] } };
+    } }).charts;
+    for (const chart of [charts.prTrends, charts.issueTrends, charts.prSizeTrends]) {
+      expect(chart.data.datasets.map((dataset) => dataset.label)).toEqual(
+        expect.arrayContaining([
+          expect.stringMatching(/^Selected repositories/),
+          expect.stringMatching(/^Other repositories/),
+        ]),
+      );
+      expect(chart.data.datasets).toHaveLength(4);
+    }
   });
 
   it("ignores repo names in the URL that are no longer collected", () => {
