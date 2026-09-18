@@ -1175,10 +1175,10 @@ describe("build-pages · dashboard JS executes", () => {
             weeklyTrends: [
               {
                 week: "2026-W34",
-                prsOpened: 1,
-                prsMerged: 1,
-                issuesOpened: 1,
-                issuesClosed: 1,
+                prsOpened: i === 0 ? 1 : 2,
+                prsMerged: i === 0 ? 1 : 3,
+                issuesOpened: i === 0 ? 1 : 4,
+                issuesClosed: i === 0 ? 1 : 5,
                 linesAdded: 10,
                 linesDeleted: 2,
               },
@@ -1191,10 +1191,10 @@ describe("build-pages · dashboard JS executes", () => {
           weeklyTrends: [
             {
               week: "2026-W34",
-              prsOpened: 2,
-              prsMerged: 2,
-              issuesOpened: 2,
-              issuesClosed: 2,
+              prsOpened: 3,
+              prsMerged: 4,
+              issuesOpened: 5,
+              issuesClosed: 6,
               linesAdded: 30,
               linesDeleted: 4,
             },
@@ -1351,35 +1351,25 @@ describe("build-pages · dashboard JS executes", () => {
       prSizeTrends: { data: { datasets: TrendDataset[] } };
     } }).charts;
     for (const chart of [charts.prTrends, charts.issueTrends, charts.prSizeTrends]) {
-      expect(chart.data.datasets.map((dataset) => dataset.label)).toEqual(
-        expect.arrayContaining([
-          expect.stringMatching(/^Selected repositories/),
-          expect.stringMatching(/^Other repositories/),
-        ]),
-      );
       expect(chart.data.datasets).toHaveLength(4);
-      expect(chart.data.datasets.slice(2).map((dataset) => dataset.borderDash)).toEqual([
-        [5, 5],
-        [5, 5],
-      ]);
     }
-    expect(charts.prTrends.data.datasets.map((dataset) => dataset.data)).toEqual([
-      [1],
-      [1],
-      [1],
-      [1],
+    expect(charts.prTrends.data.datasets).toMatchObject([
+      { label: "Selected repositories — Opened", data: [1] },
+      { label: "Selected repositories — Merged", data: [1] },
+      { label: "Other repositories — Opened", data: [2], borderDash: [5, 5] },
+      { label: "Other repositories — Merged", data: [3], borderDash: [5, 5] },
     ]);
-    expect(charts.issueTrends.data.datasets.map((dataset) => dataset.data)).toEqual([
-      [1],
-      [1],
-      [1],
-      [1],
+    expect(charts.issueTrends.data.datasets).toMatchObject([
+      { label: "Selected repositories — Opened", data: [1] },
+      { label: "Selected repositories — Closed", data: [1] },
+      { label: "Other repositories — Opened", data: [4], borderDash: [5, 5] },
+      { label: "Other repositories — Closed", data: [5], borderDash: [5, 5] },
     ]);
-    expect(charts.prSizeTrends.data.datasets.map((dataset) => dataset.data)).toEqual([
-      [10],
-      [2],
-      [20],
-      [2],
+    expect(charts.prSizeTrends.data.datasets).toMatchObject([
+      { label: "Selected repositories — Lines Added", data: [10] },
+      { label: "Selected repositories — Lines Removed", data: [2] },
+      { label: "Other repositories — Lines Added", data: [20], borderDash: [5, 5] },
+      { label: "Other repositories — Lines Removed", data: [2], borderDash: [5, 5] },
     ]);
   });
 
