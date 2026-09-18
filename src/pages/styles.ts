@@ -49,6 +49,7 @@ a{color:var(--accent)}
 .kpi-val{font-size:2rem;font-weight:700;line-height:1.1}
 .kpi-lbl{font-size:.85rem;color:var(--muted);margin-top:.15rem}
 .kpi-sub{font-size:.75rem;color:var(--muted);margin-top:.15rem}
+.metric-hint{display:inline-flex;align-items:center;color:var(--muted);cursor:help;font-size:.85em;line-height:1;vertical-align:middle}
 .charts{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:2rem}
 .card{background:var(--card);border-radius:var(--r);padding:1.25rem;box-shadow:var(--sh)}
 .card h2{font-size:1rem;font-weight:600;margin-bottom:.75rem}
