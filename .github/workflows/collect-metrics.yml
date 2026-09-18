@@ -35,8 +35,8 @@ jobs:
   collect:
     runs-on: ubuntu-latest
     permissions:
-      # actions/checkout requires read access to the repository.
-      contents: read
+      # The job also publishes the append-only metrics-data branch.
+      contents: write
     steps:
       - uses: actions/checkout@v7
         with:
@@ -71,7 +71,7 @@ jobs:
       # to the default branch.
       - name: Check out history store
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: scripts/metrics-data.sh checkout .metrics-data
 
       - name: Replay committed snapshots into the history store
@@ -130,7 +130,7 @@ jobs:
 
       - name: Publish history store
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           scripts/metrics-data.sh publish .metrics-data \
             "data: ${{ inputs.owner || vars.DEVEX_OWNER }} ${{ steps.date.outputs.date }}"

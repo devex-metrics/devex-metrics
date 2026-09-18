@@ -43,11 +43,14 @@ jobs:
 
       - run: npm run build
 
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
       # The history store is a data-only orphan branch; it is never built or
       # served, only read here to find the newest snapshot.
       - name: Check out history store
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: scripts/metrics-data.sh checkout .metrics-data "${{ inputs.history_branch }}"
 
       - name: Build pages site

@@ -824,6 +824,7 @@ describe("build-pages", () => {
     expect(html).toContain('id="kpiAgentVal"');
     expect(html).toContain('id="kpiAgentSub"');
     expect(html).toContain("Agent Tasks (30d)");
+    expect(html).not.toContain("Agent task metrics are optional.");
     // KPI should show total task count and summary
     expect(html).toContain(">5<");
     expect(html).toContain("3 completed");
@@ -946,6 +947,8 @@ describe("build-pages", () => {
     expect(html).toContain('id="kpiAgentVal"');
     const dom = new JSDOM(html);
     expect(dom.window.document.getElementById("kpiAgentVal")?.textContent).toBe("–");
+    expect(html).toContain("Agent task metrics are optional.");
+    expect(html).toContain('href="https://github.com/devex-metrics/devex-metrics#deploying"');
   });
 });
 
