@@ -1373,6 +1373,45 @@ describe("build-pages · dashboard JS executes", () => {
     ]);
   });
 
+  it("adds all-repository averages to a selected repository chart", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: {
+        repos: Array<{
+          name: string;
+          issues: { open: number; closed: number };
+          mergedPRTimeline: Array<Record<string, unknown>>;
+        }>;
+      };
+    };
+    const billing = cache.data.repos.find((repo) => repo.name === "billing");
+    if (!billing) throw new Error("Expected the billing fixture repository.");
+    billing.issues.open = 7;
+    billing.mergedPRTimeline.push({
+      number: 99,
+      createdAt: "2026-08-20T00:00:00Z",
+      mergedAt: "2026-08-22T00:00:00Z",
+      author: "dana",
+      isBotAuthor: false,
+      isCopilotAuthored: false,
+      timeToMergeHours: 48,
+      closesIssues: [],
+      linesAdded: 5,
+      linesDeleted: 1,
+    });
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+
+    const { dom, errors } = run("?period=all&repos=api", {}, true);
+    expect(errors).toEqual([]);
+    const repos = (dom.window as unknown as { charts: {
+      repos: { data: { labels: string[]; datasets: TrendDataset[] } };
+    } }).charts.repos;
+    expect(repos.data.labels).toEqual(["api", "All repositories average"]);
+    expect(repos.data.datasets).toMatchObject([
+      { label: "Issues", data: [2, 5] },
+      { label: "Pull Requests", data: [1, 1.5] },
+    ]);
+  });
+
   it("ignores repo names in the URL that are no longer collected", () => {
     const { dom, errors } = run("?repos=api,deleted-repo");
     expect(errors).toEqual([]);
