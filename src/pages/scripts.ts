@@ -714,6 +714,9 @@ function applyFilter(period){
 
   // ── Repo-filtered PR base (no period/bot filter yet) ──
   var allPRBase=getRepoFilteredPRDetails();
+  var allOrgPR=CHART_DATA.allPRDetails||[];
+  if(excludeBots)allOrgPR=allOrgPR.filter(function(p){return !p.isBotAuthor;});
+  var filteredOrgPR=cutoff?allOrgPR.filter(function(p){return new Date(p.mergedAt)>=cutoff;}):allOrgPR;
 
   // ── Trends ──
   // PR/size trends are recomputed from allPRBase when a repo filter is active.
@@ -802,10 +805,14 @@ function applyFilter(period){
         var prCnt=0;filteredPR.forEach(function(p){if(p.repo===n)prCnt++;});
         return{name:n,issues:rs.issues,prs:prCnt};
       }).sort(function(a,b){return b.issues+b.prs-(a.issues+a.prs);}).slice(0,15);
-      charts.repos.data.labels=selData.map(function(r){return r.name;});
+      var allRepoSummaries=CHART_DATA.repoSummaries||[];
+      var repoCount=allRepoSummaries.length;
+      var averageIssues=repoCount===0?0:allRepoSummaries.reduce(function(total,r){return total+r.issues;},0)/repoCount;
+      var averagePRs=repoCount===0?0:filteredOrgPR.length/repoCount;
+      charts.repos.data.labels=selData.map(function(r){return r.name;}).concat(["All repositories average"]);
       charts.repos.data.datasets=[
-        {label:"Issues",data:selData.map(function(r){return r.issues;}),xAxisID:"xIssues",_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
-        {label:"Pull Requests",data:selData.map(function(r){return r.prs;}),xAxisID:"xPRs",_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}];
+        {label:"Issues",data:selData.map(function(r){return r.issues;}).concat([averageIssues]),xAxisID:"xIssues",_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
+        {label:"Pull Requests",data:selData.map(function(r){return r.prs;}).concat([averagePRs]),xAxisID:"xPRs",_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}];
       var pLabel=period==="all"?"All Time":period==="year"?"This Year":period==="90days"?"Last 90 Days":"Last 30 Days";
       if(titleEl)titleEl.textContent="Selected Repositories \u2014 "+pLabel;
     }else if(period==="all"){
