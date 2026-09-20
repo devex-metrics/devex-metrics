@@ -124,7 +124,16 @@ The installation ID is retrieved automatically at runtime.
 ### Deploying
 
 1. Enable **GitHub Pages** in your repo settings (set source to *GitHub Actions*).
-2. Optionally add a **fine-grained PAT** as a repository secret named `COPILOT_AGENT_TOKEN` (with the "Copilot agent tasks" permission) to enable Copilot agent task metrics. It adds 30-day per-repository task, session, credit, agent-created PR, and associated Actions-minute data. Without it, collection and deployment continue normally, but those optional dashboard values are unavailable. GitHub App installation tokens are not supported for this API; a fine-grained `GITHUB_TOKEN` with the same permission is used as a fallback when available.
+2. Optionally add a **fine-grained PAT** as a repository secret named
+   `COPILOT_AGENT_TOKEN` to enable Copilot agent task metrics. When creating
+   the token, select the target organisation as its resource owner, then choose
+   either **All repositories** or **Only select repositories** before adding the
+   **Copilot agent tasks** organisation permission. This adds 30-day
+   per-repository task, session, credit, agent-created PR, and associated
+   Actions-minute data. Without it, collection and deployment continue normally,
+   but those optional dashboard values are unavailable. GitHub App installation
+   tokens are not supported for this API; a fine-grained `GITHUB_TOKEN` with
+   the same permission is used as a fallback when available.
 3. Configure the deployment with Actions **variables** — at minimum `DEVEX_OWNER`.
    See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for the full list.
 4. The workflow runs daily at 06:00 UTC. It:
