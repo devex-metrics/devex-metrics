@@ -830,7 +830,6 @@ describe("build-pages", () => {
     expect(html).toContain('id="kpiAgentVal"');
     expect(html).toContain('id="kpiAgentSub"');
     expect(html).toContain("Agent Tasks (30d)");
-    expect(html).not.toContain("Agent task metrics are optional.");
     // KPI should show total task count and summary
     expect(html).toContain(">5<");
     expect(html).toContain("3 completed");
@@ -942,7 +941,7 @@ describe("build-pages", () => {
     expect(repoRow!.dataset.agentTasks).toBe("7");
   });
 
-  it("should show – for repos with no agent data in Agent Tasks column", () => {
+  it("should hide the agent task chart when no agent tasks were collected", () => {
     execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
       cwd: process.cwd(),
     });
@@ -953,8 +952,8 @@ describe("build-pages", () => {
     expect(html).toContain('id="kpiAgentVal"');
     const dom = new JSDOM(html);
     expect(dom.window.document.getElementById("kpiAgentVal")?.textContent).toBe("–");
-    expect(html).toContain("Agent task metrics are optional.");
-    expect(html).toContain('href="https://github.com/devex-metrics/devex-metrics#deploying"');
+    expect(html).not.toContain("Agent Tasks by Repository");
+    expect(html).not.toContain('id="chartAgentTasks"');
   });
 });
 
