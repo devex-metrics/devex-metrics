@@ -1243,11 +1243,14 @@ describe("build-pages · dashboard JS executes", () => {
             this.canvas = canvas;
             this.data = config.data;
             this.options = config.options;
+            (window as unknown as { __charts: Record<string, unknown> }).__charts[
+              canvas.id
+            ] = this;
           }
           setDatasetVisibility() {}
           update() {}
         }
-        Object.assign(window, { Chart: ChartMock });
+        Object.assign(window, { Chart: ChartMock, __charts: {} });
       },
     });
     dom.window.document.dispatchEvent(
@@ -1277,6 +1280,32 @@ describe("build-pages · dashboard JS executes", () => {
       DEVEX_TRIAL_START: "2026-08-01",
     });
     expect(errors).toEqual([]);
+  });
+
+  it("marks the trial milestone on every weekly delivery chart", () => {
+    const { dom, errors } = run(
+      "?period=all",
+      { DEVEX_TRIAL_MILESTONES: "2026-08-22=Project start" },
+      true,
+    );
+    expect(errors).toEqual([]);
+    const charts = (
+      dom.window as unknown as {
+        __charts: Record<
+          string,
+          { options: { plugins: { annotation: { annotations: Record<string, { label: { content: string } }> } } } }
+        >;
+      }
+    ).__charts;
+    for (const id of [
+      "chartCycleTime",
+      "chartActorBreakdown",
+      "chartCopilotPRTrend",
+      "chartReviewWait",
+    ]) {
+      const annotations = charts[id].options.plugins.annotation.annotations;
+      expect(annotations.milestoneLine0?.label.content).toBe("Project start");
+    }
   });
 
   it("fills the trial table with real numbers", () => {

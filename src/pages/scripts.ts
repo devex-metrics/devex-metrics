@@ -948,7 +948,7 @@ function applyFilter(period){
     var ctWeeks=Object.keys(weekCT).sort();
     charts.cycleTime.data.labels=ctWeeks;
     charts.cycleTime.data.datasets[0].data=ctWeeks.map(function(w){return Math.round(medianOf(weekCT[w])*10)/10;});
-    charts.cycleTime.options.plugins.annotation=(yearBoundaryAnnotations(ctWeeks).annotation||{annotations:{}});
+    charts.cycleTime.options.plugins.annotation=trendAnnotations(ctWeeks);
     charts.cycleTime.update();
   }
   if(charts.actorBreakdown){
@@ -967,7 +967,7 @@ function applyFilter(period){
     charts.actorBreakdown.data.datasets[1].data=aW.map(function(w){return wA[w].copilot;});
     charts.actorBreakdown.data.datasets[2].data=aW.map(function(w){return wA[w].dependabot;});
     charts.actorBreakdown.data.datasets[3].data=aW.map(function(w){return wA[w].otherBot;});
-    charts.actorBreakdown.options.plugins.annotation=(yearBoundaryAnnotations(aW).annotation||{annotations:{}});
+    charts.actorBreakdown.options.plugins.annotation=trendAnnotations(aW);
     charts.actorBreakdown.update();
   }
 
@@ -978,7 +978,7 @@ function applyFilter(period){
     var copWeeks2=Object.keys(wCopPR2).sort();
     charts.copilotPRTrend.data.labels=copWeeks2;
     charts.copilotPRTrend.data.datasets[0].data=copWeeks2.map(function(w){return wCopPR2[w];});
-    charts.copilotPRTrend.options.plugins.annotation=(yearBoundaryAnnotations(copWeeks2).annotation||{annotations:{}});
+    charts.copilotPRTrend.options.plugins.annotation=trendAnnotations(copWeeks2);
     charts.copilotPRTrend.update();
   }
 
@@ -1044,7 +1044,7 @@ function applyFilter(period){
     var rwWeeks=Object.keys(wRW).sort();
     charts.reviewWait.data.labels=rwWeeks;
     charts.reviewWait.data.datasets[0].data=rwWeeks.map(function(w){return Math.round(medianOf(wRW[w])*10)/10;});
-    charts.reviewWait.options.plugins.annotation=(yearBoundaryAnnotations(rwWeeks).annotation||{annotations:{}});
+    charts.reviewWait.options.plugins.annotation=trendAnnotations(rwWeeks);
     charts.reviewWait.update();
   }
 
