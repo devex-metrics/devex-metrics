@@ -160,7 +160,7 @@ type PRDetail = {
   merge_commit_sha?: string | null;
 };
 type CheckRun = { started_at: string | null; completed_at: string | null };
-type Review = { user?: { login: string } | null; state: string };
+type Review = { user?: { login: string; type?: string } | null; state: string };
 
 function buildDetailsOctokit(opts: {
   prs?: ClosedPR[];
@@ -394,6 +394,41 @@ describe("collectPullRequestDetails", () => {
     expect(result[0].aiAuthorType).toBe("copilot");
     expect(result[0].hasCopilotReview).toBe(true);
     expect(result[0].author).toBe("copilot[bot]");
+  });
+
+  it.each([
+    "copilot-pull-request-reviewer[bot]",
+    "copilot[bot]",
+  ])("detects submitted REST reviews from %s", async (login) => {
+    setOctokit(buildDetailsOctokit({
+      prs: [{
+        number: 333,
+        title: "Human PR reviewed by Copilot",
+        merged_at: "2026-09-17T11:41:38Z",
+        created_at: "2026-09-17T10:00:00Z",
+        user: { login: "alice", type: "User" },
+      }],
+      reviews: new Map([[333, [{ user: { login, type: "Bot" }, state: "COMMENTED" }]]]),
+    }));
+
+    const [detail] = await collectPullRequestDetails("owner", "repo");
+    expect(detail.hasCopilotReview).toBe(true);
+    expect(detail.isCopilotAuthored).toBe(false);
+  });
+
+  it("does not treat a pending REST review as received", async () => {
+    setOctokit(buildDetailsOctokit({
+      prs: [{
+        number: 333,
+        title: "Draft review",
+        merged_at: "2026-09-17T11:41:38Z",
+        created_at: "2026-09-17T10:00:00Z",
+      }],
+      reviews: new Map([[333, [{ user: { login: "copilot-pull-request-reviewer[bot]" }, state: "PENDING" }]]]),
+    }));
+
+    const [detail] = await collectPullRequestDetails("owner", "repo");
+    expect(detail.hasCopilotReview).toBe(false);
   });
 
   it("detects AI via merge commit co-authored-by for human-authored PR (REST path)", async () => {
@@ -1258,6 +1293,32 @@ describe("collectPullRequestDetailsFromNodes", () => {
     expect(result[0].hasCopilotReview).toBe(true);
   });
 
+  it("recognizes GraphQL's unsuffixed Copilot reviewer only when it is a bot", async () => {
+    const nodes = [
+      makePRNode({
+        number: 333,
+        reviews: { nodes: [{ author: { login: "copilot-pull-request-reviewer", __typename: "Bot" }, state: "COMMENTED", submittedAt: "2026-09-17T10:11:27Z" }] },
+      }),
+      makePRNode({
+        number: 334,
+        reviews: { nodes: [{ author: { login: "copilot-pull-request-reviewer", __typename: "User" }, state: "COMMENTED", submittedAt: "2026-09-17T10:11:27Z" }] },
+      }),
+      makePRNode({
+        number: 335,
+        reviews: { nodes: [{ author: { login: "copilot-pull-request-reviewer", __typename: "Bot" }, state: "PENDING", submittedAt: null }] },
+      }),
+    ];
+    setOctokit({
+      rest: { checks: { listForRef: async () => ({ data: { check_runs: [] } }) } },
+    } as unknown as Octokit);
+
+    const details = await collectPullRequestDetailsFromNodes("owner", "repo", nodes);
+    expect(Object.fromEntries(details.map((detail) => [detail.number, detail.hasCopilotReview]))).toEqual({
+      333: true, 334: false, 335: false,
+    });
+    expect(details.find((detail) => detail.number === 333)?.isCopilotAuthored).toBe(false);
+  });
+
   it("returns 0 actionsMinutes when check runs throw", async () => {
     const node = makePRNode();
 
@@ -1496,7 +1557,12 @@ describe("countReviewerLoad", () => {
     const load = countReviewerLoad([
       makePRNode({
         reviews: {
-          nodes: [{ author: { login: "copilot[bot]" } }, { author: { login: "amy" } }],
+          nodes: [
+            { author: { login: "copilot[bot]" } },
+            { author: { login: "copilot-pull-request-reviewer", __typename: "Bot" } },
+            { author: { login: "Copilot", __typename: "Bot" } },
+            { author: { login: "amy" } },
+          ],
         },
       }),
     ]);

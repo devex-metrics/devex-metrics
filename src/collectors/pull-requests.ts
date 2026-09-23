@@ -1,4 +1,5 @@
 import { getOctokit } from "../github-client.js";
+import { isCopilotLogin } from "./repo-graphql.js";
 import { getCountFromLinkHeader } from "../link-header.js";
 import type {
   PullRequestCounts,
@@ -155,11 +156,6 @@ function resolveAIType(
   }
   return parseAIBodySignature(body);
 }
-function isCopilotUser(login: string, typeHint?: string): boolean {
-  const lower = login.toLowerCase();
-  return lower === "copilot[bot]" || (lower === "copilot" && typeHint === "Bot");
-}
-
 /**
  * The pull request a body says it reverts.
  *
@@ -272,7 +268,7 @@ export function countReviewerLoad(nodes: readonly GraphQLPRNode[]): ReviewerLoad
   for (const node of nodes) {
     for (const review of node.reviews?.nodes ?? []) {
       const login = review.author?.login;
-      if (!login || isBotLogin(login)) continue;
+      if (!login || review.author?.__typename === "Bot" || isBotLogin(login)) continue;
       counts.set(login, (counts.get(login) ?? 0) + 1);
     }
   }
@@ -299,7 +295,8 @@ export function parseIssueRefs(body: string | null | undefined): number[] {
 function isBotLogin(login: string): boolean {
   const lower = login.toLowerCase();
   return lower.endsWith("[bot]") || lower.endsWith("[agent]") ||
-    lower === "copilot-swe-agent" || lower === "anthropic-code-agent" || lower === "openai-code-agent";
+    lower === "copilot-swe-agent" || lower === "copilot-pull-request-reviewer" ||
+    lower === "anthropic-code-agent" || lower === "openai-code-agent";
 }
 
 function hoursBetween(a: string, b: string): number {
@@ -434,7 +431,7 @@ export async function collectPullRequestDetails(
           per_page: 100,
         });
         hasCopilotReview = reviews.some(
-          (r) => isCopilotUser(r.user?.login ?? "", r.user?.type),
+          (r) => r.state !== "PENDING" && isCopilotLogin(r.user?.login ?? "", r.user?.type),
         );
       } catch {
         // Reviews may not be accessible
@@ -696,11 +693,10 @@ export async function collectPullRequestDetailsFromNodes(
     }
 
     const authorLogin = node.author?.login ?? "unknown";
-    const reviewerLogins = node.reviews.nodes
-      .map((r) => r.author?.login ?? "")
-      .filter(Boolean);
-    const hasCopilotReview = reviewerLogins.some(
-      (l) => l.toLowerCase() === "copilot[bot]" || l.toLowerCase() === "copilot"
+    const hasCopilotReview = node.reviews.nodes.some(
+      (review) => review.state !== "PENDING" &&
+        review.submittedAt !== null &&
+        isCopilotLogin(review.author?.login ?? "", review.author?.__typename),
     );
     const aiType = resolveAIType(authorLogin, node.author?.__typename, node.mergeCommit?.message, node.commits.nodes, node.body);
 
