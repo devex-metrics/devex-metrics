@@ -6,8 +6,8 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
 
 /**
  * Current cache schema version. Bump this whenever `OrgMetrics` gains a new
- * required field so that cached/fixture data missing the field is automatically
- * invalidated and re-collected.
+ * required field or an existing stored metric changes meaning, so cached
+ * data is invalidated and re-collected.
  *
  * Version history:
  *   1 — initial versioning; adds mergedPRDates per repo
@@ -38,8 +38,10 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
  *       and the connection's totalCount is used when the page was truncated.
  *       Bumped so a cached per-repo timeline cannot feed the review-rounds
  *       median a count collected under the old meaning.
+ *  12 — recognize the Copilot code review account in REST and GraphQL; older
+ *       snapshots incorrectly marked its reviews as absent.
  */
-export const CURRENT_SCHEMA_VERSION = 11;
+export const CURRENT_SCHEMA_VERSION = 12;
 
 function cacheFilePath(owner: string): string {
   return path.join(DATA_DIR, `${owner}.json`);

@@ -55,7 +55,7 @@ export interface GraphQLPRNode {
 /** One submitted review on a pull request. */
 export interface ReviewNode {
   /** Reviewer, or null when the account is gone. */
-  author: { login: string } | null;
+  author: { login: string; __typename?: string } | null;
   /** When the review was submitted; null for a review still in progress. */
   submittedAt?: string | null;
   /** APPROVED | CHANGES_REQUESTED | COMMENTED | DISMISSED | PENDING. */
@@ -158,7 +158,7 @@ const REPO_DATA_QUERY = `
           reviewThreads(first: 1) { totalCount }
           reviews(first: 100) {
             totalCount
-            nodes { author { login } submittedAt state }
+            nodes { author { login __typename } submittedAt state }
           }
           mergeCommit { message }
         }
@@ -169,13 +169,15 @@ const REPO_DATA_QUERY = `
 
 /**
  * Return true when the login belongs to a Copilot bot account.
- * Checks for the legacy `copilot[bot]` review-bot login and the newer
- * Copilot coding agent (copilot-swe-agent) that uses login `"Copilot"` with
- * GraphQL `__typename` `"Bot"`.
+ * REST identifies Copilot code review as `copilot-pull-request-reviewer[bot]`,
+ * while GraphQL returns `copilot-pull-request-reviewer` with type `Bot`.
+ * Also recognizes the legacy `copilot[bot]` and `Copilot` bot logins.
  */
 export function isCopilotLogin(login: string, typename?: string): boolean {
   const lower = login.toLowerCase();
-  return lower === "copilot[bot]" || (lower === "copilot" && typename === "Bot");
+  return lower === "copilot[bot]" ||
+    lower === "copilot-pull-request-reviewer[bot]" ||
+    ((lower === "copilot" || lower === "copilot-pull-request-reviewer") && typename === "Bot");
 }
 
 /**

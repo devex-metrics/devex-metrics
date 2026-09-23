@@ -172,7 +172,7 @@ export interface PullRequestDetail {
   isCopilotAuthored: boolean;
   /** Which AI tool authored this PR ('copilot', 'claude', or 'codex'); undefined for human/other-bot authors. */
   aiAuthorType?: "copilot" | "claude" | "codex";
-  /** True when the PR received a review from copilot[bot] (Copilot Review). */
+  /** True when the PR received a review from a Copilot code review bot. */
   hasCopilotReview: boolean;
   linesAdded: number;
   linesDeleted: number;
@@ -346,7 +346,7 @@ export interface CopilotAdoption {
    */
   copilotAuthoredPRs: number;
   /**
-   * Number of detailed PRs that received a review from `copilot[bot]`
+   * Number of detailed PRs that received a review from a Copilot code review bot
    * specifically (unlike `copilotAuthoredPRs`, this one really is
    * Copilot-only — Claude/Codex reviews are not counted). Measured over
    * `totalDetailedPRs`, up to 10 PRs per repo: the REST fallback starts from

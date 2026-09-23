@@ -112,8 +112,9 @@ export function generateReport(metrics: OrgMetrics): string {
     );
     summaryNotes.push(
       "> Unlike the row above, this one really is Copilot-only (a review " +
-        "from `copilot[bot]`) and is sampled from up to 10 of the most " +
-        "recently updated closed PRs per repository (filtered to merged), " +
+        "from `copilot[bot]` or the Copilot code review bot) and is sampled " +
+        "from up to 10 of the most recently updated closed PRs per repository " +
+        "(filtered to merged), " +
         "not necessarily the most recently merged — a much smaller " +
         "population than the collected-history figure above."
     );
