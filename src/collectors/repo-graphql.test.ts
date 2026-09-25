@@ -484,7 +484,7 @@ describe("fetchHistoricalPRPage", () => {
     const success = makeHistoricalPageResponse({ nodes: [{ number: 1 }], hasNextPage: false });
     setOctokit(buildMockOctokit([err, success]));
 
-    const p = fetchHistoricalPRPage("barcoclickshare", "cx_system_tests", null, DEFAULT_OPTIONS);
+    const p = fetchHistoricalPRPage("example-org", "example-graphql-repo", null, DEFAULT_OPTIONS);
     await vi.advanceTimersByTimeAsync(5_001);
     const outcome = await p;
 
@@ -501,7 +501,7 @@ describe("fetchHistoricalPRPage", () => {
     const err = makeGenericExecutionError("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655");
     setOctokit(buildMockOctokit([err])); // every attempt fails
 
-    const p = fetchHistoricalPRPage("barcoclickshare", "cx_system_tests", "cursor-9", DEFAULT_OPTIONS);
+    const p = fetchHistoricalPRPage("example-org", "example-graphql-repo", "cursor-9", DEFAULT_OPTIONS);
     await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
     const outcome = await p;
 
