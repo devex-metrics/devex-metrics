@@ -39,6 +39,11 @@ export interface GraphQLPRNode {
       };
     }>;
   };
+  /** Up to 100 latest commit timestamps, for post-review commit counts. */
+  recentCommits?: {
+    totalCount: number;
+    nodes: Array<{ commit: { committedDate: string } } | null>;
+  };
   comments: { totalCount: number };
   /** Inline review comment threads (maps to REST `review_comments` count). */
   reviewThreads: { totalCount: number };
@@ -62,10 +67,14 @@ export interface ReviewNode {
   state?: string;
 }
 
-/** A pull request still open, from the daily query's first page. */
+/** A pull request still open, from the daily query's oldest-first page. */
 export interface OpenPRNode {
   number: number;
+  title: string;
   createdAt: string;
+  isDraft: boolean;
+  /** Submitted reviews only; pending drafts are excluded by the query. */
+  submittedReviews: { totalCount: number };
   author: { login: string; __typename: string } | null;
 }
 
@@ -120,7 +129,12 @@ const REPO_DATA_QUERY = `
       ) @include(if: $firstPage) {
         nodes {
           number
+          title
           createdAt
+          isDraft
+          submittedReviews: reviews(first: 1, states: [APPROVED, CHANGES_REQUESTED, COMMENTED, DISMISSED]) {
+            totalCount
+          }
           author { login __typename }
         }
       }
@@ -153,6 +167,10 @@ const REPO_DATA_QUERY = `
                 }
               }
             }
+          }
+          recentCommits: commits(last: 100) {
+            totalCount
+            nodes { commit { committedDate } }
           }
           comments(first: 1) { totalCount }
           reviewThreads(first: 1) { totalCount }

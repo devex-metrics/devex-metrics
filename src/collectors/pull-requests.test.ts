@@ -1578,6 +1578,32 @@ describe("countReviewerLoad", () => {
 });
 
 describe("buildMergedPRTimeline review facts", () => {
+  it("retains comment counts and sampled commit dates without claiming missing data is zero", () => {
+    const sample = [
+      { commit: { committedDate: "2026-03-01T00:00:00Z" } },
+      { commit: { committedDate: "2026-03-02T00:00:00Z" } },
+    ];
+    const timeline = buildMergedPRTimeline([
+      makePRNode({
+        number: 1,
+        recentCommits: { totalCount: 101, nodes: sample },
+        comments: { totalCount: 7 },
+        reviewThreads: { totalCount: 3 },
+      }),
+      makePRNode({ number: 2 }),
+    ]);
+    const entry = timeline.find((pr) => pr.number === 1)!;
+    const missing = timeline.find((pr) => pr.number === 2)!;
+    expect(entry).toMatchObject({
+      conversationCommentCount: 7,
+      reviewThreadCount: 3,
+      totalCommitCount: 101,
+      recentCommitDates: ["2026-03-01T00:00:00Z", "2026-03-02T00:00:00Z"],
+    });
+    expect(missing.recentCommitDates).toBeUndefined();
+    expect(missing.totalCommitCount).toBeUndefined();
+  });
+
   it("carries the raw review timestamps onto the timeline entry", () => {
     const [entry] = buildMergedPRTimeline([
       makePRNode({
@@ -1699,16 +1725,20 @@ describe("buildOpenPRTimeline", () => {
 
   it("keeps the query's oldest-first order", () => {
     const open = buildOpenPRTimeline([
-      { number: 1, createdAt: "2025-01-01T00:00:00Z", author: { login: "amy", __typename: "User" } },
-      { number: 2, createdAt: "2026-01-01T00:00:00Z", author: { login: "bob", __typename: "User" } },
+      { number: 1, title: "Old", createdAt: "2025-01-01T00:00:00Z", isDraft: false, submittedReviews: { totalCount: 0 }, author: { login: "amy", __typename: "User" } },
+      { number: 2, title: "New", createdAt: "2026-01-01T00:00:00Z", isDraft: true, submittedReviews: { totalCount: 2 }, author: { login: "bob", __typename: "User" } },
     ]);
     expect(open.map((p) => p.number)).toEqual([1, 2]);
+    expect(open.map((p) => ({ title: p.title, isDraft: p.isDraft, hasReview: p.hasReview }))).toEqual([
+      { title: "Old", isDraft: false, hasReview: false },
+      { title: "New", isDraft: true, hasReview: true },
+    ]);
   });
 
   it("flags bot and AI authors", () => {
     const open = buildOpenPRTimeline([
-      { number: 1, createdAt: "2026-01-01T00:00:00Z", author: { login: "dependabot[bot]", __typename: "Bot" } },
-      { number: 2, createdAt: "2026-01-02T00:00:00Z", author: { login: "Copilot", __typename: "Bot" } },
+      { number: 1, title: "Dependencies", createdAt: "2026-01-01T00:00:00Z", isDraft: false, submittedReviews: { totalCount: 0 }, author: { login: "dependabot[bot]", __typename: "Bot" } },
+      { number: 2, title: "Code", createdAt: "2026-01-02T00:00:00Z", isDraft: false, submittedReviews: { totalCount: 0 }, author: { login: "Copilot", __typename: "Bot" } },
     ]);
     expect(open[0].isBotAuthor).toBe(true);
     expect(open[0].aiAuthorType).toBeUndefined();
@@ -1717,7 +1747,7 @@ describe("buildOpenPRTimeline", () => {
 
   it("falls back to 'unknown' for a deleted account", () => {
     const open = buildOpenPRTimeline([
-      { number: 1, createdAt: "2026-01-01T00:00:00Z", author: null },
+      { number: 1, title: "Unknown", createdAt: "2026-01-01T00:00:00Z", isDraft: false, submittedReviews: { totalCount: 0 }, author: null },
     ]);
     expect(open[0].author).toBe("unknown");
     expect(open[0].isBotAuthor).toBe(false);

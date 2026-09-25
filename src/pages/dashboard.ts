@@ -2,6 +2,7 @@ import type { CiRunSample, OrgMetrics, RepoMetrics } from "../types.js";
 import type { BrandingConfig } from "../config.js";
 import type { RollupRow } from "../history.js";
 import { LARGE_PR_LINES } from "../history.js";
+import { postReviewCommitFacts } from "../review-rework.js";
 import { escapeHtml, computeMedian, weekToDate, formatDurationHtml } from "./utils.js";
 import { getCSS } from "./styles.js";
 import { getJS } from "./scripts.js";
@@ -77,6 +78,7 @@ const DEFAULT_BRANDING: BrandingConfig = {
   attribution: "Made with \u2764\uFE0F by rajbos",
   attributionUrl: "https://github.com/rajbos",
 };
+
 export function buildDashboardHtml(
   data: OrgMetrics,
   date: string,
@@ -150,6 +152,7 @@ export function buildDashboardHtml(
     if (r.mergedPRTimeline && r.mergedPRTimeline.length > 0) {
       return r.mergedPRTimeline.map((p) => ({
         repo: r.name,
+        fullName: r.fullName,
         number: p.number,
         mergedAt: p.mergedAt,
         createdAt: p.createdAt,
@@ -163,6 +166,9 @@ export function buildDashboardHtml(
         firstReviewAt: p.firstReviewAt,
         firstApprovalAt: p.firstApprovalAt,
         reviewCount: p.reviewCount,
+        conversationCommentCount: p.conversationCommentCount,
+        reviewThreadCount: p.reviewThreadCount,
+        postReviewCommits: postReviewCommitFacts(p),
         changesRequestedCount: p.changesRequestedCount,
         revertsPR: p.revertsPR,
       }));
@@ -171,6 +177,7 @@ export function buildDashboardHtml(
       .filter((pr) => !!pr.mergedAt)
       .map((pr) => ({
         repo: r.name,
+        fullName: r.fullName,
         number: pr.number,
         mergedAt: pr.mergedAt!,
         createdAt: pr.createdAt,
@@ -184,6 +191,9 @@ export function buildDashboardHtml(
         firstReviewAt: undefined as string | undefined,
         firstApprovalAt: undefined as string | undefined,
         reviewCount: undefined as number | undefined,
+        conversationCommentCount: undefined as number | undefined,
+        reviewThreadCount: undefined as number | undefined,
+        postReviewCommits: undefined as { count: number; partial: boolean } | undefined,
         changesRequestedCount: undefined as number | undefined,
         revertsPR: undefined as number | undefined,
       }));
@@ -207,8 +217,12 @@ export function buildDashboardHtml(
   const allOpenPRs = data.repos.flatMap((r) =>
     (r.openPRTimeline ?? []).map((p) => ({
       repo: r.name,
+      fullName: r.fullName,
       number: p.number,
+      title: p.title,
       createdAt: p.createdAt,
+      isDraft: p.isDraft,
+      hasReview: p.hasReview,
       author: p.author,
       isBotAuthor: p.isBotAuthor,
     })),
@@ -384,6 +398,12 @@ export function buildDashboardHtml(
     allPRDetails,
     allClosedPRs,
     allOpenPRs,
+    openPRCoverage: data.repos.map((r) => ({
+      repo: r.name,
+      fullName: r.fullName,
+      open: r.pullRequests.open,
+      sampled: r.openPRTimeline?.length ?? null,
+    })),
     reviewerLoadByRepo,
     allIssueLeadTimes,
     copilot: {
@@ -411,6 +431,7 @@ export function buildDashboardHtml(
     },
     collectedAt: data.collectedAt,
     teamRepos: teamRepoNames,
+    teamFullNames: [...teamFullNames],
     team: data.team ?? null,
     trial: data.trial ?? null,
     // Only the org-level rollup rows are needed for the trial baseline; the
@@ -432,7 +453,7 @@ export function buildDashboardHtml(
         abandonedPRs30d: r.abandonedPRs30d,
         reviewGini: r.reviewGini,
       })),
-  });
+  }).replace(/</g, "\\u003c");
 
   const datasetSwitcherHtml =
     datasets && datasets.length > 1
@@ -581,6 +602,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
   </section>
 
   ${buildFlowSection()}
+  ${buildReviewReworkSection()}
   ${buildAIHumanSection()}
   ${buildCiSection(ciSamples.length > 0, ciWindowDays)}
 
@@ -719,6 +741,28 @@ ${legs}
 </section>`;
 }
 
+function buildReviewReworkSection(): string {
+  return `<section class="card card-wide metric-card" aria-label="Reviews and rework by repository">
+  <h2>Reviews and rework by repository</h2>
+  <p class="metric-lede">Merged PRs in the selected period. Review rounds count submitted reviews, not
+  distinct back-and-forth cycles. Conversation comments exclude inline review threads.</p>
+  <div class="trial-table-wrap">
+    <table class="trial-table review-rework-table">
+      <thead><tr>
+        <th scope="col">Repository</th>
+        <th scope="col">Merged PRs</th>
+        <th scope="col">Median reviews <span class="trial-hint">per reviewed PR</span></th>
+        <th scope="col">Conversation comments</th>
+        <th scope="col">Review threads</th>
+        <th scope="col">Commits after first review</th>
+      </tr></thead>
+      <tbody id="reviewReworkRows"></tbody>
+    </table>
+  </div>
+  <p class="trial-note" id="reviewReworkNote"></p>
+</section>`;
+}
+
 /**
  * CI health: how often the trunk is green, how long a build takes, how long it
  * waits for a runner, and how often it needs a second attempt.
@@ -834,10 +878,14 @@ function buildTrialBanner(data: OrgMetrics, teamRepoCount: number): string {
   const started = trial?.interventionStart
     ? `<span class="trial-date" title="Intervention start">started ${escapeHtml(trial.interventionStart)}</span>`
     : "";
-  const baseline =
-    trial?.baselineFrom && trial.baselineTo
-      ? `<span class="trial-baseline-window">baseline ${escapeHtml(trial.baselineFrom)} &rarr; ${escapeHtml(trial.baselineTo)}</span>`
-      : `<span class="trial-baseline-window">baseline: all repositories, all time</span>`;
+  const baselineLabel = trial?.baselineFrom && trial.baselineTo
+    ? `baseline ${escapeHtml(trial.baselineFrom)} &rarr; ${escapeHtml(trial.baselineTo)}`
+    : trial?.baselineFrom
+      ? `baseline: from ${escapeHtml(trial.baselineFrom)}`
+      : trial?.baselineTo
+        ? `baseline: through ${escapeHtml(trial.baselineTo)}`
+        : "baseline: all repositories, selected period";
+  const baseline = `<span class="trial-baseline-window">${baselineLabel}</span>`;
   const hypothesis = trial?.hypothesis
     ? `<p class="trial-hypothesis">${escapeHtml(trial.hypothesis)}</p>`
     : "";
@@ -861,6 +909,7 @@ function buildTrialBanner(data: OrgMetrics, teamRepoCount: number): string {
     { id: "cycle", label: "Median cycle time", hint: "PR created → merged" },
     { id: "cycle75", label: "Cycle time p75", hint: "the slow quarter of PRs" },
     { id: "cycle90", label: "Cycle time p90", hint: "the worst tenth" },
+    { id: "reviewWait", label: "Wait for first review", hint: "opened → first review, reviewed merged PRs" },
     { id: "size", label: "Median PR size", hint: "lines added + deleted" },
     { id: "merged", label: "Merged PRs", hint: "in the selected period" },
     { id: "ai", label: "AI-authored PRs", hint: "share of human + AI PRs" },
@@ -889,6 +938,12 @@ function buildTrialBanner(data: OrgMetrics, teamRepoCount: number): string {
     </div>
   </div>
   ${milestones}
+  <p class="trial-gap" id="trialReviewGap" aria-live="polite">Median first-review wait: &ndash;</p>
+  <div class="trial-tabs" role="tablist" aria-label="Review comparison views">
+    <button class="trial-tab active" type="button" id="trialComparisonTab" role="tab" aria-selected="true" aria-controls="trialComparisonPanel" tabindex="0">Comparison</button>
+    <button class="trial-tab" type="button" id="trialWaitingTab" role="tab" aria-selected="false" aria-controls="trialWaitingPanel" tabindex="-1">Awaiting first review <span id="trialWaitingCount"></span></button>
+  </div>
+  <div id="trialComparisonPanel" role="tabpanel" aria-labelledby="trialComparisonTab">
   <div class="trial-table-wrap">
     <table class="trial-table">
       <thead>
@@ -905,5 +960,11 @@ ${rows}
     </table>
   </div>
   <p class="trial-note" id="trialNote"></p>
+  </div>
+  <div id="trialWaitingPanel" role="tabpanel" aria-labelledby="trialWaitingTab" hidden>
+    <p class="trial-waiting-intro" id="trialWaitingIntro"></p>
+    <ol class="trial-waiting-list" id="trialWaitingList"></ol>
+    <p class="trial-note" id="trialWaitingNote"></p>
+  </div>
 </section>`;
 }

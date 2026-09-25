@@ -110,8 +110,9 @@ export interface RepoMetrics {
    */
   closedPRTimeline?: ClosedPRSummary[];
   /**
-   * Pull requests still open at collection time, oldest first. Used for the
-   * median age of open work; absent in older data.
+   * Up to 100 of the oldest pull requests still open at collection time per
+   * repository. Used for the median age of open work and the review queue;
+   * absent when GraphQL collection is unavailable.
    */
   openPRTimeline?: OpenPRSummary[];
   /**
@@ -248,6 +249,14 @@ export interface MergedPRSummary {
   firstApprovalAt?: string;
   /** Total reviews submitted on the PR. */
   reviewCount?: number;
+  /** PR conversation comments (excludes inline review comments). */
+  conversationCommentCount?: number;
+  /** Number of inline review threads (not individual comments). GraphQL only. */
+  reviewThreadCount?: number;
+  /** Recorded commit timestamps from up to the last 100 PR commits, in GitHub's order. */
+  recentCommitDates?: string[];
+  /** Total number of PR commits; compare with recentCommitDates.length for sample coverage. */
+  totalCommitCount?: number;
   /** Reviews that requested changes — one per review round. */
   changesRequestedCount?: number;
   /**
@@ -287,8 +296,14 @@ export interface ClosedPRSummary {
 export interface OpenPRSummary {
   /** PR number. */
   number: number;
+  /** PR title, for identifying the waiting work. */
+  title: string;
   /** ISO-8601 timestamp when the PR was created. */
   createdAt: string;
+  /** True while the PR is still a draft and not yet ready for review. */
+  isDraft: boolean;
+  /** Whether at least one submitted review was recorded, including dismissed reviews. */
+  hasReview: boolean;
   /** GitHub login of the PR author. */
   author: string;
   /** True when the PR author is a bot. */

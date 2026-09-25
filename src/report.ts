@@ -1,6 +1,7 @@
 import type { OrgMetrics, RepoMetrics, CopilotAdoption, CopilotAgentMetrics } from "./types.js";
 import { gini, quantiles, shareAtLeast } from "./stats.js";
 import { LARGE_PR_LINES } from "./history.js";
+import { postReviewCommitFacts } from "./review-rework.js";
 import { renderMarkdownTableRow } from "./markdown.js";
 
 /**
@@ -261,6 +262,34 @@ export function generateReport(metrics: OrgMetrics): string {
     );
     lines.push(`Dependents: ${repo.dependentCount}`);
     lines.push("");
+
+    if (repo.mergedPRTimeline?.length) {
+      const prs = repo.mergedPRTimeline;
+      const rounds = prs.flatMap((pr) => pr.reviewCount && pr.reviewCount > 0 ? [pr.reviewCount] : []);
+      const commentCounts = prs.flatMap((pr) =>
+        pr.conversationCommentCount === undefined ? [] : [pr.conversationCommentCount]
+      );
+      const threadCounts = prs.flatMap((pr) =>
+        pr.reviewThreadCount === undefined ? [] : [pr.reviewThreadCount]
+      );
+      const reviewed = prs.filter((pr) => pr.firstReviewAt !== undefined);
+      const commits = reviewed.flatMap((pr) => {
+        const facts = postReviewCommitFacts(pr);
+        return facts ? [facts] : [];
+      });
+      const count = (values: number[]): string =>
+        values.length === 0 ? "–" :
+          `${values.length < prs.length ? "≥" : ""}${values.reduce((sum, n) => sum + n, 0)} (n=${values.length}/${prs.length})`;
+      const postReviewCount = commits.length === 0 ? "–" :
+        `${commits.length < reviewed.length || commits.some((entry) => entry.partial) ? "≥" : ""}` +
+          `${commits.reduce((sum, entry) => sum + entry.count, 0)} (n=${commits.length}/${reviewed.length})`;
+      lines.push(`**Reviews and rework (${WINDOW.collected.toLowerCase()}, ${prs.length} merged PRs)**`);
+      lines.push("");
+      lines.push(`- Median submitted reviews per reviewed PR: ${rounds.length ? median(rounds) : "–"} (n=${rounds.length})`);
+      lines.push(`- PR conversation comments: ${count(commentCounts)}; inline review threads: ${count(threadCounts)} (threads, not comments)`);
+      lines.push(`- Commits after first submitted review: ${postReviewCount} (latest 100 commit timestamps per PR; timestamp proxy, not proof of review-driven rework)`);
+      lines.push("");
+    }
 
     // Copilot agent metrics for this repo
     if (repo.copilotAgentMetrics && repo.copilotAgentMetrics.totalTasks > 0) {

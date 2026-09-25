@@ -591,6 +591,12 @@ export function buildMergedPRTimeline(nodes: GraphQLPRNode[]): MergedPRSummary[]
       firstReviewAt: reviews.firstReviewAt,
       firstApprovalAt: reviews.firstApprovalAt,
       reviewCount: reviews.reviewCount,
+      conversationCommentCount: node.comments.totalCount,
+      reviewThreadCount: node.reviewThreads.totalCount,
+      recentCommitDates: node.recentCommits?.nodes.flatMap((entry) =>
+        entry?.commit ? [entry.commit.committedDate] : []
+      ),
+      totalCommitCount: node.recentCommits?.totalCount,
       changesRequestedCount: reviews.changesRequestedCount,
       revertsPR: parseRevertRef(node.body),
     });
@@ -644,7 +650,10 @@ export function buildOpenPRTimeline(nodes: readonly OpenPRNode[]): OpenPRSummary
     const aiType = getAIAuthorType(authorLogin, node.author?.__typename);
     return {
       number: node.number,
+      title: node.title,
       createdAt: node.createdAt,
+      isDraft: node.isDraft,
+      hasReview: node.submittedReviews.totalCount > 0,
       author: authorLogin,
       isBotAuthor: node.author?.__typename === "Bot" || isBotLogin(authorLogin),
       aiAuthorType: aiType ?? undefined,

@@ -138,6 +138,14 @@ export interface EventRow {
   linesDeleted?: number;
   /** Number of reviews submitted on the PR. */
   reviewCount?: number;
+  /** PR conversation comments, excluding inline review threads. */
+  conversationCommentCount?: number;
+  /** Inline review threads, not individual comments. */
+  reviewThreadCount?: number;
+  /** Commit timestamps from up to the latest 100 commits in the PR. */
+  recentCommitDates?: string[];
+  /** Total commit count, used to recognize incomplete timestamp samples. */
+  totalCommitCount?: number;
   /**
    * When the first review was submitted. The raw fact behind review latency —
    * captured during the historical crawl so the metric can be built later
@@ -511,6 +519,10 @@ export function buildEventRows(metrics: OrgMetrics): EventRow[] {
         linesAdded: pr.linesAdded,
         linesDeleted: pr.linesDeleted,
         reviewCount: pr.reviewCount,
+        conversationCommentCount: pr.conversationCommentCount,
+        reviewThreadCount: pr.reviewThreadCount,
+        recentCommitDates: pr.recentCommitDates,
+        totalCommitCount: pr.totalCommitCount,
         firstReviewAt: pr.firstReviewAt,
         firstApprovalAt: pr.firstApprovalAt,
         changesRequestedCount: pr.changesRequestedCount,

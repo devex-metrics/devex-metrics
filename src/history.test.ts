@@ -201,6 +201,24 @@ describe("buildEventRows", () => {
     );
     expect(rows[0].aiAuthorType).toBe("claude");
   });
+
+  it("retains raw review, comment and commit facts on new merged-PR events", () => {
+    const [row] = buildEventRows(metrics([repo("acme/api", [pr(1, 1, {
+      reviewCount: 2,
+      firstReviewAt: "2026-08-01T12:00:00Z",
+      conversationCommentCount: 4,
+      reviewThreadCount: 3,
+      recentCommitDates: ["2026-08-02T00:00:00Z"],
+      totalCommitCount: 101,
+    })])]));
+    expect(row).toMatchObject({
+      reviewCount: 2,
+      conversationCommentCount: 4,
+      reviewThreadCount: 3,
+      recentCommitDates: ["2026-08-02T00:00:00Z"],
+      totalCommitCount: 101,
+    });
+  });
 });
 
 describe("appendRun", () => {

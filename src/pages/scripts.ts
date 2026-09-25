@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded",function(){
   setupFilter();
   setupRepoPicker();
   setupScopeButtons();
+  setupTrialTabs();
   setupShare();
   formatLineNumbers();
   applyFilter(readStateFromUrl());
@@ -117,6 +118,30 @@ function setupScopeButtons(){
       syncRepoCheckboxes();
       var activeBtn=document.querySelector(".filter-btn.active");
       applyFilter(activeBtn?activeBtn.dataset.period:"30days");
+    });
+  });
+}
+function setupTrialTabs(){
+  var tabs=[document.getElementById("trialComparisonTab"),document.getElementById("trialWaitingTab")];
+  if(!tabs[0]||!tabs[1])return;
+  function select(tab,focus){
+    tabs.forEach(function(btn){
+      var active=btn===tab;
+      btn.classList.toggle("active",active);
+      btn.setAttribute("aria-selected",String(active));
+      btn.tabIndex=active?0:-1;
+      document.getElementById(btn.getAttribute("aria-controls")).hidden=!active;
+    });
+    if(focus)tab.focus();
+  }
+  tabs.forEach(function(tab,i){
+    tab.addEventListener("click",function(){select(tab,false);});
+    tab.addEventListener("keydown",function(e){
+      if(["ArrowLeft","ArrowRight","Home","End"].indexOf(e.key)===-1)return;
+      e.preventDefault();
+      var next=e.key==="Home"?0:e.key==="End"?tabs.length-1:
+        (i+(e.key==="ArrowRight"?1:-1)+tabs.length)%tabs.length;
+      select(tabs[next],true);
     });
   });
 }
@@ -1056,6 +1081,7 @@ function applyFilter(period){
 
   updateSizeKPI(filteredPR);
   updateFlow(filteredPR,period);
+  updateReviewRework(filteredPR,period);
   updateAbandonment(filteredPR,closedInPeriod,openNow);
   updateAgentCost(repoFiltered);
   updateAIHuman(filteredPR,allPRBase,period,excludeBots);
@@ -1403,11 +1429,106 @@ function fmtHours(h){
 function fmtLines(n){return n===null?"\u2013":Math.round(n).toLocaleString();}
 function fmtCount(n){return n===null?"\u2013":Math.round(n).toLocaleString();}
 function fmtPct(n){return n===null?"\u2013":n.toFixed(1)+"%";}
+function updateReviewRework(prs,period){
+  var body=document.getElementById("reviewReworkRows");
+  var note=document.getElementById("reviewReworkNote");
+  if(!body||!note)return;
+  body.replaceChildren();
+  var byRepo=new Map(),team=new Set(CHART_DATA.teamFullNames||[]);
+  prs.forEach(function(pr){
+    if(!byRepo.has(pr.fullName))byRepo.set(pr.fullName,[]);
+    byRepo.get(pr.fullName).push(pr);
+  });
+  var incomplete=0,unavailable=0;
+  Array.from(byRepo.entries()).sort(function(a,b){
+    var teamOrder=Number(team.has(b[0]))-Number(team.has(a[0]));
+    return teamOrder||a[0].localeCompare(b[0]);
+  }).forEach(function(pair){
+    var fullName=pair[0],items=pair[1],rounds=[],comments=0,commentN=0,
+      threads=0,threadN=0,after=0,afterN=0,partial=0,reviewed=0,prCounts=[];
+    items.forEach(function(pr){
+      if(typeof pr.reviewCount==="number"&&pr.reviewCount>0){
+        rounds.push(pr.reviewCount);
+        reviewed++;
+      }else if(pr.firstReviewAt){reviewed++;}
+      if(typeof pr.conversationCommentCount==="number"){
+        comments+=pr.conversationCommentCount;commentN++;
+      }
+      if(typeof pr.reviewThreadCount==="number"){
+        threads+=pr.reviewThreadCount;threadN++;
+      }
+      if(!pr.firstReviewAt)return;
+      var result=pr.postReviewCommits;
+      if(!result)return;
+      after+=result.count;afterN++;
+      if(result.partial)partial++;
+      prCounts.push({pr:pr,count:result.count,partial:result.partial});
+    });
+    incomplete+=partial;
+    unavailable+=reviewed-afterN;
+    var tr=document.createElement("tr");
+    var repoCell=document.createElement("th");
+    repoCell.scope="row";
+    var link=document.createElement("a");
+    link.href="https://github.com/"+fullName;
+    link.textContent=fullName;
+    repoCell.appendChild(link);
+    if(team.has(fullName)){
+      var marker=document.createElement("span");
+      marker.className="review-team-label";
+      marker.textContent="Team";
+      repoCell.appendChild(marker);
+    }
+    if(prCounts.length){
+      var details=document.createElement("details");
+      details.className="review-pr-details";
+      var summary=document.createElement("summary");
+      summary.textContent="See PRs";
+      details.appendChild(summary);
+      var list=document.createElement("ul");
+      prCounts.sort(function(a,b){return b.count-a.count;}).slice(0,5).forEach(function(entry){
+        var li=document.createElement("li"),prLink=document.createElement("a");
+        prLink.href="https://github.com/"+fullName+"/pull/"+entry.pr.number;
+        prLink.textContent="#"+entry.pr.number;
+        li.appendChild(prLink);
+        li.appendChild(document.createTextNode(
+          " · "+(typeof entry.pr.reviewCount==="number"?entry.pr.reviewCount:"\u2013")+" reviews · "+
+          (typeof entry.pr.conversationCommentCount==="number"?entry.pr.conversationCommentCount:"\u2013")+
+          " comments · "+(entry.partial?"\u2265":"")+entry.count+" post-review commits"));
+        list.appendChild(li);
+      });
+      details.appendChild(list);
+      repoCell.appendChild(details);
+    }
+    tr.appendChild(repoCell);
+    var values=[
+      String(items.length),
+      rounds.length?pctl(rounds,50).toFixed(1)+" (n="+rounds.length+")":"\u2013",
+      commentN?(commentN<items.length?"\u2265":"")+fmtCount(comments):"\u2013",
+      threadN?(threadN<items.length?"\u2265":"")+fmtCount(threads):"\u2013",
+      afterN?(partial?"\u2265":"")+fmtCount(after)+" (n="+afterN+"/"+reviewed+")":"\u2013"
+    ];
+    values.forEach(function(value){
+      var cell=document.createElement("td");
+      cell.textContent=value;
+      tr.appendChild(cell);
+    });
+    body.appendChild(tr);
+  });
+  note.textContent=byRepo.size===0
+    ?"No merged PRs match the selected repositories, period and bot setting."
+    :"The "+period+" period and repository/bot filters apply. Post-review commits use commit timestamps strictly after the first submitted review, not proof of review-driven rework. "+
+      "Only the latest 100 commits per PR are sampled; \u2265 marks incomplete comment or commit counts as lower bounds. "+
+      (incomplete?incomplete+" PR"+(incomplete===1?" has":"s have")+" incomplete commit history. ":"")+
+      (unavailable?unavailable+" reviewed PR"+(unavailable===1?" lacks":"s lack")+" commit timestamps (for example, REST fallback); excluded from totals.":"");
+}
 /** Summarise one set of merged PRs into the metrics the trial table shows. */
 function summarisePRs(prs){
-  var cycles=[],sizes=[],ai=0,human=0;
+  var cycles=[],waits=[],sizes=[],ai=0,human=0;
   prs.forEach(function(p){
     if(p.timeToMergeHours>0)cycles.push(p.timeToMergeHours);
+    var wait=hoursBetweenISO(p.createdAt,p.firstReviewAt);
+    if(wait!==null)waits.push(wait);
     var size=(p.linesAdded||0)+(p.linesDeleted||0);
     if(size>0)sizes.push(size);
     if(p.isCopilotAuthored)ai++;
@@ -1416,6 +1537,7 @@ function summarisePRs(prs){
   var aiDenom=ai+human;
   return {
     cycle:pctl(cycles,50),cycle75:pctl(cycles,75),cycle90:pctl(cycles,90),
+    reviewWait:pctl(waits,50),reviewedN:waits.length,
     size:pctl(sizes,50),
     merged:prs.length,
     ai:aiDenom>0?(ai/aiDenom)*100:null,
@@ -1428,12 +1550,13 @@ var TRIAL_METRICS=[
   {id:"cycle",fmt:fmtHours,lowerIsBetter:true},
   {id:"cycle75",fmt:fmtHours,lowerIsBetter:true},
   {id:"cycle90",fmt:fmtHours,lowerIsBetter:true},
+  {id:"reviewWait",fmt:fmtHours,lowerIsBetter:true},
   {id:"size",fmt:fmtLines,lowerIsBetter:true},
   {id:"merged",fmt:fmtCount,lowerIsBetter:null},
   {id:"ai",fmt:fmtPct,lowerIsBetter:null}
 ];
 function updateTrial(cutoff,excludeBots,period){
-  var team=CHART_DATA.teamRepos||[];
+  var team=CHART_DATA.teamFullNames||[];
   var trial=CHART_DATA.trial;
   // A configured team is enough to compare against the baseline; the trial is
   // only an overlay on top of it.
@@ -1443,25 +1566,47 @@ function updateTrial(cutoff,excludeBots,period){
   var all=(CHART_DATA.allPRDetails||[]).slice();
   if(excludeBots)all=all.filter(function(p){return !p.isBotAuthor;});
 
-  // Baseline: every repository. Bounded by the configured baseline window when
-  // one is set, otherwise the whole collected history.
+  // Baseline: every repository for the selected period, unless the trial
+  // explicitly pins either edge of its historical baseline window.
   var baseFrom=trial&&trial.baselineFrom?new Date(trial.baselineFrom+"T00:00:00Z"):null;
   var baseTo=trial&&trial.baselineTo?new Date(trial.baselineTo+"T23:59:59Z"):null;
   var basePRs=all.filter(function(p){
     var t=new Date(p.mergedAt);
     if(baseFrom&&t<baseFrom)return false;
     if(baseTo&&t>baseTo)return false;
+    if(!baseFrom&&!baseTo&&cutoff&&t<cutoff)return false;
     return true;
   });
 
   // Comparison: the team's repositories over the selected period.
   var teamPRs=all.filter(function(p){
-    if(!teamSet[p.repo])return false;
+    if(!teamSet[p.fullName])return false;
+    return !cutoff||new Date(p.mergedAt)>=cutoff;
+  });
+  var otherPRs=all.filter(function(p){
+    if(teamSet[p.fullName])return false;
     return !cutoff||new Date(p.mergedAt)>=cutoff;
   });
 
   var base=summarisePRs(basePRs);
   var cur=summarisePRs(teamPRs);
+  var other=summarisePRs(otherPRs);
+  var gapEl=document.getElementById("trialReviewGap");
+  if(gapEl){
+    gapEl.className="trial-gap";
+    if(base.reviewWait===null||cur.reviewWait===null){
+      gapEl.textContent="Median first-review wait: not enough reviewed merged PRs to compare.";
+    }else{
+      var reviewGap=cur.reviewWait-base.reviewWait;
+      var gapText=reviewGap===0?"matches the all-repo baseline":
+        "is "+fmtHours(Math.abs(reviewGap))+(reviewGap>0?" longer":" shorter")+" than the all-repo baseline";
+      gapEl.textContent="Team median first-review wait "+gapText+
+        " (team "+fmtHours(cur.reviewWait)+", all repos "+fmtHours(base.reviewWait)+
+        "; n="+cur.reviewedN+" vs "+base.reviewedN+")"+
+        (cur.reviewedN<20||base.reviewedN<20?" · small sample.":".");
+      if(reviewGap!==0)gapEl.classList.add(reviewGap>0?"worse":"better");
+    }
+  }
 
   TRIAL_METRICS.forEach(function(m){
     var bEl=document.getElementById("trialBaseline-"+m.id);
@@ -1489,11 +1634,80 @@ function updateTrial(cutoff,excludeBots,period){
     var pLabel=period==="all"?"all time":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
     var parts=["Baseline n="+base.n+" merged PRs across all repositories; "+
       (CHART_DATA.team?CHART_DATA.team.name:"team")+" n="+cur.n+" over "+pLabel+"."];
-    if(cur.n<20){
+    parts.push("First-review wait: baseline n="+base.reviewedN+", team n="+cur.reviewedN+
+      " reviewed merged PRs (unreviewed PRs excluded; all repositories include the team).");
+    parts.push("Other repositories over "+pLabel+": "+fmtHours(other.reviewWait)+
+      " wait for first review (n="+other.reviewedN+" reviewed merged PRs).");
+    if(cur.reviewWait!==null&&other.reviewWait!==null){
+      var gap=cur.reviewWait-other.reviewWait;
+      parts.push("Team wait is "+(gap===0?"the same as other repositories.":fmtHours(Math.abs(gap))+
+        (gap>0?" longer":" shorter")+" than other repositories."));
+    }else if(other.reviewedN===0){
+      parts.push("No other reviewed PRs to compare.");
+    }
+    if(cur.n<20||cur.reviewedN<20){
       parts.push("Not enough team data yet to read a difference — treat these numbers as provisional.");
     }
     if(excludeBots)parts.push("Bot-authored PRs excluded.");
     noteEl.textContent=parts.join(" ");
+  }
+  updateWaitingPRs(teamSet,team.length>0,excludeBots);
+}
+function updateWaitingPRs(teamSet,hasTeam,excludeBots){
+  var list=document.getElementById("trialWaitingList");
+  if(!list)return;
+  var intro=document.getElementById("trialWaitingIntro");
+  var note=document.getElementById("trialWaitingNote");
+  var count=document.getElementById("trialWaitingCount");
+  var coverage=(CHART_DATA.openPRCoverage||[]).filter(function(r){return !hasTeam||teamSet[r.fullName];});
+  var missing=coverage.filter(function(r){return r.sampled===null&&r.open>0;}).length;
+  var truncated=coverage.filter(function(r){return r.sampled!==null&&r.sampled<r.open;}).length;
+  var waiting=(CHART_DATA.allOpenPRs||[]).filter(function(p){
+    return (!hasTeam||teamSet[p.fullName])&&p.hasReview===false&&p.isDraft===false&&
+      (!excludeBots||!p.isBotAuthor)&&hoursBetweenISO(p.createdAt,CHART_DATA.collectedAt)!==null;
+  }).sort(function(a,b){
+    return new Date(a.createdAt).getTime()-new Date(b.createdAt).getTime()||
+      a.fullName.localeCompare(b.fullName)||a.number-b.number;
+  });
+  if(count)count.textContent="("+waiting.length+(truncated||missing?"+":"")+")";
+  if(intro)intro.textContent=waiting.length>0
+    ?"Oldest "+Math.min(5,waiting.length)+" of "+waiting.length+
+      " open, non-draft PR"+(waiting.length===1?"":"s")+" with no submitted review in "+
+      (hasTeam?"the team's repositories":"the collected repositories")+"."
+    :(missing||truncated
+      ?"No PRs awaiting a first review found in the available sample."
+      :"No open, non-draft PRs awaiting a first review.");
+  list.replaceChildren();
+  waiting.slice(0,5).forEach(function(p){
+    var item=document.createElement("li");
+    item.className="trial-waiting-item";
+    var details=document.createElement("div");
+    details.className="trial-waiting-details";
+    var link=document.createElement("a");
+    link.href="https://github.com/"+p.fullName.split("/").map(encodeURIComponent).join("/")+
+      "/pull/"+encodeURIComponent(p.number);
+    link.target="_blank";
+    link.rel="noopener noreferrer";
+    link.textContent=p.title;
+    var meta=document.createElement("small");
+    meta.textContent=p.fullName+" #"+p.number+" · @"+p.author;
+    details.append(link,meta);
+    var age=document.createElement("span");
+    age.className="trial-waiting-age";
+    age.textContent=fmtHours(hoursBetweenISO(p.createdAt,CHART_DATA.collectedAt));
+    age.title="Since opened on "+p.createdAt+"; measured at collection time";
+    item.append(details,age);
+    list.appendChild(item);
+  });
+  if(note){
+    var parts=["As of "+new Date(CHART_DATA.collectedAt).toISOString().slice(0,16).replace("T"," ")+" UTC"+
+      "; open PRs are shown regardless of the selected period or repository picker."];
+    if(excludeBots)parts.push("Bot-authored PRs excluded.");
+    if(truncated)parts.push("The open-PR list is capped at the 100 oldest per repo; "+truncated+
+      " repo"+(truncated===1?" has":"s have")+" additional open PRs not checked.");
+    if(missing)parts.push("Review status unavailable for "+missing+
+      " repo"+(missing===1?"":"s")+"; their PRs are not listed.");
+    note.textContent=parts.join(" ");
   }
 }
 /** Vertical markers for the intervention date and any configured milestones. */
