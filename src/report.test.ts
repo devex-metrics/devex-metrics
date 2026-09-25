@@ -786,6 +786,24 @@ describe("generateReport flow metrics", () => {
     expect(md).toContain('| PRs receiving "changes requested" | 50.0% (n=2) | Collected history |');
   });
 
+  it("reports per-repo rework with sample sizes and lower bounds for missing data", () => {
+    const md = reportFor([repoWith({
+      mergedPRTimeline: [
+        {
+          ...merged, reviewCount: 2, firstReviewAt: "2026-08-20T06:00:00Z",
+          conversationCommentCount: 4, reviewThreadCount: 1,
+          recentCommitDates: ["2026-08-20T05:00:00Z", "2026-08-20T07:00:00Z"],
+          totalCommitCount: 101,
+        },
+        { ...merged, number: 2, reviewCount: 0, conversationCommentCount: 0 },
+      ],
+    })]);
+    expect(md).toContain("**Reviews and rework (collected history, 2 merged PRs)**");
+    expect(md).toContain("Median submitted reviews per reviewed PR: 2 (n=1)");
+    expect(md).toContain("PR conversation comments: 4 (n=2/2); inline review threads: ≥1 (n=1/2)");
+    expect(md).toContain("Commits after first submitted review: ≥1 (n=1/1)");
+  });
+
   it("omits the review legs entirely when no review data exists", () => {
     const md = reportFor([repoWith({ mergedPRTimeline: [{ ...merged }] })]);
     expect(md).not.toContain("Wait for first review");

@@ -40,8 +40,12 @@ const DATA_DIR = path.resolve(process.cwd(), "data");
  *       median a count collected under the old meaning.
  *  12 — recognize the Copilot code review account in REST and GraphQL; older
  *       snapshots incorrectly marked its reviews as absent.
+ *  13 — collect title, draft status and submitted-review status for open PRs;
+ *       older open-PR snapshots cannot distinguish unreviewed work.
+ *  14 — capture PR conversation comments, review threads, and recent commit
+ *       dates so review/rework by repository can be computed without guessing.
  */
-export const CURRENT_SCHEMA_VERSION = 12;
+export const CURRENT_SCHEMA_VERSION = 14;
 
 function cacheFilePath(owner: string): string {
   return path.join(DATA_DIR, `${owner}.json`);

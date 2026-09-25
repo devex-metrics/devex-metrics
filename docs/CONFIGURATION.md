@@ -107,6 +107,39 @@ variables are an overlay on top of it, adding a headline, a hypothesis, an
 intervention date and milestone markers on the charts. Configure the comparison
 first and add the trial framing when an experiment actually starts.
 
+The comparison includes median wait from opening a PR to its first submitted
+review, as well as PR cycle time. Both columns use the selected period by
+default; `DEVEX_BASELINE_FROM` / `DEVEX_BASELINE_TO` pin the all-repos baseline
+to historical dates instead. The baseline includes the team's PRs. Review wait
+uses reviewed merged PRs only (including bot reviews), with separate reviewed
+PR sample sizes; unreviewed or still-open PRs are not counted. Team scope
+means PRs in the configured repositories, regardless of the author's team. The
+note below the table also compares team wait with non-team repositories over
+the same selected period, even when the trial baseline is historical. Above
+the table, the absolute gap between team and all-repo medians is highlighted.
+The **Awaiting first review** tab shows the oldest five open, non-draft PRs
+without a submitted review in the configured team's repositories. It uses
+the collection-time snapshot regardless of the selected period or repository
+picker; the bot toggle still applies. Only the 100 oldest open PRs per repo
+are sampled, and the tab warns if a repo has more or if GraphQL review status
+was unavailable. A new collection is needed to populate review status in
+older open-PR snapshots.
+
+The **Reviews and rework by repository** table uses merged PRs in the selected
+period and follows the repository picker and bot filter. Median review rounds
+mean submitted reviews per reviewed PR, not distinct back-and-forth cycles.
+Conversation comments exclude inline review comments; review threads are
+displayed separately as thread counts, not comment counts. Commits after the
+first submitted review are identified by recorded commit timestamps, which
+cannot establish that a review prompted the changes or when they were pushed.
+GitHub supplies at most the latest 100 commit timestamps per PR; incomplete
+counts are shown as lower bounds. The expandable repository rows link to up to
+five PRs with the highest post-review commit counts. REST fallback cannot
+provide these review/comment/commit facts for the timeline and is shown as
+unavailable rather than zero. The Markdown report also shows per-repository
+sample sizes and lower bounds. Newly collected raw comment and commit facts
+are retained in future events; older append-only events are not rewritten.
+
 To collect *only* the team's repos — much cheaper, but no baseline — set
 `DEVEX_DISCOVER_ALL=false`. Repos are then filtered to `DEVEX_TEAM_REPOS`
 during discovery, so the API cost drops to the team's repos alone.
@@ -216,6 +249,9 @@ each repository's first one: cycle time, PR size and the share over 400 lines,
 merge and abandonment counts, AI-versus-human authorship, review-load
 concentration, and the raw review timestamps behind the three legs of review
 latency (opened → first review → approval → merged) and the review-round count.
+Newly collected events also retain conversation comments, review-thread counts
+and up to 100 latest commit timestamps for the per-repository rework view;
+previously written events are immutable and may lack these facts.
 Historical rollup rows are recomputed from those events and marked
 `reconstructed: true`.
 

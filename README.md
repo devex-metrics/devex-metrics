@@ -182,9 +182,28 @@ Set `DEVEX_TEAM_REPOS` and `DEVEX_TRIAL_TITLE` (plus optionally
 `DEVEX_TRIAL_START`, `DEVEX_BASELINE_FROM` / `DEVEX_BASELINE_TO` and
 `DEVEX_TRIAL_MILESTONES`) and the dashboard grows a trial panel: the
 intervention title, the whole org as the baseline, the team's current numbers,
-and the difference between them. Durations are reported as median, p75 and p90
-with sample sizes, and the panel says so plainly when there is not yet enough
-team data to read a difference.
+and the difference between them. The comparison includes median wait from PR
+creation to first review alongside cycle time (median, p75 and p90). By default
+both columns use the selected period; `DEVEX_BASELINE_FROM` /
+`DEVEX_BASELINE_TO` can pin a historical baseline instead. Review wait uses
+reviewed merged PRs only, and the panel shows their sample sizes and warns when
+there is not yet enough team data to read a difference. It also states the
+same-period wait for non-team repositories, so the team can be compared with
+the rest rather than only the all-repos baseline. The absolute difference
+between the team and all-repo medians appears above the table. The adjacent
+**Awaiting first review** tab lists the five oldest open, non-draft PRs in the
+configured team's repositories that have no submitted review, with direct PR
+links and their age at collection time.
+
+The **Reviews and rework by repository** table compares submitted reviews per
+reviewed merged PR, PR conversation comments, inline review threads (not inline
+comment counts), and commits whose recorded commit time is after the first
+submitted review. Expand a repository to inspect the five PRs with the most
+post-review commits. The period, repository and bot filters apply. Commit
+timestamps are a proxy, not proof a review caused a change; only the latest 100
+commits per PR are sampled, so incomplete counts are shown as lower bounds.
+If GitHub's GraphQL query falls back to REST, unavailable facts show as missing,
+not as zero. The Markdown report includes the same per-repository measures.
 
 Every dashboard view is addressable — the period, repository selection, scope
 and bot filter are held in the query string, and **Copy link** puts the current

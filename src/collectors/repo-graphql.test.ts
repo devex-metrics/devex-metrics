@@ -124,6 +124,21 @@ describe("collectRepoGraphQL", () => {
     expect(result!.prNodes[0].number).toBe(42);
   });
 
+  it("requests the latest 100 commit timestamps without replacing author sampling", async () => {
+    let query = "";
+    setOctokit({
+      graphql: async (q: string) => {
+        query = q;
+        return makeGraphQLResponse({ nodes: [makePRNode()] });
+      },
+    } as unknown as Octokit);
+
+    await collectRepoGraphQL("owner", "repo");
+    expect(query).toContain("recentCommits: commits(last: 100)");
+    expect(query).toContain("nodes { commit { committedDate } }");
+    expect(query).toContain("commits(first: 10)");
+  });
+
   it("paginates through multiple pages and accumulates nodes", async () => {
     const recentDate = new Date().toISOString();
     const node1 = makePRNode({ number: 1, updatedAt: recentDate });
@@ -378,7 +393,10 @@ describe("collectRepoGraphQL open pull requests", () => {
       nodes: [
         {
           number: 7,
+          title: "Waiting for review",
           createdAt: "2026-01-01T00:00:00Z",
+          isDraft: false,
+          submittedReviews: { totalCount: 0 },
           author: { login: "amy", __typename: "User" },
         },
       ],
@@ -387,6 +405,19 @@ describe("collectRepoGraphQL open pull requests", () => {
     const result = await collectRepoGraphQL("owner", "repo");
     expect(result!.openPRNodes).toHaveLength(1);
     expect(result!.openPRNodes[0].number).toBe(7);
+    expect(result!.openPRNodes[0].submittedReviews.totalCount).toBe(0);
+  });
+
+  it("requests only submitted review states for the open-PR queue", async () => {
+    const graphql = vi.fn(async (query: string) => {
+      expect(query).toContain("submittedReviews: reviews(first: 1, states: [APPROVED, CHANGES_REQUESTED, COMMENTED, DISMISSED])");
+      expect(query).toContain("isDraft");
+      expect(query).toContain("title");
+      return makeGraphQLResponse({});
+    });
+    setOctokit({ graphql } as unknown as Octokit);
+    await collectRepoGraphQL("owner", "repo");
+    expect(graphql).toHaveBeenCalledOnce();
   });
 
   it("asks for the open-PR list only on the first page", async () => {

@@ -1051,7 +1051,8 @@ describe("build-pages · trial and branding", () => {
     expect(html).toContain('<section class="trial"');
     expect(html).toContain('<div class="trial-eyebrow">Focus repositories</div>');
     expect(html).toContain('<h2 class="trial-title">Team Alpha</h2>');
-    expect(html).toContain("baseline: all repositories, all time");
+    expect(html).toContain("baseline: all repositories, selected period");
+    expect(html).toContain('data-metric="reviewWait"');
     // Trial-only framing stays out until a trial is configured.
     expect(html).not.toContain("Improvement trial");
     expect(html).not.toContain('class="trial-date"');
@@ -1144,6 +1145,14 @@ describe("build-pages · dashboard JS executes", () => {
                 firstReviewAt: "2026-08-20T06:00:00Z",
                 firstApprovalAt: "2026-08-21T00:00:00Z",
                 reviewCount: 2,
+                conversationCommentCount: 3 + i,
+                reviewThreadCount: 1 + i,
+                recentCommitDates: [
+                  "2026-08-20T04:00:00Z",
+                  "2026-08-20T06:00:00Z",
+                  "2026-08-20T08:00:00Z",
+                ],
+                totalCommitCount: 3,
                 changesRequestedCount: i,
                 revertsPR: undefined,
               },
@@ -1162,7 +1171,10 @@ describe("build-pages · dashboard JS executes", () => {
             openPRTimeline: [
               {
                 number: i * 10 + 3,
+                title: `${name} needs a review`,
                 createdAt: "2026-08-10T00:00:00Z",
+                isDraft: false,
+                hasReview: false,
                 author: "carol",
                 isBotAuthor: false,
               },
@@ -1342,6 +1354,275 @@ describe("build-pages · dashboard JS executes", () => {
     );
   });
 
+  it("compares team and org review waits for the same selected period", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: {
+        repos: {
+          mergedPRTimeline: {
+            number: number;
+            createdAt: string;
+            mergedAt: string;
+            firstReviewAt?: string;
+            timeToMergeHours: number;
+          }[];
+        }[];
+      };
+    };
+    cache.data.repos[0].mergedPRTimeline[0].firstReviewAt = "2026-08-21T12:00:00Z";
+    cache.data.repos[1].mergedPRTimeline.push({
+      ...cache.data.repos[1].mergedPRTimeline[0],
+      number: 99,
+      createdAt: "2026-07-01T00:00:00Z",
+      firstReviewAt: "2026-07-11T00:00:00Z",
+      mergedAt: "2026-07-15T00:00:00Z",
+      timeToMergeHours: 336,
+    });
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+    const env = {
+      DEVEX_TEAM_NAME: "Platform",
+      DEVEX_TEAM_REPOS: "js-owner/api",
+    };
+
+    const { dom, errors } = run("", env);
+    expect(errors).toEqual([]);
+    expect(dom.window.document.getElementById("trialBaseline-reviewWait")?.textContent).toBe("21.0hr");
+    expect(dom.window.document.getElementById("trialTeam-reviewWait")?.textContent).toBe("1.5d");
+    expect(dom.window.document.getElementById("trialDelta-reviewWait")?.textContent).toBe("↑ 71%");
+    expect(dom.window.document.getElementById("trialDelta-reviewWait")?.classList.contains("worse")).toBe(true);
+    expect(dom.window.document.getElementById("trialReviewGap")?.textContent).toContain(
+      "Team median first-review wait is 15.0hr longer than the all-repo baseline"
+    );
+    expect(dom.window.document.getElementById("trialNote")?.textContent).toContain(
+      "First-review wait: baseline n=2, team n=1 reviewed merged PRs"
+    );
+    expect(dom.window.document.getElementById("trialNote")?.textContent).toContain(
+      "Other repositories over the last 30 days: 6.0hr wait for first review (n=1 reviewed merged PRs)."
+    );
+    expect(dom.window.document.getElementById("trialNote")?.textContent).toContain(
+      "Team wait is 1.3d longer than other repositories."
+    );
+
+    const allTime = run("?period=all", env);
+    expect(allTime.errors).toEqual([]);
+    expect(allTime.dom.window.document.getElementById("trialBaseline-reviewWait")?.textContent).toBe("1.5d");
+
+    const trial = run("", {
+      ...env,
+      DEVEX_BASELINE_FROM: "2026-07-01",
+      DEVEX_BASELINE_TO: "2026-07-31",
+    });
+    expect(trial.errors).toEqual([]);
+    expect(trial.dom.window.document.getElementById("trialBaseline-reviewWait")?.textContent).toBe("10.0d");
+    expect(trial.dom.window.document.getElementById("trialReviewGap")?.textContent).toContain(
+      "Team median first-review wait is 8.5d shorter than the all-repo baseline"
+    );
+  });
+
+  it("does not turn unreviewed merged PRs into a zero-hour wait", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: { repos: { mergedPRTimeline: { firstReviewAt?: string }[] }[] };
+    };
+    delete cache.data.repos[0].mergedPRTimeline[0].firstReviewAt;
+    delete cache.data.repos[1].mergedPRTimeline[0].firstReviewAt;
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+
+    const { dom, errors } = run("", {
+      DEVEX_TEAM_NAME: "Platform",
+      DEVEX_TEAM_REPOS: "js-owner/api",
+    });
+    expect(errors).toEqual([]);
+    expect(dom.window.document.getElementById("trialBaseline-reviewWait")?.textContent).toBe("–");
+    expect(dom.window.document.getElementById("trialTeam-reviewWait")?.textContent).toBe("–");
+    expect(dom.window.document.getElementById("trialReviewGap")?.textContent).toContain(
+      "not enough reviewed merged PRs to compare"
+    );
+    expect(dom.window.document.getElementById("trialNote")?.textContent).toContain(
+      "First-review wait: baseline n=0, team n=0 reviewed merged PRs"
+    );
+    expect(dom.window.document.getElementById("trialNote")?.textContent).toContain(
+      "No other reviewed PRs to compare."
+    );
+  });
+
+  it("shows when the team waits less and when no peer review is available", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: { repos: { mergedPRTimeline: { firstReviewAt?: string }[] }[] };
+    };
+    cache.data.repos[0].mergedPRTimeline[0].firstReviewAt = "2026-08-20T02:00:00Z";
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+    const env = {
+      DEVEX_TEAM_NAME: "Platform",
+      DEVEX_TEAM_REPOS: "js-owner/api",
+    };
+
+    const { dom, errors } = run("", env);
+    expect(errors).toEqual([]);
+    expect(dom.window.document.getElementById("trialDelta-reviewWait")?.classList.contains("better")).toBe(true);
+    expect(dom.window.document.getElementById("trialNote")?.textContent).toContain(
+      "Team wait is 4.0hr shorter than other repositories."
+    );
+
+    delete cache.data.repos[1].mergedPRTimeline[0].firstReviewAt;
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+    const noPeer = run("", env);
+    expect(noPeer.errors).toEqual([]);
+    expect(noPeer.dom.window.document.getElementById("trialNote")?.textContent).toContain(
+      "No other reviewed PRs to compare."
+    );
+  });
+
+  it("shows the oldest unreviewed, non-draft team PRs in an accessible tab", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: { repos: {
+        pullRequests: { open: number };
+        openPRTimeline: {
+          number: number; title: string; createdAt: string; isDraft: boolean;
+          hasReview: boolean; author: string; isBotAuthor: boolean;
+        }[];
+      }[] };
+    };
+    const teamRepo = cache.data.repos[0];
+    teamRepo.pullRequests.open = 4;
+    teamRepo.openPRTimeline[0].hasReview = true;
+    const title = '</script><script>window.__queueInjected=true</script>';
+    teamRepo.openPRTimeline.push(
+      { number: 4, title, createdAt: "2026-07-01T00:00:00Z",
+        isDraft: false, hasReview: false, author: "amy", isBotAuthor: false },
+      { number: 5, title: "Still a draft", createdAt: "2026-05-01T00:00:00Z",
+        isDraft: true, hasReview: false, author: "amy", isBotAuthor: false },
+      { number: 6, title: "Bot PR", createdAt: "2026-06-01T00:00:00Z",
+        isDraft: false, hasReview: false, author: "dependabot", isBotAuthor: true },
+    );
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+    const env = { DEVEX_TEAM_NAME: "Platform", DEVEX_TEAM_REPOS: "js-owner/api" };
+
+    const { dom, errors } = run("?period=30days&repos=billing", env);
+    expect(errors).toEqual([]);
+    const document = dom.window.document;
+    const comparison = document.getElementById("trialComparisonPanel")!;
+    const waiting = document.getElementById("trialWaitingPanel")!;
+    const tab = document.getElementById("trialWaitingTab")!;
+    expect(waiting.hidden).toBe(true);
+    expect(tab.getAttribute("aria-selected")).toBe("false");
+    expect(document.getElementById("trialWaitingCount")?.textContent).toBe("(2)");
+    document.getElementById("trialComparisonTab")!.dispatchEvent(
+      new dom.window.KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })
+    );
+    expect(waiting.hidden).toBe(false);
+    expect(comparison.hidden).toBe(true);
+    expect(tab.getAttribute("aria-selected")).toBe("true");
+    expect(document.activeElement).toBe(tab);
+    const links = [...document.querySelectorAll<HTMLAnchorElement>("#trialWaitingList a")];
+    expect(links.map((a) => a.textContent)).toEqual(["Bot PR", title]);
+    expect(links[1].href).toBe("https://github.com/js-owner/api/pull/4");
+    expect(document.querySelectorAll("#trialWaitingList li")[1].textContent).toContain("60.0d");
+    expect(document.getElementById("trialWaitingNote")?.textContent).toContain(
+      "shown regardless of the selected period or repository picker"
+    );
+    expect(document.getElementById("trialWaitingNote")?.textContent).toContain(
+      "As of 2026-08-30 00:00 UTC"
+    );
+    expect((dom.window as unknown as { __queueInjected?: boolean }).__queueInjected).toBeUndefined();
+    tab.dispatchEvent(new dom.window.KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+    expect(comparison.hidden).toBe(false);
+    expect(waiting.hidden).toBe(true);
+
+    const withoutBots = run("?bots=exclude", env);
+    expect(withoutBots.errors).toEqual([]);
+    expect(withoutBots.dom.window.document.getElementById("trialWaitingCount")?.textContent).toBe("(1)");
+    expect(withoutBots.dom.window.document.querySelectorAll("#trialWaitingList li")).toHaveLength(1);
+  });
+
+  it("labels empty and incomplete review queues without claiming no PR is waiting", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: { repos: {
+        pullRequests: { open: number };
+        openPRTimeline?: { number: number; title: string; createdAt: string;
+          isDraft: boolean; hasReview: boolean; author: string; isBotAuthor: boolean }[];
+      }[] };
+    };
+    const env = { DEVEX_TEAM_NAME: "Platform", DEVEX_TEAM_REPOS: "js-owner/api" };
+    cache.data.repos[0].pullRequests.open = 0;
+    cache.data.repos[0].openPRTimeline = [];
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+    const empty = run("", env);
+    expect(empty.errors).toEqual([]);
+    expect(empty.dom.window.document.getElementById("trialWaitingIntro")?.textContent).toBe(
+      "No open, non-draft PRs awaiting a first review."
+    );
+
+    delete cache.data.repos[0].openPRTimeline;
+    cache.data.repos[0].pullRequests.open = 2;
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+    const unavailable = run("", env);
+    expect(unavailable.errors).toEqual([]);
+    expect(unavailable.dom.window.document.getElementById("trialWaitingIntro")?.textContent).toContain(
+      "in the available sample"
+    );
+    expect(unavailable.dom.window.document.getElementById("trialWaitingNote")?.textContent).toContain(
+      "Review status unavailable for 1 repo"
+    );
+
+    cache.data.repos[0].openPRTimeline = [{
+      number: 4, title: "Found", createdAt: "2026-08-01T00:00:00Z",
+      isDraft: false, hasReview: false, author: "amy", isBotAuthor: false,
+    }];
+    cache.data.repos[0].pullRequests.open = 101;
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+    const truncated = run("", env);
+    expect(truncated.errors).toEqual([]);
+    expect(truncated.dom.window.document.getElementById("trialWaitingCount")?.textContent).toBe("(1+)");
+    expect(truncated.dom.window.document.getElementById("trialWaitingNote")?.textContent).toContain(
+      "additional open PRs not checked"
+    );
+  });
+
+  it("uses full repository names when matching the team across owners", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: { repos: {
+        name: string; fullName: string; mergedPRTimeline: { firstReviewAt: string }[];
+        openPRTimeline: { title: string }[];
+      }[] };
+    };
+    cache.data.repos[1].name = "api";
+    cache.data.repos[1].fullName = "another-owner/api";
+    cache.data.repos[1].mergedPRTimeline[0].firstReviewAt = "2026-08-21T06:00:00Z";
+    cache.data.repos[1].openPRTimeline[0].title = "Other owner's PR";
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+
+    const { dom, errors } = run("", {
+      DEVEX_TEAM_NAME: "Platform", DEVEX_TEAM_REPOS: "js-owner/api",
+    });
+    expect(errors).toEqual([]);
+    expect(dom.window.document.getElementById("trialTeam-reviewWait")?.textContent).toBe("6.0hr");
+    expect(dom.window.document.getElementById("trialBaseline-reviewWait")?.textContent).toBe("18.0hr");
+    expect(dom.window.document.querySelectorAll("#trialWaitingList li")).toHaveLength(1);
+    expect(dom.window.document.querySelector("#trialWaitingList a")?.textContent).toBe("api needs a review");
+  });
+
+  it("limits the waiting tab to the five longest waits", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: { repos: { pullRequests: { open: number }; openPRTimeline: {
+        number: number; title: string; createdAt: string; isDraft: boolean;
+        hasReview: boolean; author: string; isBotAuthor: boolean;
+      }[] }[] };
+    };
+    cache.data.repos[0].openPRTimeline = Array.from({ length: 7 }, (_, i) => ({
+      number: 20 + i, title: `PR ${i}`, createdAt: `2026-08-${String(20 - i).padStart(2, "0")}T00:00:00Z`,
+      isDraft: false, hasReview: false, author: "amy", isBotAuthor: false,
+    }));
+    cache.data.repos[0].pullRequests.open = 7;
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+
+    const { dom, errors } = run("", {
+      DEVEX_TEAM_NAME: "Platform", DEVEX_TEAM_REPOS: "js-owner/api",
+    });
+    expect(errors).toEqual([]);
+    expect(dom.window.document.getElementById("trialWaitingCount")?.textContent).toBe("(7)");
+    expect([...dom.window.document.querySelectorAll("#trialWaitingList a")].map((a) => a.textContent))
+      .toEqual(["PR 6", "PR 5", "PR 4", "PR 3", "PR 2"]);
+  });
+
   it("warns when the team sample is too small to read", () => {
     const { dom } = run("", {
       DEVEX_TEAM_NAME: "Platform",
@@ -1499,6 +1780,116 @@ describe("build-pages · dashboard JS executes", () => {
     const doc = dom.window.document;
     expect(doc.getElementById("aiHumanAI-rounds")?.textContent).toBe("2.0");
     expect(doc.getElementById("aiHumanHuman-rounds")?.textContent).toBe("2.0");
+  });
+
+  it("shows per-repository comments, threads and post-review commits with PR links", () => {
+    const { dom, errors } = run("?period=all", {
+      DEVEX_TEAM_NAME: "Platform",
+      DEVEX_TEAM_REPOS: "js-owner/api",
+    });
+    expect(errors).toEqual([]);
+    const rows = dom.window.document.querySelectorAll("#reviewReworkRows tr");
+    expect(rows).toHaveLength(2);
+    expect(rows[0].textContent).toContain("js-owner/api");
+    expect(rows[0].textContent).toContain("Team");
+    expect([...rows[0].querySelectorAll("td")].map((cell) => cell.textContent)).toEqual([
+      "1", "2.0 (n=1)", "3", "1", "1 (n=1/1)",
+    ]);
+    expect(rows[0].querySelector("details a")?.getAttribute("href")).toBe(
+      "https://github.com/js-owner/api/pull/1"
+    );
+    expect(rows[0].querySelector("details")?.textContent).toContain("1 post-review commits");
+    expect(fs.readFileSync(path.join(siteDir, "index.html"), "utf-8")).not.toContain(
+      "recentCommitDates"
+    );
+  });
+
+  it("does not present missing or truncated rework as an exact zero", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: { repos: { mergedPRTimeline: {
+        recentCommitDates?: string[];
+        totalCommitCount?: number;
+        conversationCommentCount?: number;
+        reviewThreadCount?: number;
+      }[] }[] };
+    };
+    cache.data.repos[0].mergedPRTimeline[0].recentCommitDates = [
+      "2026-08-20T06:00:00Z", "2026-08-20T08:00:00Z",
+    ];
+    cache.data.repos[0].mergedPRTimeline[0].totalCommitCount = 101;
+    delete cache.data.repos[1].mergedPRTimeline[0].recentCommitDates;
+    delete cache.data.repos[1].mergedPRTimeline[0].totalCommitCount;
+    delete cache.data.repos[1].mergedPRTimeline[0].conversationCommentCount;
+    delete cache.data.repos[1].mergedPRTimeline[0].reviewThreadCount;
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+
+    const { dom, errors } = run("?period=all");
+    expect(errors).toEqual([]);
+    const rows = dom.window.document.querySelectorAll("#reviewReworkRows tr");
+    expect(rows[0].querySelector("td:last-child")?.textContent).toBe("≥1 (n=1/1)");
+    expect(rows[1].querySelector("td:last-child")?.textContent).toBe("–");
+    expect(rows[1].querySelectorAll("td")[2].textContent).toBe("–");
+    expect(dom.window.document.getElementById("reviewReworkNote")?.textContent).toContain(
+      "1 PR has incomplete commit history"
+    );
+    expect(dom.window.document.getElementById("reviewReworkNote")?.textContent).toContain(
+      "1 reviewed PR lacks commit timestamps"
+    );
+  });
+
+  it("filters the repository review table by selected repositories and bot setting", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: { repos: { mergedPRTimeline: { isBotAuthor: boolean }[] }[] };
+    };
+    cache.data.repos[0].mergedPRTimeline[0].isBotAuthor = true;
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+
+    const { dom, errors } = run("?period=all&repos=api&bots=exclude");
+    expect(errors).toEqual([]);
+    expect(dom.window.document.querySelectorAll("#reviewReworkRows tr")).toHaveLength(0);
+    expect(dom.window.document.getElementById("reviewReworkNote")?.textContent).toContain(
+      "No merged PRs match"
+    );
+  });
+
+  it("excludes unreviewed PRs from the median and marks missing comments as a lower bound", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: { repos: { mergedPRTimeline: {
+        number: number;
+        firstReviewAt?: string;
+        reviewCount: number;
+        conversationCommentCount?: number;
+        reviewThreadCount?: number;
+      }[] }[] };
+    };
+    cache.data.repos[0].mergedPRTimeline.push({
+      ...cache.data.repos[0].mergedPRTimeline[0],
+      number: 42,
+      firstReviewAt: undefined,
+      reviewCount: 0,
+      conversationCommentCount: undefined,
+      reviewThreadCount: undefined,
+    });
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+
+    const { dom, errors } = run("?period=all&repos=api");
+    expect(errors).toEqual([]);
+    const cells = dom.window.document.querySelectorAll("#reviewReworkRows tr td");
+    expect([...cells].map((cell) => cell.textContent)).toEqual([
+      "2", "2.0 (n=1)", "≥3", "≥1", "1 (n=1/1)",
+    ]);
+  });
+
+  it("applies the selected period to the per-repository review table", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: { repos: { mergedPRTimeline: { mergedAt: string }[] }[] };
+    };
+    cache.data.repos[0].mergedPRTimeline[0].mergedAt = "2026-07-01T00:00:00Z";
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+
+    const { dom, errors } = run("?period=30days&repos=api");
+    expect(errors).toEqual([]);
+    expect(dom.window.document.querySelectorAll("#reviewReworkRows tr")).toHaveLength(0);
   });
 
   it("leaves unreviewed pull requests out of the review-rounds median", () => {

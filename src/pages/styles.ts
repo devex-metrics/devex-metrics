@@ -205,6 +205,27 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
 .trial-delta.worse{color:var(--err)}
 .trial-delta.flat{color:var(--muted)}
 .trial-note{margin:.7rem 0 0;font-size:.75rem;color:var(--muted)}
+.trial-gap{margin:1rem 0 0;padding:.6rem .8rem;background:var(--accent-s);
+  border-radius:var(--rs);font-size:.88rem;font-weight:600;font-variant-numeric:tabular-nums}
+.trial-gap.worse{background:var(--err-s);color:var(--err)}
+.trial-gap.better{background:var(--ok-s);color:var(--ok)}
+.trial-tabs{display:flex;gap:1rem;margin-top:1rem;border-bottom:1px solid var(--border)}
+.trial-tab{font:inherit;font-size:.83rem;font-weight:600;color:var(--muted);background:none;
+  padding:.4rem .25rem;border:0;border-bottom:2px solid transparent;cursor:pointer}
+.trial-tab:hover{color:var(--accent)}
+.trial-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.trial-tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.trial-waiting-intro{margin:.9rem 0 .35rem;font-size:.83rem;color:var(--muted)}
+.trial-waiting-list{list-style:none;padding:0}
+.trial-waiting-item{display:flex;align-items:center;justify-content:space-between;
+  gap:.75rem;padding:.55rem .2rem;border-bottom:1px solid var(--border)}
+.trial-waiting-details{min-width:0;overflow-wrap:anywhere}
+.trial-waiting-details a{font-size:.87rem;font-weight:600}
+.trial-waiting-details small{display:block;font-size:.74rem;color:var(--muted)}
+.trial-waiting-age{flex:none;font-size:.88rem;font-weight:700;font-variant-numeric:tabular-nums}
+@media(max-width:500px){.trial-facts{align-items:flex-start;text-align:left}
+  .trial-waiting-item{align-items:flex-start}
+  .trial-waiting-age{padding-top:.1rem}}
 .metric-card{margin-bottom:1.5rem}
 .metric-lede{margin:0 0 .2rem;font-size:.78rem;color:var(--muted);max-width:80ch}
 .gini-badge{float:right;font-size:.78rem;font-weight:700;font-variant-numeric:tabular-nums;
@@ -213,5 +234,13 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
 .gini-badge.ok{color:var(--ok)}
 .metric-card .trial-table td{font-variant-numeric:tabular-nums}
 .metric-card .trial-table td.thin{color:var(--muted);font-weight:400}
+.review-rework-table{min-width:760px}
+.review-rework-table th:first-child{min-width:175px}
+.review-team-label{display:inline-block;margin-left:.4rem;color:var(--accent);
+  font-size:.7rem;font-weight:600}
+.review-pr-details{margin-top:.2rem;font-size:.75rem;font-weight:400;color:var(--muted)}
+.review-pr-details summary{cursor:pointer;width:max-content;color:var(--accent)}
+.review-pr-details ul{list-style:none;padding:.2rem 0 0 .5rem}
+.review-pr-details li{padding:.1rem 0;white-space:nowrap}
 `;
 }
