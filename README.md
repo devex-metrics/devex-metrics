@@ -149,6 +149,27 @@ Nothing is committed to the default branch. Collected data lives on the
 or merged. The dashboard is published via GitHub Pages from an uploaded
 artifact, so no branch is served directly.
 
+### Optional public repository landscape
+
+The dashboard can also display AI instruction-file observations and file-level
+hash drift for the **same filtered repositories** as DevEx collection. It is
+off by default. After `@devex-metrics/repo-landscape` has its first published
+OIDC release (the proposed `0.1.0` is not available yet), set
+`DEVEX_FEATURE_LANDSCAPE=true` and `DEVEX_LANDSCAPE_CLI_VERSION` to that
+release's exact `X.Y.Z` version. The workflow then scans verified-public repos
+belonging to the configured owner with a short-lived, Contents-read GitHub App
+token limited to that selected list. Private and cross-owner repos remain
+**unknown**, never "zero files"; denied scans also cannot masquerade as an
+empty observation. No scanner package or token is requested while disabled.
+
+Validated, sanitized observations and successive SHA-256 comparisons live in
+their own `metrics-data` history stream. Pages shows a compact per-repository
+summary and expandable public file paths, plus `landscape.json`. File contents,
+scanner evidence and private repository paths are never included. Drift means
+files were added, removed or changed content since the last successful scan —
+not that older files are incorrect. Configuration, privacy constraints and
+release prerequisites are in [docs/CONFIGURATION.md](docs/CONFIGURATION.md#public-repository-landscape-opt-in).
+
 ### Getting the full history
 
 The scheduled collection walks back two years to stay cheap. A background crawl

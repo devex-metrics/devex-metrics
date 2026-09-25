@@ -85,6 +85,9 @@ describe("loadConfig", () => {
     expect(c.ownerType).toBe("org");
     expect(c.repos.excludeArchived).toBe(true);
     expect(c.collection.features.dependents).toBe(false);
+    expect(c.collection.features.landscape).toBe(false);
+    expect(c.collection.landscapeCliVersion).toBe("");
+    expect(c.collection.landscapeStaleAfterDays).toBe(90);
     expect(c.team).toBeUndefined();
     expect(c.trial).toBeUndefined();
   });
@@ -97,11 +100,28 @@ describe("loadConfig", () => {
       DEVEX_MAX_IDLE_DAYS: "180",
       DEVEX_EXCLUDE_FORKS: "true",
     });
+
     expect(c.owner).toBe("acme");
     expect(c.ownerType).toBe("user");
     expect(c.repos.include).toEqual(["api", "web"]);
     expect(c.repos.maxIdleDays).toBe(180);
     expect(c.repos.excludeForks).toBe(true);
+  });
+
+  it("supports opt-in landscape configuration and validates its age threshold", () => {
+    const c = loadConfig({
+      DEVEX_CONFIG: JSON.stringify({
+        collection: { features: { landscape: true }, landscapeCliVersion: "0.1.0" },
+      }),
+      DEVEX_LANDSCAPE_STALE_AFTER_DAYS: "120",
+    });
+    expect(c.collection.features.landscape).toBe(true);
+    expect(c.collection.landscapeCliVersion).toBe("0.1.0");
+    expect(c.collection.landscapeStaleAfterDays).toBe(120);
+    expect(() => loadConfig({ DEVEX_LANDSCAPE_STALE_AFTER_DAYS: "-1" }))
+      .toThrow(/positive integer/);
+    expect(() => loadConfig({ DEVEX_LANDSCAPE_STALE_AFTER_DAYS: "90days" }))
+      .toThrow(/positive integer/);
   });
 
   it("ignores an owner type that is not org or user", () => {

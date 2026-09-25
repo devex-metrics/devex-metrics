@@ -41,6 +41,108 @@ export interface OrgMetrics {
   trial?: TrialSummary;
 }
 
+/** Sanitized, portable v1 repo-landscape scan; never contains file contents or evidence. */
+export interface LandscapeScan {
+  /** Portable JSON contract version. */
+  schema_version: 1;
+  /** ISO-8601 time of this scan. */
+  generated_at: string;
+  /** Version of the external scanner which produced the observation. */
+  scanner_version: string;
+  /** Public repositories observed or explicitly reported unavailable. */
+  repositories: (LandscapeRepository | LandscapeUnavailableRepository)[];
+}
+
+/** An explicitly denied or failed scan; it carries no file or path data. */
+export interface LandscapeUnavailableRepository {
+  /** Canonical GitHub owner/repository name. */
+  full_name: string;
+  /** The scanner could not observe this repository. */
+  status: "denied" | "error";
+}
+
+/** One public repository's observed AI instruction files at a specific head. */
+export interface LandscapeRepository {
+  /** Canonical GitHub owner/repository name. */
+  full_name: string;
+  /** Commit SHA from which the files were observed. */
+  head_sha: string;
+  /** Paths and content hashes only, never file contents. */
+  ai_files: LandscapeFile[];
+  /** Counts derived from the observed files. */
+  ai_summary: LandscapeSummary;
+}
+
+/** Public instruction-file metadata, sanitized from the scanner's output. */
+export interface LandscapeFile {
+  /** Relative Git path, permitted for public repositories only. */
+  path: string;
+  /** Scanner's classification of this instruction file. */
+  kind: string;
+  /** SHA-256 of the contents, not the contents themselves. */
+  sha256: string;
+  /** Last changed time, or null when file history is unavailable. */
+  last_changed: string | null;
+  /** Age in days, or null when file history is unavailable. */
+  age_days: number | null;
+  /** Lag from the current head in days, or null when history is unavailable. */
+  lag_days: number | null;
+  /** Scanner's age signal; null is unknown, not "not stale". */
+  stale: boolean | null;
+  /** Whether historical file signals could be established. */
+  status: "known" | "unknown";
+}
+
+/** File counts and known/unknown age-signal coverage. */
+export interface LandscapeSummary {
+  /** Number of observed instruction files. */
+  count: number;
+  /** Number with a positive stale signal (not a correctness assessment). */
+  stale_count: number;
+  /** Maximum known lag in days, or null if no lag is known. */
+  max_lag_days: number | null;
+  /** Number of files without historical age signals. */
+  unknown_count: number;
+  /** Known or partial_unknown when one or more file histories are unknown. */
+  status: "known" | "partial_unknown";
+}
+
+/** Observed path changes relative to the last successful scan of this repo. */
+export interface LandscapeDrift {
+  /** Time of the successful observation compared against. */
+  compared_at: string;
+  /** Head commit of that successful observation. */
+  compared_head_sha: string;
+  /** Paths absent before and present now. */
+  added: string[];
+  /** Paths present before but absent now. */
+  removed: string[];
+  /** Paths whose SHA-256 changed at the same path. */
+  content_changed: string[];
+}
+
+/** A DevEx repository joined to landscape observations, including unknowns. */
+export interface LandscapeRepoView {
+  /** Canonical DevEx owner/repository name. */
+  fullName: string;
+  /** No observation is represented as unknown, never as zero files. */
+  status: "observed" | "unknown";
+  /** Why this repository has no trusted observation. */
+  reason?: "private" | "visibility_unknown" | "not_scanned" | "denied" | "scan_error";
+  /** Scan time for an observed repository. */
+  collectedAt?: string;
+  /** Scanner version for an observed repository. */
+  scannerVersion?: string;
+  /** Head commit for an observed repository. */
+  headSha?: string;
+  /** Files from the newest successful observation, for public repositories only. */
+  files?: LandscapeFile[];
+  /** Summary for an observed repository. */
+  summary?: LandscapeSummary;
+  /** Changes from its last successful observation, if one exists. */
+  drift?: LandscapeDrift;
+}
+
 /** The configured team, copied into the dataset so the site can render it. */
 export interface TeamSummary {
   /** Stable identifier, also used in share URLs. */
@@ -73,6 +175,11 @@ export interface TrialSummary {
 export interface RepoMetrics {
   name: string;
   fullName: string;
+  /**
+   * GitHub repository privacy from discovery. Absent in older snapshots; an
+   * unknown visibility is never treated as public for landscape scanning.
+   */
+  isPrivate?: boolean;
   /** ISO-8601 date when the repository was last pushed to. */
   pushedAt?: string;
   /**

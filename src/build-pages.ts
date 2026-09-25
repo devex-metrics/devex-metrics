@@ -5,6 +5,7 @@ import { CURRENT_SCHEMA_VERSION, fixturesEnabled } from "./cache.js";
 import { loadConfig, applyScope } from "./config.js";
 import { latestPath, loadRollup } from "./history.js";
 import { loadCiRuns, toCiSamples } from "./ci-health.js";
+import { loadLandscapeView } from "./landscape.js";
 import type { CacheEnvelope, OrgMetrics } from "./types.js";
 import { buildDashboardHtml } from "./pages/dashboard.js";
 
@@ -160,12 +161,22 @@ function main(): void {
   fs.mkdirSync(siteDir, { recursive: true });
   fs.writeFileSync(path.join(siteDir, "report.md"), generateReport(data));
   fs.writeFileSync(path.join(siteDir, "data.json"), JSON.stringify(data, null, 2));
+  const landscape = config.collection.features.landscape
+    ? loadLandscapeView(historyDir, data)
+    : undefined;
+  const landscapeFile = path.join(siteDir, "landscape.json");
+  if (landscape) {
+    fs.writeFileSync(landscapeFile, JSON.stringify(landscape, null, 2));
+  } else if (fs.existsSync(landscapeFile)) {
+    fs.unlinkSync(landscapeFile);
+  }
 
   const html = buildDashboardHtml(data, date, process.env.GITHUB_REF_NAME, buildRunUrl(), {
     branding: config.branding,
     history,
     ciSamples,
     ciWindowDays: config.collection.ciHealth.windowDays,
+    landscape,
   });
   fs.writeFileSync(path.join(siteDir, "index.html"), html);
 
