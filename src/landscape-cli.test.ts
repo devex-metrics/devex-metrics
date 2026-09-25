@@ -78,6 +78,7 @@ describe("landscape workflow adapter", () => {
     expect(outputs).toContain("landscape-enabled=true");
     expect(outputs).toContain("landscape-scan-needed=true");
     expect(outputs).toContain("landscape-cli-version=0.1.0");
+    expect(outputs).toContain("landscape-owner=acme\n");
     expect(outputs).toContain("landscape-repositories=public\n");
     expect(outputs).not.toContain("private");
   });
@@ -135,6 +136,7 @@ describe("landscape workflow adapter", () => {
     expect(
       JSON.parse(fs.readFileSync(path.join(work, "data", "landscape.config.json"), "utf8"))
     ).toMatchObject({ stale_after_days: 120, repositories: ["acme/public"] });
+    expect(fs.readFileSync(output, "utf8")).toContain("landscape-owner=acme\n");
   });
 
   it("does not request a broad installation token for an empty public selection", () => {
@@ -146,7 +148,32 @@ describe("landscape workflow adapter", () => {
     expect(run("prepare").status).toBe(0);
     const outputs = fs.readFileSync(output, "utf8");
     expect(outputs).toContain("landscape-scan-needed=false");
+    expect(outputs).not.toContain("landscape-owner=");
     expect(outputs).not.toContain("landscape-repositories=");
+  });
+
+  it("passes the landscape flag to collection and the resolved settings to ingestion", () => {
+    const workflow = fs.readFileSync(
+      path.resolve(".github", "workflows", "collect-metrics.yml"),
+      "utf8"
+    );
+    const collect = workflow
+      .split("      - name: Collect metrics\n")[1]
+      ?.split("      - name: Prepare public landscape scan\n")[0];
+    const ingest = workflow
+      .split("      - name: Ingest sanitized landscape snapshots\n")[1]
+      ?.split("      - name: Publish history store\n")[0];
+    expect(collect).toContain("DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}");
+    expect(workflow).toContain("owner: ${{ steps.landscape.outputs.landscape-owner }}");
+    expect(workflow).toContain(
+      "repositories: ${{ steps.landscape.outputs.landscape-repositories }}"
+    );
+    expect(ingest).toContain(
+      "DEVEX_LANDSCAPE_CLI_VERSION: ${{ vars.DEVEX_LANDSCAPE_CLI_VERSION }}"
+    );
+    expect(ingest).toContain(
+      "DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}"
+    );
   });
 
   it("refuses ingestion without a restricted Contents-read token", () => {

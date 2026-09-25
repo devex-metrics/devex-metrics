@@ -115,6 +115,7 @@ jobs:
           DEVEX_FEATURE_DEPENDENTS: ${{ vars.DEVEX_FEATURE_DEPENDENTS }}
           DEVEX_FEATURE_COPILOT_AGENT: ${{ vars.DEVEX_FEATURE_COPILOT_AGENT }}
           DEVEX_FEATURE_CI_HEALTH: ${{ vars.DEVEX_FEATURE_CI_HEALTH }}
+          DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
           DEVEX_CI_PAGES_PER_RUN: ${{ vars.DEVEX_CI_PAGES_PER_RUN }}
           DEVEX_CI_MAX_PAGES_PER_REPO: ${{ vars.DEVEX_CI_MAX_PAGES_PER_REPO }}
           DEVEX_CI_WINDOW_DAYS: ${{ vars.DEVEX_CI_WINDOW_DAYS }}
@@ -159,7 +160,7 @@ jobs:
         with:
           app-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: ${{ inputs.owner || vars.DEVEX_OWNER }}
+          owner: ${{ steps.landscape.outputs.landscape-owner }}
           repositories: ${{ steps.landscape.outputs.landscape-repositories }}
           permission-contents: read
 
@@ -188,6 +189,8 @@ jobs:
           DEVEX_HISTORY_DIR: .metrics-data/data
           DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
           DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
+          DEVEX_LANDSCAPE_CLI_VERSION: ${{ vars.DEVEX_LANDSCAPE_CLI_VERSION }}
+          DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
         run: node dist/landscape-cli.js ingest data/landscape-raw.json
 
       - name: Publish history store

@@ -57,6 +57,7 @@ function prepare(): void {
   writeOutput("landscape-scan-needed", String(repositories.length > 0));
   writeOutput("landscape-cli-version", version);
   if (repositories.length > 0) {
+    writeOutput("landscape-owner", metrics.owner);
     writeOutput("landscape-repositories", repositories.map((repo) => repo.split("/")[1]).join(","));
   }
 }

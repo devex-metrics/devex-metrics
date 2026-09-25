@@ -20,7 +20,7 @@ function observed(): LandscapeRepoView {
         age_days: null,
         lag_days: null,
         stale: null,
-        status: "partial_unknown",
+        status: "unknown",
       },
     ],
     summary: {
@@ -28,7 +28,7 @@ function observed(): LandscapeRepoView {
       stale_count: 0,
       max_lag_days: null,
       unknown_count: 1,
-      status: "unknown",
+      status: "partial_unknown",
     },
     drift: {
       compared_at: "2026-09-24T10:30:00.000Z",
