@@ -514,21 +514,21 @@ describe("generateReport", () => {
 
   it("escapes pipe characters in a PR title so the table structure is preserved", () => {
     const metrics: OrgMetrics = {
-      owner: "barcoclickshare",
+      owner: "example-org",
       ownerType: "org",
       collectedAt: "2026-09-09T00:00:00Z",
       repoCount: 1,
       repos: [
         {
-          name: "ui-composer-apk",
-          fullName: "barcoclickshare/ui-composer-apk",
+          name: "example-layout-repo",
+          fullName: "example-org/example-layout-repo",
           issues: { open: 0, closed: 0 },
           pullRequests: { open: 0, closed: 0, merged: 1 },
           pullRequestDetails: [
             {
-              number: 3816,
+              number: 101,
               title:
-                "ui-composer-apk 0.22.0: UI Composer | Implementation | Side-by-side layout production hardening",
+                "example-layout-repo 1.0.0: Layout | Implementation | Side-by-side panel",
               state: "merged",
               mergedAt: "2026-09-09T00:00:00Z",
               linesAdded: 2,
@@ -550,7 +550,7 @@ describe("generateReport", () => {
     const report = generateReport(metrics);
 
     expect(report).toContain(
-      "#3816 ui-composer-apk 0.22.0: UI Composer \\| Implementation \\| Side-by-side layout production hardening",
+      "#101 example-layout-repo 1.0.0: Layout \\| Implementation \\| Side-by-side panel",
     );
     // Every generated data row keeps the declared 6-column structure.
     const counts = prTableRowColumnCounts(report);
@@ -560,22 +560,22 @@ describe("generateReport", () => {
     expect(metrics.repos[0].pullRequestDetails[0].title).toBe(originalTitle);
   });
 
-  it("escapes multiple pipes in a sanitized regression title (BU Event Impl shape)", () => {
+  it("escapes multiple pipes in a synthetic regression title", () => {
     const metrics: OrgMetrics = {
-      owner: "barcoclickshare",
+      owner: "example-org",
       ownerType: "org",
       collectedAt: "2026-09-09T00:00:00Z",
       repoCount: 1,
       repos: [
         {
-          name: "component",
-          fullName: "barcoclickshare/component",
+          name: "example-component-repo",
+          fullName: "example-org/example-component-repo",
           issues: { open: 0, closed: 0 },
           pullRequests: { open: 0, closed: 0, merged: 1 },
           pullRequestDetails: [
             {
-              number: 273,
-              title: "feat: [CS0666-10086] BU Event Impl | BU Part | Share - Sharing to Room",
+              number: 102,
+              title: "feat: [DEMO-101] Widget Event | Panel State | Ready for Review",
               state: "merged",
               mergedAt: "2026-09-01T00:00:00Z",
               linesAdded: 10,
@@ -595,28 +595,28 @@ describe("generateReport", () => {
 
     const report = generateReport(metrics);
     expect(report).toContain(
-      "#273 feat: [CS0666-10086] BU Event Impl \\| BU Part \\| Share - Sharing to Room",
+      "#102 feat: [DEMO-101] Widget Event \\| Panel State \\| Ready for Review",
     );
     for (const count of prTableRowColumnCounts(report)) expect(count).toBe(6);
   });
 
   it("collapses a newline embedded in a PR title into one physical table row", () => {
     const metrics: OrgMetrics = {
-      owner: "barcoclickshare",
+      owner: "example-org",
       ownerType: "org",
       collectedAt: "2026-09-09T00:00:00Z",
       repoCount: 1,
       repos: [
         {
-          name: "wired-source-provider-apk",
-          fullName: "barcoclickshare/wired-source-provider-apk",
+          name: "example-stream-repo",
+          fullName: "example-org/example-stream-repo",
           issues: { open: 0, closed: 0 },
           pullRequests: { open: 0, closed: 0, merged: 1 },
           pullRequestDetails: [
             {
-              number: 3808,
+              number: 103,
               title:
-                "wired-source-provider-apk 0.3.0: WSP | Share/unshare video\r\non DP-in plug/unplug",
+                "example-stream-repo 1.0.0: Player | Pause/resume video\r\non playback toggle",
               state: "merged",
               mergedAt: "2026-09-08T00:00:00Z",
               linesAdded: 4,
@@ -637,9 +637,9 @@ describe("generateReport", () => {
     const report = generateReport(metrics);
     // The CRLF must not have created an extra physical row.
     expect(report).toContain(
-      "#3808 wired-source-provider-apk 0.3.0: WSP \\| Share/unshare video on DP-in plug/unplug",
+      "#103 example-stream-repo 1.0.0: Player \\| Pause/resume video on playback toggle",
     );
-    expect(report).not.toMatch(/WSP \\?\| Share\/unshare video\r?\n/);
+    expect(report).not.toMatch(/Player \\?\| Pause\/resume video\r?\n/);
     for (const count of prTableRowColumnCounts(report)) expect(count).toBe(6);
   });
 
