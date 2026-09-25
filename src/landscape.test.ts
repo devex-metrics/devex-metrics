@@ -289,6 +289,17 @@ describe("landscape history and DevEx join", () => {
     expect(loadLandscapeView(root, data)[0].headSha).toBe(SHA_A);
   });
 
+  it("accepts a scan rounded to the same second as DevEx collection", () => {
+    const data = metrics([{ name: "public", isPrivate: false }]);
+    data.collectedAt = "2026-09-21T12:00:00.789Z";
+    expect(() =>
+      saveLandscapeScan(root, data, scan([repository()], "2026-09-21T12:00:00Z"))
+    ).not.toThrow();
+    expect(() =>
+      saveLandscapeScan(root, data, scan([repository()], "2026-09-21T11:59:59Z"))
+    ).toThrow(/predates/);
+  });
+
   it("rejects a partial scanner response instead of publishing a success-shaped snapshot", () => {
     const data = metrics([
       { name: "public", isPrivate: false },

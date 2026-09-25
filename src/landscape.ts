@@ -331,9 +331,10 @@ export function saveLandscapeScan(
   raw: unknown
 ): LandscapeScan {
   const scan = parseLandscapeScan(raw);
+  const selectedAt = Date.parse(metrics.collectedAt);
   if (
-    Number.isFinite(Date.parse(metrics.collectedAt)) &&
-    new Date(scan.generated_at).getTime() < new Date(metrics.collectedAt).getTime()
+    Number.isFinite(selectedAt) &&
+    Math.floor(Date.parse(scan.generated_at) / 1000) < Math.floor(selectedAt / 1000)
   ) {
     throw new Error("Landscape scan predates the DevEx repository selection");
   }
