@@ -242,5 +242,27 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
 .review-pr-details summary{cursor:pointer;width:max-content;color:var(--accent)}
 .review-pr-details ul{list-style:none;padding:.2rem 0 0 .5rem}
 .review-pr-details li{padding:.1rem 0;white-space:nowrap}
+.landscape-section{margin-bottom:2rem}
+.landscape-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap}
+.landscape-heading>div{max-width:75ch}
+.landscape-coverage{font-size:.82rem;font-weight:600;color:var(--accent);white-space:nowrap}
+.landscape-actions{display:flex;align-items:center;gap:.75rem;font-size:.82rem;white-space:nowrap}
+.landscape-table-wrap,.landscape-file-scroll{overflow-x:auto}
+.landscape-table,.landscape-file-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.landscape-table{min-width:740px}
+.landscape-file-table{min-width:680px}
+.landscape-table th,.landscape-table td,.landscape-file-table th,.landscape-file-table td{
+  padding:.55rem .65rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--border)}
+.landscape-table thead th,.landscape-file-table thead th{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+.landscape-table tbody th{font-weight:600}
+.landscape-table tbody tr:last-child>th,.landscape-table tbody tr:last-child>td{border-bottom:0}
+.landscape-path{overflow-wrap:anywhere;max-width:270px}
+.landscape-hash{display:block;font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.landscape-details summary{color:var(--accent);cursor:pointer;font-weight:600;white-space:nowrap}
+.landscape-details summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+.landscape-details[open]{min-width:520px}
+.landscape-details .landscape-file-scroll{margin:.45rem 0}
+.landscape-note,.landscape-empty{font-size:.78rem;color:var(--muted);margin:.5rem 0;max-width:75ch}
+.landscape-unknown{color:var(--muted)}
 `;
 }

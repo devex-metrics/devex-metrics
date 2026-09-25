@@ -1,4 +1,4 @@
-import type { CiRunSample, OrgMetrics, RepoMetrics } from "../types.js";
+import type { CiRunSample, LandscapeRepoView, OrgMetrics, RepoMetrics } from "../types.js";
 import type { BrandingConfig } from "../config.js";
 import type { RollupRow } from "../history.js";
 import { LARGE_PR_LINES } from "../history.js";
@@ -7,6 +7,7 @@ import { escapeHtml, computeMedian, weekToDate, formatDurationHtml } from "./uti
 import { getCSS } from "./styles.js";
 import { getJS } from "./scripts.js";
 import { buildRepoRow } from "./repo-row.js";
+import { buildLandscapeSection } from "./landscape.js";
 
 interface Totals {
   openIssues: number;
@@ -71,6 +72,8 @@ export interface DashboardExtras {
   ciWindowDays?: number;
   /** Dataset navigation entries for the local multi-dataset site. */
   datasets?: DatasetNavEntry[];
+  /** Opt-in sanitized landscape observations; absent when the feature is disabled. */
+  landscape?: LandscapeRepoView[];
 }
 
 const DEFAULT_BRANDING: BrandingConfig = {
@@ -636,6 +639,8 @@ ${buildTrialBanner(data, teamRepoNames.length)}
     <div class="card card-chart card-wide"><h2>AI-authored PRs merged per week</h2><canvas id="chartCopilotPRTrend"></canvas></div>
     ${hasCopilotAgentTaskData ? '<div class="card card-chart card-wide"><h2>Agent Tasks by Repository (30&nbsp;d)</h2><canvas id="chartAgentTasks"></canvas></div>' : ""}
   </section>
+
+  ${extras.landscape ? buildLandscapeSection(extras.landscape) : ""}
 
   <section class="repos-section" aria-label="Repositories">
     <div class="repos-toolbar">

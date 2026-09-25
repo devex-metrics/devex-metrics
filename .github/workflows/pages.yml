@@ -66,6 +66,7 @@ jobs:
           DEVEX_TEAM_NAME: ${{ vars.DEVEX_TEAM_NAME }}
           DEVEX_TEAM_ID: ${{ vars.DEVEX_TEAM_ID }}
           DEVEX_DISCOVER_ALL: ${{ vars.DEVEX_DISCOVER_ALL }}
+          DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
           DEVEX_TRIAL_TITLE: ${{ vars.DEVEX_TRIAL_TITLE }}
           DEVEX_TRIAL_HYPOTHESIS: ${{ vars.DEVEX_TRIAL_HYPOTHESIS }}
           DEVEX_TRIAL_START: ${{ vars.DEVEX_TRIAL_START }}
