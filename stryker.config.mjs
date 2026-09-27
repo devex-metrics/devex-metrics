@@ -3,7 +3,8 @@
 export default {
   packageManager: "npm",
   testRunner: "vitest",
-  plugins: ["@stryker-mutator/vitest-runner"],
+  // Wraps @stryker-mutator/vitest-runner; see the file for why.
+  plugins: ["./scripts/stryker-vitest5-runner.mjs"],
   coverageAnalysis: "perTest",
   // dist/ is gitignored, so Stryker's sandbox (which respects .gitignore when
   // copying files) never receives it. build-pages.test.ts shells out to
