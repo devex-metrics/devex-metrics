@@ -192,7 +192,7 @@ describe("landscape workflow adapter", () => {
       "    needs: collect\n    if: success() || (failure() && needs.collect.outputs.landscape-scrubbed == 'true')"
     );
     expect(workflow).toContain(
-      "        if: failure() && steps.landscape-scan.outcome == 'failure'\n"
+      "        if: failure() && steps.landscape-token.outcome == 'success'\n"
     );
     expect(workflow).toContain("run: node dist/landscape-cli.js recheck");
   });

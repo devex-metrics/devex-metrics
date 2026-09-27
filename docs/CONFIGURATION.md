@@ -258,11 +258,12 @@ Stored observations of any repository that is no longer verified public are
 removed from the latest landscape observation and every stored snapshot, at
 three points: `prepare` drops every repository outside the refreshed public
 selection (now private, unknown visibility or no longer selected), before it
-checks the CLI version; a failed scanner run re-checks the selection with the
-scan token; and ingestion re-checks the whole prepared selection before it
-reads the scanner output, so a partial or malformed output cannot skip it. The run publishes that removal and rebuilds Pages even when it then
-fails, so those repositories show as unknown instead of keeping their old
-paths online. Earlier commits on the `metrics-data` branch still contain them.
+checks the CLI version; any failure after the scan token is created (CLI
+install or scanner) re-checks the selection with that token; and ingestion
+re-checks the whole prepared selection before it reads the scanner output, so
+a partial or malformed output cannot skip it. The run publishes that removal
+and rebuilds Pages even when it then fails, so those repositories show as
+unknown instead of keeping their old paths online. Earlier commits on the `metrics-data` branch still contain them.
 
 The installation token is scoped to one owner and its selected repos. In user
 mode, the DevEx selection may include public repositories belonging to other

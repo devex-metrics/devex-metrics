@@ -184,12 +184,13 @@ jobs:
           GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
         run: npx --no-install repo-landscape scan --config data/landscape.config.json --output data/landscape-raw.json
 
-      # A scanner failure (for example a 403/404 on a repo that just went
-      # private) skips ingestion; re-check visibility so any repo that is no
-      # longer public is scrubbed and that removal is published below.
-      - name: Re-check landscape visibility after a failed scan
+      # Any failure after the scan token exists (CLI install, or a scanner
+      # 403/404 on a repo that just went private) skips ingestion; re-check
+      # visibility so any repo that is no longer public is scrubbed and that
+      # removal is published below.
+      - name: Re-check landscape visibility after a failure
         id: landscape-recheck
-        if: failure() && steps.landscape-scan.outcome == 'failure'
+        if: failure() && steps.landscape-token.outcome == 'success'
         env:
           GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
