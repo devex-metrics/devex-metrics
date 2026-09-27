@@ -279,6 +279,25 @@ describe("landscape workflow adapter", () => {
     });
   });
 
+  it("mark-failed still records the failure when the configuration is invalid", () => {
+    const result = spawnSync(process.execPath, [ENTRY, "mark-failed"], {
+      cwd: work,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        DEVEX_CONFIG: "{not json",
+        DEVEX_OWNER: "acme",
+        DEVEX_HISTORY_DIR: history,
+        DEVEX_FEATURE_LANDSCAPE: "true",
+        GITHUB_OUTPUT: output,
+      },
+    });
+    expect(result.status).toBe(0);
+    expect(fs.readFileSync(output, "utf8")).toContain("landscape-publish=true");
+    const status = path.join(path.dirname(landscapeLatestPath(history, "acme")), "status.json");
+    expect(JSON.parse(fs.readFileSync(status, "utf8"))).toMatchObject({ ok: false });
+  });
+
   it("mark-failed is a no-op when the feature is disabled", () => {
     const result = spawnSync(process.execPath, [ENTRY, "mark-failed"], {
       cwd: work,

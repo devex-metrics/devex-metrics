@@ -176,11 +176,11 @@ async function recheck(): Promise<void> {
  * publish the store and rebuild Pages before the run reports its failure.
  */
 function markFailed(): void {
-  const config = loadConfig();
-  if (!config.collection.features.landscape || !config.history.enabled || !config.owner) return;
-  const historyDir = path.resolve(config.history.dir);
+  const settings = failureSettings();
+  if (!settings) return;
+  const { owner, historyDir } = settings;
   try {
-    const metrics = loadLandscapeSelection(historyDir, config.owner);
+    const metrics = loadLandscapeSelection(historyDir, owner);
     const removed = scrubLandscapeOutsideSelection(historyDir, metrics);
     if (removed > 0) {
       console.log(`Removed ${removed} stored landscape observations outside the public selection`);
@@ -188,13 +188,37 @@ function markFailed(): void {
   } catch (err: unknown) {
     console.warn("Could not re-scrub the landscape store against the DevEx selection:", err);
   }
-  saveLandscapeRunStatus(historyDir, config.owner, {
+  saveLandscapeRunStatus(historyDir, owner, {
     attempted_at: new Date().toISOString(),
     ok: false,
     ...runUrl(),
   });
   console.log("Recorded a failed landscape run; the dashboard will mark its data as stale");
   writeOutput("landscape-publish", "true");
+}
+
+/**
+ * The owner and history dir for markFailed, or undefined when landscape is off.
+ * An invalid configuration may be why the run failed, so fall back to the
+ * discrete variables rather than skip recording the failure.
+ */
+function failureSettings(): { owner: string; historyDir: string } | undefined {
+  let enabled: boolean;
+  let owner: string;
+  let dir: string;
+  try {
+    const config = loadConfig();
+    if (!config.history.enabled) return undefined;
+    enabled = config.collection.features.landscape;
+    owner = config.owner;
+    dir = config.history.dir;
+  } catch (err: unknown) {
+    console.warn("Configuration is invalid; recording the failure from discrete variables:", err);
+    enabled = /^(1|true|yes|on)$/i.test(process.env.DEVEX_FEATURE_LANDSCAPE?.trim() ?? "");
+    owner = process.env.DEVEX_OWNER?.trim() ?? "";
+    dir = process.env.DEVEX_HISTORY_DIR?.trim() || "data/history";
+  }
+  return enabled && owner ? { owner, historyDir: path.resolve(dir) } : undefined;
 }
 
 function runUrl(): { run_url?: string } {
