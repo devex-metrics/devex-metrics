@@ -3,17 +3,17 @@ import { escapeMarkdownTableCell, renderMarkdownTableRow } from "./markdown.js";
 
 describe("escapeMarkdownTableCell", () => {
   it("escapes a pipe in a PR title", () => {
-    const input = "UI Composer | Implementation | Side-by-side layout";
+    const input = "Layout | Implementation | Side-by-side panel";
     expect(escapeMarkdownTableCell(input)).toBe(
-      "UI Composer \\| Implementation \\| Side-by-side layout",
+      "Layout \\| Implementation \\| Side-by-side panel",
     );
   });
 
   it("escapes all pipes in a sanitized multi-pipe regression fixture", () => {
-    const input = "BU Event Impl | BU Part | Share - Sharing to Room";
+    const input = "Widget Event | Panel State | Ready for Review";
     const escaped = escapeMarkdownTableCell(input);
     expect(escaped).not.toMatch(/(?<!\\)\|/);
-    expect(escaped).toBe("BU Event Impl \\| BU Part \\| Share - Sharing to Room");
+    expect(escaped).toBe("Widget Event \\| Panel State \\| Ready for Review");
   });
 
   it("collapses LF line breaks into a single space", () => {
@@ -150,7 +150,7 @@ describe("renderMarkdownTableRow", () => {
 
   it("escapes a pipe inside one cell without corrupting the row's column count", () => {
     const row = renderMarkdownTableRow([
-      "#3816 ui-composer-apk 0.22.0: UI Composer | Implementation | Side-by-side layout production hardening",
+      "#101 example-layout-repo 1.0.0: Layout | Implementation | Side-by-side panel",
       "2026-09-09",
       "+2/-2",
       3,
@@ -162,7 +162,7 @@ describe("renderMarkdownTableRow", () => {
 
   it("renders a complete PR row with a pipe- and newline-bearing title under the correct columns", () => {
     const row = renderMarkdownTableRow([
-      `#3808 wired-source-provider-apk 0.3.0: WSP | Share/unshare video\non DP-in plug/unplug`,
+      `#103 example-stream-repo 1.0.0: Player | Pause/resume video\non playback toggle`,
       "2026-09-01",
       "+10/-4",
       2,
@@ -172,7 +172,7 @@ describe("renderMarkdownTableRow", () => {
     const cells = splitStructuralCells(row);
     expect(cells).toHaveLength(6);
     expect(cells[0]).toBe(
-      "#3808 wired-source-provider-apk 0.3.0: WSP \\| Share/unshare video on DP-in plug/unplug",
+      "#103 example-stream-repo 1.0.0: Player \\| Pause/resume video on playback toggle",
     );
     expect(cells[1]).toBe("2026-09-01");
     expect(cells[2]).toBe("+10/-4");
