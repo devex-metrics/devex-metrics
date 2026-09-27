@@ -7,6 +7,7 @@ import {
   parseLandscapeScan,
   saveLandscapeScan,
   validateLandscapeScannerOutput,
+  scrubLandscapeOutsideSelection,
   scrubLandscapeRepositories,
   unverifiedLandscapeRepositories,
 } from "./landscape.js";
@@ -348,6 +349,35 @@ describe("landscape history and DevEx join", () => {
     expect(scrubLandscapeRepositories(root, "acme", ["acme/public"])).toBe(0);
   });
 
+  it("scrubs stored repositories that left the verified public selection", () => {
+    const before = metrics([
+      { name: "public", isPrivate: false },
+      { name: "gone-private", isPrivate: false },
+      { name: "dropped", isPrivate: false },
+    ]);
+    saveLandscapeScan(
+      root,
+      before,
+      scan([repository("acme/public"), repository("acme/gone-private"), repository("acme/dropped")])
+    );
+    const after = metrics([
+      { name: "public", isPrivate: false },
+      { name: "gone-private", isPrivate: true },
+    ]);
+    expect(scrubLandscapeOutsideSelection(root, after)).toBe(4);
+    const snapshots = path.join(path.dirname(landscapeLatestPath(root, "acme")), "snapshots");
+    for (const f of [
+      landscapeLatestPath(root, "acme"),
+      ...fs.readdirSync(snapshots).map((n) => path.join(snapshots, n)),
+    ]) {
+      const stored = fs.readFileSync(f, "utf8");
+      expect(stored).toContain("acme/public");
+      expect(stored).not.toContain("acme/gone-private");
+      expect(stored).not.toContain("acme/dropped");
+    }
+    expect(scrubLandscapeOutsideSelection(root, after)).toBe(0);
+  });
+
   it("scrubbing without a stored observation is a no-op", () => {
     expect(scrubLandscapeRepositories(root, "acme", ["acme/public"])).toBe(0);
     expect(fs.existsSync(landscapeLatestPath(root, "acme"))).toBe(false);
@@ -375,7 +405,6 @@ it("hash drift is independent of file age and stale flags", () => {
 });
 
 describe("visibility re-check before ingestion", () => {
-  const publicScan = parseLandscapeScan(scan([repository("acme/public")]));
   it("accepts a still-public repository and flags a privacy change", async () => {
     const get = vi.fn().mockResolvedValue({
       data: { full_name: "acme/public", private: false },
@@ -384,10 +413,10 @@ describe("visibility re-check before ingestion", () => {
     const octokit = { rest: { repos: { get } } } as Parameters<
       typeof unverifiedLandscapeRepositories
     >[1];
-    await expect(unverifiedLandscapeRepositories(publicScan, octokit)).resolves.toEqual([]);
+    await expect(unverifiedLandscapeRepositories(["acme/public"], octokit)).resolves.toEqual([]);
     expect(get).toHaveBeenCalledWith({ owner: "acme", repo: "public" });
     get.mockResolvedValue({ data: { full_name: "acme/public", private: true } });
-    await expect(unverifiedLandscapeRepositories(publicScan, octokit)).resolves.toEqual([
+    await expect(unverifiedLandscapeRepositories(["acme/public"], octokit)).resolves.toEqual([
       "acme/public",
     ]);
   });
@@ -470,7 +499,7 @@ describe("visibility re-check before ingestion", () => {
     const octokit = { rest: { repos: { get } } } as Parameters<
       typeof unverifiedLandscapeRepositories
     >[1];
-    await expect(unverifiedLandscapeRepositories(publicScan, octokit)).resolves.toEqual([
+    await expect(unverifiedLandscapeRepositories(["acme/public"], octokit)).resolves.toEqual([
       "acme/public",
     ]);
     expect(warn).toHaveBeenCalled();

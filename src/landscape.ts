@@ -456,44 +456,37 @@ export function loadLandscapeSelection(historyDir: string, owner: string): OrgMe
 }
 
 /**
- * Repositories in the scan that can no longer be verified public. A failed
- * lookup counts as unverified: publishing paths is only safe on a positive check.
+ * Repositories that can no longer be verified public. A failed lookup counts
+ * as unverified: publishing paths is only safe on a positive check.
  */
 export async function unverifiedLandscapeRepositories(
-  scan: LandscapeScan,
+  names: readonly string[],
   octokit: Pick<Octokit, "rest">
 ): Promise<string[]> {
   const unverified: string[] = [];
-  for (const repo of scan.repositories) {
-    const [owner, name] = repo.full_name.split("/");
+  for (const fullName of names) {
+    const [owner, name] = fullName.split("/");
     try {
       const response = await octokit.rest.repos.get({ owner, repo: name });
       if (
         response.data.private === false &&
-        response.data.full_name.toLowerCase() === repo.full_name.toLowerCase()
+        response.data.full_name.toLowerCase() === fullName.toLowerCase()
       ) {
         continue;
       }
     } catch (err: unknown) {
-      console.warn(`Could not verify visibility of ${repo.full_name}:`, err);
+      console.warn(`Could not verify visibility of ${fullName}:`, err);
     }
-    unverified.push(repo.full_name);
+    unverified.push(fullName);
   }
   return unverified;
 }
 
-/**
- * Drop stored observations for repositories that are no longer verified public
- * from the latest scan and every snapshot, so neither the next Pages build nor
- * the persisted landscape stream keeps their paths. Returns how many
- * observations were removed across all files.
- */
-export function scrubLandscapeRepositories(
+function dropLandscapeObservations(
   historyDir: string,
   owner: string,
-  names: readonly string[]
+  drop: (fullName: string) => boolean
 ): number {
-  const drop = new Set(names.map((name) => name.toLowerCase()));
   const folder = snapshotsPath(historyDir, owner);
   const files = [
     landscapeLatestPath(historyDir, owner),
@@ -508,7 +501,7 @@ export function scrubLandscapeRepositories(
   for (const file of files) {
     if (!fs.existsSync(file)) continue;
     const scan = readScan(file);
-    const kept = scan.repositories.filter((repo) => !drop.has(repo.full_name.toLowerCase()));
+    const kept = scan.repositories.filter((repo) => !drop(repo.full_name));
     if (kept.length === scan.repositories.length) continue;
     removed += scan.repositories.length - kept.length;
     fs.writeFileSync(
@@ -518,4 +511,35 @@ export function scrubLandscapeRepositories(
     fs.renameSync(`${file}.tmp`, file);
   }
   return removed;
+}
+
+/**
+ * Drop stored observations for repositories that are no longer verified public
+ * from the latest scan and every snapshot, so neither the next Pages build nor
+ * the persisted landscape stream keeps their paths. Returns how many
+ * observations were removed across all files.
+ */
+export function scrubLandscapeRepositories(
+  historyDir: string,
+  owner: string,
+  names: readonly string[]
+): number {
+  const drop = new Set(names.map((name) => name.toLowerCase()));
+  return dropLandscapeObservations(historyDir, owner, (name) => drop.has(name.toLowerCase()));
+}
+
+/**
+ * Drop stored observations for every repository outside the current verified
+ * public selection: ones now private, of unknown visibility, or no longer
+ * selected at all. Returns how many observations were removed across all files.
+ */
+export function scrubLandscapeOutsideSelection(historyDir: string, metrics: OrgMetrics): number {
+  const keep = new Set(
+    publicLandscapeSelection(metrics).map((repo) => repo.fullName.toLowerCase())
+  );
+  return dropLandscapeObservations(
+    historyDir,
+    metrics.owner,
+    (name) => !keep.has(name.toLowerCase())
+  );
 }

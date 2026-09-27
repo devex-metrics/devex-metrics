@@ -35,7 +35,7 @@ jobs:
   collect:
     runs-on: ubuntu-latest
     outputs:
-      landscape-scrubbed: ${{ steps.landscape-ingest.outputs.landscape-scrubbed }}
+      landscape-scrubbed: ${{ steps.landscape.outputs.landscape-scrubbed || steps.landscape-recheck.outputs.landscape-scrubbed || steps.landscape-ingest.outputs.landscape-scrubbed }}
     permissions:
       # The job also publishes the append-only metrics-data branch.
       contents: write
@@ -178,10 +178,27 @@ jobs:
           npm install --no-save --ignore-scripts --package-lock=false --no-audit --no-fund @devex-metrics/repo-landscape@"${DEVEX_LANDSCAPE_CLI_VERSION}"
 
       - name: Scan selected public repositories
+        id: landscape-scan
         if: steps.landscape.outputs.landscape-enabled == 'true' && steps.landscape.outputs.landscape-scan-needed == 'true'
         env:
           GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
         run: npx --no-install repo-landscape scan --config data/landscape.config.json --output data/landscape-raw.json
+
+      # A scanner failure (for example a 403/404 on a repo that just went
+      # private) skips ingestion; re-check visibility so any repo that is no
+      # longer public is scrubbed and that removal is published below.
+      - name: Re-check landscape visibility after a failed scan
+        id: landscape-recheck
+        if: failure() && steps.landscape-scan.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
+          DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
+          DEVEX_HISTORY_DIR: .metrics-data/data
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+          DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
+          DEVEX_LANDSCAPE_CLI_VERSION: ${{ vars.DEVEX_LANDSCAPE_CLI_VERSION }}
+          DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
+        run: node dist/landscape-cli.js recheck
 
       - name: Ingest sanitized landscape snapshots
         id: landscape-ingest
@@ -196,10 +213,15 @@ jobs:
           DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
         run: node dist/landscape-cli.js ingest data/landscape-raw.json
 
-      # A failed visibility re-check scrubs the affected observations; publish
-      # that removal (and rebuild Pages below) even though the run fails.
+      # Prepare, the post-failure re-check and ingestion scrub observations of
+      # repos no longer verified public; publish that removal (and rebuild
+      # Pages below) even when the run fails.
       - name: Publish history store
-        if: success() || (failure() && steps.landscape-ingest.outputs.landscape-scrubbed == 'true')
+        if: >-
+          success() || (failure() && (
+          steps.landscape.outputs.landscape-scrubbed == 'true' ||
+          steps.landscape-recheck.outputs.landscape-scrubbed == 'true' ||
+          steps.landscape-ingest.outputs.landscape-scrubbed == 'true'))
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

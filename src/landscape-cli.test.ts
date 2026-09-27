@@ -2,6 +2,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { spawnSync } from "node:child_process";
 import { latestPath } from "./history.js";
+import { landscapeLatestPath } from "./landscape.js";
 import type { OrgMetrics, RepoMetrics } from "./types.js";
 
 const ENTRY = path.resolve("dist", "landscape-cli.js");
@@ -181,16 +182,55 @@ describe("landscape workflow adapter", () => {
       path.resolve(".github", "workflows", "collect-metrics.yml"),
       "utf8"
     );
-    const scrubbed = "outputs.landscape-scrubbed == 'true'";
+    for (const id of ["landscape", "landscape-recheck", "landscape-ingest"]) {
+      expect(workflow).toContain(`steps.${id}.outputs.landscape-scrubbed`);
+    }
     expect(workflow).toContain(
-      "landscape-scrubbed: ${{ steps.landscape-ingest.outputs.landscape-scrubbed }}"
+      "      - name: Publish history store\n        if: >-\n          success() || (failure() && ("
     );
     expect(workflow).toContain(
-      `      - name: Publish history store\n        if: success() || (failure() && steps.landscape-ingest.${scrubbed})`
+      "    needs: collect\n    if: success() || (failure() && needs.collect.outputs.landscape-scrubbed == 'true')"
     );
     expect(workflow).toContain(
-      `    needs: collect\n    if: success() || (failure() && needs.collect.${scrubbed})`
+      "        if: failure() && steps.landscape-scan.outcome == 'failure'\n"
     );
+    expect(workflow).toContain("run: node dist/landscape-cli.js recheck");
+  });
+
+  it("scrubs stored observations of repos no longer verified public during prepare", () => {
+    const latest = landscapeLatestPath(history, "acme");
+    const snapshot = path.join(path.dirname(latest), "snapshots", "old.json");
+    const stored = {
+      schema_version: 1,
+      generated_at: "2026-09-20T12:00:00Z",
+      scanner_version: "0.1.0",
+      repositories: ["acme/public", "acme/private"].map((full_name) => ({
+        full_name,
+        head_sha: "a".repeat(40),
+        ai_files: [
+          {
+            path: "AGENTS.md",
+            kind: "instructions",
+            sha256: "a".repeat(64),
+            last_changed: "2026-09-01T00:00:00Z",
+            age_days: 1,
+            lag_days: 1,
+            stale: false,
+          },
+        ],
+        ai_summary: { count: 1, stale_count: 0, max_lag_days: 1 },
+      })),
+    };
+    fs.mkdirSync(path.dirname(snapshot), { recursive: true });
+    fs.writeFileSync(latest, JSON.stringify(stored));
+    fs.writeFileSync(snapshot, JSON.stringify(stored));
+    expect(run("prepare").status).toBe(0);
+    expect(fs.readFileSync(output, "utf8")).toContain("landscape-scrubbed=true");
+    for (const file of [latest, snapshot]) {
+      const contents = fs.readFileSync(file, "utf8");
+      expect(contents).toContain("acme/public");
+      expect(contents).not.toContain("acme/private");
+    }
   });
 
   it("refuses ingestion without a restricted Contents-read token", () => {
