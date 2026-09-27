@@ -298,6 +298,30 @@ describe("landscape workflow adapter", () => {
     expect(JSON.parse(fs.readFileSync(status, "utf8"))).toMatchObject({ ok: false });
   });
 
+  it("mark-failed recovers config-only settings when a landscape setting is invalid", () => {
+    const result = spawnSync(process.execPath, [ENTRY, "mark-failed"], {
+      cwd: work,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        DEVEX_CONFIG: JSON.stringify({
+          owner: "acme",
+          history: { dir: history },
+          collection: { landscapeStaleAfterDays: 0, features: { landscape: true } },
+        }),
+        DEVEX_OWNER: "",
+        DEVEX_HISTORY_DIR: "",
+        DEVEX_FEATURE_LANDSCAPE: "",
+        GITHUB_OUTPUT: output,
+      },
+    });
+    expect(result.status).toBe(0);
+    expect(result.stderr).toContain("Configuration is invalid");
+    expect(fs.readFileSync(output, "utf8")).toContain("landscape-publish=true");
+    const status = path.join(path.dirname(landscapeLatestPath(history, "acme")), "status.json");
+    expect(JSON.parse(fs.readFileSync(status, "utf8"))).toMatchObject({ ok: false });
+  });
+
   it("mark-failed is a no-op when the feature is disabled", () => {
     const result = spawnSync(process.execPath, [ENTRY, "mark-failed"], {
       cwd: work,

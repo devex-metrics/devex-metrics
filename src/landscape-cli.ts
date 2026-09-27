@@ -199,26 +199,84 @@ function markFailed(): void {
 
 /**
  * The owner and history dir for markFailed, or undefined when landscape is off.
- * An invalid configuration may be why the run failed, so fall back to the
- * discrete variables rather than skip recording the failure.
+ * An invalid configuration may be why the run failed, so on a loadConfig error
+ * fall back to reading just these settings, without validation, from the same
+ * sources in the same order: config file, DEVEX_CONFIG, then discrete variables.
  */
 function failureSettings(): { owner: string; historyDir: string } | undefined {
-  let enabled: boolean;
-  let owner: string;
-  let dir: string;
+  let settings: MinimalSettings;
   try {
     const config = loadConfig();
-    if (!config.history.enabled) return undefined;
-    enabled = config.collection.features.landscape;
-    owner = config.owner;
-    dir = config.history.dir;
+    settings = {
+      owner: config.owner,
+      historyEnabled: config.history.enabled,
+      historyDir: config.history.dir,
+      landscape: config.collection.features.landscape,
+    };
   } catch (err: unknown) {
-    console.warn("Configuration is invalid; recording the failure from discrete variables:", err);
-    enabled = /^(1|true|yes|on)$/i.test(process.env.DEVEX_FEATURE_LANDSCAPE?.trim() ?? "");
-    owner = process.env.DEVEX_OWNER?.trim() ?? "";
-    dir = process.env.DEVEX_HISTORY_DIR?.trim() || "data/history";
+    console.warn("Configuration is invalid; recording the failure from its raw sources:", err);
+    settings = minimalSettings();
   }
-  return enabled && owner ? { owner, historyDir: path.resolve(dir) } : undefined;
+  return settings.landscape && settings.historyEnabled && settings.owner
+    ? { owner: settings.owner, historyDir: path.resolve(settings.historyDir) }
+    : undefined;
+}
+
+interface MinimalSettings {
+  owner: string;
+  historyEnabled: boolean;
+  historyDir: string;
+  landscape: boolean;
+}
+
+function minimalSettings(): MinimalSettings {
+  const settings: MinimalSettings = {
+    owner: "",
+    historyEnabled: true,
+    historyDir: "data/history",
+    landscape: false,
+  };
+  const file = process.env.DEVEX_CONFIG_FILE?.trim() || "devex.config.json";
+  for (const text of [readIfPresent(path.resolve(file)), process.env.DEVEX_CONFIG]) {
+    const raw = parseLenient(text);
+    if (!raw) continue;
+    if (typeof raw.owner === "string") settings.owner = raw.owner;
+    const history = asRecord(raw.history);
+    if (typeof history?.enabled === "boolean") settings.historyEnabled = history.enabled;
+    if (typeof history?.dir === "string") settings.historyDir = history.dir;
+    const features = asRecord(asRecord(raw.collection)?.features);
+    if (typeof features?.landscape === "boolean") settings.landscape = features.landscape;
+  }
+  const env = (key: string) => process.env[key]?.trim() || undefined;
+  const flag = (value: string) => /^(1|true|yes|on)$/i.test(value);
+  const owner = env("DEVEX_OWNER");
+  if (owner) settings.owner = owner;
+  const historyEnabled = env("DEVEX_HISTORY_ENABLED");
+  if (historyEnabled) settings.historyEnabled = flag(historyEnabled);
+  const historyDir = env("DEVEX_HISTORY_DIR");
+  if (historyDir) settings.historyDir = historyDir;
+  const landscape = env("DEVEX_FEATURE_LANDSCAPE");
+  if (landscape) settings.landscape = flag(landscape);
+  return settings;
+}
+
+function readIfPresent(file: string): string | undefined {
+  return fs.existsSync(file) ? fs.readFileSync(file, "utf8") : undefined;
+}
+
+function parseLenient(text: string | undefined): Record<string, unknown> | undefined {
+  if (!text?.trim()) return undefined;
+  try {
+    return asRecord(JSON.parse(text) as unknown);
+  } catch {
+    return undefined;
+  }
+}
+
+function asRecord(value: unknown): Record<string, unknown> | undefined {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : undefined;
 }
 
 function runUrl(): { run_url?: string } {
