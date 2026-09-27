@@ -6,6 +6,8 @@ import type { DevexConfig } from "../config.js";
 export interface DiscoveredRepo {
   name: string;
   fullName: string;
+  /** Privacy from GitHub discovery; undefined when the listing omits it. */
+  isPrivate?: boolean;
   /** ISO-8601 date of the last push ("" when GitHub reports none). */
   pushedAt: string;
   /** True when the repository is archived. */
@@ -24,6 +26,7 @@ export interface DiscoveredRepo {
 interface RawRepo {
   name: string;
   full_name: string;
+  private?: boolean;
   pushed_at?: string | null;
   archived?: boolean;
   fork?: boolean;
@@ -34,6 +37,7 @@ function toDiscovered(repo: RawRepo): DiscoveredRepo {
   return {
     name: repo.name,
     fullName: repo.full_name,
+    isPrivate: repo.private,
     pushedAt: repo.pushed_at ?? "",
     archived: repo.archived ?? false,
     fork: repo.fork ?? false,

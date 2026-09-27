@@ -4,6 +4,7 @@ import * as path from "node:path";
 import { execFileSync } from "node:child_process";
 import { JSDOM, VirtualConsole } from "jsdom";
 import { CURRENT_SCHEMA_VERSION } from "./cache.js";
+import { landscapeLatestPath } from "./landscape.js";
 import type { CacheEnvelope, WeeklyTrendPoint } from "./types.js";
 
 type TrendDataset = {
@@ -56,12 +57,71 @@ describe("build-pages", () => {
     execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
       cwd: process.cwd(),
     });
+
     const indexPath = path.join(siteDir, "index.html");
     expect(fs.existsSync(indexPath)).toBe(true);
     const html = fs.readFileSync(indexPath, "utf-8");
     expect(html).toContain("<!DOCTYPE html>");
     expect(html).toContain("test-pages-owner");
     expect(html).toContain("DevEx Metrics");
+  });
+
+  it("publishes the opt-in landscape view and sanitized JSON without changing the base data API", () => {
+      const historyDir = path.join(dataDir, "test-pages-landscape-history");
+      const envelope: CacheEnvelope = JSON.parse(fs.readFileSync(cacheFile, "utf8"));
+      envelope.data.repos[0].isPrivate = false;
+      fs.writeFileSync(cacheFile, JSON.stringify(envelope));
+      const snapshot = landscapeLatestPath(historyDir, "test-pages-owner");
+      fs.mkdirSync(path.dirname(snapshot), { recursive: true });
+      fs.writeFileSync(snapshot, JSON.stringify({
+        schema_version: 1, generated_at: "2026-03-29T12:00:00Z",
+        scanner_version: "0.1.0",
+        repositories: [{
+          full_name: "test-pages-owner/repo-a",
+          head_sha: "a".repeat(40),
+          ai_files: [{
+            path: "AGENTS.md", kind: "instructions", sha256: "b".repeat(64),
+            last_changed: null, age_days: null, lag_days: null, stale: null,
+          }],
+          ai_summary: { count: 1, stale_count: 0, max_lag_days: null, unknown_count: 1 },
+        }],
+        content: "NEVER PUBLISH",
+      }));
+      try {
+        execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DEVEX_HISTORY_DIR: historyDir,
+            DEVEX_FEATURE_LANDSCAPE: "true",
+          },
+        });
+        const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf8");
+        const landscape = JSON.parse(fs.readFileSync(path.join(siteDir, "landscape.json"), "utf8"));
+        expect(html).toContain('id="ai-landscape"');
+        expect(html).toContain("AGENTS.md");
+        expect(html).toContain("Sanitized JSON");
+        expect(landscape[0]).toMatchObject({ status: "observed", summary: { count: 1 } });
+        expect(html).not.toContain("NEVER PUBLISH");
+        expect(fs.readFileSync(path.join(siteDir, "landscape.json"), "utf8"))
+          .not.toContain("NEVER PUBLISH");
+        expect(JSON.parse(fs.readFileSync(path.join(siteDir, "data.json"), "utf8"))
+          .repos[0]).not.toHaveProperty("landscape");
+      } finally {
+        fs.rmSync(historyDir, { recursive: true, force: true });
+      }
+  });
+
+  it("does not show or export landscape files when the feature is disabled", () => {
+      fs.mkdirSync(siteDir, { recursive: true });
+      fs.writeFileSync(path.join(siteDir, "landscape.json"), '{"stale":"must be removed"}');
+      execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+        cwd: process.cwd(),
+        env: { ...process.env, DEVEX_FEATURE_LANDSCAPE: "false" },
+      });
+      const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf8");
+      expect(html).not.toContain('id="ai-landscape"');
+      expect(fs.existsSync(path.join(siteDir, "landscape.json"))).toBe(false);
   });
 
   it("should generate a data.json file", () => {

@@ -30,6 +30,7 @@ import type { OrgMetrics, RepoMetrics, TeamSummary, TrialSummary } from "./types
 
 interface ResolvedRepoRef {
   fullName: string;
+  isPrivate?: boolean;
   pushedAt: string;
   isTeamRepo: boolean;
   defaultBranch: string;
@@ -72,7 +73,9 @@ export async function collect(
     options.maxRepoAgeHours ??
     config.collection.maxRepoAgeHours ??
     DEFAULT_MAX_REPO_AGE_HOURS;
-  if (!options.skipCache) {
+  // A landscape scan may expose instruction paths on public Pages. Refresh
+  // discovery first so same-day cached visibility cannot authorize a scan.
+  if (!options.skipCache && !config.collection.features.landscape) {
     const cached = loadCache(owner);
     if (cached) {
       console.log(`Using cached data for ${owner} (collected ${cached.collectedAt})`);
@@ -134,6 +137,7 @@ export async function collectGroup(
       const { data } = await octokit.rest.repos.get({ owner: repoOwner, repo: name });
       repoList.push({
         fullName: data.full_name,
+        isPrivate: data.private,
         pushedAt: data.pushed_at ?? "",
         isTeamRepo: false,
         defaultBranch: data.default_branch ?? "",
@@ -206,7 +210,7 @@ async function collectMetricsForRepoList(
   // Collects pre-fetched GraphQL PR nodes per repo for the trends collector.
   const prDataByRepo = new Map<string, GraphQLPRNode[]>();
 
-  for (const { fullName, pushedAt, isTeamRepo, defaultBranch } of repoList) {
+  for (const { fullName, isPrivate, pushedAt, isTeamRepo, defaultBranch } of repoList) {
     // Reuse per-repo data if it is recent enough. The team flag comes from the
     // current config rather than the cache, so re-scoping a trial takes effect
     // without discarding collected data.
@@ -216,7 +220,12 @@ async function collectMetricsForRepoList(
         console.log(`  → ${fullName} (cached)`);
         // The default branch, like the team flag, comes from this run's
         // discovery rather than from whatever the cache was written with.
-        repos.push({ ...cached, isTeamRepo, defaultBranch: defaultBranch || cached.defaultBranch });
+        repos.push({
+          ...cached,
+          isPrivate,
+          isTeamRepo,
+          defaultBranch: defaultBranch || cached.defaultBranch,
+        });
         continue;
       }
     }
@@ -300,6 +309,7 @@ async function collectMetricsForRepoList(
     repos.push({
       name: repoName,
       fullName,
+      isPrivate,
       pushedAt,
       isTeamRepo,
       defaultBranch: defaultBranch || undefined,

@@ -6,6 +6,7 @@ import { collectRepos } from "./repos.js";
 type RepoPage = Array<{
   name: string;
   full_name: string;
+  private?: boolean;
   pushed_at: string | null;
   default_branch?: string;
 }>;
@@ -84,6 +85,7 @@ describe("collectRepos", () => {
     expect(repos[0]).toEqual({
       name: "repo-a",
       fullName: "myorg/repo-a",
+      isPrivate: undefined,
       pushedAt: "2026-01-01T00:00:00Z",
       archived: false,
       fork: false,
@@ -103,6 +105,15 @@ describe("collectRepos", () => {
     await collectRepos("myorg", "org");
 
     expect(getAuthenticated).not.toHaveBeenCalled();
+  });
+
+  it("preserves GitHub visibility for both public and private repositories", async () => {
+    const { mock } = buildMockOctokit([[
+      { name: "public", full_name: "myorg/public", pushed_at: "", private: false },
+      { name: "private", full_name: "myorg/private", pushed_at: "", private: true },
+    ]]);
+    setOctokit(mock);
+    expect((await collectRepos("myorg", "org")).map((repo) => repo.isPrivate)).toEqual([false, true]);
   });
 
   it("uses listForAuthenticatedUser when owner matches the authenticated user", async () => {

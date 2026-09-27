@@ -34,6 +34,8 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
+    outputs:
+      landscape-publish: ${{ steps.landscape-failed.outputs.landscape-publish }}
     permissions:
       # The job also publishes the append-only metrics-data branch.
       contents: write
@@ -115,6 +117,7 @@ jobs:
           DEVEX_FEATURE_DEPENDENTS: ${{ vars.DEVEX_FEATURE_DEPENDENTS }}
           DEVEX_FEATURE_COPILOT_AGENT: ${{ vars.DEVEX_FEATURE_COPILOT_AGENT }}
           DEVEX_FEATURE_CI_HEALTH: ${{ vars.DEVEX_FEATURE_CI_HEALTH }}
+          DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
           DEVEX_CI_PAGES_PER_RUN: ${{ vars.DEVEX_CI_PAGES_PER_RUN }}
           DEVEX_CI_MAX_PAGES_PER_REPO: ${{ vars.DEVEX_CI_MAX_PAGES_PER_REPO }}
           DEVEX_CI_WINDOW_DAYS: ${{ vars.DEVEX_CI_WINDOW_DAYS }}
@@ -128,7 +131,105 @@ jobs:
           DEVEX_HISTORY_DIR: .metrics-data/data
         run: node dist/index.js
 
+      # Prepare resolves DEVEX_CONFIG and the discrete variables; it returns
+      # without scanning when landscape is disabled.
+      - name: Prepare public landscape scan
+        id: landscape
+        env:
+          DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
+          DEVEX_HISTORY_DIR: .metrics-data/data
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+          DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
+          DEVEX_LANDSCAPE_CLI_VERSION: ${{ vars.DEVEX_LANDSCAPE_CLI_VERSION }}
+          DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
+        run: node dist/landscape-cli.js prepare
+
+      # An empty repositories input with owner would grant every installed repo.
+      - name: Check landscape token scope
+        if: steps.landscape.outputs.landscape-enabled == 'true' && steps.landscape.outputs.landscape-scan-needed == 'true'
+        env:
+          LANDSCAPE_REPOSITORIES: ${{ steps.landscape.outputs.landscape-repositories }}
+        run: |
+          if [[ ! "$LANDSCAPE_REPOSITORIES" =~ ^[A-Za-z0-9._-]+(,[A-Za-z0-9._-]+)*$ ]]; then
+            echo "Landscape prepare did not return a valid non-empty list of repository names; refusing an owner-wide token" >&2
+            exit 1
+          fi
+
+      - name: Create landscape scan token
+        id: landscape-token
+        if: steps.landscape.outputs.landscape-enabled == 'true' && steps.landscape.outputs.landscape-scan-needed == 'true'
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ steps.landscape.outputs.landscape-owner }}
+          repositories: ${{ steps.landscape.outputs.landscape-repositories }}
+          permission-contents: read
+
+      - name: Install pinned landscape CLI
+        if: steps.landscape.outputs.landscape-enabled == 'true' && steps.landscape.outputs.landscape-scan-needed == 'true'
+        env:
+          DEVEX_LANDSCAPE_CLI_VERSION: ${{ steps.landscape.outputs.landscape-cli-version }}
+        run: |
+          if [ -z "$DEVEX_LANDSCAPE_CLI_VERSION" ]; then
+            echo "Landscape prepare did not return an exact CLI version" >&2
+            exit 1
+          fi
+          npm install --no-save --ignore-scripts --package-lock=false --no-audit --no-fund @devex-metrics/repo-landscape@"${DEVEX_LANDSCAPE_CLI_VERSION}"
+
+      - name: Scan selected public repositories
+        id: landscape-scan
+        if: steps.landscape.outputs.landscape-enabled == 'true' && steps.landscape.outputs.landscape-scan-needed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
+        run: npx --no-install repo-landscape scan --config data/landscape.config.json --output data/landscape-raw.json
+
+      # Any failure after the scan token exists (CLI install, or a scanner
+      # 403/404 on a repo that just went private) skips ingestion; re-check
+      # visibility so any repo that is no longer public is scrubbed before the
+      # failure is recorded and published below.
+      - name: Re-check landscape visibility after a failure
+        id: landscape-recheck
+        if: failure() && steps.landscape-token.outcome == 'success'
+        env:
+          GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
+          DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
+          DEVEX_HISTORY_DIR: .metrics-data/data
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+          DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
+          DEVEX_LANDSCAPE_CLI_VERSION: ${{ vars.DEVEX_LANDSCAPE_CLI_VERSION }}
+          DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
+        run: node dist/landscape-cli.js recheck
+
+      - name: Ingest sanitized landscape snapshots
+        id: landscape-ingest
+        if: steps.landscape.outputs.landscape-enabled == 'true' && steps.landscape.outputs.landscape-scan-needed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
+          DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
+          DEVEX_HISTORY_DIR: .metrics-data/data
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+          DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
+          DEVEX_LANDSCAPE_CLI_VERSION: ${{ vars.DEVEX_LANDSCAPE_CLI_VERSION }}
+          DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
+        run: node dist/landscape-cli.js ingest data/landscape-raw.json
+
+      # On any failure with landscape enabled, keep the last good landscape
+      # data, scrub repos outside the current public selection, and record the
+      # failure so the dashboard marks the data as stale. The store is then
+      # published and Pages rebuilt, and the run still reports its failure.
+      - name: Record failed landscape run
+        id: landscape-failed
+        if: failure()
+        env:
+          DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
+          DEVEX_HISTORY_DIR: .metrics-data/data
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+          DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
+        run: node dist/landscape-cli.js mark-failed
+
       - name: Publish history store
+        if: success() || (failure() && steps.landscape-failed.outputs.landscape-publish == 'true')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -137,6 +238,7 @@ jobs:
 
   pages:
     needs: collect
+    if: success() || (failure() && needs.collect.outputs.landscape-publish == 'true')
     # A called workflow can never hold more than its caller grants, and this
     # workflow denies everything by default — so the permissions pages.yml needs
     # must be granted here or the run fails before any job starts.

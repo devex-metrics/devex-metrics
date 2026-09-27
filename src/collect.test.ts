@@ -49,6 +49,7 @@ import {
   collectCopilotAgentMetrics,
 } from "./collectors/index.js";
 import type { OrgMetrics } from "./types.js";
+import { defaultConfig } from "./config.js";
 
 function setupDefaultMocks() {
   vi.mocked(loadCache).mockReturnValue(null);
@@ -126,6 +127,36 @@ describe("collect", () => {
 
     expect(collectRepos).toHaveBeenCalled();
     expect(result.repoCount).toBe(0); // fresh data – no repos from mock
+  });
+
+  it("refreshes visibility discovery when landscape is enabled but reuses safe per-repo cached metrics", async () => {
+    setupDefaultMocks();
+    const config = defaultConfig();
+    config.collection.features.landscape = true;
+    const previouslyPublic = {
+      name: "r", fullName: "org/r", isPrivate: false,
+      issues: { open: 0, closed: 0 },
+      pullRequests: { open: 0, closed: 0, merged: 0 },
+      pullRequestDetails: [], weeklyTrends: [],
+      committerCount: 0, reviewerCount: 0, contributorCount: 0, dependentCount: 0,
+    };
+    vi.mocked(loadCache).mockReturnValue({
+      owner: "org", ownerType: "org", collectedAt: "2026-09-25T10:00:00Z",
+      repoCount: 1, repos: [previouslyPublic],
+    });
+    vi.mocked(loadRawCache).mockReturnValue({
+      owner: "org", ownerType: "org", collectedAt: "2026-09-25T10:00:00Z",
+      repoCount: 1, repos: [previouslyPublic], weeklyTrends: [],
+    });
+    vi.mocked(isWithinHours).mockReturnValue(true);
+    vi.mocked(collectRepos).mockResolvedValue([
+      { name: "r", fullName: "org/r", pushedAt: "", isPrivate: true },
+    ]);
+    const result = await collect("org", "org", { config });
+    expect(loadCache).not.toHaveBeenCalled();
+    expect(collectRepos).toHaveBeenCalledTimes(1);
+    expect(collectRepoGraphQL).not.toHaveBeenCalled();
+    expect(result.repos[0].isPrivate).toBe(true);
   });
 
   it("saves collected metrics to cache after a fresh collection", async () => {

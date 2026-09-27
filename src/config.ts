@@ -95,6 +95,8 @@ export interface FeatureFlags {
    * calls rather than inherit them.
    */
   ciHealth: boolean;
+  /** Scan public repositories for AI instruction files via repo-landscape. Off by default. */
+  landscape: boolean;
 }
 
 /**
@@ -168,6 +170,10 @@ export interface CollectionConfig {
   maxPRPages: number;
   /** Hours before a per-repo cache entry is considered stale. */
   maxRepoAgeHours: number;
+  /** Exact, published repo-landscape CLI version; empty until its OIDC release exists. */
+  landscapeCliVersion: string;
+  /** Days before the external scanner marks a file-age signal stale. */
+  landscapeStaleAfterDays: number;
   features: FeatureFlags;
   backfill: BackfillConfig;
   ciHealth: CiHealthConfig;
@@ -217,7 +223,9 @@ export function defaultConfig(): DevexConfig {
       historyWeeks: 104,
       maxPRPages: 10,
       maxRepoAgeHours: 8,
-      features: { dependents: false, copilotAgent: true, ciHealth: false },
+      landscapeCliVersion: "",
+      landscapeStaleAfterDays: 90,
+      features: { dependents: false, copilotAgent: true, ciHealth: false, landscape: false },
       backfill: {
         enabled: true,
         pagesPerRun: 200,
@@ -288,6 +296,16 @@ function strictInt(env: Env, key: string): number | undefined {
     throw new Error(`${key} must be a whole number from 1 through 100, got "${v}".`);
   }
   return Number.parseInt(v, 10);
+}
+
+function positiveInt(env: Env, key: string): number | undefined {
+  const value = str(env, key);
+  if (value === undefined) return undefined;
+  const n = Number(value);
+  if (!/^[1-9]\d*$/.test(value) || !Number.isSafeInteger(n)) {
+    throw new Error(`${key} must be a positive integer, got "${value}".`);
+  }
+  return n;
 }
 
 function assign<T, K extends keyof T>(target: T, key: K, value: T[K] | undefined): void {
@@ -379,9 +397,12 @@ function applyEnv(config: DevexConfig, env: Env): void {
   assign(config.collection, "historyWeeks", int(env, "DEVEX_HISTORY_WEEKS"));
   assign(config.collection, "maxPRPages", int(env, "DEVEX_MAX_PR_PAGES"));
   assign(config.collection, "maxRepoAgeHours", int(env, "DEVEX_MAX_REPO_AGE_HOURS"));
+  assign(config.collection, "landscapeCliVersion", str(env, "DEVEX_LANDSCAPE_CLI_VERSION"));
+  assign(config.collection, "landscapeStaleAfterDays", positiveInt(env, "DEVEX_LANDSCAPE_STALE_AFTER_DAYS"));
   assign(config.collection.features, "dependents", bool(env, "DEVEX_FEATURE_DEPENDENTS"));
   assign(config.collection.features, "copilotAgent", bool(env, "DEVEX_FEATURE_COPILOT_AGENT"));
   assign(config.collection.features, "ciHealth", bool(env, "DEVEX_FEATURE_CI_HEALTH"));
+  assign(config.collection.features, "landscape", bool(env, "DEVEX_FEATURE_LANDSCAPE"));
 
   assign(config.collection.ciHealth, "pagesPerRun", int(env, "DEVEX_CI_PAGES_PER_RUN"));
   assign(config.collection.ciHealth, "maxPagesPerRepo", int(env, "DEVEX_CI_MAX_PAGES_PER_REPO"));
@@ -530,6 +551,10 @@ export function loadConfig(env: Env = process.env): DevexConfig {
 
   applyEnv(config, env);
   validateBackfillPageSizes(config.collection.backfill);
+  if (!Number.isSafeInteger(config.collection.landscapeStaleAfterDays) ||
+    config.collection.landscapeStaleAfterDays < 1) {
+    throw new Error("Landscape staleAfterDays must be a positive integer");
+  }
   return config;
 }
 

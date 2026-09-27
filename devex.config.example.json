@@ -50,10 +50,13 @@
     "historyWeeks": 104,
     "maxPRPages": 10,
     "maxRepoAgeHours": 8,
+    "landscapeCliVersion": "",
+    "landscapeStaleAfterDays": 90,
     "features": {
       "dependents": false,
       "copilotAgent": true,
-      "ciHealth": false
+      "ciHealth": false,
+      "landscape": false
     },
     "backfill": {
       "enabled": true,
