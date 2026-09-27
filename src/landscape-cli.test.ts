@@ -176,6 +176,23 @@ describe("landscape workflow adapter", () => {
     );
   });
 
+  it("publishes the scrubbed store and rebuilds Pages when the visibility re-check fails", () => {
+    const workflow = fs.readFileSync(
+      path.resolve(".github", "workflows", "collect-metrics.yml"),
+      "utf8"
+    );
+    const scrubbed = "outputs.landscape-scrubbed == 'true'";
+    expect(workflow).toContain(
+      "landscape-scrubbed: ${{ steps.landscape-ingest.outputs.landscape-scrubbed }}"
+    );
+    expect(workflow).toContain(
+      `      - name: Publish history store\n        if: success() || (failure() && steps.landscape-ingest.${scrubbed})`
+    );
+    expect(workflow).toContain(
+      `    needs: collect\n    if: success() || (failure() && needs.collect.${scrubbed})`
+    );
+  });
+
   it("refuses ingestion without a restricted Contents-read token", () => {
     const rawFile = path.join(work, "raw.json");
     fs.writeFileSync(rawFile, "{}");

@@ -7,7 +7,8 @@ import {
   parseLandscapeScan,
   saveLandscapeScan,
   validateLandscapeScannerOutput,
-  verifyLandscapeVisibility,
+  scrubLandscapeRepositories,
+  unverifiedLandscapeRepositories,
 } from "./landscape.js";
 import type { OrgMetrics, RepoMetrics } from "./types.js";
 
@@ -314,6 +315,29 @@ describe("landscape history and DevEx join", () => {
     );
     expect(fs.existsSync(landscapeLatestPath(root, "acme"))).toBe(false);
   });
+
+  it("scrubs a no-longer-public repository from the published observation", () => {
+    const data = metrics([
+      { name: "public", isPrivate: false },
+      { name: "other", isPrivate: false },
+    ]);
+    saveLandscapeScan(
+      root,
+      data,
+      scan([repository("acme/public"), repository("acme/other", [file("CLAUDE.md")])])
+    );
+    expect(scrubLandscapeRepositories(root, "acme", ["ACME/public"])).toBe(1);
+    const view = loadLandscapeView(root, data);
+    expect(view[0]).toEqual({ fullName: "acme/public", status: "unknown", reason: "not_scanned" });
+    expect(view[1]).toMatchObject({ fullName: "acme/other", status: "observed" });
+    expect(fs.readFileSync(landscapeLatestPath(root, "acme"), "utf8")).not.toContain("AGENTS.md");
+    expect(scrubLandscapeRepositories(root, "acme", ["acme/public"])).toBe(0);
+  });
+
+  it("scrubbing without a stored observation is a no-op", () => {
+    expect(scrubLandscapeRepositories(root, "acme", ["acme/public"])).toBe(0);
+    expect(fs.existsSync(landscapeLatestPath(root, "acme"))).toBe(false);
+  });
 });
 
 it("hash drift is independent of file age and stale flags", () => {
@@ -338,18 +362,20 @@ it("hash drift is independent of file age and stale flags", () => {
 
 describe("visibility re-check before ingestion", () => {
   const publicScan = parseLandscapeScan(scan([repository("acme/public")]));
-  it("accepts a still-public repository and rejects a privacy change", async () => {
+  it("accepts a still-public repository and flags a privacy change", async () => {
     const get = vi.fn().mockResolvedValue({
       data: { full_name: "acme/public", private: false },
     });
 
-    const octokit = { rest: { repos: { get } } } as Parameters<typeof verifyLandscapeVisibility>[1];
-    await expect(verifyLandscapeVisibility(publicScan, octokit)).resolves.toBeUndefined();
+    const octokit = { rest: { repos: { get } } } as Parameters<
+      typeof unverifiedLandscapeRepositories
+    >[1];
+    await expect(unverifiedLandscapeRepositories(publicScan, octokit)).resolves.toEqual([]);
     expect(get).toHaveBeenCalledWith({ owner: "acme", repo: "public" });
     get.mockResolvedValue({ data: { full_name: "acme/public", private: true } });
-    await expect(verifyLandscapeVisibility(publicScan, octokit)).rejects.toThrow(
-      /no longer verified public/
-    );
+    await expect(unverifiedLandscapeRepositories(publicScan, octokit)).resolves.toEqual([
+      "acme/public",
+    ]);
   });
 
   describe("v1 engine output compatibility", () => {
@@ -425,8 +451,15 @@ describe("visibility re-check before ingestion", () => {
   });
 
   it("fails closed on a denied or missing GitHub API response", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const get = vi.fn().mockRejectedValue(Object.assign(new Error("Forbidden"), { status: 403 }));
-    const octokit = { rest: { repos: { get } } } as Parameters<typeof verifyLandscapeVisibility>[1];
-    await expect(verifyLandscapeVisibility(publicScan, octokit)).rejects.toThrow(/Forbidden/);
+    const octokit = { rest: { repos: { get } } } as Parameters<
+      typeof unverifiedLandscapeRepositories
+    >[1];
+    await expect(unverifiedLandscapeRepositories(publicScan, octokit)).resolves.toEqual([
+      "acme/public",
+    ]);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
   });
 });

@@ -6,8 +6,9 @@ import {
   loadLandscapeSelection,
   publicLandscapeSelection,
   saveLandscapeScan,
+  scrubLandscapeRepositories,
+  unverifiedLandscapeRepositories,
   validateLandscapeScannerOutput,
-  verifyLandscapeVisibility,
 } from "./landscape.js";
 
 function prepare(): void {
@@ -84,7 +85,20 @@ async function ingest(file: string | undefined): Promise<void> {
     config.collection.landscapeStaleAfterDays,
     config.collection.landscapeCliVersion
   );
-  await verifyLandscapeVisibility(scanToVerify, new Octokit({ auth: token }));
+  const unverified = await unverifiedLandscapeRepositories(
+    scanToVerify,
+    new Octokit({ auth: token })
+  );
+  if (unverified.length > 0) {
+    // The workflow publishes the scrubbed store and rebuilds Pages on this
+    // output even though the run fails, so stale paths are not left online.
+    const removed = scrubLandscapeRepositories(historyDir, metrics.owner, unverified);
+    writeOutput("landscape-scrubbed", "true");
+    throw new Error(
+      `${unverified.length} landscape repositories are no longer verified public; ` +
+        `refusing to persist paths (removed ${removed} previously stored observations)`
+    );
+  }
   const scan = saveLandscapeScan(historyDir, metrics, raw);
   console.log(
     `Stored sanitized landscape v1 scan (${scan.repositories.length} public repositories)`

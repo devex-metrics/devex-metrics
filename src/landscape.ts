@@ -455,21 +455,54 @@ export function loadLandscapeSelection(historyDir: string, owner: string): OrgMe
   return metrics;
 }
 
-/** Reject a visibility change between DevEx discovery and landscape ingestion. */
-export async function verifyLandscapeVisibility(
+/**
+ * Repositories in the scan that can no longer be verified public. A failed
+ * lookup counts as unverified: publishing paths is only safe on a positive check.
+ */
+export async function unverifiedLandscapeRepositories(
   scan: LandscapeScan,
   octokit: Pick<Octokit, "rest">
-): Promise<void> {
+): Promise<string[]> {
+  const unverified: string[] = [];
   for (const repo of scan.repositories) {
     const [owner, name] = repo.full_name.split("/");
-    const response = await octokit.rest.repos.get({ owner, repo: name });
-    if (
-      response.data.private !== false ||
-      response.data.full_name.toLowerCase() !== repo.full_name.toLowerCase()
-    ) {
-      throw new Error(
-        "Landscape repository is no longer verified public; refusing to persist paths"
-      );
+    try {
+      const response = await octokit.rest.repos.get({ owner, repo: name });
+      if (
+        response.data.private === false &&
+        response.data.full_name.toLowerCase() === repo.full_name.toLowerCase()
+      ) {
+        continue;
+      }
+    } catch (err: unknown) {
+      console.warn(`Could not verify visibility of ${repo.full_name}:`, err);
     }
+    unverified.push(repo.full_name);
   }
+  return unverified;
+}
+
+/**
+ * Drop previously stored observations for repositories that are no longer
+ * verified public, so the next Pages build shows them as unknown instead of
+ * keeping their published paths. Returns how many observations were removed.
+ */
+export function scrubLandscapeRepositories(
+  historyDir: string,
+  owner: string,
+  names: readonly string[]
+): number {
+  const latest = landscapeLatestPath(historyDir, owner);
+  if (!fs.existsSync(latest)) return 0;
+  const drop = new Set(names.map((name) => name.toLowerCase()));
+  const scan = readScan(latest);
+  const kept = scan.repositories.filter((repo) => !drop.has(repo.full_name.toLowerCase()));
+  const removed = scan.repositories.length - kept.length;
+  if (removed === 0) return 0;
+  fs.writeFileSync(
+    `${latest}.tmp`,
+    JSON.stringify({ ...scan, repositories: kept }, null, 2) + "\n"
+  );
+  fs.renameSync(`${latest}.tmp`, latest);
+  return removed;
 }

@@ -254,6 +254,10 @@ the scanner receives only the short-lived installation token.
 Ingestion uses that same restricted token to re-check every repository is
 still public before persisting any file paths. A privacy change, failed
 re-check or missing token fails the scan rather than publishing stale paths.
+When the re-check fails, the affected repositories' previously stored
+observations are removed from the landscape store, and the run still publishes
+that removal and rebuilds Pages before reporting the failure, so those
+repositories show as unknown instead of keeping their old paths online.
 
 The installation token is scoped to one owner and its selected repos. In user
 mode, the DevEx selection may include public repositories belonging to other
