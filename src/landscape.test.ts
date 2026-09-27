@@ -326,7 +326,21 @@ describe("landscape history and DevEx join", () => {
       data,
       scan([repository("acme/public"), repository("acme/other", [file("CLAUDE.md")])])
     );
-    expect(scrubLandscapeRepositories(root, "acme", ["ACME/public"])).toBe(1);
+    saveLandscapeScan(
+      root,
+      data,
+      scan(
+        [repository("acme/public"), repository("acme/other", [file("CLAUDE.md")])],
+        "2026-09-22T12:00:00Z"
+      )
+    );
+    expect(scrubLandscapeRepositories(root, "acme", ["ACME/public"])).toBe(3);
+    const snapshots = path.join(path.dirname(landscapeLatestPath(root, "acme")), "snapshots");
+    for (const f of fs.readdirSync(snapshots)) {
+      const stored = fs.readFileSync(path.join(snapshots, f), "utf8");
+      expect(stored).not.toContain("acme/public");
+      expect(stored).toContain("acme/other");
+    }
     const view = loadLandscapeView(root, data);
     expect(view[0]).toEqual({ fullName: "acme/public", status: "unknown", reason: "not_scanned" });
     expect(view[1]).toMatchObject({ fullName: "acme/other", status: "observed" });

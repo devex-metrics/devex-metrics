@@ -483,26 +483,39 @@ export async function unverifiedLandscapeRepositories(
 }
 
 /**
- * Drop previously stored observations for repositories that are no longer
- * verified public, so the next Pages build shows them as unknown instead of
- * keeping their published paths. Returns how many observations were removed.
+ * Drop stored observations for repositories that are no longer verified public
+ * from the latest scan and every snapshot, so neither the next Pages build nor
+ * the persisted landscape stream keeps their paths. Returns how many
+ * observations were removed across all files.
  */
 export function scrubLandscapeRepositories(
   historyDir: string,
   owner: string,
   names: readonly string[]
 ): number {
-  const latest = landscapeLatestPath(historyDir, owner);
-  if (!fs.existsSync(latest)) return 0;
   const drop = new Set(names.map((name) => name.toLowerCase()));
-  const scan = readScan(latest);
-  const kept = scan.repositories.filter((repo) => !drop.has(repo.full_name.toLowerCase()));
-  const removed = scan.repositories.length - kept.length;
-  if (removed === 0) return 0;
-  fs.writeFileSync(
-    `${latest}.tmp`,
-    JSON.stringify({ ...scan, repositories: kept }, null, 2) + "\n"
-  );
-  fs.renameSync(`${latest}.tmp`, latest);
+  const folder = snapshotsPath(historyDir, owner);
+  const files = [
+    landscapeLatestPath(historyDir, owner),
+    ...(fs.existsSync(folder)
+      ? fs
+          .readdirSync(folder)
+          .filter((f) => f.endsWith(".json"))
+          .map((f) => path.join(folder, f))
+      : []),
+  ];
+  let removed = 0;
+  for (const file of files) {
+    if (!fs.existsSync(file)) continue;
+    const scan = readScan(file);
+    const kept = scan.repositories.filter((repo) => !drop.has(repo.full_name.toLowerCase()));
+    if (kept.length === scan.repositories.length) continue;
+    removed += scan.repositories.length - kept.length;
+    fs.writeFileSync(
+      `${file}.tmp`,
+      JSON.stringify({ ...scan, repositories: kept }, null, 2) + "\n"
+    );
+    fs.renameSync(`${file}.tmp`, file);
+  }
   return removed;
 }
