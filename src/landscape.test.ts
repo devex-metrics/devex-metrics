@@ -28,7 +28,11 @@ function file(filePath: string, hash = HASH_A) {
   };
 }
 
-function repository(fullName = "acme/public", files = [file("AGENTS.md")], head = SHA_A) {
+function repository(
+  fullName = "acme/public",
+  files: Array<{ stale?: boolean | null }> = [file("AGENTS.md")],
+  head = SHA_A
+) {
   return {
     full_name: fullName,
     head_sha: head,
