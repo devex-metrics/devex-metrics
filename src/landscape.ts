@@ -7,6 +7,7 @@ import type {
   LandscapeFile,
   LandscapeRepoView,
   LandscapeRepository,
+  LandscapeRunStatus,
   LandscapeScan,
   LandscapeSummary,
   LandscapeUnavailableRepository,
@@ -542,4 +543,43 @@ export function scrubLandscapeOutsideSelection(historyDir: string, metrics: OrgM
     metrics.owner,
     (name) => !keep.has(name.toLowerCase())
   );
+}
+
+function statusPath(historyDir: string, owner: string): string {
+  return scopePath(historyDir, owner, "landscape/status.json");
+}
+
+/** Record the outcome of a landscape scan attempt for the dashboard's stale-data notice. */
+export function saveLandscapeRunStatus(
+  historyDir: string,
+  owner: string,
+  status: Omit<LandscapeRunStatus, "last_success_at">
+): void {
+  const file = statusPath(historyDir, owner);
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(`${file}.tmp`, JSON.stringify(status, null, 2) + "\n");
+  fs.renameSync(`${file}.tmp`, file);
+}
+
+/** The latest attempt's outcome joined to the scan time of the observation being shown. */
+export function loadLandscapeRunStatus(
+  historyDir: string,
+  owner: string
+): LandscapeRunStatus | undefined {
+  const file = statusPath(historyDir, owner);
+  if (!fs.existsSync(file)) return undefined;
+  const raw = object(JSON.parse(fs.readFileSync(file, "utf8")) as unknown, "run status");
+  if (typeof raw.ok !== "boolean") throw new Error("Landscape run status ok must be a boolean");
+  const runUrl =
+    raw.run_url === undefined ? undefined : nonempty(raw.run_url, "run status run_url");
+  if (runUrl !== undefined && !/^https:\/\//.test(runUrl)) {
+    throw new Error("Landscape run status run_url must be an https URL");
+  }
+  const latest = landscapeLatestPath(historyDir, owner);
+  return {
+    attempted_at: timestamp(raw.attempted_at, "run status attempted_at"),
+    ok: raw.ok,
+    ...(runUrl ? { run_url: runUrl } : {}),
+    last_success_at: fs.existsSync(latest) ? readScan(latest).generated_at : null,
+  };
 }

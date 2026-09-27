@@ -143,6 +143,18 @@ export interface LandscapeRepoView {
   drift?: LandscapeDrift;
 }
 
+/** Outcome of the most recent landscape scan attempt, stored beside latest.json. */
+export interface LandscapeRunStatus {
+  /** When the most recent attempt finished (ISO-8601). */
+  attempted_at: string;
+  /** False when that attempt failed; the dashboard then shows the stored data as stale. */
+  ok: boolean;
+  /** Workflow run of the attempt, when known. */
+  run_url?: string;
+  /** Scan time of the observation being shown, filled in when loaded; null when there is none. */
+  last_success_at?: string | null;
+}
+
 /** The configured team, copied into the dataset so the site can render it. */
 export interface TeamSummary {
   /** Stable identifier, also used in share URLs. */

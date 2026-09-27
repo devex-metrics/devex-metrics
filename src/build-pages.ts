@@ -5,7 +5,7 @@ import { CURRENT_SCHEMA_VERSION, fixturesEnabled } from "./cache.js";
 import { loadConfig, applyScope } from "./config.js";
 import { latestPath, loadRollup } from "./history.js";
 import { loadCiRuns, toCiSamples } from "./ci-health.js";
-import { loadLandscapeView } from "./landscape.js";
+import { loadLandscapeRunStatus, loadLandscapeView } from "./landscape.js";
 import type { CacheEnvelope, OrgMetrics } from "./types.js";
 import { buildDashboardHtml } from "./pages/dashboard.js";
 
@@ -177,6 +177,7 @@ function main(): void {
     ciSamples,
     ciWindowDays: config.collection.ciHealth.windowDays,
     landscape,
+    landscapeStatus: landscape ? loadLandscapeRunStatus(historyDir, data.owner) : undefined,
   });
   fs.writeFileSync(path.join(siteDir, "index.html"), html);
 

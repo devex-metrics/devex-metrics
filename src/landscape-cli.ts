@@ -6,6 +6,7 @@ import type { OrgMetrics } from "./types.js";
 import {
   loadLandscapeSelection,
   publicLandscapeSelection,
+  saveLandscapeRunStatus,
   saveLandscapeScan,
   scrubLandscapeOutsideSelection,
   scrubLandscapeRepositories,
@@ -32,7 +33,6 @@ function prepare(): void {
     console.log(
       `Removed ${scrubbed} stored landscape observations for repositories no longer verified public`
     );
-    writeOutput("landscape-scrubbed", "true");
   }
   // Checked after the scrub, so a bad rollout still publishes that cleanup.
   const version = config.collection.landscapeCliVersion;
@@ -64,6 +64,12 @@ function prepare(): void {
     `Landscape selection: ${repositories.length} verified public repositories in ${config.owner} ` +
       `of ${metrics.repos.length} DevEx-selected (other owners and private/unknown visibility stay unknown)`
   );
+  if (repositories.length === 0) {
+    saveLandscapeRunStatus(historyDir, metrics.owner, {
+      attempted_at: new Date().toISOString(),
+      ok: true,
+    });
+  }
   writeOutput("landscape-enabled", "true");
   writeOutput("landscape-scan-needed", String(repositories.length > 0));
   writeOutput("landscape-cli-version", version);
@@ -85,9 +91,9 @@ function scanToken(): string {
 
 /**
  * Re-check visibility and scrub any repository that is no longer verified
- * public. The workflow publishes the scrubbed store and rebuilds Pages on the
- * landscape-scrubbed output even when the run fails, so stale paths are not
- * left online. Returns the unverified repositories.
+ * public. On a failed run the workflow still publishes the scrubbed store and
+ * rebuilds Pages (see markFailed), so stale paths are not left online.
+ * Returns the unverified repositories.
  */
 async function recheckAndScrub(
   historyDir: string,
@@ -98,7 +104,6 @@ async function recheckAndScrub(
   const unverified = await unverifiedLandscapeRepositories(names, new Octokit({ auth: token }));
   if (unverified.length > 0) {
     const removed = scrubLandscapeRepositories(historyDir, owner, unverified);
-    writeOutput("landscape-scrubbed", "true");
     console.error(
       `${unverified.length} landscape repositories are no longer verified public ` +
         `(removed ${removed} previously stored observations)`
@@ -143,6 +148,11 @@ async function ingest(file: string | undefined): Promise<void> {
     config.collection.landscapeCliVersion
   );
   const scan = saveLandscapeScan(historyDir, metrics, raw);
+  saveLandscapeRunStatus(historyDir, metrics.owner, {
+    attempted_at: new Date().toISOString(),
+    ok: true,
+    ...runUrl(),
+  });
   console.log(
     `Stored sanitized landscape v1 scan (${scan.repositories.length} public repositories)`
   );
@@ -159,6 +169,39 @@ async function recheck(): Promise<void> {
   }
 }
 
+/**
+ * Run as the last step of a failed collection. Keeps the last good landscape
+ * data, scrubs repositories outside the current public selection, records the
+ * failure so the dashboard marks the data as stale, and asks the workflow to
+ * publish the store and rebuild Pages before the run reports its failure.
+ */
+function markFailed(): void {
+  const config = loadConfig();
+  if (!config.collection.features.landscape || !config.history.enabled || !config.owner) return;
+  const historyDir = path.resolve(config.history.dir);
+  try {
+    const metrics = loadLandscapeSelection(historyDir, config.owner);
+    const removed = scrubLandscapeOutsideSelection(historyDir, metrics);
+    if (removed > 0) {
+      console.log(`Removed ${removed} stored landscape observations outside the public selection`);
+    }
+  } catch (err: unknown) {
+    console.warn("Could not re-scrub the landscape store against the DevEx selection:", err);
+  }
+  saveLandscapeRunStatus(historyDir, config.owner, {
+    attempted_at: new Date().toISOString(),
+    ok: false,
+    ...runUrl(),
+  });
+  console.log("Recorded a failed landscape run; the dashboard will mark its data as stale");
+  writeOutput("landscape-publish", "true");
+}
+
+function runUrl(): { run_url?: string } {
+  const { GITHUB_SERVER_URL: server, GITHUB_REPOSITORY: repo, GITHUB_RUN_ID: id } = process.env;
+  return server && repo && id ? { run_url: `${server}/${repo}/actions/runs/${id}` } : {};
+}
+
 function writeOutput(name: string, value: string): void {
   if (process.env.GITHUB_OUTPUT) {
     fs.appendFileSync(process.env.GITHUB_OUTPUT, `${name}=${value}\n`);
@@ -170,7 +213,11 @@ async function main(): Promise<void> {
   if (command === "prepare") prepare();
   else if (command === "ingest") await ingest(process.argv[3]);
   else if (command === "recheck") await recheck();
-  else throw new Error("Usage: landscape-cli <prepare | ingest <raw-scan.json> | recheck>");
+  else if (command === "mark-failed") markFailed();
+  else
+    throw new Error(
+      "Usage: landscape-cli <prepare | ingest <raw-scan.json> | recheck | mark-failed>"
+    );
 }
 
 main().catch((err: unknown) => {

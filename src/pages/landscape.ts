@@ -1,4 +1,4 @@
-import type { LandscapeFile, LandscapeRepoView } from "../types.js";
+import type { LandscapeFile, LandscapeRepoView, LandscapeRunStatus } from "../types.js";
 import { escapeHtml } from "./utils.js";
 
 function unknownLabel(reason: LandscapeRepoView["reason"]): string {
@@ -73,8 +73,27 @@ function observedRow(row: LandscapeRepoView): string {
   </tr>`;
 }
 
+function timeTag(iso: string): string {
+  return `<time datetime="${escapeHtml(iso)}">${escapeHtml(iso.slice(0, 16).replace("T", " "))} UTC</time>`;
+}
+
+/** A prominent notice when the latest collection run failed and older data is shown. */
+function staleNotice(status: LandscapeRunStatus | undefined): string {
+  if (!status || status.ok) return "";
+  const shown = status.last_success_at
+    ? `The data below is from the last successful scan at ${timeTag(status.last_success_at)} and may be out of date.`
+    : "There is no successful scan to show yet.";
+  const run = status.run_url
+    ? ` <a href="${escapeHtml(status.run_url)}">View the failed run</a>.`
+    : "";
+  return `<div class="landscape-stale" role="status"><strong>Stale data:</strong> the latest collection run at ${timeTag(status.attempted_at)} failed, so this landscape was not refreshed. ${shown}${run}</div>`;
+}
+
 /** Render the opt-in landscape panel alongside the existing dashboard's metrics. */
-export function buildLandscapeSection(rows: readonly LandscapeRepoView[]): string {
+export function buildLandscapeSection(
+  rows: readonly LandscapeRepoView[],
+  status?: LandscapeRunStatus
+): string {
   const observed = rows.filter((row) => row.status === "observed").length;
   const content = rows.length
     ? `<div class="landscape-table-wrap"><table class="landscape-table" aria-label="AI instruction file observations by repository">
@@ -93,6 +112,7 @@ export function buildLandscapeSection(rows: readonly LandscapeRepoView[]): strin
       <h2 id="landscape-heading">AI instruction landscape</h2>
       <p class="metric-lede">Observed files and content-hash drift at each repository head. Presence and age are not a readiness score or a correctness assessment; this snapshot does not follow the PR period or bot filters.</p>
     </div><div class="landscape-actions"><span class="landscape-coverage">${observed} / ${rows.length} observed</span><a href="landscape.json">Sanitized JSON</a></div></div>
+    ${staleNotice(status)}
     ${content}
   </section>`;
 }

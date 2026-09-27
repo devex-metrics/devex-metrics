@@ -7,6 +7,8 @@ import {
   parseLandscapeScan,
   saveLandscapeScan,
   validateLandscapeScannerOutput,
+  loadLandscapeRunStatus,
+  saveLandscapeRunStatus,
   scrubLandscapeOutsideSelection,
   scrubLandscapeRepositories,
   unverifiedLandscapeRepositories,
@@ -376,6 +378,19 @@ describe("landscape history and DevEx join", () => {
       expect(stored).not.toContain("acme/dropped");
     }
     expect(scrubLandscapeOutsideSelection(root, after)).toBe(0);
+  });
+
+  it("joins the latest run status to the scan time of the data being shown", () => {
+    expect(loadLandscapeRunStatus(root, "acme")).toBeUndefined();
+    saveLandscapeRunStatus(root, "acme", { attempted_at: "2026-09-27T06:00:00Z", ok: false });
+    expect(loadLandscapeRunStatus(root, "acme")).toEqual({
+      attempted_at: "2026-09-27T06:00:00.000Z",
+      ok: false,
+      last_success_at: null,
+    });
+    const data = metrics([{ name: "public", isPrivate: false }]);
+    saveLandscapeScan(root, data, scan([repository()]));
+    expect(loadLandscapeRunStatus(root, "acme")?.last_success_at).toBe("2026-09-21T12:00:00.000Z");
   });
 
   it("scrubbing without a stored observation is a no-op", () => {

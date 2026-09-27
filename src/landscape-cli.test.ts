@@ -177,19 +177,18 @@ describe("landscape workflow adapter", () => {
     );
   });
 
-  it("publishes the scrubbed store and rebuilds Pages when the visibility re-check fails", () => {
+  it("records a failed run, then publishes the store and rebuilds Pages", () => {
     const workflow = fs.readFileSync(
       path.resolve(".github", "workflows", "collect-metrics.yml"),
       "utf8"
     );
-    for (const id of ["landscape", "landscape-recheck", "landscape-ingest"]) {
-      expect(workflow).toContain(`steps.${id}.outputs.landscape-scrubbed`);
-    }
+    expect(workflow).toContain("        id: landscape-failed\n        if: failure()\n");
+    expect(workflow).toContain("run: node dist/landscape-cli.js mark-failed");
     expect(workflow).toContain(
-      "      - name: Publish history store\n        if: >-\n          success() || (failure() && ("
+      "      - name: Publish history store\n        if: success() || (failure() && steps.landscape-failed.outputs.landscape-publish == 'true')"
     );
     expect(workflow).toContain(
-      "    needs: collect\n    if: success() || (failure() && needs.collect.outputs.landscape-scrubbed == 'true')"
+      "    needs: collect\n    if: success() || (failure() && needs.collect.outputs.landscape-publish == 'true')"
     );
     expect(workflow).toContain(
       "        if: failure() && steps.landscape-token.outcome == 'success'\n"
@@ -227,12 +226,76 @@ describe("landscape workflow adapter", () => {
     const result = run("prepare", "");
     expect(result.status).not.toBe(0);
     expect(result.stderr).toContain("exact published OIDC release");
-    expect(fs.readFileSync(output, "utf8")).toContain("landscape-scrubbed=true");
     for (const file of [latest, snapshot]) {
       const contents = fs.readFileSync(file, "utf8");
       expect(contents).toContain("acme/public");
       expect(contents).not.toContain("acme/private");
     }
+  });
+
+  it("mark-failed keeps the last good data, scrubs, records the failure and asks to publish", () => {
+    const latest = landscapeLatestPath(history, "acme");
+    fs.mkdirSync(path.dirname(latest), { recursive: true });
+    fs.writeFileSync(
+      latest,
+      JSON.stringify({
+        schema_version: 1,
+        generated_at: "2026-09-20T12:00:00Z",
+        scanner_version: "0.1.0",
+        repositories: ["acme/public", "acme/private"].map((full_name) => ({
+          full_name,
+          head_sha: "a".repeat(40),
+          ai_files: [],
+          ai_summary: { count: 0, stale_count: 0, max_lag_days: null },
+        })),
+      })
+    );
+    const result = spawnSync(process.execPath, [ENTRY, "mark-failed"], {
+      cwd: work,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        DEVEX_CONFIG: "",
+        DEVEX_OWNER: "acme",
+        DEVEX_HISTORY_DIR: history,
+        DEVEX_FEATURE_LANDSCAPE: "true",
+        GITHUB_OUTPUT: output,
+        GITHUB_SERVER_URL: "https://github.com",
+        GITHUB_REPOSITORY: "acme/devex",
+        GITHUB_RUN_ID: "42",
+      },
+    });
+    expect(result.status).toBe(0);
+    expect(fs.readFileSync(output, "utf8")).toContain("landscape-publish=true");
+    const stored = fs.readFileSync(latest, "utf8");
+    expect(stored).toContain("acme/public");
+    expect(stored).not.toContain("acme/private");
+    const status = JSON.parse(
+      fs.readFileSync(path.join(path.dirname(latest), "status.json"), "utf8")
+    );
+    expect(status).toMatchObject({
+      ok: false,
+      run_url: "https://github.com/acme/devex/actions/runs/42",
+    });
+  });
+
+  it("mark-failed is a no-op when the feature is disabled", () => {
+    const result = spawnSync(process.execPath, [ENTRY, "mark-failed"], {
+      cwd: work,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        DEVEX_CONFIG: "",
+        DEVEX_OWNER: "acme",
+        DEVEX_HISTORY_DIR: history,
+        DEVEX_FEATURE_LANDSCAPE: "false",
+        GITHUB_OUTPUT: output,
+      },
+    });
+    expect(result.status).toBe(0);
+    expect(fs.existsSync(output) ? fs.readFileSync(output, "utf8") : "").not.toContain(
+      "landscape-publish"
+    );
   });
 
   it("refuses ingestion without a restricted Contents-read token", () => {

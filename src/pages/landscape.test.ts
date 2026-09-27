@@ -93,4 +93,30 @@ describe("landscape dashboard view", () => {
     expect(html).toContain("First observation; no comparison yet");
     expect(html).toContain("No AI instruction files observed at this commit.");
   });
+
+  it("marks the data as stale with the failed run when the latest attempt failed", () => {
+    const html = buildLandscapeSection([observed()], {
+      attempted_at: "2026-09-27T06:00:00.000Z",
+      ok: false,
+      run_url: "https://github.com/acme/devex/actions/runs/42",
+      last_success_at: "2026-09-26T06:00:00.000Z",
+    });
+    const doc = new JSDOM(html).window.document;
+    const notice = doc.querySelector(".landscape-stale");
+    expect(notice?.textContent).toContain("Stale data");
+    expect(notice?.textContent).toContain("2026-09-27 06:00 UTC");
+    expect(notice?.textContent).toContain("last successful scan at 2026-09-26 06:00 UTC");
+    expect(notice?.querySelector("a")?.getAttribute("href")).toBe(
+      "https://github.com/acme/devex/actions/runs/42"
+    );
+  });
+
+  it("shows no stale notice after a successful attempt", () => {
+    const html = buildLandscapeSection([observed()], {
+      attempted_at: "2026-09-27T06:00:00.000Z",
+      ok: true,
+      last_success_at: "2026-09-27T06:00:00.000Z",
+    });
+    expect(html).not.toContain("landscape-stale");
+  });
 });

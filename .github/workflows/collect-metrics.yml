@@ -35,7 +35,7 @@ jobs:
   collect:
     runs-on: ubuntu-latest
     outputs:
-      landscape-scrubbed: ${{ steps.landscape.outputs.landscape-scrubbed || steps.landscape-recheck.outputs.landscape-scrubbed || steps.landscape-ingest.outputs.landscape-scrubbed }}
+      landscape-publish: ${{ steps.landscape-failed.outputs.landscape-publish }}
     permissions:
       # The job also publishes the append-only metrics-data branch.
       contents: write
@@ -186,8 +186,8 @@ jobs:
 
       # Any failure after the scan token exists (CLI install, or a scanner
       # 403/404 on a repo that just went private) skips ingestion; re-check
-      # visibility so any repo that is no longer public is scrubbed and that
-      # removal is published below.
+      # visibility so any repo that is no longer public is scrubbed before the
+      # failure is recorded and published below.
       - name: Re-check landscape visibility after a failure
         id: landscape-recheck
         if: failure() && steps.landscape-token.outcome == 'success'
@@ -214,15 +214,22 @@ jobs:
           DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
         run: node dist/landscape-cli.js ingest data/landscape-raw.json
 
-      # Prepare, the post-failure re-check and ingestion scrub observations of
-      # repos no longer verified public; publish that removal (and rebuild
-      # Pages below) even when the run fails.
+      # On any failure with landscape enabled, keep the last good landscape
+      # data, scrub repos outside the current public selection, and record the
+      # failure so the dashboard marks the data as stale. The store is then
+      # published and Pages rebuilt, and the run still reports its failure.
+      - name: Record failed landscape run
+        id: landscape-failed
+        if: failure()
+        env:
+          DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
+          DEVEX_HISTORY_DIR: .metrics-data/data
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+          DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
+        run: node dist/landscape-cli.js mark-failed
+
       - name: Publish history store
-        if: >-
-          success() || (failure() && (
-          steps.landscape.outputs.landscape-scrubbed == 'true' ||
-          steps.landscape-recheck.outputs.landscape-scrubbed == 'true' ||
-          steps.landscape-ingest.outputs.landscape-scrubbed == 'true'))
+        if: success() || (failure() && steps.landscape-failed.outputs.landscape-publish == 'true')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -231,7 +238,7 @@ jobs:
 
   pages:
     needs: collect
-    if: success() || (failure() && needs.collect.outputs.landscape-scrubbed == 'true')
+    if: success() || (failure() && needs.collect.outputs.landscape-publish == 'true')
     # A called workflow can never hold more than its caller grants, and this
     # workflow denies everything by default — so the permissions pages.yml needs
     # must be granted here or the run fails before any job starts.

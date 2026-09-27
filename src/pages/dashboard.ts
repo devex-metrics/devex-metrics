@@ -1,4 +1,10 @@
-import type { CiRunSample, LandscapeRepoView, OrgMetrics, RepoMetrics } from "../types.js";
+import type {
+  CiRunSample,
+  LandscapeRepoView,
+  LandscapeRunStatus,
+  OrgMetrics,
+  RepoMetrics,
+} from "../types.js";
 import type { BrandingConfig } from "../config.js";
 import type { RollupRow } from "../history.js";
 import { LARGE_PR_LINES } from "../history.js";
@@ -74,6 +80,8 @@ export interface DashboardExtras {
   datasets?: DatasetNavEntry[];
   /** Opt-in sanitized landscape observations; absent when the feature is disabled. */
   landscape?: LandscapeRepoView[];
+  /** Outcome of the latest landscape scan attempt; a failure marks the data as stale. */
+  landscapeStatus?: LandscapeRunStatus;
 }
 
 const DEFAULT_BRANDING: BrandingConfig = {
@@ -640,7 +648,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
     ${hasCopilotAgentTaskData ? '<div class="card card-chart card-wide"><h2>Agent Tasks by Repository (30&nbsp;d)</h2><canvas id="chartAgentTasks"></canvas></div>' : ""}
   </section>
 
-  ${extras.landscape ? buildLandscapeSection(extras.landscape) : ""}
+  ${extras.landscape ? buildLandscapeSection(extras.landscape, extras.landscapeStatus) : ""}
 
   <section class="repos-section" aria-label="Repositories">
     <div class="repos-toolbar">

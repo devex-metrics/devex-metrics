@@ -261,9 +261,20 @@ selection (now private, unknown visibility or no longer selected), before it
 checks the CLI version; any failure after the scan token is created (CLI
 install or scanner) re-checks the selection with that token; and ingestion
 re-checks the whole prepared selection before it reads the scanner output, so
-a partial or malformed output cannot skip it. The run publishes that removal
-and rebuilds Pages even when it then fails, so those repositories show as
-unknown instead of keeping their old paths online. Earlier commits on the `metrics-data` branch still contain them.
+a partial or malformed output cannot skip it. Those repositories then show as
+unknown instead of keeping their old paths online. Earlier commits on the
+`metrics-data` branch still contain them.
+
+**Failed runs keep the last good data, marked as stale.** When any step of a
+collection run fails with the landscape feature enabled, a final
+`mark-failed` step scrubs repositories outside the current public selection,
+records the failed attempt (time and run link) in `landscape/status.json`, and
+the run still publishes the history store and rebuilds Pages before reporting
+its failure. The dashboard keeps showing the last successful observation for
+repositories that are still public, under a "Stale data" notice that names the
+failed run and the time of the data shown. The next successful scan clears the
+notice. Because the store is published on this path, DevEx history written
+before the failure is published too.
 
 The installation token is scoped to one owner and its selected repos. In user
 mode, the DevEx selection may include public repositories belonging to other
@@ -280,7 +291,8 @@ metrics-data retains public repository file paths, which the file-level
 dashboard displays. A repository-level `403` or `404` from the scanner makes
 the scan step fail before ingestion, so unreadable repos cannot produce
 success-shaped landscape data; the post-failure re-check described above
-scrubs any repository that is no longer public. Within a
+scrubs any repository that is no longer public, and the rest keep their last
+good observation under the stale-data notice. Within a
 scanned repo, each file has a `known` or `unknown` status. If file history is
 unavailable, age, lag and stale are `null`, not zero or healthy; the summary
 reports `unknown_count` and `partial_unknown` status for incomplete coverage.

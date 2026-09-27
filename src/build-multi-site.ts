@@ -4,7 +4,7 @@ import { listDatasetKeys, loadRawCache } from "./cache.js";
 import { generateReport } from "./report.js";
 import { buildDashboardHtml } from "./pages/dashboard.js";
 import { loadConfig } from "./config.js";
-import { loadLandscapeView } from "./landscape.js";
+import { loadLandscapeRunStatus, loadLandscapeView } from "./landscape.js";
 import type { DatasetNavEntry } from "./pages/dashboard.js";
 import type { OrgMetrics } from "./types.js";
 
@@ -126,7 +126,14 @@ function writeDatasetPage(
     ds.data.collectedAt.slice(0, 10),
     branch,
     runUrl,
-    { datasets: nav, landscape }
+    {
+      datasets: nav,
+      landscape,
+      landscapeStatus:
+        landscape && landscapeHistoryDir
+          ? loadLandscapeRunStatus(landscapeHistoryDir, ds.data.owner)
+          : undefined,
+    }
   );
   fs.writeFileSync(path.join(folder, "index.html"), html);
 }
