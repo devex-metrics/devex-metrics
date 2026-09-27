@@ -197,7 +197,7 @@ describe("landscape workflow adapter", () => {
     expect(workflow).toContain("run: node dist/landscape-cli.js recheck");
   });
 
-  it("scrubs stored observations of repos no longer verified public during prepare", () => {
+  it("scrubs stored observations of repos no longer verified public before the version gate", () => {
     const latest = landscapeLatestPath(history, "acme");
     const snapshot = path.join(path.dirname(latest), "snapshots", "old.json");
     const stored = {
@@ -224,7 +224,9 @@ describe("landscape workflow adapter", () => {
     fs.mkdirSync(path.dirname(snapshot), { recursive: true });
     fs.writeFileSync(latest, JSON.stringify(stored));
     fs.writeFileSync(snapshot, JSON.stringify(stored));
-    expect(run("prepare").status).toBe(0);
+    const result = run("prepare", "");
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("exact published OIDC release");
     expect(fs.readFileSync(output, "utf8")).toContain("landscape-scrubbed=true");
     for (const file of [latest, snapshot]) {
       const contents = fs.readFileSync(file, "utf8");

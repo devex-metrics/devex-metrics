@@ -25,13 +25,6 @@ function prepare(): void {
   if (!config.history.enabled) {
     throw new Error("Landscape collection requires the DevEx history store");
   }
-  const version = config.collection.landscapeCliVersion;
-  if (!/^\d+\.\d+\.\d+$/.test(version)) {
-    throw new Error(
-      "Set DEVEX_LANDSCAPE_CLI_VERSION to an exact published OIDC release " +
-        "(for example 0.1.0) before enabling landscape collection"
-    );
-  }
   const historyDir = path.resolve(config.history.dir);
   const metrics = loadLandscapeSelection(historyDir, config.owner);
   const scrubbed = scrubLandscapeOutsideSelection(historyDir, metrics);
@@ -40,6 +33,14 @@ function prepare(): void {
       `Removed ${scrubbed} stored landscape observations for repositories no longer verified public`
     );
     writeOutput("landscape-scrubbed", "true");
+  }
+  // Checked after the scrub, so a bad rollout still publishes that cleanup.
+  const version = config.collection.landscapeCliVersion;
+  if (!/^\d+\.\d+\.\d+$/.test(version)) {
+    throw new Error(
+      "Set DEVEX_LANDSCAPE_CLI_VERSION to an exact published OIDC release " +
+        "(for example 0.1.0) before enabling landscape collection"
+    );
   }
   const repositories = publicLandscapeSelection(metrics)
     .map((repo) => repo.fullName)
@@ -124,27 +125,23 @@ async function ingest(file: string | undefined): Promise<void> {
   if (!file) throw new Error("Usage: landscape-cli ingest <raw-scan.json>");
   const { config, historyDir, metrics } = loadEnabled();
   const token = scanToken();
-  const raw = JSON.parse(fs.readFileSync(path.resolve(file), "utf8")) as unknown;
-  const scanToVerify = validateLandscapeScannerOutput(
-    raw,
-    metrics,
-    config.collection.landscapeStaleAfterDays,
-    config.collection.landscapeCliVersion
-  );
-  // Re-check the whole prepared selection, not just the scan output: a partial
-  // output could omit a repository that has since gone private.
-  const names = new Map(
-    [
-      ...publicLandscapeSelection(metrics).map((repo) => repo.fullName),
-      ...scanToVerify.repositories.map((repo) => repo.full_name),
-    ].map((name) => [name.toLowerCase(), name])
-  );
-  const unverified = await recheckAndScrub(historyDir, metrics.owner, [...names.values()], token);
+  // Re-check the whole prepared selection before reading the scanner output,
+  // so neither a partial nor a malformed output can skip the scrub. Validation
+  // below rejects any repository outside that selection.
+  const names = publicLandscapeSelection(metrics).map((repo) => repo.fullName);
+  const unverified = await recheckAndScrub(historyDir, metrics.owner, names, token);
   if (unverified.length > 0) {
     throw new Error(
       "Landscape repositories are no longer verified public; refusing to persist paths"
     );
   }
+  const raw = JSON.parse(fs.readFileSync(path.resolve(file), "utf8")) as unknown;
+  validateLandscapeScannerOutput(
+    raw,
+    metrics,
+    config.collection.landscapeStaleAfterDays,
+    config.collection.landscapeCliVersion
+  );
   const scan = saveLandscapeScan(historyDir, metrics, raw);
   console.log(
     `Stored sanitized landscape v1 scan (${scan.repositories.length} public repositories)`
