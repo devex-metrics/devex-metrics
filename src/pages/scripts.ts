@@ -1757,10 +1757,10 @@ function compareRows(a,b,by,direction){
   var result;
   if(by==="name")result=repoNameCollator.compare(a.dataset.name,b.dataset.name);
   else if(by==="pushed"){
-    var pa=a.dataset.pushed||"",pb=b.dataset.pushed||"";
-    if(!pa)return pb?1:original;
-    if(!pb)return -1;
-    result=pa.localeCompare(pb);
+    var pa=Date.parse(a.dataset.pushed||""),pb=Date.parse(b.dataset.pushed||"");
+    if(!isFinite(pa))return isFinite(pb)?1:original;
+    if(!isFinite(pb))return -1;
+    result=pa-pb;
   }else result=Number(a.dataset[by]||0)-Number(b.dataset[by]||0);
   return (direction==="descending"?-result:result)||original;
 }
