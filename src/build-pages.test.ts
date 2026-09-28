@@ -1984,6 +1984,30 @@ describe("build-pages · dashboard JS executes", () => {
     );
   });
 
+  it("counts only reviews submitted in the selected period", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as {
+      data: { repos: { reviewerLoad: { reviewer: string; reviews: number; byDay?: Record<string, number> }[] }[] };
+    };
+    for (const repo of cache.data.repos) {
+      for (const entry of repo.reviewerLoad) {
+        // Collected 2026-08-30, so the 30-day window starts 2026-07-31.
+        entry.byDay = entry.reviewer === "amy"
+          ? { "2026-08-20": entry.reviews }
+          : { "2024-01-15": entry.reviews };
+      }
+    }
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+
+    const recent = run("?period=30days");
+    expect(recent.errors).toEqual([]);
+    const note = recent.dom.window.document.getElementById("giniNote")?.textContent ?? "";
+    expect(note).toContain("One reviewer (amy)");
+    expect(note).toContain("the last 30 days");
+
+    const all = run("?period=all");
+    expect(all.dom.window.document.getElementById("giniNote")?.textContent).toContain("2 reviewers");
+  });
+
   it("reports the abandonment rate and the age of open work", () => {
     const { dom, errors } = run("?period=all");
     expect(errors).toEqual([]);

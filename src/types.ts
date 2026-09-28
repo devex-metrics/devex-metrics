@@ -464,6 +464,13 @@ export interface ReviewerLoad {
   reviewer: string;
   /** Reviews submitted across the collected pull requests. */
   reviews: number;
+  /**
+   * The same reviews bucketed by UTC submission day (`YYYY-MM-DD` → count),
+   * so the dashboard can restrict review load to the selected period. Reviews
+   * without a `submittedAt` count toward `reviews` but not here. Absent in
+   * older data.
+   */
+  byDay?: Record<string, number>;
 }
 
 /** Per-repo Copilot adoption summary. */

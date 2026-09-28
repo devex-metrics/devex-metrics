@@ -265,15 +265,25 @@ export function summariseReviews(
  */
 export function countReviewerLoad(nodes: readonly GraphQLPRNode[]): ReviewerLoad[] {
   const counts = new Map<string, number>();
+  const days = new Map<string, Record<string, number>>();
   for (const node of nodes) {
     for (const review of node.reviews?.nodes ?? []) {
       const login = review.author?.login;
       if (!login || review.author?.__typename === "Bot" || isBotLogin(login)) continue;
       counts.set(login, (counts.get(login) ?? 0) + 1);
+      const day = review.submittedAt?.slice(0, 10);
+      if (day) {
+        const byDay = days.get(login) ?? {};
+        byDay[day] = (byDay[day] ?? 0) + 1;
+        days.set(login, byDay);
+      }
     }
   }
   return [...counts.entries()]
-    .map(([reviewer, reviews]) => ({ reviewer, reviews }))
+    .map(([reviewer, reviews]): ReviewerLoad => {
+      const byDay = days.get(reviewer);
+      return byDay ? { reviewer, reviews, byDay } : { reviewer, reviews };
+    })
     .sort((a, b) => b.reviews - a.reviews || a.reviewer.localeCompare(b.reviewer));
 }
 
