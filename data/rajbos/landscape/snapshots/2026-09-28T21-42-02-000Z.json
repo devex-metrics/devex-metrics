@@ -1,0 +1,3207 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-28T21:42:02.000Z",
+  "scanner_version": "0.1.1",
+  "repositories": [
+    {
+      "full_name": "rajbos/.github",
+      "head_sha": "035b6f38db82ef0e67c0e0ebdf4643ac29d82d57",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/acp-editor-demo",
+      "head_sha": "82b18f787c3c04f894e5ffe8ea70645fb45192a4",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/actions-load-test",
+      "head_sha": "f2ffb9bf250c9e72ed066aab111e0ae1d33ec7e0",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/actions-marketplace",
+      "head_sha": "49ec0b335d782483487a2586573d7430f636a7dd",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/actions-marketplace-checks",
+      "head_sha": "71e8f85f6589cc010d9464e3cdbeb6b96d58e96f",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "9a64a475bbcbd7007f47e03817a6f01e7cfd135de818babd95173e0d42f726f5",
+          "last_changed": "2026-01-10T16:47:40.000Z",
+          "age_days": 261,
+          "lag_days": 253,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/instructions/api-upsert.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "0ab5f5cd5f4db8e214cb7b40cba116cde97c3c9aade5f59a6342253c07d291f7",
+          "last_changed": "2026-01-05T19:29:08.000Z",
+          "age_days": 266,
+          "lag_days": 258,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/instructions/github-actions.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "e6fe65e7131f451897e7d81b458fc93552b4fc9f5c277646a93e3ea56f2224d3",
+          "last_changed": "2026-02-15T14:52:04.000Z",
+          "age_days": 225,
+          "lag_days": 217,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "4aef1f21ab17faa6b30da4d3927fc92a2f8f8b401fd8f7454e4a8170d6eff51f",
+          "last_changed": "2026-05-23T13:05:53.000Z",
+          "age_days": 128,
+          "lag_days": 120,
+          "stale": true,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 4,
+        "stale_count": 4,
+        "max_lag_days": 258,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/actions-permissions",
+      "head_sha": "99a2a345e1797ce4900f62f0c39bb5a29c9c2735",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/actions-testing",
+      "head_sha": "fea030e694f8655b37c5ffca75fa5902917906d8",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/actions-testing-grounds",
+      "head_sha": "c0c86b94e8af4961f11932d3a6df71de1c78e203",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/actions-usage",
+      "head_sha": "db50b380df3f7960e86bd76684fb366506e92a5b",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/ai-engineering-fluency",
+      "head_sha": "a965abfb4353bbd3ec8c5696ee561fdae3abc904",
+      "ai_files": [
+        {
+          "path": ".claude/agents/architecture-expert.md",
+          "kind": "tool_config",
+          "sha256": "2ee48d49876684f7c23d19e1a1e50e78c309ae104173cb0ff9e2c650a5b048a4",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/agents/code-quality-review.md",
+          "kind": "tool_config",
+          "sha256": "2e128e2583fe5e880be31ece8a5e49dd222d9bcd7a171ab18e0826c31ec9deed",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/agents/improve-mutation-score.md",
+          "kind": "tool_config",
+          "sha256": "7b7bcd80271f169c94df19a3e9e52a5013c4462f5f4dc15a368b8ea2fc36f2f5",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/agents/new-editor-support.md",
+          "kind": "tool_config",
+          "sha256": "861a81cde28e1f62a20c37080e5880c0ebb7e467f75e31b8798111be918a6e70",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/agents/performance-expert.md",
+          "kind": "tool_config",
+          "sha256": "340329ee8b836dc750c3dba4ade045226c00913caee7f8d4415f7c1e392c9d69",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/agents/prep-release.md",
+          "kind": "tool_config",
+          "sha256": "d8bd655655ddde0c9387898f95c0c2f336aa62be4a463d8fab7f402901bfb8e0",
+          "last_changed": "2026-09-28T12:16:58.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/agents/product-owner.md",
+          "kind": "tool_config",
+          "sha256": "f4c72379067557af1818d634ea3edc30aea2866ca4c2e859321d7543849fd4a4",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/agents/refactor-large-function.md",
+          "kind": "tool_config",
+          "sha256": "c57eb92854e11574ea74a22acea917fa8ce2e8b02baddf2374f27ae7df6af04c",
+          "last_changed": "2026-07-06T12:11:33.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/agents/refactor.md",
+          "kind": "tool_config",
+          "sha256": "571f5f50c36247b0371fd707dc33db758d92ca46847eb11caf22eeb43e75a495",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/agents/repo-health-scan.md",
+          "kind": "tool_config",
+          "sha256": "e7f7e108533a2f009344f9f36e471484d9aa5e2d224d4660a276c74d433e66ee",
+          "last_changed": "2026-09-28T18:06:52.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/agents/test-expert.md",
+          "kind": "tool_config",
+          "sha256": "4dc49be6c3833d6fc2875897bf00b1f1755dfd5cd832f4c7bac9a465979882f1",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/agents/tool-names.md",
+          "kind": "tool_config",
+          "sha256": "f7e201bfa60a052c2558de9738bee4804a0154f4ed1f331f06217e3142ecc6b5",
+          "last_changed": "2026-09-01T19:21:32.000Z",
+          "age_days": 27,
+          "lag_days": 27,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/settings.local.json",
+          "kind": "tool_config",
+          "sha256": "72b23bc90795e423c94ea65feb517d9955dc48cb0dd927af865346ca7fd9d813",
+          "last_changed": "2026-07-06T13:57:06.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/azure-storage-loader/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "141d3af083ede986efa6325a818a3cd6d7a6545a589ba8a670188e910bfe4dbe",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/check-urls/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "a694eff42b4061b32f3c0bb894ff4b912563694d69dc280d6be9e7c543f911d4",
+          "last_changed": "2026-09-01T19:21:32.000Z",
+          "age_days": 27,
+          "lag_days": 27,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/copilot-log-analysis/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "0e30a1bf1f515fdbe9d2601c0f8bd4b75638c5d0bc933b04445e8aec27438e55",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/deduplicate-code/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "7c5c4a142462e8640b8e783f42ecdd87d5acdf86ff761f6957ca32edccd1f29b",
+          "last_changed": "2026-09-12T08:27:54.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/discover-debug-log-schema/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "0d90ff7f70dbcbea34ea2c030069239802fc3af1046c3622f14c6fc9fd3d2b02",
+          "last_changed": "2026-09-03T21:02:54.000Z",
+          "age_days": 25,
+          "lag_days": 25,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/improve-tool-families/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "ad41fba614d395c634bc8bf65140bdfab72223d4854f6ed12da6e3404f5d8e5c",
+          "last_changed": "2026-09-01T16:19:27.000Z",
+          "age_days": 27,
+          "lag_days": 27,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/load-cache-data/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "16ed156b47549403ff0bcd4365e4768f97e808a74eae2f1d6347c20e23449dbc",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/pr-review-readiness/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "f0004fc207cc614aa304f9d481576b9a33c1f0c4f4fb54b345396a47660f1249",
+          "last_changed": "2026-09-17T11:41:57.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/pr-risk-review/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "9291ad360938d12895a3116d71753f8fef3c48cdb46c8f5d132511eaf58a39bb",
+          "last_changed": "2026-08-29T14:31:46.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/refactor-large-function/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "0c717870aae45ae56ec3da81c4e8b0cee842066e3ed6db6df94959be283e4bba",
+          "last_changed": "2026-07-06T12:11:33.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/refresh-json-data/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "917fa9442f707c7460a84c11da2b08707d753c5c8f072cf4ce4d3a0aea5415bb",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/scan-hardcoded-strings/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "dcc53a81282352530ffed760fed0b9776dda9dd6c21ecb1e7984c25c9b31d678",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/session-log-data/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "d1e037ee0dcca350f97102c9255dddf42ee2c9327ecd3c2a9653062155b096dc",
+          "last_changed": "2026-09-14T14:55:16.000Z",
+          "age_days": 14,
+          "lag_days": 14,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/sync-host-views/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "9b0d7d7f2e858a34f0a4cda1d9e29d10498104e834e33cf70d4e7e1facf091af",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/validate-app-db-schema/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "57db660b4ed88e830c239b2b7c3901da431ecad1ce4020fd23a17dd38d3eeecd",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/validate-editor-names/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "2fed819171ac3899364fc61008bd194ce7c698b990c255a398385eaf572dcf20",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/validate-model-pricing/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "6b1be476701ea21b40fe6c242c51b1cd08b04a491cd396475122666affac115c",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/validate-session-schemas/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "4c566281f6d7dcc091f596188546a5c5ef716ab623c08b5e052bb72e1311bf04",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/visual-view-diff/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "4b242282d4740b1c3a776e8c4394a2c1ca95f396f2a052fd8a4ede074fe2b0ee",
+          "last_changed": "2026-09-25T13:21:47.000Z",
+          "age_days": 3,
+          "lag_days": 3,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/whats-new-catalog/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "abad067810a485a293236fb8e0b901c304d9b7efeb14a67a96fe0ce37a4ebf0f",
+          "last_changed": "2026-09-07T20:27:55.000Z",
+          "age_days": 21,
+          "lag_days": 21,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/architecture-expert.agent.md",
+          "kind": "agent",
+          "sha256": "149969d8b7ca84807ed31cd3e9616cd7803ee18732daaab68371380312a3a1eb",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/code-quality-review.agent.md",
+          "kind": "agent",
+          "sha256": "1ce1d11fddad0badc765863adfec1d2dbf30cc49734644955b393286211c50dc",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/improve-mutation-score.agent.md",
+          "kind": "agent",
+          "sha256": "201714451bf08cd42c5ed64736cfd1c0c77d461b8ee594ff8669944104cc9fb8",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/new-editor-support.agent.md",
+          "kind": "agent",
+          "sha256": "6249c2648c22d7e0c4afc3986ff4836b444aacbad2b370e565fea38c58568b1f",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/performance-expert.agent.md",
+          "kind": "agent",
+          "sha256": "a86da6710da8d91ca56b3c98e99ef4def208ba6d941668432a2f6a76c0b978de",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/prep-release.agent.md",
+          "kind": "agent",
+          "sha256": "7f78a7da4f49d03b043951d0ff1123e76be3a2f64a2c2adeb7c1bc73eaf8a32f",
+          "last_changed": "2026-09-28T12:16:58.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/product-owner.agent.md",
+          "kind": "agent",
+          "sha256": "1677a1bcf6ec91ff69c2c46b935e98c2f0842193f8567f964f84c81a185ee2dc",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/refactor-large-function.agent.md",
+          "kind": "agent",
+          "sha256": "0367fcaa3eda8069f6ccee35068511500b7ff994d40d9d86be3a63f33791ae97",
+          "last_changed": "2026-05-17T08:33:32.000Z",
+          "age_days": 134,
+          "lag_days": 134,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/refactor.agent.md",
+          "kind": "agent",
+          "sha256": "099c10afa1e4e2bcfd3007f483a9bcec2c2a900f7df48464f0724a6b32a2a068",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/repo-health-scan.agent.md",
+          "kind": "agent",
+          "sha256": "9b0ecdb82c9394df211eb844c09c574e6be0365846723967139bfa0235479442",
+          "last_changed": "2026-09-28T18:06:52.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/test-expert.agent.md",
+          "kind": "agent",
+          "sha256": "5c2d07c1dd7b882a2c5ec204b135efdc973395cce984cceff5f6a77185a3d5e1",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/tool-names.agent.md",
+          "kind": "agent",
+          "sha256": "44b1d5cfda30967d7400b7dd08163fcb8d7fb4b03a4124adf852129b78cf3d76",
+          "last_changed": "2026-09-01T19:21:32.000Z",
+          "age_days": 27,
+          "lag_days": 27,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "c4d1c2604f687cc2bd16c777560c13081fd8f5ade2b873391f5975acedeea321",
+          "last_changed": "2026-09-01T09:48:41.000Z",
+          "age_days": 27,
+          "lag_days": 27,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/instructions/cli.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "e90494b1df4bba98d784ddb0d681b9b050b5a8f4ce20bde1f783aa46a6ef5e7d",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/instructions/jetbrains-plugin.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "5c9683387971c0bdedfee3ff906dd9969161d94fe86d652f385da2e11acf0680",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/instructions/sharing-server.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "57f9bb6bd21d41610df05b8dfd2ce28c3309186f894f325995d672cef4dad563",
+          "last_changed": "2026-09-07T09:40:00.000Z",
+          "age_days": 21,
+          "lag_days": 21,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/instructions/visualstudio-extension.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "de34fc77a06fa8436d73c4040b32bef3669a7701de2b47421ef3fd181ff7d361",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/instructions/vscode-extension.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "5f960048bcd1eba4764cefeabcfa6a6049553cb2beb03f417fc0e26b55c76de4",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/instructions/workflows.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "0596b1488f11fb72412f8cdfb5467b54386dc5100bfc624e400d0ff327e4999b",
+          "last_changed": "2026-05-09T11:34:39.000Z",
+          "age_days": 142,
+          "lag_days": 142,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/prompts/improve-mutation-score.prompt.md",
+          "kind": "prompt",
+          "sha256": "721db13d57c186e98b30279052fa5505d73bbfe87b144f830855beb980074a28",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/prompts/pr-risk-review.prompt.md",
+          "kind": "prompt",
+          "sha256": "dc624c8dbd93cd20510f5c64482581b2ddadfd5f20ce286069b99012e16939ae",
+          "last_changed": "2026-08-29T14:31:46.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/prompts/refactor-large-function.prompt.md",
+          "kind": "prompt",
+          "sha256": "7238f1a86ff6314fee6f5920fd1f24560b023794668ebf337a7c17deac30da8f",
+          "last_changed": "2026-05-16T19:12:37.000Z",
+          "age_days": 135,
+          "lag_days": 135,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/prompts/sync-automatic-tools.prompt.md",
+          "kind": "prompt",
+          "sha256": "c002492f1587c318b1168c8f13e862ffd8c6378111a22e0aa7eee1b056ea4883",
+          "last_changed": "2026-04-21T18:34:44.000Z",
+          "age_days": 160,
+          "lag_days": 160,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/prompts/sync-toolnames.prompt.md",
+          "kind": "prompt",
+          "sha256": "26d6e02669df9614b074ed902aff68c75a94719a1af74a5028d010fdf1876f6d",
+          "last_changed": "2026-07-20T11:21:49.000Z",
+          "age_days": 70,
+          "lag_days": 70,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/.gitignore",
+          "kind": "skill",
+          "sha256": "aa9a3b93558793e98a67a2b325961847f0b190db552bd2a2cd7e7ce092188ef6",
+          "last_changed": "2026-01-30T19:33:02.000Z",
+          "age_days": 241,
+          "lag_days": 241,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/example-usage.js",
+          "kind": "skill",
+          "sha256": "198d9928808e7206868e1707394771f5658a1cb71d7b9550b81e88894455a861",
+          "last_changed": "2026-07-30T17:18:06.000Z",
+          "age_days": 60,
+          "lag_days": 60,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/load-table-data.js",
+          "kind": "skill",
+          "sha256": "59b43585e1aa747da579c27c54deac36da3a4ddae703e2a1443f44bad52d4697",
+          "last_changed": "2026-01-31T17:38:02.000Z",
+          "age_days": 240,
+          "lag_days": 240,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/package-lock.json",
+          "kind": "skill",
+          "sha256": "085e898045f2350a51d9641421ad2eee86675843487ade127b5965e66b3cdd31",
+          "last_changed": "2026-05-08T18:33:03.000Z",
+          "age_days": 143,
+          "lag_days": 143,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/package.json",
+          "kind": "skill",
+          "sha256": "c4dea0ecee93e6cf557b164765a005de548bc72eec8c9d8f05cce200c5a1905a",
+          "last_changed": "2026-04-24T20:17:17.000Z",
+          "age_days": 157,
+          "lag_days": 157,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/README.md",
+          "kind": "skill",
+          "sha256": "81f5d11d4a6d0f1277e1231372bb917b68e7bb62e50d4f8ad95e963101150ea4",
+          "last_changed": "2026-01-30T19:34:04.000Z",
+          "age_days": 241,
+          "lag_days": 241,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/SKILL.md",
+          "kind": "skill",
+          "sha256": "141d3af083ede986efa6325a818a3cd6d7a6545a589ba8a670188e910bfe4dbe",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/check-urls/check-urls.js",
+          "kind": "skill",
+          "sha256": "9e7b85e1925c7affbd26e4cf59eb2c88827c5231ede17809a613e409ab86a71b",
+          "last_changed": "2026-03-18T20:49:04.000Z",
+          "age_days": 194,
+          "lag_days": 194,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/check-urls/README.md",
+          "kind": "skill",
+          "sha256": "9f08343912294d6fbe2d2762033de1dfb8792c7d57f90652066358efabb7546a",
+          "last_changed": "2026-03-18T20:49:04.000Z",
+          "age_days": 194,
+          "lag_days": 194,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/check-urls/SKILL.md",
+          "kind": "skill",
+          "sha256": "a694eff42b4061b32f3c0bb894ff4b912563694d69dc280d6be9e7c543f911d4",
+          "last_changed": "2026-09-01T19:21:32.000Z",
+          "age_days": 27,
+          "lag_days": 27,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/copilot-log-analysis/analyze-session-schema.ps1",
+          "kind": "skill",
+          "sha256": "2b7d891484d4907fea59cb6521e0e4a4c58ed6c359a0be455f19990bd87bde57",
+          "last_changed": "2026-02-22T19:41:00.000Z",
+          "age_days": 218,
+          "lag_days": 218,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/copilot-log-analysis/diagnose-session-files.js",
+          "kind": "skill",
+          "sha256": "4dfb122d6b1fe3504235c2b4243112fac9ce2cda133fad8b872f72dc269e419e",
+          "last_changed": "2026-02-22T19:41:00.000Z",
+          "age_days": 218,
+          "lag_days": 218,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/copilot-log-analysis/evals/evals.json",
+          "kind": "skill",
+          "sha256": "484e83954ecf67603fe3c5a96a93cbf2e0ec57bfdb7d815c497e3c23cecc6a2d",
+          "last_changed": "2026-08-31T15:56:25.000Z",
+          "age_days": 28,
+          "lag_days": 28,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/copilot-log-analysis/get-session-files.js",
+          "kind": "skill",
+          "sha256": "d606070b366ff9aa941bcf634bb07463a06aaec6b61744251d661c688018a14b",
+          "last_changed": "2026-01-16T16:55:23.000Z",
+          "age_days": 255,
+          "lag_days": 255,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/copilot-log-analysis/session-file-discovery.js",
+          "kind": "skill",
+          "sha256": "05a5dd085dfbe8a89cc258538b032328bf3f33ba06d588a757c6fed63e1a98ac",
+          "last_changed": "2026-05-15T21:13:04.000Z",
+          "age_days": 136,
+          "lag_days": 136,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/copilot-log-analysis/SKILL.md",
+          "kind": "skill",
+          "sha256": "0e30a1bf1f515fdbe9d2601c0f8bd4b75638c5d0bc933b04445e8aec27438e55",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/deduplicate-code/SKILL.md",
+          "kind": "skill",
+          "sha256": "7c5c4a142462e8640b8e783f42ecdd87d5acdf86ff761f6957ca32edccd1f29b",
+          "last_changed": "2026-09-12T08:27:54.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/discover-debug-log-schema/discover-debug-log-schema.js",
+          "kind": "skill",
+          "sha256": "cb7f4bac4c3abe93225eaca47c9bf3a415c719901a5f5fdfa7e626b0cf7aaf4e",
+          "last_changed": "2026-09-03T21:02:54.000Z",
+          "age_days": 25,
+          "lag_days": 25,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/discover-debug-log-schema/SKILL.md",
+          "kind": "skill",
+          "sha256": "0d90ff7f70dbcbea34ea2c030069239802fc3af1046c3622f14c6fc9fd3d2b02",
+          "last_changed": "2026-09-03T21:02:54.000Z",
+          "age_days": 25,
+          "lag_days": 25,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/improve-tool-families/analyze-tool-families.js",
+          "kind": "skill",
+          "sha256": "5a07761f49af937eba26392c7c3c07a1e1dbab18abfa22cc08fdb722046a7bc8",
+          "last_changed": "2026-07-27T09:44:51.000Z",
+          "age_days": 63,
+          "lag_days": 63,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/improve-tool-families/SKILL.md",
+          "kind": "skill",
+          "sha256": "ad41fba614d395c634bc8bf65140bdfab72223d4854f6ed12da6e3404f5d8e5c",
+          "last_changed": "2026-09-01T16:19:27.000Z",
+          "age_days": 27,
+          "lag_days": 27,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/load-cache-data/load-cache-data.js",
+          "kind": "skill",
+          "sha256": "2c0326559e1c5d8474f3b5b1b856fff8151f44f5229ff948ea20cc1f5018bb28",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/load-cache-data/README.md",
+          "kind": "skill",
+          "sha256": "e8bad7f9e6138d2860ebac6fa270b44ddf6da6bbcb707b486802c7ca5f508f19",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/load-cache-data/SKILL.md",
+          "kind": "skill",
+          "sha256": "16ed156b47549403ff0bcd4365e4768f97e808a74eae2f1d6347c20e23449dbc",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/pr-review-readiness/SKILL.md",
+          "kind": "skill",
+          "sha256": "f0004fc207cc614aa304f9d481576b9a33c1f0c4f4fb54b345396a47660f1249",
+          "last_changed": "2026-09-17T11:41:57.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/pr-risk-review/collect-changeset.js",
+          "kind": "skill",
+          "sha256": "8e34d50bef4d22e79fcbe84319e0e89e9e0c29640bfc6da414ae12d63b769cde",
+          "last_changed": "2026-08-29T14:31:46.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/pr-risk-review/README.md",
+          "kind": "skill",
+          "sha256": "9d46abf3d175e08e6118d41ca457306a6241677a4ed8a7fa0bfc3dd84aad0534",
+          "last_changed": "2026-08-29T14:31:46.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/pr-risk-review/render-comment.js",
+          "kind": "skill",
+          "sha256": "20c58aa938bbc9e8b5ab5fc89ff87b10f1c0be567b49bb4fa49e3aada00fc970",
+          "last_changed": "2026-08-29T14:31:46.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/pr-risk-review/risk-signals.json",
+          "kind": "skill",
+          "sha256": "b3d4faf0603925511b464f1e12cbb998901518e079e90e431416adf60ab0277c",
+          "last_changed": "2026-08-29T14:31:46.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/pr-risk-review/SKILL.md",
+          "kind": "skill",
+          "sha256": "9291ad360938d12895a3116d71753f8fef3c48cdb46c8f5d132511eaf58a39bb",
+          "last_changed": "2026-08-29T14:31:46.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/README.md",
+          "kind": "skill",
+          "sha256": "49c07449c20cb0f6849c45948787027e6e5a0204705c883e1aa9836141021388",
+          "last_changed": "2026-09-17T15:19:44.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/refactor-large-function/SKILL.md",
+          "kind": "skill",
+          "sha256": "0c717870aae45ae56ec3da81c4e8b0cee842066e3ed6db6df94959be283e4bba",
+          "last_changed": "2026-05-17T10:25:11.000Z",
+          "age_days": 134,
+          "lag_days": 134,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/refresh-json-data/README.md",
+          "kind": "skill",
+          "sha256": "21d87c6e2077327e9cdd76784c88ad4527d8adfca0d72ace3909b82a85bcf6d8",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/refresh-json-data/SKILL.md",
+          "kind": "skill",
+          "sha256": "917fa9442f707c7460a84c11da2b08707d753c5c8f072cf4ce4d3a0aea5415bb",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/refresh-json-data/validate-json.js",
+          "kind": "skill",
+          "sha256": "54b4c081512a44e47db85934f5526d354f65f2a4563d2011c455f76496024fde",
+          "last_changed": "2026-01-16T10:55:09.000Z",
+          "age_days": 255,
+          "lag_days": 255,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/scan-hardcoded-strings/README.md",
+          "kind": "skill",
+          "sha256": "9882d9948b0f0550418cf8ee07b3968bdc69639bfe6debbd7972e22e3a9095d7",
+          "last_changed": "2026-09-12T18:14:43.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/scan-hardcoded-strings/scan-hardcoded-strings.js",
+          "kind": "skill",
+          "sha256": "a5fb29ad2e6bb388a73314b52610accf9797f563456682ec4621c0817d7ab189",
+          "last_changed": "2026-09-12T18:14:43.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/scan-hardcoded-strings/scan-hardcoded-strings.test.js",
+          "kind": "skill",
+          "sha256": "ed9bbb49ff0187fb65536fefb6f923a7b3c7ea8af83ce1b9536c9d2041c2be4f",
+          "last_changed": "2026-09-12T18:14:43.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/scan-hardcoded-strings/SKILL.md",
+          "kind": "skill",
+          "sha256": "dcc53a81282352530ffed760fed0b9776dda9dd6c21ecb1e7984c25c9b31d678",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/session-log-data/evals/evals.json",
+          "kind": "skill",
+          "sha256": "080e4962f0fd4130346855ccbb0053ce642688eb395d8a479f5abe5613980fd6",
+          "last_changed": "2026-08-31T15:56:25.000Z",
+          "age_days": 28,
+          "lag_days": 28,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/session-log-data/SKILL.md",
+          "kind": "skill",
+          "sha256": "d1e037ee0dcca350f97102c9255dddf42ee2c9327ecd3c2a9653062155b096dc",
+          "last_changed": "2026-09-14T14:55:16.000Z",
+          "age_days": 14,
+          "lag_days": 14,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/sync-host-views/SKILL.md",
+          "kind": "skill",
+          "sha256": "9b0d7d7f2e858a34f0a4cda1d9e29d10498104e834e33cf70d4e7e1facf091af",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/sync-host-views/sync-host-views.js",
+          "kind": "skill",
+          "sha256": "4453ae9db9f43d3b7460f6f9ad87faa465f8bea2aa4a2f0c786596535e5f5b40",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/validate-app-db-schema/SKILL.md",
+          "kind": "skill",
+          "sha256": "57db660b4ed88e830c239b2b7c3901da431ecad1ce4020fd23a17dd38d3eeecd",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/validate-app-db-schema/validate-schema.js",
+          "kind": "skill",
+          "sha256": "d97a2abc82a72a1f8b75004f078b587ccc12d162e98729d8c1cd33b7c6181b48",
+          "last_changed": "2026-05-29T22:45:02.000Z",
+          "age_days": 121,
+          "lag_days": 121,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/validate-editor-names/SKILL.md",
+          "kind": "skill",
+          "sha256": "2fed819171ac3899364fc61008bd194ce7c698b990c255a398385eaf572dcf20",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/validate-editor-names/validate-editor-names.js",
+          "kind": "skill",
+          "sha256": "1ec7816bb3ce87f51cf49331f59b25965f28843d2d00c885ecde64166689ea08",
+          "last_changed": "2026-09-28T20:02:11.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/validate-model-pricing/SKILL.md",
+          "kind": "skill",
+          "sha256": "6b1be476701ea21b40fe6c242c51b1cd08b04a491cd396475122666affac115c",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/validate-model-pricing/validate-model-pricing.js",
+          "kind": "skill",
+          "sha256": "00d1377ae414eb12956c81a5a4e15850227839f53e6c6c4eccbedd56b7b08bd0",
+          "last_changed": "2026-09-28T20:02:11.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/validate-session-schemas/schema-baselines.json",
+          "kind": "skill",
+          "sha256": "366283951903dc34260a037829f3eb1ae9baeb8aeb76167b464729f19c57517c",
+          "last_changed": "2026-06-21T09:52:40.000Z",
+          "age_days": 99,
+          "lag_days": 99,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/validate-session-schemas/SKILL.md",
+          "kind": "skill",
+          "sha256": "4c566281f6d7dcc091f596188546a5c5ef716ab623c08b5e052bb72e1311bf04",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/validate-session-schemas/validate-session-schemas.js",
+          "kind": "skill",
+          "sha256": "c18c4da7f4a7c526b4b4eb081028cb6f7fff7faeb70448f0435cbc5184343971",
+          "last_changed": "2026-07-30T17:18:06.000Z",
+          "age_days": 60,
+          "lag_days": 60,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/diff-screenshots.js",
+          "kind": "skill",
+          "sha256": "fb3b5b9b6918dace101a737c8d1384b886670a0c6347ea1271550987ccab2b18",
+          "last_changed": "2026-09-17T15:19:44.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/chart.json",
+          "kind": "skill",
+          "sha256": "59e49c9aad9f7376848d99101ce153b602eceff94430779edee34e47f44729ca",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/dashboard.json",
+          "kind": "skill",
+          "sha256": "3762235098387ed83439d38fedbf476d53e5e0b83f5cb340788901b647e9dcb0",
+          "last_changed": "2026-09-25T13:21:47.000Z",
+          "age_days": 3,
+          "lag_days": 3,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/details.json",
+          "kind": "skill",
+          "sha256": "ec9caab65e69c112c7d45902353c25c5bb033b35b24fbce4670317918157aa8f",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/diagnostics.json",
+          "kind": "skill",
+          "sha256": "e53462a0bf74adfcfdc6f8e44c66b46cc6e6aafa0b87f25686ff3d9f385f4816",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/efficiency.json",
+          "kind": "skill",
+          "sha256": "369fd43aa4fcbda1758311ae4b10c52b0d37e3dab307c4b51e5ad75d891834a5",
+          "last_changed": "2026-09-17T15:19:44.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/environmental.json",
+          "kind": "skill",
+          "sha256": "7db633ca387a4eeb3e86f68a793b8a8d0aac348e0cd106880102510c8b9178f4",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/fluency-level-viewer.json",
+          "kind": "skill",
+          "sha256": "8e476645a53842efef7cce0c76bf8ef2ddb05c835127fb876ee3870510709266",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/logviewer.json",
+          "kind": "skill",
+          "sha256": "7e78fdd9b21f5a795f71dd89a54bcf4d560654d0abdde9b9da6c61e4b58f4371",
+          "last_changed": "2026-09-12T19:22:10.000Z",
+          "age_days": 16,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/maturity.json",
+          "kind": "skill",
+          "sha256": "ccc0505393b4f617e442e58ba1f89f1e77b530af1165e6f4dc11f68c0a4bab45",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/usage.json",
+          "kind": "skill",
+          "sha256": "f4eecda742d357d83b55749a63ab42ab58c83db403099e33737921dd3b931793",
+          "last_changed": "2026-09-25T13:08:59.000Z",
+          "age_days": 3,
+          "lag_days": 3,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/whatsnew.json",
+          "kind": "skill",
+          "sha256": "4a2ca001ff4f2c5f3ccac12cef3e6e3480af3121b421210a5ef1f19f894cb290",
+          "last_changed": "2026-09-18T16:22:49.000Z",
+          "age_days": 10,
+          "lag_days": 10,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/browser.js",
+          "kind": "skill",
+          "sha256": "e5e982023bbc88462973f93f577153101341c7e4f36c04d725e74024d90b22b5",
+          "last_changed": "2026-09-07T08:02:21.000Z",
+          "age_days": 21,
+          "lag_days": 21,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/config.js",
+          "kind": "skill",
+          "sha256": "e543a6ea088d30baea5c3bf0e69aac9172f5780e1d5bb8ee6f6f78828e194b3a",
+          "last_changed": "2026-09-25T13:21:47.000Z",
+          "age_days": 3,
+          "lag_days": 3,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/harness.js",
+          "kind": "skill",
+          "sha256": "5f2a07f7faf486d072a73e4753fbe95021b38bde1e06a94033eadf7dba59adbb",
+          "last_changed": "2026-09-25T13:21:47.000Z",
+          "age_days": 3,
+          "lag_days": 3,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/imageDiff.js",
+          "kind": "skill",
+          "sha256": "4bcfdc04db549f42451c5f982ceb2f20b9e2877ed1808cacf68ffedde549d630",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/report.js",
+          "kind": "skill",
+          "sha256": "fc8268de18b9d8b40eb0e4371fcdc2842c05bf82c11da315d4e59c8f017603e5",
+          "last_changed": "2026-09-17T15:19:44.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/steps.js",
+          "kind": "skill",
+          "sha256": "d3f05c5c73fc5fc315d9db9bfef49a01d19461efbaa8dd0debd1cb7287a2c497",
+          "last_changed": "2026-09-17T15:19:44.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/theme-dark.css",
+          "kind": "skill",
+          "sha256": "9487377576103ac00e9ddfaa16b8cc77c0839cc749be3ccefb48bcb940919f20",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/theme-light.css",
+          "kind": "skill",
+          "sha256": "4f4a97396ef580f86bb69e58ea418f0501e92a3e9b27a90e4c95dc12fc06605e",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 30,
+          "lag_days": 30,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/README.md",
+          "kind": "skill",
+          "sha256": "816c39d1a3d03a13a70a9815993354749c5d74269df2d45bafb788efd04bb788",
+          "last_changed": "2026-09-25T13:21:47.000Z",
+          "age_days": 3,
+          "lag_days": 3,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/render-views.js",
+          "kind": "skill",
+          "sha256": "3f8fde372025ab6bd5f85cd507dd86a57833bdefd0c645bfff09307f22ad7a0f",
+          "last_changed": "2026-09-25T13:21:47.000Z",
+          "age_days": 3,
+          "lag_days": 3,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/SKILL.md",
+          "kind": "skill",
+          "sha256": "4b242282d4740b1c3a776e8c4394a2c1ca95f396f2a052fd8a4ede074fe2b0ee",
+          "last_changed": "2026-09-25T13:21:47.000Z",
+          "age_days": 3,
+          "lag_days": 3,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/views.config.json",
+          "kind": "skill",
+          "sha256": "e523a3dcf705b70b70a7b5aff74a14aa7098bd4257c146fe35d920b9c38ceffc",
+          "last_changed": "2026-09-25T13:21:47.000Z",
+          "age_days": 3,
+          "lag_days": 3,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/visual-view-diff/visual-diff.js",
+          "kind": "skill",
+          "sha256": "9e9f24453d4f7683e98578d66decf38a50f733496e538730006fa610f81579c6",
+          "last_changed": "2026-09-17T15:19:44.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/whats-new-catalog/SKILL.md",
+          "kind": "skill",
+          "sha256": "abad067810a485a293236fb8e0b901c304d9b7efeb14a67a96fe0ce37a4ebf0f",
+          "last_changed": "2026-09-07T20:27:55.000Z",
+          "age_days": 21,
+          "lag_days": 21,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/whats-new-catalog/whats-new-catalog.js",
+          "kind": "skill",
+          "sha256": "a5a62061e6b6517f2918b354bdc344ab2d917646151a69590fee4e3266cae5b5",
+          "last_changed": "2026-09-19T20:00:17.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "fa0923b145f29a74449d09ba47f3a930e96a81a1bac9501aa635d86567646917",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": "CLAUDE.md",
+          "kind": "claude",
+          "sha256": "7e6ee72a2db7f947e750f7ffc58e8d5fc7c942dab6694d644f99b9091ed75f4d",
+          "last_changed": "2026-09-07T09:40:00.000Z",
+          "age_days": 21,
+          "lag_days": 21,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": "sharing-server/AGENTS.md",
+          "kind": "agents",
+          "sha256": "d161097cee3b03dbeaaeb8a222e84d6d3e47707eaf711b9ee3f5e86095eb5668",
+          "last_changed": "2026-09-07T09:40:00.000Z",
+          "age_days": 21,
+          "lag_days": 21,
+          "stale": false,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 139,
+        "stale_count": 19,
+        "max_lag_days": 255,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/authority-contribution-scraper",
+      "head_sha": "1575ec9df99f7315e51a2daf44802a1bb073261f",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/azure-openai-service-proxy",
+      "head_sha": "a99fe303857f05e1e5dfb3d6c7c14394ac281641",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/Azure-scripts",
+      "head_sha": "89ac4520a17225d65ddd562d09c6d220d9da4a8f",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/centralPackageVersioningSample",
+      "head_sha": "e5e2fd314aba50a520f52621228d7f35c064fa4c",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/check-dependabot",
+      "head_sha": "349d265d40521d161ad54237b4e022b382335586",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/CleanupCopilotLicenses",
+      "head_sha": "098d72c6b3193d31482688f66b44cc4d1993a268",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/cli",
+      "head_sha": "c024e856dbf6323c04d0a642eb099c4b7634fed3",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/codespaces-models",
+      "head_sha": "ad17d151aa08707f7ea68a00f5a9ee2a6ba7d4f4",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/CodeToCloud-Student",
+      "head_sha": "a849006880dd2aa379a21ed8d175e39b09546dea",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/container-scan",
+      "head_sha": "1f8a3ee73316d6d494b274e97d6a904fe464443d",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/continuous-compliance-action",
+      "head_sha": "56bb06eb0ef5e0cbcb0f1ee3af3f5c57762537a9",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/Copilot-App-demo",
+      "head_sha": "2b7cc14f811e927cefd119e2df7a7ed0896ed39c",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/copilot-custom-agents",
+      "head_sha": "e2965ae2efde5c00ab6c74b2204540d6751f2975",
+      "ai_files": [
+        {
+          "path": ".github/agents/my-agent.agent.md",
+          "kind": "agent",
+          "sha256": "f8568db6fdab87edfe84dc7c144fc2cfa1a2f84c0320ddaab586c7d394acb8bf",
+          "last_changed": "2025-11-23T21:34:41.000Z",
+          "age_days": 309,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/research.agent.md",
+          "kind": "agent",
+          "sha256": "e4493e4f5c8f022e03ff32954657caae1ff33e837141832c7e84ddfbba78be72",
+          "last_changed": "2025-11-23T21:31:08.000Z",
+          "age_days": 309,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/ui.agent.md",
+          "kind": "agent",
+          "sha256": "12d8dc4aa5af0aac54df5f5031513f5537ac2947a629e964e36ba8d438f5b714",
+          "last_changed": "2025-11-23T21:34:06.000Z",
+          "age_days": 309,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 3,
+        "stale_count": 0,
+        "max_lag_days": 0,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/copilot-usage-advanced-dashboard",
+      "head_sha": "774aea9dd6708b2699e17e9132f0c44d89d7ab47",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/create-github-app-from-manifest",
+      "head_sha": "9fdfeecc1b7c0f8f97a6e9d932201bcfe65f9a4c",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/demo",
+      "head_sha": "8a2ee4ec1cbd9966cc799d05584bee934f1570fc",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/demo-actions",
+      "head_sha": "beeeeb066c2d06bd418320520f1d8456e3181302",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/demo-javascript-action",
+      "head_sha": "9eecaeed9878bbc6778272804dee8f17d6ed8247",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/Demo-Pages",
+      "head_sha": "eeeadc8c011df3586f8ea86a14ce7734a8e2bfb0",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/demo-repo-monday",
+      "head_sha": "a0eb9ecfe91977e2f9cb7ee5d15eb5a97fdbbdea",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/demo-webgoat",
+      "head_sha": "0be14388204a38e9e5864b3a0c32f24b107ee2dd",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/dependency-review-action",
+      "head_sha": "0a68c5dfa682385c4d52b3638b1c945b1e68caa1",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/dependency-updates",
+      "head_sha": "4a8231a6573dd7ba37d4219b5742c86c987a5ca3",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/dind-rootless-runner",
+      "head_sha": "7df18bcacb30df09ed763344fe6ddf4f211f2f27",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/dind-secure",
+      "head_sha": "fa9d024f9b4982a50586e2a4e5addfcb7f702596",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/docker-test",
+      "head_sha": "63f21e6b1003c2397cc4fc52b810642726899a0e",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/doom-sharp",
+      "head_sha": "bea390bee1ef9c3a05092aa281ba2e6980487917",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/dotnetcore-webapp",
+      "head_sha": "d52eb355f49db85c9cd871f9bc14cbcb3462bf42",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/eco-ci-activity-checker",
+      "head_sha": "2c156b32949dda507d95c4cdc5efa9d9fa52f43e",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/eco-ci-energy-estimation",
+      "head_sha": "376d2195df5eeaeac1d305cd93e15417ab79bfaf",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/find-action-used",
+      "head_sha": "9996e36ce16c98cfb037913cadcc64c0c1a44c15",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/game-center",
+      "head_sha": "5ed7031d757fec0d40ed535d581fb027579dc6c4",
+      "ai_files": [
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "4aebf0434052a432ec8cf5246c5dd652beeb2448c487cc815ab04dc1505fca05",
+          "last_changed": "2025-12-23T13:53:27.000Z",
+          "age_days": 279,
+          "lag_days": 187,
+          "stale": true,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 1,
+        "stale_count": 1,
+        "max_lag_days": 187,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/get-organization-repositories-fork",
+      "head_sha": "0e75130a3adede7958692a36c723db983ed42870",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/gh-developer-games",
+      "head_sha": "1d5ef981c8f8a67a5dbe2bd7ee6b9adcc3031354",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/GHAzDo-widget",
+      "head_sha": "fba6893dd0568b7f56e7f8501ec759938c4c74be",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "0f55a480d3a9aa2224e36ec73b097fc4172b7347a304b0110127c58a97d8cbf3",
+          "last_changed": "2026-04-27T10:01:48.000Z",
+          "age_days": 154,
+          "lag_days": 124,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "b86ec5799034e0590473b7cb92e9a589589301961052be5441d33c2a3b362b60",
+          "last_changed": "2026-03-21T14:33:54.000Z",
+          "age_days": 191,
+          "lag_days": 161,
+          "stale": true,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 2,
+        "stale_count": 2,
+        "max_lag_days": 161,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/giphy-action",
+      "head_sha": "5fb58f255f99502efa07b0697b50ccbf774a1c79",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-action-composite-message",
+      "head_sha": "0bfb470db761e6b925a52f32a291f060134d6d5d",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-actions-requests",
+      "head_sha": "37e271512f09e80710f19ca4fc0f871e012e9240",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-azure-devops-marketplace-extension-news",
+      "head_sha": "68e2e49541a132e366c4aad1695cc4cfbd774952",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "66c1453a24f79fef0c0c65d262caecef1b47d452a760f5d484c6e9159b62d45c",
+          "last_changed": "2025-11-16T21:15:23.000Z",
+          "age_days": 316,
+          "lag_days": 315,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "0cb2005f7882dd2d64545fca6354c309aba0a23f1029b9a54662f12e414064ec",
+          "last_changed": "2026-07-24T10:12:37.000Z",
+          "age_days": 66,
+          "lag_days": 65,
+          "stale": false,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 2,
+        "stale_count": 1,
+        "max_lag_days": 315,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-composite-action-goodbye",
+      "head_sha": "5580fb3eb7ed49c52bd19a40e4bf119c63fa99a9",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-config-as-code",
+      "head_sha": "2bc005ea3e7bfbfb59ba05b593464adad7a261b2",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-copilot-game-dev",
+      "head_sha": "78f4084ca4597b243ba8f8c0eb4ad37889f898d2",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "7950c2d46fd9d1b7a8d789b1258f1be506188f344e1d6f780312a98bcdafefdd",
+          "last_changed": "2026-04-01T09:55:18.000Z",
+          "age_days": 180,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 1,
+        "stale_count": 0,
+        "max_lag_days": 0,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-copilot-model-notifier",
+      "head_sha": "c3d7341da9e0ee5e302dc347f02417aba469bf1c",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-copilot-premium-reqs-usage-fork",
+      "head_sha": "feb3e8090d5d19d771be56d9202ee5e533a69a69",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "325e243fb6852945143ac48b95c247a1cc55be621e797e5cc0553a54cdcaa725",
+          "last_changed": "2026-07-23T10:03:02.000Z",
+          "age_days": 67,
+          "lag_days": 54,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "f643ad82b678f34cf0da9075e15da2d16d95be9a243542d28f7a1ab91d3c3a6d",
+          "last_changed": "2026-05-06T19:16:55.000Z",
+          "age_days": 145,
+          "lag_days": 131,
+          "stale": true,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 2,
+        "stale_count": 1,
+        "max_lag_days": 131,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-fork-updater",
+      "head_sha": "5e83a41b4acc92e45128b9fa00594c3c31dbac99",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "ae254a4dfa5f212b2a2d8c4e14887ed889876b8fe149c864988ca88077c5580a",
+          "last_changed": "2026-04-20T18:57:30.000Z",
+          "age_days": 161,
+          "lag_days": 126,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "9cafb398baccff4522ec8070bd74ab65e6a2faf02cf2d3e0ea0581e2993ba9dd",
+          "last_changed": "2026-04-20T18:57:30.000Z",
+          "age_days": 161,
+          "lag_days": 126,
+          "stale": true,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 2,
+        "stale_count": 2,
+        "max_lag_days": 126,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-graphql-examples",
+      "head_sha": "7e1848cceb571476353404617ee4805fe785908b",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-mcp-server",
+      "head_sha": "644ab70cbfee0e37511a1c6228eb76c41eeaed9e",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-models-example",
+      "head_sha": "6a9f53a3ec65d90c5ade32d1643e2e219b3b2bf6",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-org-information",
+      "head_sha": "c0bc229fd752e8d8a341bacf1242b72197932c04",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/GitHub-ratelimit-research",
+      "head_sha": "a781fc2ccf58a972693b556f0b288e2a082843dc",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-secure-code-game",
+      "head_sha": "8fce73a6bf014354ec6aa9b8fab0ba81b1771ea4",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-upload-action",
+      "head_sha": "997e5c85d66375559f76e55008ab63cbee71542e",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/github-vnext-chopin",
+      "head_sha": "d68bf51cb8febc41ad4eeba9b78b15e22017eedf",
+      "ai_files": [
+        {
+          "path": ".github/agents/agentic-workflows.agent.md",
+          "kind": "agent",
+          "sha256": "278b496534f443f7bffdddd9eed69dd65f8f56e7ba512efe8c6fa558e5c3baf2",
+          "last_changed": "2026-08-20T19:16:16.000Z",
+          "age_days": 39,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "fcdc3618c6c69ee0b9f0ba025656a8309b86dc5f1c095d0066bcf347ab871ffa",
+          "last_changed": "2026-09-05T21:10:53.000Z",
+          "age_days": 23,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 2,
+        "stale_count": 0,
+        "max_lag_days": 16,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/GitHubBootcamp",
+      "head_sha": "c72941cb9f2e476a12a34cbc0620e687e3c7e949",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/greenframe-action",
+      "head_sha": "c3bc3203c2ad04ae8ecf46fe67cec1d10ce016fd",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/ha-config",
+      "head_sha": "8e6aff95526da946a9986c45ca2b0ed38b7edffa",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/hol-demo",
+      "head_sha": "8c3219143c542f9bcbd74016d0fb55b6ca66b6b1",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/home-automation",
+      "head_sha": "8bfaf59a7a92f6b68952aa3465b81fbe01452064",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/html-timer",
+      "head_sha": "f1a16aea458961186950cc4aa4b8917f2c012224",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/issue-labeler",
+      "head_sha": "37f2b4055e6c4f5ff8cded0dc8df24c3bdc90199",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/Jarvis",
+      "head_sha": "a2ca86c905819093f4e9baefa257f176df64179a",
+      "ai_files": [
+        {
+          "path": ".claude/agents/product-owner.md",
+          "kind": "tool_config",
+          "sha256": "f1ddbd8ace3bcfc891e86f4e8f8b086a81bd5036d4dbbfddcc457842681b60a4",
+          "last_changed": "2026-04-13T08:02:58.000Z",
+          "age_days": 168,
+          "lag_days": 168,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/check-db/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "03d494b9427b3ea850cd979f3e0ff01e6670b10816fc23d559ed2e4fab428fb1",
+          "last_changed": "2026-07-06T07:44:55.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/onenote-caching/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "c5837075f7fa83c846ed186c30b5a4dcf0c5922f2fe2d7762ed0f1f6e31ea8bf",
+          "last_changed": "2026-07-06T07:44:55.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".claude/skills/project-budget-actuals/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "d7f637b84b326300b312eec5644bf9f15699ffdd2c3bc90f9561fd5ddac3c872",
+          "last_changed": "2026-07-06T07:44:55.000Z",
+          "age_days": 84,
+          "lag_days": 84,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/agents/product-owner.agent.md",
+          "kind": "agent",
+          "sha256": "b3fc67e9b8d36016c74f890bb107186fea4cb2dd32a07c5fb7f2194f8b7455fa",
+          "last_changed": "2026-04-13T17:28:31.000Z",
+          "age_days": 168,
+          "lag_days": 168,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "a83926789c8c83c77825834dbf59b38f30951c46deacbeffe535d902c332c534",
+          "last_changed": "2026-09-28T20:07:54.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/check-db/check-db.js",
+          "kind": "skill",
+          "sha256": "c09dadd49c211e2692bd381ea30d79c6a15a3d0ba971189552e55dd301cdd2dd",
+          "last_changed": "2026-03-16T20:21:43.000Z",
+          "age_days": 196,
+          "lag_days": 196,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/check-db/SKILL.md",
+          "kind": "skill",
+          "sha256": "3d3ab0c8343a6825b1ddd3e247dffbcd59c19e44e0e65be55642eb18870d325e",
+          "last_changed": "2026-03-16T20:21:43.000Z",
+          "age_days": 196,
+          "lag_days": 196,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/onenote-caching/SKILL.md",
+          "kind": "skill",
+          "sha256": "d51dcf152319848d7d3b3d2762f6d22d9339a185b99db7d39165255b358f302b",
+          "last_changed": "2026-05-27T07:46:04.000Z",
+          "age_days": 124,
+          "lag_days": 124,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/project-budget-actuals/SKILL.md",
+          "kind": "skill",
+          "sha256": "091d5ae4e19645e950d957103285c8684a70faa21769a6c4ba8a28a107fb3e1d",
+          "last_changed": "2026-09-27T21:26:02.000Z",
+          "age_days": 1,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "90d8d492a59d56869bdf6020a14742246bfb4e6a1b9ae6cb6f69d0c4da7fecd5",
+          "last_changed": "2026-04-11T21:46:52.000Z",
+          "age_days": 169,
+          "lag_days": 169,
+          "stale": true,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 11,
+        "stale_count": 6,
+        "max_lag_days": 196,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/juice-shop",
+      "head_sha": "d04751bf551e77b97894a90814dd81ad5cafdc0c",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/kvm",
+      "head_sha": "d81776dbbd821176195b0b2afe866ee814cdf234",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/legitify",
+      "head_sha": "038aa49473a6974a3ef79f6c76b949b689d23282",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/local-setup",
+      "head_sha": "9b31238e29a91baccaad25726b83bfe18e7ea2b4",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/mcp-agents-hub",
+      "head_sha": "6c0751082cd752f502ebbc978a09b3ac40ed4935",
+      "ai_files": [
+        {
+          "path": "CLAUDE.md",
+          "kind": "claude",
+          "sha256": "e1123523973396fef9778515b19023c4b5995111f70301260bd637ebbee4ba08",
+          "last_changed": "2025-06-05T03:43:29.000Z",
+          "age_days": 480,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 1,
+        "stale_count": 0,
+        "max_lag_days": 0,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/mcp-registry-demo",
+      "head_sha": "5b66f6ce1e29e4d666266a2afbdd4a369d8041a0",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/mcp-servers",
+      "head_sha": "5309e52de2703e0710e0e26244aca2b361cfed10",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/melos-action",
+      "head_sha": "ff94301d820b8b98bd1939f52e473a433f7bcaeb",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/microsoft-learn",
+      "head_sha": "2f4510d79e243280dc42f2df2554e959b553f87b",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/microsoft-todo-mcp-server",
+      "head_sha": "dd99cb7732f71ab5dadfbf385041a973a5d4a256",
+      "ai_files": [
+        {
+          "path": "CLAUDE.md",
+          "kind": "claude",
+          "sha256": "2e54651db4486e20d5d734d67293060d3d0640123e640b123c90b540f4f2d1f0",
+          "last_changed": "2025-06-08T22:16:04.000Z",
+          "age_days": 476,
+          "lag_days": 306,
+          "stale": true,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 1,
+        "stale_count": 1,
+        "max_lag_days": 306,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/modern-development",
+      "head_sha": "bad51b5ab0c26b35ca1fb2f019b11f666b54d04b",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/NuGetDefense.Core",
+      "head_sha": "9ec44fe022cff685d38e1d8070a49b64b22f0fa6",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/openssf-scorecard-monitor",
+      "head_sha": "be47c610f43a1b8b903887c8a21d4c2cc1cda1ca",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/pages-test",
+      "head_sha": "853a7ec853628bf9e6237d3bad2d6eabca955f26",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/pipelines",
+      "head_sha": "aec3b5e5be011208602957110389cc896e907f8f",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/pr-template-test",
+      "head_sha": "3c7e828f435451744128ccfb5e113deca28f2836",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/PS-NetworkAnalyzer",
+      "head_sha": "1c5ae11121199e4934e60f501dc9ca8e20c66b4c",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/PublicGitHubActionsTest",
+      "head_sha": "453b284f09ac4eadc777adaa42b918626affea88",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/rajbos",
+      "head_sha": "a5c1c152356c62afb243e6aab020420013a73a01",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "b45700641527b42e08ee012c2a0bc4ddb0c42d3f0fa910c774f12be079143397",
+          "last_changed": "2025-11-30T21:39:21.000Z",
+          "age_days": 302,
+          "lag_days": 273,
+          "stale": true,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 1,
+        "stale_count": 1,
+        "max_lag_days": 273,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/rajbos.github.io",
+      "head_sha": "7187440d79f0ba28c9e1737948a8b38de5fe9708",
+      "ai_files": [
+        {
+          "path": ".github/agents/blog-interviewer.agent.md",
+          "kind": "agent",
+          "sha256": "cfc03d28a259c8028ad20ebb2c6f87ed168d03f7cbac59451466e8a551220f0e",
+          "last_changed": "2026-05-15T14:52:50.000Z",
+          "age_days": 136,
+          "lag_days": 135,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "6a1dea346cd99d816d55cb95ca27be88dc4da565208d4356b7c61242245ed798",
+          "last_changed": "2026-08-26T20:05:00.000Z",
+          "age_days": 33,
+          "lag_days": 32,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/prompts/check-ai-tropes.prompt.md",
+          "kind": "prompt",
+          "sha256": "788e3294807616e22a30ffe9ff3f6c29ed3e968dd6c792aaf2a45c7512967484",
+          "last_changed": "2026-08-26T20:05:00.000Z",
+          "age_days": 33,
+          "lag_days": 32,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/prompts/writing-style.prompt.md",
+          "kind": "prompt",
+          "sha256": "a1940d840253e500c09d6dd76a9a27bf489529cab3835d5f415b8c23afaf4b6e",
+          "last_changed": "2026-05-14T20:05:25.000Z",
+          "age_days": 137,
+          "lag_days": 136,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/blog-writing/references/ai-tropes.md",
+          "kind": "skill",
+          "sha256": "e73e61918dda9f07604ad55ccd8f6a63f800e6bcf3b2a9b5e91f56766b0f77ca",
+          "last_changed": "2026-08-26T20:05:00.000Z",
+          "age_days": 33,
+          "lag_days": 32,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/blog-writing/SKILL.md",
+          "kind": "skill",
+          "sha256": "9a2ae13d06634ca0f2493b2f99d35f456aeff947bd7bbf897767d77b438fa8be",
+          "last_changed": "2026-08-26T20:05:00.000Z",
+          "age_days": 33,
+          "lag_days": 32,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/youtube-transcript/fetch-transcript.mjs",
+          "kind": "skill",
+          "sha256": "829f0ab5ee576cc4eac5dc6ef9cae2e3e3f61424f1ea678ba24e5fbdc6f09a7b",
+          "last_changed": "2026-05-14T20:40:59.000Z",
+          "age_days": 137,
+          "lag_days": 136,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": ".github/skills/youtube-transcript/SKILL.md",
+          "kind": "skill",
+          "sha256": "9b3546a54e1e04f0620fd0bd196126841d7c134ff0e370427bfed1872bff0b6b",
+          "last_changed": "2026-05-14T20:40:59.000Z",
+          "age_days": 137,
+          "lag_days": 136,
+          "stale": true,
+          "status": "known"
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "4cf4e31105544beba76e5afeceaffe766474096b3f48a6af10df6b024e990f79",
+          "last_changed": "2026-05-14T20:34:17.000Z",
+          "age_days": 137,
+          "lag_days": 136,
+          "stale": true,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 9,
+        "stale_count": 5,
+        "max_lag_days": 136,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/runner-tests",
+      "head_sha": "baeb5df1c9421accc2bdb6091f73ad94b69a7e84",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/sample-app-aoai-chatGPT",
+      "head_sha": "3bf6acaec8fc18177ce0797b319995d9c981823a",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/scorecard-action",
+      "head_sha": "33bb591983cdd3feffdbe87b9719c784f7e90ac1",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/scorecard-ghes",
+      "head_sha": "0e28115977cd0181df0f14185eec5f65efbcc17a",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/scorecard-webapp",
+      "head_sha": "29dafb779294cafb6f028bb56b4540f920832788",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/secret-scanning-custom-patterns",
+      "head_sha": "8c3ee9eb2fe1500a8ae9428e6e3fa5aba0f64c26",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/SonarQube-AzureAppService",
+      "head_sha": "e4348fab8f81cbe7593395921f913022a29621d9",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/Stryker.MultipleProjectRunner",
+      "head_sha": "aedd8fb99621014878f5b912f50ea97fbdf07b42",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/tag-npm-version",
+      "head_sha": "dce8f98ce1ba9730c5c2c7e1d76159af94b54747",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/TailwindTraders",
+      "head_sha": "8d9bb44793c2f2b5bbca275d4e2bfef2a69bca12",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/teams-automation",
+      "head_sha": "595fd667082aa35f49b1caf6af1d1c9f8dbd2e90",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/test-repo",
+      "head_sha": "213ecbc220d7570881edcbd6d25f12ad25fd9a8f",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/tfsec-sarif-action",
+      "head_sha": "bd17f78e6a7abc8c5033b53bf7e8d7d86217dc09",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/training-manual",
+      "head_sha": "5d0b9b1914336ff486616c3649d7c1ba74c65879",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/trivy-action",
+      "head_sha": "d2a0b60797ff03db6132bd4e2b293f9b37081297",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/typescript-demo",
+      "head_sha": "db48e6248a013f67bae94462cb902c27d4ee0fef",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/vscode-copilot-insights",
+      "head_sha": "734cce21ced8770099b2fcc43bef1d17cac4994a",
+      "ai_files": [
+        {
+          "path": ".github/agents/vscode-extension-developer.agent.md",
+          "kind": "agent",
+          "sha256": "b1edbacf56b426b3c19852f7e425a79c58e1ac9280cb99acd607d695685e77d6",
+          "last_changed": "2026-07-06T09:55:57.000Z",
+          "age_days": 84,
+          "lag_days": 21,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "212f2ad2a52582900802bc3c7f54952585a3875571ea6978c8662eb260899226",
+          "last_changed": "2026-07-06T11:12:43.000Z",
+          "age_days": 84,
+          "lag_days": 20,
+          "stale": false,
+          "status": "known"
+        },
+        {
+          "path": ".github/instructions/repo-validation.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "3cb4ce9c864577dd54ebb6816a52b5cbf7ac165a665350720069a33651068cde",
+          "last_changed": "2026-07-06T11:12:43.000Z",
+          "age_days": 84,
+          "lag_days": 20,
+          "stale": false,
+          "status": "known"
+        }
+      ],
+      "ai_summary": {
+        "count": 3,
+        "stale_count": 0,
+        "max_lag_days": 21,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/vscode-github-ratelimit",
+      "head_sha": "baf9d2fff88d9f0fe4d566667b9ebb94c6ed44a3",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/webdis-fork",
+      "head_sha": "4b66bcf85bd4450575b4286aab9e9c58f7cebc5e",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/WebGoat.NETCore",
+      "head_sha": "a013533c494227bf1c08c118a659efd4a8008312",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    },
+    {
+      "full_name": "rajbos/workflow-composition",
+      "head_sha": "80f7ca440f547e42c22c05a8ad71bbfe1dd32f69",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      }
+    }
+  ]
+}
