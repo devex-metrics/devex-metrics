@@ -140,7 +140,6 @@ jobs:
           DEVEX_HISTORY_DIR: .metrics-data/data
           DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
           DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
-          DEVEX_LANDSCAPE_CLI_VERSION: ${{ vars.DEVEX_LANDSCAPE_CLI_VERSION }}
           DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
         run: node dist/landscape-cli.js prepare
 
@@ -166,17 +165,6 @@ jobs:
           repositories: ${{ steps.landscape.outputs.landscape-repositories }}
           permission-contents: read
 
-      - name: Install pinned landscape CLI
-        if: steps.landscape.outputs.landscape-enabled == 'true' && steps.landscape.outputs.landscape-scan-needed == 'true'
-        env:
-          DEVEX_LANDSCAPE_CLI_VERSION: ${{ steps.landscape.outputs.landscape-cli-version }}
-        run: |
-          if [ -z "$DEVEX_LANDSCAPE_CLI_VERSION" ]; then
-            echo "Landscape prepare did not return an exact CLI version" >&2
-            exit 1
-          fi
-          npm install --no-save --ignore-scripts --package-lock=false --no-audit --no-fund @devex-metrics/repo-landscape@"${DEVEX_LANDSCAPE_CLI_VERSION}"
-
       - name: Scan selected public repositories
         id: landscape-scan
         if: steps.landscape.outputs.landscape-enabled == 'true' && steps.landscape.outputs.landscape-scan-needed == 'true'
@@ -184,10 +172,9 @@ jobs:
           GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
         run: npx --no-install repo-landscape scan --config data/landscape.config.json --output data/landscape-raw.json
 
-      # Any failure after the scan token exists (CLI install, or a scanner
-      # 403/404 on a repo that just went private) skips ingestion; re-check
-      # visibility so any repo that is no longer public is scrubbed before the
-      # failure is recorded and published below.
+      # Any failure after the scan token exists (including a scanner 403/404
+      # on a repo that just went private) skips ingestion; re-check visibility
+      # so repos no longer public are scrubbed before recording the failure.
       - name: Re-check landscape visibility after a failure
         id: landscape-recheck
         if: failure() && steps.landscape-token.outcome == 'success'
@@ -197,7 +184,6 @@ jobs:
           DEVEX_HISTORY_DIR: .metrics-data/data
           DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
           DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
-          DEVEX_LANDSCAPE_CLI_VERSION: ${{ vars.DEVEX_LANDSCAPE_CLI_VERSION }}
           DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
         run: node dist/landscape-cli.js recheck
 
@@ -210,7 +196,6 @@ jobs:
           DEVEX_HISTORY_DIR: .metrics-data/data
           DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
           DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
-          DEVEX_LANDSCAPE_CLI_VERSION: ${{ vars.DEVEX_LANDSCAPE_CLI_VERSION }}
           DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
         run: node dist/landscape-cli.js ingest data/landscape-raw.json
 

@@ -153,14 +153,14 @@ artifact, so no branch is served directly.
 
 The dashboard can also display AI instruction-file observations and file-level
 hash drift for the **same filtered repositories** as DevEx collection. It is
-off by default. After `@devex-metrics/repo-landscape` has its first published
-OIDC release (the proposed `0.1.0` is not available yet), set
-`DEVEX_FEATURE_LANDSCAPE=true` and `DEVEX_LANDSCAPE_CLI_VERSION` to that
-release's exact `X.Y.Z` version. The workflow then scans verified-public repos
-belonging to the configured owner with a short-lived, Contents-read GitHub App
-token limited to that selected list. Private and cross-owner repos remain
+off by default. The published `@devex-metrics/repo-landscape` scanner is a
+normal npm dependency installed by `npm ci` and updated through Dependabot.
+Set `DEVEX_FEATURE_LANDSCAPE=true` to scan verified-public repos belonging to
+the configured owner with a short-lived, Contents-read GitHub App token limited
+to that selected list. Private and cross-owner repos remain
 **unknown**, never "zero files"; denied scans also cannot masquerade as an
-empty observation. No scanner package or token is requested while disabled.
+empty observation. The package is installed even while disabled, but no
+landscape scan or additional token is requested.
 
 Validated, sanitized observations and successive SHA-256 comparisons live in
 their own `metrics-data` history stream. Pages shows a compact per-repository
