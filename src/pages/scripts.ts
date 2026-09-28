@@ -1751,10 +1751,11 @@ function trendAnnotations(labels){
   return {annotations:merged};
 }
 var repoNameCollator=new Intl.Collator(undefined,{numeric:true,sensitivity:"base"});
-var repoIsoTimestamp=/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$/;
+var repoIsoTimestamp=/^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})(?:\\.(\\d+))?(Z|[+-]\\d{2}:\\d{2})$/;
 function parsePushedTimestamp(value){
-  if(!value||!repoIsoTimestamp.test(value))return null;
-  var timestamp=Date.parse(value);
+  var parts=repoIsoTimestamp.exec(value||"");
+  if(!parts)return null;
+  var timestamp=Date.parse(parts[1]+parts[3]);
   if(!Number.isFinite(timestamp))return null;
   var day=value.slice(0,10);
   var calendarDay=new Date(day+"T00:00:00Z");
@@ -1762,9 +1763,9 @@ function parsePushedTimestamp(value){
   if(Number(value.slice(11,13))>23||
      Number(value.slice(14,16))>59||
      Number(value.slice(17,19))>59)return null;
-  if(!value.endsWith("Z")&&
-     (Number(value.slice(-5,-3))>23||Number(value.slice(-2))>59))return null;
-  return timestamp;
+  if(parts[3]!=="Z"&&
+     (Number(parts[3].slice(1,3))>23||Number(parts[3].slice(4,6))>59))return null;
+  return {timestamp:timestamp,fraction:(parts[2]||"").replace(/0+$/,"")};
 }
 function compareRows(a,b,by,direction){
   var original=Number(a.dataset.repoIndex)-Number(b.dataset.repoIndex);
@@ -1775,7 +1776,8 @@ function compareRows(a,b,by,direction){
     var pa=parsePushedTimestamp(a.dataset.pushed),pb=parsePushedTimestamp(b.dataset.pushed);
     if(pa===null)return pb===null?original:1;
     if(pb===null)return -1;
-    result=pa-pb;
+    result=pa.timestamp-pb.timestamp;
+    if(result===0)result=pa.fraction<pb.fraction?-1:pa.fraction>pb.fraction?1:0;
   }else result=Number(a.dataset[by]||0)-Number(b.dataset[by]||0);
   return (direction==="descending"?-result:result)||original;
 }

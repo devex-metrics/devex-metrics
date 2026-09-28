@@ -233,6 +233,22 @@ describe("repository table controls", () => {
     dom.window.close();
   });
 
+  it("orders sub-millisecond pushed instants across offsets with stable equal-instant ties", () => {
+    const { dom, doc } = render([
+      repo("higher", 0, "2020-09-24T12:00:00.1239Z"),
+      repo("lower-offset", 0, "2020-09-24T09:00:00.1234-03:00"),
+      repo("equal-utc", 0, "2020-09-24T12:00:00.123400Z"),
+      repo("whole-ms", 0, "2020-09-24T12:00:00.123Z"),
+    ]);
+    const names = () => visibleRows(doc).map((row) => row.dataset.repoName);
+    const sort = doc.querySelector<HTMLButtonElement>('.repo-sort[data-sort="pushed"]')!;
+    sort.click();
+    expect(names()).toEqual(["higher", "lower-offset", "equal-utc", "whole-ms"]);
+    sort.click();
+    expect(names()).toEqual(["whole-ms", "lower-offset", "equal-utc", "higher"]);
+    dom.window.close();
+  });
+
   it("uses ungrouped range wording when no age-group headers are present", () => {
     const { dom, doc } = render([repo("one"), repo("two")]);
     expect(doc.getElementById("repoRange")?.textContent).toBe(
