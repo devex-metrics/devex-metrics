@@ -28,13 +28,32 @@ function visibleRows(document: Document): HTMLTableRowElement[] {
   );
 }
 
-function render(repos: RepoMetrics[]) {
+function pr(number: number, mergedAt: string) {
+  return {
+    number,
+    title: "PR",
+    state: "closed",
+    createdAt: mergedAt,
+    author: "tester",
+    isCopilotAuthored: false,
+    hasCopilotReview: false,
+    mergedAt,
+    linesAdded: 0,
+    linesDeleted: 0,
+    commentCount: 0,
+    commitCount: 0,
+    actionsMinutes: 0,
+  };
+}
+
+function render(repos: RepoMetrics[], team?: OrgMetrics["team"]) {
   const data: OrgMetrics = {
     owner: "example",
     ownerType: "org",
     collectedAt: new Date().toISOString(),
     repoCount: repos.length,
     repos,
+    team,
   };
   const html = buildDashboardHtml(data, data.collectedAt.slice(0, 10));
   const errors: string[] = [];
@@ -214,21 +233,6 @@ describe("repository table controls", () => {
   it("reorders a merged-PR sort when the period filter changes", () => {
     const old = repo("old", 0);
     const recent = repo("recent", 0);
-    const pr = (number: number, mergedAt: string) => ({
-      number,
-      title: "PR",
-      state: "closed",
-      createdAt: mergedAt,
-      author: "tester",
-      isCopilotAuthored: false,
-      hasCopilotReview: false,
-      mergedAt,
-      linesAdded: 0,
-      linesDeleted: 0,
-      commentCount: 0,
-      commitCount: 0,
-      actionsMinutes: 0,
-    });
     old.pullRequests.merged = 2;
     old.pullRequestDetails = [pr(1, "2020-01-01T00:00:00Z"), pr(2, "2020-01-02T00:00:00Z")];
     recent.pullRequests.merged = 1;
@@ -240,6 +244,43 @@ describe("repository table controls", () => {
     (doc.querySelector('.filter-btn[data-period="all"]') as HTMLButtonElement).click();
     expect(visibleRows(doc).map((row) => row.dataset.repoName)).toEqual(["old", "recent"]);
     expect(sort.closest("th")?.getAttribute("aria-sort")).toBe("descending");
+    dom.window.close();
+  });
+
+  it("keeps chart scope and picker independent of table pagination while re-sorting merged PRs", () => {
+    const teamRepo = repo("team-repo");
+    teamRepo.isTeamRepo = true;
+    teamRepo.pullRequests.merged = 1;
+    teamRepo.pullRequestDetails = [pr(1, new Date().toISOString())];
+    const other = repo("other-repo");
+    other.pullRequests.merged = 2;
+    other.pullRequestDetails = [pr(2, new Date().toISOString()), pr(3, new Date().toISOString())];
+    const repos = [teamRepo, other, ...Array.from({ length: 19 }, (_, i) => repo(`extra-${i}`))];
+    const { dom, doc } = render(repos, {
+      id: "team",
+      name: "Team",
+      repos: [teamRepo.fullName],
+      discoverAll: true,
+    });
+    doc.querySelector<HTMLButtonElement>('.repo-sort[data-sort="mergedPrs"]')!.click();
+    expect(visibleRows(doc)[0]?.dataset.repoName).toBe("other-repo");
+    doc.querySelector<HTMLButtonElement>('.scope-btn[data-scope="team"]')!.click();
+    expect(visibleRows(doc)[0]?.dataset.repoName).toBe("team-repo");
+    expect(doc.getElementById("repoPage")?.textContent).toBe("Page 1 of 2");
+    expect(doc.getElementById("shown")?.textContent).toBe("20");
+    const teamCheckbox = doc.querySelector<HTMLInputElement>(
+      '#repoPickerList input[value="team-repo"]'
+    )!;
+    teamCheckbox.checked = false;
+    teamCheckbox.dispatchEvent(new dom.window.Event("change"));
+    const otherCheckbox = doc.querySelector<HTMLInputElement>(
+      '#repoPickerList input[value="other-repo"]'
+    )!;
+    otherCheckbox.checked = true;
+    otherCheckbox.dispatchEvent(new dom.window.Event("change"));
+    expect(visibleRows(doc)[0]?.dataset.repoName).toBe("other-repo");
+    expect(doc.getElementById("repoRange")?.textContent).toContain("Showing 1–20 of 21");
+    expect(doc.getElementById("shown")?.textContent).toBe("20");
     dom.window.close();
   });
 });
