@@ -48,7 +48,7 @@ describe("landscape workflow adapter", () => {
   });
   afterEach(() => fs.rmSync(work, { recursive: true, force: true }));
 
-  function run(command: string, version = "0.1.0", config = "") {
+  function run(command: string, config = "") {
     return spawnSync(process.execPath, [ENTRY, ...command.split(" ")], {
       cwd: work,
       encoding: "utf8",
@@ -58,7 +58,6 @@ describe("landscape workflow adapter", () => {
         DEVEX_OWNER: "acme",
         DEVEX_HISTORY_DIR: history,
         DEVEX_FEATURE_LANDSCAPE: "true",
-        DEVEX_LANDSCAPE_CLI_VERSION: version,
         GITHUB_OUTPUT: output,
       },
     });
@@ -78,13 +77,13 @@ describe("landscape workflow adapter", () => {
     const outputs = fs.readFileSync(output, "utf8");
     expect(outputs).toContain("landscape-enabled=true");
     expect(outputs).toContain("landscape-scan-needed=true");
-    expect(outputs).toContain("landscape-cli-version=0.1.0");
+    expect(outputs).not.toContain("landscape-cli-version=");
     expect(outputs).toContain("landscape-owner=acme\n");
     expect(outputs).toContain("landscape-repositories=public\n");
     expect(outputs).not.toContain("private");
   });
 
-  it("skips installation and scan when disabled, even with no CLI release", () => {
+  it("skips the scan and additional token when disabled", () => {
     const result = spawnSync(process.execPath, [ENTRY, "prepare"], {
       cwd: work,
       encoding: "utf8",
@@ -93,22 +92,28 @@ describe("landscape workflow adapter", () => {
         DEVEX_CONFIG: "",
         DEVEX_FEATURE_LANDSCAPE: "false",
         DEVEX_OWNER: "acme",
-        DEVEX_LANDSCAPE_CLI_VERSION: "",
         GITHUB_OUTPUT: output,
       },
     });
     expect(result.status).toBe(0);
-    expect(fs.readFileSync(output, "utf8")).toContain("landscape-scan-needed=false");
+    expect(fs.readFileSync(output, "utf8")).toBe(
+      "landscape-enabled=false\nlandscape-scan-needed=false\n"
+    );
     expect(fs.existsSync(path.join(work, "data", "landscape.config.json"))).toBe(false);
   });
 
-  it("fails clearly before installation if enabled without an exact OIDC release", () => {
-    for (const version of ["", "^0.1.0", "0.1.0;echo BAD"]) {
-      const result = run("prepare", version);
-      expect(result.status).not.toBe(0);
-      expect(result.stderr).toContain("exact published OIDC release");
-    }
+  it("rejects invalid landscape input before requesting a scan token", () => {
+    const result = run(
+      "prepare",
+      JSON.stringify({
+        owner: "acme",
+        collection: { landscapeStaleAfterDays: 0, features: { landscape: true } },
+      })
+    );
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("positive integer");
     expect(fs.existsSync(path.join(work, "data", "landscape.config.json"))).toBe(false);
+    expect(fs.existsSync(output)).toBe(false);
   });
 
   it("accepts inline feature configuration and preserves configured stale threshold", () => {
@@ -121,7 +126,6 @@ describe("landscape workflow adapter", () => {
           owner: "acme",
           history: { dir: history },
           collection: {
-            landscapeCliVersion: "0.1.0",
             landscapeStaleAfterDays: 120,
             features: { landscape: true },
           },
@@ -129,7 +133,6 @@ describe("landscape workflow adapter", () => {
         DEVEX_OWNER: "",
         DEVEX_HISTORY_DIR: "",
         DEVEX_FEATURE_LANDSCAPE: "",
-        DEVEX_LANDSCAPE_CLI_VERSION: "",
         GITHUB_OUTPUT: output,
       },
     });
@@ -158,6 +161,8 @@ describe("landscape workflow adapter", () => {
       path.resolve(".github", "workflows", "collect-metrics.yml"),
       "utf8"
     );
+    const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
+    const lockfile = JSON.parse(fs.readFileSync("package-lock.json", "utf8"));
     const collect = workflow
       .split("      - name: Collect metrics\n")[1]
       ?.split("      - name: Prepare public landscape scan\n")[0];
@@ -169,8 +174,23 @@ describe("landscape workflow adapter", () => {
     expect(workflow).toContain(
       "repositories: ${{ steps.landscape.outputs.landscape-repositories }}"
     );
-    expect(ingest).toContain(
-      "DEVEX_LANDSCAPE_CLI_VERSION: ${{ vars.DEVEX_LANDSCAPE_CLI_VERSION }}"
+    expect(workflow).toContain(
+      "if: steps.landscape.outputs.landscape-enabled == 'true' && steps.landscape.outputs.landscape-scan-needed == 'true'"
+    );
+    expect(workflow).toContain("run: npx --no-install repo-landscape scan");
+    expect(workflow).not.toContain("Install pinned landscape CLI");
+    expect(workflow).not.toContain("DEVEX_LANDSCAPE_CLI_VERSION");
+    expect(workflow).not.toContain("npm install");
+    expect(packageJson.dependencies["@devex-metrics/repo-landscape"]).toMatch(/^\^?\d+\.\d+\.\d+/);
+    expect(packageJson.devDependencies["@devex-metrics/repo-landscape"]).toBeUndefined();
+    const scannerManifest = JSON.parse(
+      fs.readFileSync(
+        path.resolve("node_modules", "@devex-metrics", "repo-landscape", "package.json"),
+        "utf8"
+      )
+    );
+    expect(lockfile.packages["node_modules/@devex-metrics/repo-landscape"].version).toBe(
+      scannerManifest.version
     );
     expect(ingest).toContain(
       "DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}"
@@ -196,7 +216,7 @@ describe("landscape workflow adapter", () => {
     expect(workflow).toContain("run: node dist/landscape-cli.js recheck");
   });
 
-  it("scrubs stored observations of repos no longer verified public before the version gate", () => {
+  it("scrubs stored observations of repos no longer verified public during preparation", () => {
     const latest = landscapeLatestPath(history, "acme");
     const snapshot = path.join(path.dirname(latest), "snapshots", "old.json");
     const stored = {
@@ -223,9 +243,9 @@ describe("landscape workflow adapter", () => {
     fs.mkdirSync(path.dirname(snapshot), { recursive: true });
     fs.writeFileSync(latest, JSON.stringify(stored));
     fs.writeFileSync(snapshot, JSON.stringify(stored));
-    const result = run("prepare", "");
-    expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("exact published OIDC release");
+    const result = run("prepare");
+    expect(result.status).toBe(0);
+    expect(fs.readFileSync(output, "utf8")).toContain("landscape-scan-needed=true");
     for (const file of [latest, snapshot]) {
       const contents = fs.readFileSync(file, "utf8");
       expect(contents).toContain("acme/public");

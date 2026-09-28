@@ -4,6 +4,7 @@ import {
   compareLandscape,
   landscapeLatestPath,
   loadLandscapeView,
+  installedLandscapeScannerVersion,
   parseLandscapeScan,
   saveLandscapeScan,
   validateLandscapeScannerOutput,
@@ -437,6 +438,7 @@ describe("visibility re-check before ingestion", () => {
   });
 
   describe("v1 engine output compatibility", () => {
+    const installedVersion = installedLandscapeScannerVersion();
     const data = metrics([{ name: "public", isPrivate: false }]);
     const engineOutput = {
       ...scan([
@@ -463,6 +465,7 @@ describe("visibility re-check before ingestion", () => {
           },
         },
       ]),
+      scanner_version: installedVersion,
       provenance: {
         source: "github_api",
         snapshot: "pinned_head",
@@ -478,8 +481,21 @@ describe("visibility re-check before ingestion", () => {
       edges: [],
     };
 
+    it("checks the version in the installed package against the scanner's raw output", () => {
+      const manifest = JSON.parse(
+        fs.readFileSync(
+          path.resolve("node_modules", "@devex-metrics", "repo-landscape", "package.json"),
+          "utf8"
+        )
+      ) as { version: string };
+      expect(installedVersion).toBe(manifest.version);
+      expect(
+        validateLandscapeScannerOutput(engineOutput, data, 90, installedVersion).scanner_version
+      ).toBe(manifest.version);
+    });
+
     it("accepts the released portable payload and drops provenance/evidence from public files", () => {
-      const parsed = validateLandscapeScannerOutput(engineOutput, data, 90, "0.1.0");
+      const parsed = validateLandscapeScannerOutput(engineOutput, data, 90, installedVersion);
       expect(parsed.repositories[0]).toMatchObject({
         full_name: "acme/public",
         ai_summary: { count: 1, unknown_count: 1, status: "partial_unknown" },
@@ -501,10 +517,11 @@ describe("visibility re-check before ingestion", () => {
         },
         /selection/,
       ],
-      [{ ...engineOutput, scanner_version: "9.9.9" }, /version/],
+      [{ ...engineOutput, scanner_version: "not-the-installed-version" }, /version/],
+      [{ ...engineOutput, scanner_version: "" }, /scanner_version/],
       [{ ...engineOutput, edges: [{ source: "acme/public", target: "acme/private" }] }, /edges/],
     ])("rejects an unexpected scanner mode, selection, version or edges", (raw, error) => {
-      expect(() => validateLandscapeScannerOutput(raw, data, 90, "0.1.0")).toThrow(error);
+      expect(() => validateLandscapeScannerOutput(raw, data, 90, installedVersion)).toThrow(error);
     });
   });
 

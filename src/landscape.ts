@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { createRequire } from "node:module";
 import type { Octokit } from "@octokit/rest";
 import { latestPath, scopePath } from "./history.js";
 import type {
@@ -272,6 +273,18 @@ export function publicLandscapeSelection(metrics: OrgMetrics): RepoMetrics[] {
   );
 }
 
+/** Read the installed scanner's version, not a deployment-supplied release number. */
+export function installedLandscapeScannerVersion(): string {
+  const manifest: unknown = createRequire(import.meta.url)(
+    "@devex-metrics/repo-landscape/package.json"
+  );
+  const pkg = object(manifest, "installed scanner package");
+  if (pkg.name !== "@devex-metrics/repo-landscape") {
+    throw new Error("Installed landscape scanner package has an unexpected name");
+  }
+  return nonempty(pkg.version, "installed scanner package version");
+}
+
 /** Verify the scanner used the prepared explicit selection and GitHub API mode. */
 export function validateLandscapeScannerOutput(
   raw: unknown,
@@ -317,7 +330,7 @@ export function validateLandscapeScannerOutput(
   }
   const scan = parseLandscapeScan(raw);
   if (scan.scanner_version !== version) {
-    throw new Error("Landscape scanner version does not match the pinned CLI version");
+    throw new Error("Landscape scanner version does not match the installed CLI version");
   }
   return scan;
 }
