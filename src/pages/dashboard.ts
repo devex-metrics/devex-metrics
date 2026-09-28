@@ -687,14 +687,14 @@ ${buildTrialBanner(data, teamRepoNames.length)}
       </table>
     </div>
     <nav class="repo-pagination" aria-label="Repository pages">
-      <span id="repoRange" role="status" aria-live="polite">Showing ${data.repos.length ? `1–${Math.min(20, data.repos.length)}` : "0"} of ${data.repos.length} repositories</span>
+      <span id="repoRange" role="status" aria-live="polite">Showing ${data.repos.length ? `1–${Math.min(20, data.repos.length)}` : "0"} of ${data.repos.length} ${data.repos.length === 1 ? "repository" : "repositories"}</span>
       <span class="repo-page-controls">
         <button type="button" id="repoPrev" aria-controls="repoList" disabled>Previous</button>
         <span id="repoPage">Page 1 of ${Math.max(1, Math.ceil(data.repos.length / 20))}</span>
         <button type="button" id="repoNext" aria-controls="repoList"${data.repos.length <= 20 ? " disabled" : ""}>Next</button>
       </span>
     </nav>
-    <p class="repo-count"><span id="shown">${Math.min(20, data.repos.length)}</span> of ${data.repos.length} repositories shown</p>
+    <p class="repo-count"><span id="shown">${Math.min(20, data.repos.length)}</span> of ${data.repos.length} ${data.repos.length === 1 ? "repository" : "repositories"} shown</p>
   </section>
 
   ${extras.landscape ? buildLandscapeSection(extras.landscape, extras.landscapeStatus) : ""}

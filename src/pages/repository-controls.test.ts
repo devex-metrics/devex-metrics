@@ -80,6 +80,12 @@ describe("repository table controls", () => {
       const staticDoc = new JSDOM(html).window.document;
       expect(visibleRows(staticDoc)).toHaveLength(Math.min(count, 20));
       expect(visibleRows(doc)).toHaveLength(Math.min(count, 20));
+      expect(staticDoc.getElementById("repoRange")?.textContent).toBe(
+        `Showing ${count ? `1–${Math.min(count, 20)}` : "0"} of ${count} ${count === 1 ? "repository" : "repositories"}`
+      );
+      expect(staticDoc.querySelector(".repo-count")?.textContent).toBe(
+        `${Math.min(count, 20)} of ${count} ${count === 1 ? "repository" : "repositories"} shown`
+      );
       expect(doc.getElementById("repoPage")?.textContent).toBe(
         `Page 1 of ${Math.max(1, Math.ceil(count / 20))}`
       );
@@ -148,20 +154,37 @@ describe("repository table controls", () => {
     dom.window.close();
   });
 
-  it("sorts ISO dates chronologically and leaves missing dates last in either direction", () => {
+  it("sorts pushed instants across offsets and leaves missing or malformed dates last in either direction", () => {
     const repos = [
       repo("missing"),
-      repo("old", 0, "2020-01-01T00:00:00Z"),
-      repo("new", 0, "2020-12-31T00:00:00Z"),
+      repo("same-offset", 0, "2020-09-24T09:00:00-03:00"),
+      repo("later-offset", 0, "2020-09-24T15:00:00+02:00"),
+      repo("malformed", 0, "not-a-date"),
+      repo("earlier-utc", 0, "2020-09-24T10:30:00Z"),
+      repo("same-utc", 0, "2020-09-24T12:00:00Z"),
     ];
     delete repos[0].pushedAt;
     const { dom, doc } = render(repos);
     const names = () => visibleRows(doc).map((row) => row.dataset.repoName);
     const sort = doc.querySelector<HTMLButtonElement>('.repo-sort[data-sort="pushed"]')!;
     sort.click();
-    expect(names()).toEqual(["new", "old", "missing"]);
+    expect(names()).toEqual([
+      "later-offset",
+      "same-offset",
+      "same-utc",
+      "earlier-utc",
+      "missing",
+      "malformed",
+    ]);
     sort.click();
-    expect(names()).toEqual(["old", "new", "missing"]);
+    expect(names()).toEqual([
+      "earlier-utc",
+      "same-offset",
+      "same-utc",
+      "later-offset",
+      "missing",
+      "malformed",
+    ]);
     dom.window.close();
   });
 
