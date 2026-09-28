@@ -288,13 +288,11 @@ describe("landscape dashboard view", () => {
     const tbody = doc.querySelector("#landscapeRows")!;
     const sort = (key: string) => doc.querySelector<HTMLButtonElement>(`[data-landscape-sort="${key}"]`)!;
     const names = () => Array.from((tbody as HTMLTableSectionElement).rows, (row) => row.cells[0].textContent);
-    const insert = (name: string, known = false) => {
+    const insert = (name: string, metadata?: { count?: string; observed?: string }) => {
       const row = doc.createElement("tr");
       row.innerHTML = `<th scope="row">${name}</th><td>—</td><td>—</td><td>—</td><td>—</td>`;
-      if (known) {
-        row.dataset.landscapeCount = "2";
-        row.dataset.landscapeObserved = "2026-09-24T10:30:00.000Z";
-      }
+      if (metadata?.count !== undefined) row.dataset.landscapeCount = metadata.count;
+      if (metadata?.observed !== undefined) row.dataset.landscapeObserved = metadata.observed;
       tbody.prepend(row);
     };
     const flush = async () => { await new Promise((resolve) => dom.window.setTimeout(resolve, 0)); };
@@ -302,7 +300,7 @@ describe("landscape dashboard view", () => {
     sort("count").click();
     insert("acme/missing-count");
     await flush();
-    insert("acme/middle", true);
+    insert("acme/middle", { count: "2", observed: "2026-09-24T10:30:00.000Z" });
     await flush();
     expect(names().slice(0, 3)).toEqual(["acme/recent", "acme/middle", "acme/old"]);
     expect(names().at(-1)).toBe("acme/missing-count");
@@ -316,16 +314,30 @@ describe("landscape dashboard view", () => {
     sort("observed").click();
     insert("acme/missing-date");
     await flush();
-    expect(names().slice(0, 3)).toEqual(["acme/recent", "acme/middle", "acme/old"]);
-    expect(names().slice(-2)).toEqual(["acme/missing-count", "acme/missing-date"]);
+    insert("acme/invalid-date", { observed: "not-a-date" });
+    await flush();
+    insert("acme/non-iso-date", { observed: "Sep 24, 2026" });
+    await flush();
+    insert("acme/invalid-calendar", { observed: "2026-02-31T10:30:00.000Z" });
+    await flush();
+    insert("acme/offset", { count: "2", observed: "2026-09-24T09:00:00-03:00" });
+    await flush();
+    expect(names().slice(0, 4)).toEqual(["acme/recent", "acme/offset", "acme/middle", "acme/old"]);
+    expect(names().slice(-5)).toEqual([
+      "acme/missing-count", "acme/missing-date", "acme/invalid-date",
+      "acme/non-iso-date", "acme/invalid-calendar",
+    ]);
     expect(visibleNames(dom)).toHaveLength(20);
     expect(doc.querySelector("#landscapePage")?.textContent).toBe("Page 1 of 2");
     doc.querySelector<HTMLButtonElement>("#landscapeNext")!.click();
-    expect(visibleNames(dom)).toHaveLength(3);
-    expect(doc.querySelector("#landscapeRange")?.textContent).toBe("Showing 21–23 of 23 repositories");
+    expect(visibleNames(dom)).toHaveLength(7);
+    expect(doc.querySelector("#landscapeRange")?.textContent).toBe("Showing 21–27 of 27 repositories");
     sort("observed").click();
-    expect(names().slice(0, 3)).toEqual(["acme/old", "acme/middle", "acme/recent"]);
-    expect(names().slice(-2)).toEqual(["acme/missing-count", "acme/missing-date"]);
+    expect(names().slice(0, 4)).toEqual(["acme/old", "acme/middle", "acme/offset", "acme/recent"]);
+    expect(names().slice(-5)).toEqual([
+      "acme/missing-count", "acme/missing-date", "acme/invalid-date",
+      "acme/non-iso-date", "acme/invalid-calendar",
+    ]);
     expect(doc.querySelector("#landscapePage")?.textContent).toBe("Page 1 of 2");
   });
 

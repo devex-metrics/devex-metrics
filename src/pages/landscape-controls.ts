@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded",function(){
   var rows=Array.from(tbody.rows);
   var key=null, direction=null, page=0;
   var collator=new Intl.Collator(undefined,{numeric:true,sensitivity:"base"});
+  var isoTimestamp=/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$/;
   var pageSize=20;
   var observer=new MutationObserver(function(){
     rows=Array.from(tbody.rows);
@@ -31,21 +32,32 @@ document.addEventListener("DOMContentLoaded",function(){
     render();
   });
   observer.observe(tbody,{childList:true});
+  function sortValue(value){
+    if(value==null||value.trim()==="")return null;
+    if(key==="observed"){
+      if(!isoTimestamp.test(value))return null;
+      var timestamp=Date.parse(value);
+      if(!Number.isFinite(timestamp))return null;
+      var day=value.slice(0,10);
+      return new Date(day+"T00:00:00Z").toISOString().slice(0,10)===day?timestamp:null;
+    }
+    var numeric=Number(value);
+    return Number.isFinite(numeric)?numeric:null;
+  }
   function compare(a,b){
     if(!key)return Number(a.dataset.landscapeIndex)-Number(b.dataset.landscapeIndex);
     var prop="landscape"+key.charAt(0).toUpperCase()+key.slice(1);
     var x=key==="name"?a.cells[0].textContent:a.dataset[prop];
     var y=key==="name"?b.cells[0].textContent:b.dataset[prop];
+    var xValue=key==="name"?null:sortValue(x);
+    var yValue=key==="name"?null:sortValue(y);
     if(key!=="name"){
-      var xUnknown=x==null||x===""||(key!=="observed"&&!Number.isFinite(Number(x)));
-      var yUnknown=y==null||y===""||(key!=="observed"&&!Number.isFinite(Number(y)));
-      if(xUnknown||yUnknown){
-        if(xUnknown&&yUnknown)return Number(a.dataset.landscapeIndex)-Number(b.dataset.landscapeIndex);
-        return xUnknown?1:-1;
+      if(xValue===null||yValue===null){
+        if(xValue===null&&yValue===null)return Number(a.dataset.landscapeIndex)-Number(b.dataset.landscapeIndex);
+        return xValue===null?1:-1;
       }
     }
-    var result=key==="name"?collator.compare(x,y):
-      key==="observed"?x.localeCompare(y):Number(x)-Number(y);
+    var result=key==="name"?collator.compare(x,y):xValue-yValue;
     return (direction==="descending"?-result:result)||
       Number(a.dataset.landscapeIndex)-Number(b.dataset.landscapeIndex);
   }
