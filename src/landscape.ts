@@ -263,11 +263,15 @@ export function compareLandscape(
   };
 }
 
-/** Selected, verified-public repositories inside the configured App installation owner. */
+/**
+ * Selected, verified-public repositories inside the configured App installation
+ * owner. Empty repositories are left out: they have no HEAD commit to scan.
+ */
 export function publicLandscapeSelection(metrics: OrgMetrics): RepoMetrics[] {
   return metrics.repos.filter(
     (repo) =>
       repo.isPrivate === false &&
+      repo.sizeKb !== 0 &&
       repo.fullName.slice(0, repo.fullName.indexOf("/")).toLowerCase() ===
         metrics.owner.toLowerCase()
   );

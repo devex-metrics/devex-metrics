@@ -215,6 +215,8 @@ feature is enabled via `DEVEX_FEATURE_LANDSCAPE` or `DEVEX_CONFIG`:
 1. Ensure the GitHub App has `Contents: read` and its installation on the
    configured owner includes **every selected public repository**, including
    the first one. Public visibility alone does not give the App access.
+   Empty repositories (no commits) are left out of the selection, since they
+   have no HEAD commit to scan.
    Configure its `APP_ID` variable and `APP_PRIVATE_KEY` secret (also used for
    the existing collection).
 2. Set `DEVEX_FEATURE_LANDSCAPE=true` (or

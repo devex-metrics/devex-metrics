@@ -6,6 +6,7 @@ import {
   loadLandscapeView,
   installedLandscapeScannerVersion,
   parseLandscapeScan,
+  publicLandscapeSelection,
   saveLandscapeScan,
   validateLandscapeScannerOutput,
   loadLandscapeRunStatus,
@@ -59,16 +60,17 @@ function scan(repos: unknown[], at = "2026-09-21T12:00:00Z"): unknown {
   };
 }
 
-function metrics(repos: { name: string; isPrivate?: boolean }[]): OrgMetrics {
+function metrics(repos: { name: string; isPrivate?: boolean; sizeKb?: number }[]): OrgMetrics {
   return {
     owner: "acme",
     ownerType: "org",
     collectedAt: "2026-09-19T11:00:00Z",
     repoCount: repos.length,
-    repos: repos.map(({ name, isPrivate }): RepoMetrics => ({
+    repos: repos.map(({ name, isPrivate, sizeKb }): RepoMetrics => ({
       name,
       fullName: `acme/${name}`,
       isPrivate,
+      sizeKb,
       issues: { open: 0, closed: 0 },
       pullRequests: { open: 0, closed: 0, merged: 0 },
       pullRequestDetails: [],
@@ -379,6 +381,17 @@ describe("landscape history and DevEx join", () => {
       expect(stored).not.toContain("acme/dropped");
     }
     expect(scrubLandscapeOutsideSelection(root, after)).toBe(0);
+  });
+
+  it("leaves empty repositories out of the selection but keeps ones of unknown size", () => {
+    const selection = publicLandscapeSelection(
+      metrics([
+        { name: "empty", isPrivate: false, sizeKb: 0 },
+        { name: "full", isPrivate: false, sizeKb: 12 },
+        { name: "unknown-size", isPrivate: false },
+      ])
+    );
+    expect(selection.map((repo) => repo.fullName)).toEqual(["acme/full", "acme/unknown-size"]);
   });
 
   it("joins the latest run status to the scan time of the data being shown", () => {

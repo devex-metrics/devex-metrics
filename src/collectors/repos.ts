@@ -21,6 +21,11 @@ export interface DiscoveredRepo {
    * crawl treats as the trunk; empty when GitHub reports none.
    */
   defaultBranch: string;
+  /**
+   * Repository size in KB as GitHub reports it. 0 for an empty repository
+   * (no commits); undefined when the listing omits it.
+   */
+  sizeKb?: number;
 }
 
 interface RawRepo {
@@ -31,6 +36,7 @@ interface RawRepo {
   archived?: boolean;
   fork?: boolean;
   default_branch?: string | null;
+  size?: number;
 }
 
 function toDiscovered(repo: RawRepo): DiscoveredRepo {
@@ -43,6 +49,7 @@ function toDiscovered(repo: RawRepo): DiscoveredRepo {
     fork: repo.fork ?? false,
     isTeamRepo: false,
     defaultBranch: repo.default_branch ?? "",
+    sizeKb: repo.size,
   };
 }
 

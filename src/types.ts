@@ -200,6 +200,11 @@ export interface RepoMetrics {
    * know rather than guessing one.
    */
   defaultBranch?: string;
+  /**
+   * Repository size in KB from discovery. 0 means an empty repository (no
+   * commits), which the landscape scan skips. Absent in older snapshots.
+   */
+  sizeKb?: number;
   /** ISO-8601 timestamp when metrics for this repo were last collected. */
   collectedAt?: string;
   /**

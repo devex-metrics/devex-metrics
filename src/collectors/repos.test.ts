@@ -483,4 +483,17 @@ describe("collectRepos default branch", () => {
     const repos = await collectRepos("myorg", "org");
     expect(repos[0].defaultBranch).toBe("");
   });
+
+  it("records the repository size so empty repositories can be recognised", async () => {
+    const { mock } = buildMockOctokit([
+      [
+        { name: "empty", full_name: "myorg/empty", pushed_at: "", size: 0 },
+        { name: "full", full_name: "myorg/full", pushed_at: "", size: 42 },
+      ],
+    ]);
+    setOctokit(mock);
+
+    const repos = await collectRepos("myorg", "org");
+    expect(repos.map((r) => r.sizeKb)).toEqual([0, 42]);
+  });
 });
