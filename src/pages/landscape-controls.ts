@@ -36,9 +36,13 @@ document.addEventListener("DOMContentLoaded",function(){
     var prop="landscape"+key.charAt(0).toUpperCase()+key.slice(1);
     var x=key==="name"?a.cells[0].textContent:a.dataset[prop];
     var y=key==="name"?b.cells[0].textContent:b.dataset[prop];
-    if(key!=="name"&&(x===""||y==="")){
-      if(x==="")return y===""?Number(a.dataset.landscapeIndex)-Number(b.dataset.landscapeIndex):1;
-      return -1;
+    if(key!=="name"){
+      var xUnknown=x==null||x===""||(key!=="observed"&&!Number.isFinite(Number(x)));
+      var yUnknown=y==null||y===""||(key!=="observed"&&!Number.isFinite(Number(y)));
+      if(xUnknown||yUnknown){
+        if(xUnknown&&yUnknown)return Number(a.dataset.landscapeIndex)-Number(b.dataset.landscapeIndex);
+        return xUnknown?1:-1;
+      }
     }
     var result=key==="name"?collator.compare(x,y):
       key==="observed"?x.localeCompare(y):Number(x)-Number(y);
