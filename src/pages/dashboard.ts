@@ -156,7 +156,7 @@ export function buildDashboardHtml(
     .sort((a, b) => b.issues + b.prs - (a.issues + a.prs))
     .slice(0, 15);
 
-  const repoRows = data.repos.map((repo) => buildRepoRow(repo)).join("\n");
+  const repoRows = data.repos.map((repo, index) => buildRepoRow(repo, index >= 20)).join("\n");
 
   // Build enriched PR details for charts — prefer the mergedPRTimeline
   // (wider history, 1 cheap API call) over the 10-entry pullRequestDetails.
@@ -655,6 +655,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
       <div class="toolbar-ctrls">
         <input type="search" id="repoFilter" placeholder="Filter&hellip;" aria-label="Filter repositories" />
         <select id="repoSort" aria-label="Sort repositories">
+          <option value="">Original order</option>
           <option value="name">Name</option>
           <option value="openIssues">Open Issues</option>
           <option value="mergedPrs">Merged PRs</option>
@@ -667,24 +668,33 @@ ${buildTrialBanner(data, teamRepoNames.length)}
         </select>
       </div>
     </div>
+    <div class="repo-sort-toolbar"><span id="repoSortStatus" aria-live="polite">Original order</span><button type="button" id="repoSortReset" aria-controls="repoList" disabled>Clear sort</button></div>
     <p class="repos-period-note" id="reposPeriodNote">&#9432; The <strong>merged PR</strong> count reflects the selected period. Expand a row for all-time details.</p>
     <div class="table-wrap">
       <table class="repo-table" aria-label="Repositories">
         <thead><tr>
-          <th class="col-repo th-sortable" data-sort="name">Repository <span class="sort-ind" aria-hidden="true"></span></th>
-          <th class="col-num th-sortable" data-sort="openIssues">Issues <span class="sort-ind" aria-hidden="true"></span></th>
-          <th class="col-num th-sortable" data-sort="mergedPrs">Merged PRs <span class="sort-ind" aria-hidden="true"></span></th>
-          <th class="col-num th-sortable" data-sort="openPrs">Open PRs <span class="sort-ind" aria-hidden="true"></span></th>
-          <th class="col-num th-sortable" data-sort="contributors">Contributors <span class="sort-ind" aria-hidden="true"></span></th>
-          <th class="col-num th-sortable" data-sort="dependents">Dependents <span class="sort-ind" aria-hidden="true"></span></th>
-          <th class="col-date th-sortable" data-sort="pushed">Last Updated <span class="sort-ind" aria-hidden="true"></span></th>
-          <th class="col-lines th-sortable" data-sort="linesAdded" title="Total lines added/removed across merged PRs in the last ~13 months (or last 10 detailed PRs when full timeline data is unavailable)">Lines +/- <span class="sort-ind" aria-hidden="true"></span></th>
-          <th class="col-num th-sortable" data-sort="agentTasks" title="Copilot agent tasks in the 30-day collection window">Agent Tasks <span class="sort-ind" aria-hidden="true"></span></th>
+          <th scope="col" class="col-repo"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="name" data-sort-label="Repository" data-sort-default="ascending">Repository <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th scope="col" class="col-num"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="openIssues" data-sort-label="Issues" data-sort-default="descending">Issues <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th scope="col" class="col-num"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="mergedPrs" data-sort-label="Merged PRs" data-sort-default="descending">Merged PRs <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th scope="col" class="col-num"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="openPrs" data-sort-label="Open PRs" data-sort-default="descending">Open PRs <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th scope="col" class="col-num"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="contributors" data-sort-label="Contributors" data-sort-default="descending">Contributors <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th scope="col" class="col-num"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="dependents" data-sort-label="Dependents" data-sort-default="descending">Dependents <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th scope="col" class="col-date"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="pushed" data-sort-label="Last Updated" data-sort-default="descending">Last Updated <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th scope="col" class="col-lines" title="Sort by lines added. Displays total lines added/removed across merged PRs in the last ~13 months (or last 10 detailed PRs when full timeline data is unavailable)"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="linesAdded" data-sort-label="Lines Added" data-sort-default="descending">Lines +/- <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th scope="col" class="col-num" title="Copilot agent tasks in the 30-day collection window"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="agentTasks" data-sort-label="Agent Tasks" data-sort-default="descending">Agent Tasks <span class="sort-ind" aria-hidden="true">↕</span></button></th>
         </tr></thead>
         <tbody id="repoList">${repoRows}</tbody>
       </table>
     </div>
-    <p class="repo-count"><span id="shown">${data.repos.length}</span> of ${data.repos.length} repositories</p>
+    <nav class="repo-pagination" aria-label="Repository pages">
+      <span id="repoRange" role="status" aria-live="polite">Showing ${data.repos.length ? `1–${Math.min(20, data.repos.length)}` : "0"} of ${data.repos.length} repositories</span>
+      <span class="repo-page-controls">
+        <button type="button" id="repoPrev" aria-controls="repoList" disabled>Previous</button>
+        <span id="repoPage">Page 1 of ${Math.max(1, Math.ceil(data.repos.length / 20))}</span>
+        <button type="button" id="repoNext" aria-controls="repoList"${data.repos.length <= 20 ? " disabled" : ""}>Next</button>
+      </span>
+    </nav>
+    <p class="repo-count"><span id="shown">${Math.min(20, data.repos.length)}</span> of ${data.repos.length} repositories shown</p>
   </section>
 
   ${extras.landscape ? buildLandscapeSection(extras.landscape, extras.landscapeStatus) : ""}

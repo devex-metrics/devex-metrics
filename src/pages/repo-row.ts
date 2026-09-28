@@ -1,7 +1,7 @@
 import type { RepoMetrics } from "../types.js";
 import { escapeHtml, formatDurationHtml } from "./utils.js";
 
-export function buildRepoRow(repo: RepoMetrics): string {
+export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string {
   const sortedPRDetails = [...repo.pullRequestDetails].sort((a, b) => {
     if (!a.mergedAt && !b.mergedAt) return 0;
     if (!a.mergedAt) return 1;
@@ -50,7 +50,7 @@ export function buildRepoRow(repo: RepoMetrics): string {
 
   const agentTaskCount = repo.copilotAgentMetrics?.totalTasks ?? 0;
   const dataRow =
-    `<tr class="repo-row" ` +
+    `<tr class="repo-row"${initiallyHidden ? " hidden" : ""} ` +
     `data-name="${escapeHtml(repo.fullName.toLowerCase())}" ` +
     `data-repo-name="${escapeHtml(repo.name.toLowerCase())}" ` +
     `data-open-issues="${repo.issues.open}" ` +
