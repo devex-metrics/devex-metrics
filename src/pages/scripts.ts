@@ -6,6 +6,7 @@ var cssColors={};
 var selectedRepos=new Set();
 var repoScope="all";
 var restoringState=false;
+var repoListRefresh=null;
 function hexToRgba(hex,a){
   var h=(hex||"").replace("#","");
   if(h.length===3)h=h.split("").map(function(c){return c+c;}).join("");
@@ -22,7 +23,6 @@ document.addEventListener("DOMContentLoaded",function(){
   if(typeof Chart!=="undefined"){renderCharts();}
   setupGroups();
   setupControls();
-  setupSortHeaders();
   setupFilter();
   setupRepoPicker();
   setupScopeButtons();
@@ -1053,6 +1053,7 @@ function applyFilter(period){
       row.dataset.mergedPrs=v;
     });
   }
+  if(repoListRefresh&&document.getElementById("repoSort").value==="mergedPrs")repoListRefresh(false);
   var note=document.getElementById("reposPeriodNote");
   if(note)note.style.display=(period==="all"&&!repoFiltered)?"none":"";
 
@@ -1749,10 +1750,19 @@ function trendAnnotations(labels){
   Object.keys(trial).forEach(function(k){merged[k]=trial[k];});
   return {annotations:merged};
 }
-function compareRows(a,b,by){
-  if(by==="name")return a.dataset.name.localeCompare(b.dataset.name,undefined,{sensitivity:"base"});
-  if(by==="pushed"){var pa=a.dataset.pushed||"";var pb=b.dataset.pushed||"";return pb.localeCompare(pa);}
-  return Number(b.dataset[by]||0)-Number(a.dataset[by]||0);
+var repoNameCollator=new Intl.Collator(undefined,{numeric:true,sensitivity:"base"});
+function compareRows(a,b,by,direction){
+  var original=Number(a.dataset.repoIndex)-Number(b.dataset.repoIndex);
+  if(!by)return original;
+  var result;
+  if(by==="name")result=repoNameCollator.compare(a.dataset.name,b.dataset.name);
+  else if(by==="pushed"){
+    var pa=a.dataset.pushed||"",pb=b.dataset.pushed||"";
+    if(!pa)return pb?1:original;
+    if(!pb)return -1;
+    result=pa.localeCompare(pb);
+  }else result=Number(a.dataset[by]||0)-Number(b.dataset[by]||0);
+  return (direction==="descending"?-result:result)||original;
 }
 function setupControls(){
   var f=document.getElementById("repoFilter");
@@ -1760,84 +1770,107 @@ function setupControls(){
   var list=document.getElementById("repoList");
   var sh=document.getElementById("shown");
   if(!f||!list)return;
-  function filterAndSort(){
-    var q=f.value.toLowerCase();var by=st?st.value:"name";
-    var n=0;
-    var tbody=list;
-    var grpHdrRows=Array.from(tbody.querySelectorAll("tr.grp-hdr-row"));
-    if(grpHdrRows.length>0){
+  var range=document.getElementById("repoRange");
+  var pageLabel=document.getElementById("repoPage");
+  var prev=document.getElementById("repoPrev");
+  var next=document.getElementById("repoNext");
+  var reset=document.getElementById("repoSortReset");
+  var status=document.getElementById("repoSortStatus");
+  var sortButtons=Array.from(document.querySelectorAll(".repo-sort"));
+  var rows=Array.from(list.querySelectorAll("tr.repo-row"));
+  var details=new Map();
+  rows.forEach(function(row,i){
+    row.dataset.repoIndex=String(i);
+    details.set(row,document.getElementById("detail-"+row.dataset.repoId));
+  });
+  var key=null,direction=null,page=0,pageSize=20;
+  function filterAndSort(resetPage){
+    if(resetPage)page=0;
+    var q=f.value.toLowerCase();
+    var eligible=[];
+    var matched=0;
+    var grpHdrRows=Array.from(list.querySelectorAll("tr.grp-hdr-row"));
+    if(grpHdrRows.length){
       grpHdrRows.forEach(function(hdrRow){
         var grpId=hdrRow.dataset.grpId;
-        var dataRows=Array.from(tbody.querySelectorAll("tr.repo-row[data-grp-id='"+grpId+"']"));
-        dataRows.sort(function(a,b){return compareRows(a,b,by);});
-        // Find next group header to use as insertion point
+        var dataRows=rows.filter(function(row){return row.dataset.grpId===grpId;});
+        dataRows.sort(function(a,b){return compareRows(a,b,key,direction);});
         var nextHdr=hdrRow.nextElementSibling;
         while(nextHdr&&!nextHdr.classList.contains("grp-hdr-row")){nextHdr=nextHdr.nextElementSibling;}
-        // Save detail-row refs before removal — getElementById won't find detached nodes
-        var drMap=new Map();
-        dataRows.forEach(function(row){
-          var dr=document.getElementById("detail-"+row.dataset.repoId);
-          drMap.set(row,dr);
-          if(row.parentNode)row.parentNode.removeChild(row);
-          if(dr&&dr.parentNode)dr.parentNode.removeChild(dr);
-        });
+        var groupMatches=0;
         dataRows.forEach(function(row){
           var match=row.dataset.name.indexOf(q)!==-1;
-          var grpHidden=!!row.dataset.grpHidden;
-          row.style.display=(!match||grpHidden)?"none":"";
-          if(match&&!grpHidden)n++;
-          tbody.insertBefore(row,nextHdr||null);
-          var dr=drMap.get(row);
-          if(dr){
-            if(!match||grpHidden)dr.style.display="none";
-            else dr.style.display=dr.hidden?"none":"";
-            tbody.insertBefore(dr,nextHdr||null);
-          }
+          if(match){matched++;groupMatches++;}
+          if(match&&!row.dataset.grpHidden)eligible.push(row);
+          list.insertBefore(row,nextHdr);
+          var dr=details.get(row);
+          if(dr)list.insertBefore(dr,nextHdr);
         });
-      });
-      // Hide group headers whose rows are all filtered out
-      grpHdrRows.forEach(function(hdrRow){
-        var grpId=hdrRow.dataset.grpId;
-        var visible=Array.from(tbody.querySelectorAll("tr.repo-row[data-grp-id='"+grpId+"']"))
-          .filter(function(r){return r.style.display!=="none";}).length;
-        hdrRow.style.display=visible>0?"":"none";
+        hdrRow.hidden=groupMatches===0;
       });
     }else{
-      var allDataRows=Array.from(tbody.querySelectorAll("tr.repo-row"));
-      allDataRows.sort(function(a,b){return compareRows(a,b,by);});
+      var allDataRows=rows.slice().sort(function(a,b){return compareRows(a,b,key,direction);});
       allDataRows.forEach(function(row){
         var match=row.dataset.name.indexOf(q)!==-1;
-        row.style.display=match?"":"none";
-        if(match)n++;
-        tbody.appendChild(row);
-        var dr=document.getElementById("detail-"+row.dataset.repoId);
-        if(dr){
-          if(!match)dr.style.display="none";
-          else dr.style.display=dr.hidden?"none":"";
-          tbody.appendChild(dr);
-        }
+        if(match){matched++;eligible.push(row);}
+        list.appendChild(row);
+        var dr=details.get(row);
+        if(dr)list.appendChild(dr);
       });
     }
-    if(sh)sh.textContent=String(n);
+    var pages=Math.max(1,Math.ceil(eligible.length/pageSize));
+    page=Math.min(Math.max(0,page),pages-1);
+    var visible=new Set(eligible.slice(page*pageSize,(page+1)*pageSize));
+    rows.forEach(function(row){
+      row.style.display="";
+      row.hidden=!visible.has(row);
+      var dr=details.get(row);
+      if(dr)dr.style.display=visible.has(row)&&!dr.hidden?"":"none";
+    });
+    if(sh)sh.textContent=String(visible.size);
+    var start=eligible.length?page*pageSize+1:0;
+    var end=Math.min((page+1)*pageSize,eligible.length);
+    range.textContent="Showing "+(start?start+"–"+end:"0")+" of "+eligible.length+
+      (eligible.length===1?" repository":" repositories")+
+      (grpHdrRows.length?" in expanded groups"+
+        (matched>eligible.length?" ("+(matched-eligible.length)+" in collapsed groups)":""):"");
+    pageLabel.textContent="Page "+(page+1)+" of "+pages;
+    prev.disabled=page===0;
+    next.disabled=page===pages-1;
+    reset.disabled=!key;
+    var active=sortButtons.find(function(btn){return btn.dataset.sort===key;});
+    status.textContent=active?"Sorted by "+active.dataset.sortLabel+" ("+direction+") within age groups":"Original order";
+    sortButtons.forEach(function(btn){
+      var current=btn===active?direction:"none";
+      var th=btn.closest("th");
+      if(current==="none")th.removeAttribute("aria-sort");
+      else th.setAttribute("aria-sort",current);
+      btn.querySelector(".sort-ind").textContent=current==="none"?"↕":current==="ascending"?"↑":"↓";
+      var nextDirection=btn===active?(direction==="ascending"?"descending":"ascending"):btn.dataset.sortDefault;
+      btn.setAttribute("aria-label","Sort by "+btn.dataset.sortLabel+", "+nextDirection);
+    });
   }
-  f.addEventListener("input",filterAndSort);
-  if(st)st.addEventListener("change",filterAndSort);
-}
-function setupSortHeaders(){
-  var st=document.getElementById("repoSort");
-  document.querySelectorAll(".th-sortable").forEach(function(th){
-    th.addEventListener("click",function(){
-      var sortKey=th.dataset.sort;
-      document.querySelectorAll(".th-sortable").forEach(function(h){
-        h.classList.remove("sort-active");
-        var ind=h.querySelector(".sort-ind");if(ind)ind.textContent="";
-      });
-      th.classList.add("sort-active");
-      var ind=th.querySelector(".sort-ind");
-      if(ind)ind.textContent=(sortKey==="name"||sortKey==="pushed")?"↑":"↓";
-      if(st){st.value=sortKey;st.dispatchEvent(new Event("change"));}
+  repoListRefresh=filterAndSort;
+  f.addEventListener("input",function(){filterAndSort(true);});
+  st.addEventListener("change",function(){
+    key=st.value||null;
+    var active=sortButtons.find(function(btn){return btn.dataset.sort===key;});
+    direction=active?active.dataset.sortDefault:null;
+    filterAndSort(true);
+  });
+  sortButtons.forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var selected=btn.dataset.sort;
+      direction=key===selected?(direction==="ascending"?"descending":"ascending"):btn.dataset.sortDefault;
+      key=selected;
+      st.value=key;
+      filterAndSort(true);
     });
   });
+  reset.addEventListener("click",function(){st.value="";key=null;direction=null;filterAndSort(true);});
+  prev.addEventListener("click",function(){page--;filterAndSort(false);});
+  next.addEventListener("click",function(){page++;filterAndSort(false);});
+  filterAndSort(false);
 }
 function setupGroups(){
   var now=Date.now();
@@ -1878,7 +1911,7 @@ function setupGroups(){
     var hdrTr=document.createElement("tr");
     hdrTr.className="grp-hdr-row";
     hdrTr.dataset.grpId=g.id;
-    hdrTr.innerHTML='<td colspan="9" class="grp-hdr-cell"><span class="grp-chevron">&#9654;</span><span class="grp-label">'+g.label+'</span><span class="grp-count"> ('+grpRows.length+')</span></td>';
+    hdrTr.innerHTML='<td colspan="9" class="grp-hdr-cell"><button type="button" class="grp-hdr-btn" aria-expanded="false" aria-controls="repoList"><span class="grp-chevron" aria-hidden="true">&#9654;</span><span class="grp-label">'+g.label+'</span><span class="grp-count"> ('+grpRows.length+')</span></button></td>';
     hdrTr.addEventListener("click",function(){toggleGroup(g.id);});
     tbody.appendChild(hdrTr);
     grpRows.forEach(function(row){
@@ -1889,6 +1922,7 @@ function setupGroups(){
     if(!firstOpened){
       firstOpened=true;
       hdrTr.classList.add("expanded");
+      hdrTr.querySelector("button").setAttribute("aria-expanded","true");
     }else{
       grpRows.forEach(function(row){
         row.style.display="none";row.dataset.grpHidden="1";
@@ -1902,12 +1936,15 @@ function toggleGroup(grpId){
   var hdrRow=document.querySelector(".grp-hdr-row[data-grp-id='"+grpId+"']");
   if(!hdrRow)return;
   var expanded=hdrRow.classList.toggle("expanded");
+  hdrRow.querySelector("button").setAttribute("aria-expanded",String(expanded));
   var tbody=document.getElementById("repoList");
   var dataRows=Array.from(tbody.querySelectorAll("tr.repo-row[data-grp-id='"+grpId+"']"));
   dataRows.forEach(function(row){
     if(expanded){
       delete row.dataset.grpHidden;
       row.style.display="";
+      var dr=document.getElementById("detail-"+row.dataset.repoId);
+      if(dr)delete dr.dataset.grpHidden;
     }else{
       row.dataset.grpHidden="1";
       row.style.display="none";
@@ -1915,6 +1952,7 @@ function toggleGroup(grpId){
       if(dr){dr.style.display="none";dr.dataset.grpHidden="1";}
     }
   });
+  if(repoListRefresh)repoListRefresh(true);
 }
 function utcDaysSince(isoDate,nowMs){
   var d=new Date(isoDate);
