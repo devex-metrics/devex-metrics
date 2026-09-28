@@ -99,6 +99,8 @@ describe("build-pages", () => {
         const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf8");
         const landscape = JSON.parse(fs.readFileSync(path.join(siteDir, "landscape.json"), "utf8"));
         expect(html).toContain('id="ai-landscape"');
+        expect(html.indexOf('class="repos-section"')).toBeLessThan(html.indexOf('id="ai-landscape"'));
+        expect(html.indexOf('id="ai-landscape"')).toBeLessThan(html.indexOf("</main>"));
         expect(html).toContain("AGENTS.md");
         expect(html).toContain("Sanitized JSON");
         expect(landscape[0]).toMatchObject({ status: "observed", summary: { count: 1 } });

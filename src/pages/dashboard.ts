@@ -14,6 +14,7 @@ import { getCSS } from "./styles.js";
 import { getJS } from "./scripts.js";
 import { buildRepoRow } from "./repo-row.js";
 import { buildLandscapeSection } from "./landscape.js";
+import { getLandscapeControlsJS } from "./landscape-controls.js";
 
 interface Totals {
   openIssues: number;
@@ -648,8 +649,6 @@ ${buildTrialBanner(data, teamRepoNames.length)}
     ${hasCopilotAgentTaskData ? '<div class="card card-chart card-wide"><h2>Agent Tasks by Repository (30&nbsp;d)</h2><canvas id="chartAgentTasks"></canvas></div>' : ""}
   </section>
 
-  ${extras.landscape ? buildLandscapeSection(extras.landscape, extras.landscapeStatus) : ""}
-
   <section class="repos-section" aria-label="Repositories">
     <div class="repos-toolbar">
       <h2>Repositories</h2>
@@ -687,6 +686,8 @@ ${buildTrialBanner(data, teamRepoNames.length)}
     </div>
     <p class="repo-count"><span id="shown">${data.repos.length}</span> of ${data.repos.length} repositories</p>
   </section>
+
+  ${extras.landscape ? buildLandscapeSection(extras.landscape, extras.landscapeStatus) : ""}
 </main>
 
 <footer>Data cached on ${escapeHtml(date)}.${deployedFrom} Served via GitHub Pages. <a href="data.json">Raw JSON</a> &middot; <a href="report.md">Markdown</a></footer>
@@ -694,6 +695,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
 <script>
 var CHART_DATA=${chartPayload};
 ${getJS()}
+${extras.landscape ? getLandscapeControlsJS() : ""}
 </script>
 
 <a href="https://github.com/devex-metrics/devex-metrics" class="github-corner" aria-label="View source on GitHub" target="_blank" rel="noopener noreferrer">
