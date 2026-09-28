@@ -202,7 +202,9 @@ describe("landscape workflow adapter", () => {
       path.resolve(".github", "workflows", "collect-metrics.yml"),
       "utf8"
     );
-    expect(workflow).toContain("        id: landscape-failed\n        if: failure()\n");
+    expect(workflow).toContain(
+      "        id: landscape-failed\n        if: failure() || steps.landscape-token.outcome == 'failure'\n"
+    );
     expect(workflow).toContain("run: node dist/landscape-cli.js mark-failed");
     expect(workflow).toContain(
       "      - name: Publish history store\n        if: success() || (failure() && steps.landscape-failed.outputs.landscape-publish == 'true')"
@@ -214,6 +216,29 @@ describe("landscape workflow adapter", () => {
       "        if: failure() && steps.landscape-token.outcome == 'success'\n"
     );
     expect(workflow).toContain("run: node dist/landscape-cli.js recheck");
+  });
+
+  it("downgrades a failed scan token to a warning and skips the scan", () => {
+    const workflow = fs.readFileSync(
+      path.resolve(".github", "workflows", "collect-metrics.yml"),
+      "utf8"
+    );
+    const tokenStep = workflow
+      .split("      - name: Create landscape scan token\n")[1]
+      ?.split("      - name: ")[0];
+    const warnStep = workflow
+      .split("      - name: Warn about missing landscape token\n")[1]
+      ?.split("      - name: ")[0];
+    expect(tokenStep).toContain("continue-on-error: true");
+    expect(warnStep).toContain("if: steps.landscape-token.outcome == 'failure'");
+    expect(warnStep).toContain("::warning title=Landscape scan skipped::");
+    expect(warnStep).toContain('>> "$GITHUB_STEP_SUMMARY"');
+    expect(workflow).toContain(
+      "        id: landscape-scan\n        if: steps.landscape-token.outcome == 'success'\n"
+    );
+    expect(workflow).toContain(
+      "        id: landscape-ingest\n        if: steps.landscape-token.outcome == 'success'\n"
+    );
   });
 
   it("scrubs stored observations of repos no longer verified public during preparation", () => {

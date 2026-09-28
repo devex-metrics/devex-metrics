@@ -154,9 +154,13 @@ jobs:
             exit 1
           fi
 
+      # Missing App access (e.g. the App is not installed on the landscape
+      # owner) should not fail the whole collection: the next step turns it
+      # into a warning and the landscape is recorded as a failed, stale run.
       - name: Create landscape scan token
         id: landscape-token
         if: steps.landscape.outputs.landscape-enabled == 'true' && steps.landscape.outputs.landscape-scan-needed == 'true'
+        continue-on-error: true
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
           app-id: ${{ vars.APP_ID }}
@@ -165,9 +169,37 @@ jobs:
           repositories: ${{ steps.landscape.outputs.landscape-repositories }}
           permission-contents: read
 
+      - name: Warn about missing landscape token
+        if: steps.landscape-token.outcome == 'failure'
+        env:
+          APP_ID: ${{ vars.APP_ID }}
+          LANDSCAPE_OWNER: ${{ steps.landscape.outputs.landscape-owner }}
+          LANDSCAPE_REPOSITORIES: ${{ steps.landscape.outputs.landscape-repositories }}
+        run: |
+          first_repo="${LANDSCAPE_REPOSITORIES%%,*}"
+          echo "::warning title=Landscape scan skipped::Could not create a GitHub App token for the landscape repositories of '${LANDSCAPE_OWNER}'. Install the App (APP_ID ${APP_ID}) on '${LANDSCAPE_OWNER}' with access to every selected repository and Contents: read. See the step summary for details."
+          {
+            echo "## :warning: Landscape scan skipped"
+            echo
+            echo "The GitHub App token for the landscape scan could not be created, so no repositories were scanned."
+            echo "The last good landscape data is kept and the dashboard marks it as stale. The rest of the collection ran normally."
+            echo
+            echo "A \`404\` on \`GET /repos/${LANDSCAPE_OWNER}/${first_repo}/installation\` means the App has no installation covering that repository."
+            echo
+            echo "### How to fix"
+            echo
+            echo "1. Install the GitHub App identified by \`APP_ID\` (\`${APP_ID}\`) on the **${LANDSCAPE_OWNER}** account."
+            echo "2. Give the installation access to **every** selected landscape repository (or choose *All repositories*), starting with \`${LANDSCAPE_OWNER}/${first_repo}\`."
+            echo "3. Make sure the App has the \`Contents: read\` permission."
+            echo "4. Alternatively, narrow the landscape repository selection to repositories the installation already covers."
+            echo "5. Re-run **Collect DevEx Metrics** to confirm."
+            echo
+            echo "See the *Public landscape* section of \`docs/CONFIGURATION.md\` for details."
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Scan selected public repositories
         id: landscape-scan
-        if: steps.landscape.outputs.landscape-enabled == 'true' && steps.landscape.outputs.landscape-scan-needed == 'true'
+        if: steps.landscape-token.outcome == 'success'
         env:
           GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
         run: npx --no-install repo-landscape scan --config data/landscape.config.json --output data/landscape-raw.json
@@ -189,7 +221,7 @@ jobs:
 
       - name: Ingest sanitized landscape snapshots
         id: landscape-ingest
-        if: steps.landscape.outputs.landscape-enabled == 'true' && steps.landscape.outputs.landscape-scan-needed == 'true'
+        if: steps.landscape-token.outcome == 'success'
         env:
           GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
@@ -202,10 +234,11 @@ jobs:
       # On any failure with landscape enabled, keep the last good landscape
       # data, scrub repos outside the current public selection, and record the
       # failure so the dashboard marks the data as stale. The store is then
-      # published and Pages rebuilt, and the run still reports its failure.
+      # published and Pages rebuilt, and the run still reports its failure
+      # (except for a missing scan token, which is only a warning).
       - name: Record failed landscape run
         id: landscape-failed
-        if: failure()
+        if: failure() || steps.landscape-token.outcome == 'failure'
         env:
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
           DEVEX_HISTORY_DIR: .metrics-data/data
