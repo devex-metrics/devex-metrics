@@ -129,7 +129,7 @@ export interface LandscapeRepoView {
   status: "observed" | "unknown";
   /** Why this repository has no trusted observation. */
   reason?: "private" | "visibility_unknown" | "not_scanned" | "denied" | "scan_error";
-  /** Scan time for an observed repository. */
+  /** Scan time of an observation, or an attempted scan for denied/failed repositories. */
   collectedAt?: string;
   /** Scanner version for an observed repository. */
   scannerVersion?: string;

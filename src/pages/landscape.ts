@@ -115,9 +115,9 @@ export function buildLandscapeSection(
             (index >= 20 ? " hidden" : "");
           if (known) return observedRow(row, sortValues);
           return `<tr${sortValues}><th scope="row">${escapeHtml(row.fullName)}</th>` +
-            `<td class="landscape-unknown">${unknownLabel(row.reason)}</td>` +
+            `<td class="landscape-unknown">${unknownLabel(row.reason)}${row.collectedAt ? ` (scan attempted <time datetime="${escapeHtml(row.collectedAt)}">${escapeHtml(row.collectedAt.slice(0, 10))}</time>)` : ""}</td>` +
             `<td class="landscape-unknown">—</td>` +
-            `<td class="landscape-unknown">${row.collectedAt ? `<time datetime="${escapeHtml(row.collectedAt)}">${escapeHtml(row.collectedAt.slice(0, 10))}</time>` : "—"}</td>` +
+            `<td class="landscape-unknown">—</td>` +
             `<td class="landscape-unknown">—</td></tr>`;
         })
         .join("\n")}</tbody>
