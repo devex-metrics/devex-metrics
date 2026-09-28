@@ -1569,6 +1569,24 @@ describe("countReviewerLoad", () => {
     expect(load).toEqual([{ reviewer: "amy", reviews: 1 }]);
   });
 
+  it("buckets reviews by submission day so the dashboard can filter by period", () => {
+    const load = countReviewerLoad([
+      makePRNode({
+        reviews: {
+          nodes: [
+            { author: { login: "amy" }, submittedAt: "2026-09-01T10:00:00Z", state: "APPROVED" },
+            { author: { login: "amy" }, submittedAt: "2026-09-01T18:00:00Z", state: "COMMENTED" },
+            { author: { login: "amy" }, submittedAt: "2024-02-03T09:00:00Z", state: "COMMENTED" },
+            { author: { login: "amy" }, submittedAt: null, state: "PENDING" },
+          ],
+        },
+      }),
+    ]);
+    expect(load).toEqual([
+      { reviewer: "amy", reviews: 4, byDay: { "2026-09-01": 2, "2024-02-03": 1 } },
+    ]);
+  });
+
   it("ignores reviews whose author is gone", () => {
     const load = countReviewerLoad([
       makePRNode({ reviews: { nodes: [{ author: null }] } }),

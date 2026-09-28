@@ -510,15 +510,24 @@ function giniOf(values){
 function prSize(p){return (p.linesAdded||0)+(p.linesDeleted||0);}
 /**
  * Reviews per reviewer across the selected repositories, heaviest first.
- * Pass a repo name array to restrict it, or null for every collected repo.
+ * Pass a repo name array to restrict it, or null for every collected repo;
+ * pass a cutoff Date to count only reviews submitted on or after it. Data
+ * collected before per-day buckets existed has no dates, so its whole-window
+ * total is used regardless of the cutoff.
  */
-function aggregateReviewerLoad(repoNames){
+function aggregateReviewerLoad(repoNames,cutoff){
   var byRepo=CHART_DATA.reviewerLoadByRepo||{};
+  var cutoffDay=cutoff?cutoff.toISOString().slice(0,10):null;
   var totals={};
   Object.keys(byRepo).forEach(function(name){
     if(repoNames&&repoNames.indexOf(name)===-1)return;
     (byRepo[name]||[]).forEach(function(entry){
-      totals[entry.reviewer]=(totals[entry.reviewer]||0)+entry.reviews;
+      var n=entry.reviews;
+      if(cutoffDay&&entry.byDay){
+        n=0;
+        Object.keys(entry.byDay).forEach(function(day){if(day>=cutoffDay)n+=entry.byDay[day];});
+      }
+      if(n>0)totals[entry.reviewer]=(totals[entry.reviewer]||0)+n;
     });
   });
   return Object.keys(totals).map(function(k){return [k,totals[k]];})
@@ -1086,7 +1095,7 @@ function applyFilter(period){
   updateAbandonment(filteredPR,closedInPeriod,openNow);
   updateAgentCost(repoFiltered);
   updateAIHuman(filteredPR,allPRBase,period,excludeBots);
-  updateReviewLoad(repoFiltered?Array.from(selectedRepos):null);
+  updateReviewLoad(repoFiltered?Array.from(selectedRepos):null,cutoff,period);
   updateCiHealth(cutoff,repoFiltered,period);
 
   updateTrial(cutoff,excludeBots,period);
@@ -1371,8 +1380,8 @@ function fmtMinutes(m){
 }
 
 // ── Review load concentration ──
-function updateReviewLoad(repoNames){
-  var pairs=aggregateReviewerLoad(repoNames);
+function updateReviewLoad(repoNames,cutoff,period){
+  var pairs=aggregateReviewerLoad(repoNames,cutoff);
   var badge=document.getElementById("giniBadge");
   var note=document.getElementById("giniNote");
   var values=pairs.map(function(r){return r[1];});
@@ -1386,16 +1395,17 @@ function updateReviewLoad(repoNames){
       else if(g<=0.4)badge.classList.add("ok");
     }
   }
+  var pLabel=period==="year"?"this year":period==="90days"?"the last 90 days":period==="30days"?"the last 30 days":"the collected window";
   if(note){
     if(pairs.length===0){
-      note.textContent="No reviews recorded for the selected repositories.";
+      note.textContent="No reviews recorded for the selected repositories"+(cutoff?" in "+pLabel:"")+".";
     }else if(pairs.length===1){
       note.textContent="One reviewer ("+pairs[0][0]+") did all "+pairs[0][1]+
-        " recorded review"+(pairs[0][1]===1?"":"s")+" — concentration is undefined with a single reviewer.";
+        " recorded review"+(pairs[0][1]===1?"":"s")+" in "+pLabel+" — concentration is undefined with a single reviewer.";
     }else{
       var total=values.reduce(function(a,b){return a+b;},0);
       var topShare=total>0?Math.round(pairs[0][1]/total*100):0;
-      note.textContent=pairs.length+" reviewers, "+total+" reviews. The busiest ("+pairs[0][0]+
+      note.textContent=pairs.length+" reviewers, "+total+" reviews in "+pLabel+". The busiest ("+pairs[0][0]+
         ") carries "+topShare+"% of them. A Gini near 0 means the load is shared; near 1 means one person carries it.";
     }
   }
