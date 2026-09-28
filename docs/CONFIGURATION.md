@@ -246,6 +246,10 @@ fails before minting a token rather than falling back to all repositories in
 the installation. The App private key is supplied only to the token-creation
 action, not the scanner; the scanner receives only the short-lived
 installation token.
+A failure to create the scan token does not fail the collection: the run
+reports a **Landscape scan skipped** warning with the fix in its step summary,
+keeps the last good landscape data and records the landscape run as failed, so
+the dashboard marks it as stale.
 If **Create landscape scan token** fails with a `404` for
 `GET /repos/{owner}/{first-repository}/installation`, check that the App
 identified by `APP_ID` is installed with access to that first selected
