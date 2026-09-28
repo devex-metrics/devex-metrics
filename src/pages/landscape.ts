@@ -33,7 +33,7 @@ function fileRow(file: LandscapeFile, added: Set<string>, changed: Set<string>):
   </tr>`;
 }
 
-function observedRow(row: LandscapeRepoView): string {
+function observedRow(row: LandscapeRepoView, attributes: string): string {
   const files = row.files ?? [];
   const summary = row.summary;
   if (!summary || !row.headSha || !row.collectedAt || !row.scannerVersion) {
@@ -60,7 +60,7 @@ function observedRow(row: LandscapeRepoView): string {
   const counts =
     `${summary.count} observed · ${summary.stale_count} older signals` +
     (summary.unknown_count ? ` · ${summary.unknown_count} unknown ages` : "");
-  return `<tr>
+  return `<tr${attributes}>
     <th scope="row">${escapeHtml(row.fullName)}</th>
     <td>${counts}</td>
     <td>${escapeHtml(driftLabel)}</td>
@@ -89,7 +89,7 @@ function staleNotice(status: LandscapeRunStatus | undefined): string {
   return `<div class="landscape-stale" role="status"><strong>Stale data:</strong> the latest collection run at ${timeTag(status.attempted_at)} failed, so this landscape was not refreshed. ${shown}${run}</div>`;
 }
 
-/** Render the opt-in landscape panel alongside the existing dashboard's metrics. */
+/** Render the opt-in landscape panel after the dashboard's other metrics. */
 export function buildLandscapeSection(
   rows: readonly LandscapeRepoView[],
   status?: LandscapeRunStatus
@@ -97,15 +97,39 @@ export function buildLandscapeSection(
   const observed = rows.filter((row) => row.status === "observed").length;
   const content = rows.length
     ? `<div class="landscape-table-wrap"><table class="landscape-table" aria-label="AI instruction file observations by repository">
-      <thead><tr><th scope="col">Repository</th><th scope="col">AI instruction files</th><th scope="col">File drift</th><th scope="col">Observed at</th><th scope="col">Detail</th></tr></thead>
-      <tbody>${rows
-        .map((row) =>
-          row.status === "observed"
-            ? observedRow(row)
-            : `<tr><th scope="row">${escapeHtml(row.fullName)}</th><td colspan="4" class="landscape-unknown">${unknownLabel(row.reason)}${row.collectedAt ? ` (scan <time datetime="${escapeHtml(row.collectedAt)}">${escapeHtml(row.collectedAt.slice(0, 10))}</time>)` : ""}</td></tr>`
-        )
+      <thead><tr>
+        <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="name" data-landscape-default="ascending" data-landscape-label="Repository">Repository <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
+        <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="count" data-landscape-default="descending" data-landscape-label="AI instruction files">AI instruction files <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
+        <th scope="col" title="Total files added, changed and removed since the previous observation"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="changes" data-landscape-default="descending" data-landscape-label="File drift (total changes)">File drift <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
+        <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="observed" data-landscape-default="descending" data-landscape-label="Observed at">Observed at <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
+        <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="detail" data-landscape-default="descending" data-landscape-label="Detail availability">Detail <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
+      </tr></thead>
+      <tbody id="landscapeRows">${rows
+        .map((row, index) => {
+          const known = row.status === "observed";
+          const sortValues =
+            ` data-landscape-index="${index}"` +
+            ` data-landscape-count="${known ? row.summary?.count ?? "" : ""}"` +
+            ` data-landscape-changes="${known && row.drift ? row.drift.added.length + row.drift.content_changed.length + row.drift.removed.length : ""}"` +
+            ` data-landscape-observed="${escapeHtml(known ? row.collectedAt ?? "" : "")}" data-landscape-detail="${known ? 1 : 0}"` +
+            (index >= 20 ? " hidden" : "");
+          if (known) return observedRow(row, sortValues);
+          return `<tr${sortValues}><th scope="row">${escapeHtml(row.fullName)}</th>` +
+            `<td class="landscape-unknown">${unknownLabel(row.reason)}${row.collectedAt ? ` (scan attempted <time datetime="${escapeHtml(row.collectedAt)}">${escapeHtml(row.collectedAt.slice(0, 10))}</time>)` : ""}</td>` +
+            `<td class="landscape-unknown">—</td>` +
+            `<td class="landscape-unknown">—</td>` +
+            `<td class="landscape-unknown">—</td></tr>`;
+        })
         .join("\n")}</tbody>
-    </table></div>`
+    </table></div>
+    <nav class="landscape-pagination" aria-label="AI instruction landscape pages">
+      <span id="landscapeRange" role="status" aria-live="polite">Showing 1–${Math.min(20, rows.length)} of ${rows.length} repositories</span>
+      <span class="landscape-page-controls">
+        <button type="button" id="landscapePrev" aria-controls="landscapeRows" disabled>Previous</button>
+        <span id="landscapePage">Page 1 of ${Math.ceil(rows.length / 20)}</span>
+        <button type="button" id="landscapeNext" aria-controls="landscapeRows"${rows.length <= 20 ? " disabled" : ""}>Next</button>
+      </span>
+    </nav>`
     : `<p class="landscape-empty">No repositories are selected for DevEx collection; there is nothing to scan.</p>`;
   return `<section class="card landscape-section" id="ai-landscape" aria-labelledby="landscape-heading">
     <div class="landscape-heading"><div>
@@ -113,6 +137,7 @@ export function buildLandscapeSection(
       <p class="metric-lede">Observed files and content-hash drift at each repository head. Presence and age are not a readiness score or a correctness assessment; this snapshot does not follow the PR period or bot filters.</p>
     </div><div class="landscape-actions"><span class="landscape-coverage">${observed} / ${rows.length} observed</span><a href="landscape.json">Sanitized JSON</a></div></div>
     ${staleNotice(status)}
+    ${rows.length ? '<div class="landscape-sort-toolbar"><span id="landscapeSortStatus" aria-live="polite">Original order</span><button type="button" id="landscapeSortReset" aria-controls="landscapeRows" disabled>Clear sort</button></div>' : ""}
     ${content}
   </section>`;
 }

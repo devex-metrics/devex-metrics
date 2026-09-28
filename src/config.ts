@@ -170,8 +170,6 @@ export interface CollectionConfig {
   maxPRPages: number;
   /** Hours before a per-repo cache entry is considered stale. */
   maxRepoAgeHours: number;
-  /** Exact, published repo-landscape CLI version; empty until its OIDC release exists. */
-  landscapeCliVersion: string;
   /** Days before the external scanner marks a file-age signal stale. */
   landscapeStaleAfterDays: number;
   features: FeatureFlags;
@@ -223,7 +221,6 @@ export function defaultConfig(): DevexConfig {
       historyWeeks: 104,
       maxPRPages: 10,
       maxRepoAgeHours: 8,
-      landscapeCliVersion: "",
       landscapeStaleAfterDays: 90,
       features: { dependents: false, copilotAgent: true, ciHealth: false, landscape: false },
       backfill: {
@@ -397,7 +394,6 @@ function applyEnv(config: DevexConfig, env: Env): void {
   assign(config.collection, "historyWeeks", int(env, "DEVEX_HISTORY_WEEKS"));
   assign(config.collection, "maxPRPages", int(env, "DEVEX_MAX_PR_PAGES"));
   assign(config.collection, "maxRepoAgeHours", int(env, "DEVEX_MAX_REPO_AGE_HOURS"));
-  assign(config.collection, "landscapeCliVersion", str(env, "DEVEX_LANDSCAPE_CLI_VERSION"));
   assign(config.collection, "landscapeStaleAfterDays", positiveInt(env, "DEVEX_LANDSCAPE_STALE_AFTER_DAYS"));
   assign(config.collection.features, "dependents", bool(env, "DEVEX_FEATURE_DEPENDENTS"));
   assign(config.collection.features, "copilotAgent", bool(env, "DEVEX_FEATURE_COPILOT_AGENT"));

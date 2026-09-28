@@ -4,6 +4,7 @@ import { Octokit } from "@octokit/rest";
 import { loadConfig, assertUsable } from "./config.js";
 import type { OrgMetrics } from "./types.js";
 import {
+  installedLandscapeScannerVersion,
   loadLandscapeSelection,
   publicLandscapeSelection,
   saveLandscapeRunStatus,
@@ -32,14 +33,6 @@ function prepare(): void {
   if (scrubbed > 0) {
     console.log(
       `Removed ${scrubbed} stored landscape observations for repositories no longer verified public`
-    );
-  }
-  // Checked after the scrub, so a bad rollout still publishes that cleanup.
-  const version = config.collection.landscapeCliVersion;
-  if (!/^\d+\.\d+\.\d+$/.test(version)) {
-    throw new Error(
-      "Set DEVEX_LANDSCAPE_CLI_VERSION to an exact published OIDC release " +
-        "(for example 0.1.0) before enabling landscape collection"
     );
   }
   const repositories = publicLandscapeSelection(metrics)
@@ -72,7 +65,6 @@ function prepare(): void {
   }
   writeOutput("landscape-enabled", "true");
   writeOutput("landscape-scan-needed", String(repositories.length > 0));
-  writeOutput("landscape-cli-version", version);
   if (repositories.length > 0) {
     writeOutput("landscape-owner", metrics.owner);
     writeOutput("landscape-repositories", repositories.map((repo) => repo.split("/")[1]).join(","));
@@ -145,7 +137,7 @@ async function ingest(file: string | undefined): Promise<void> {
     raw,
     metrics,
     config.collection.landscapeStaleAfterDays,
-    config.collection.landscapeCliVersion
+    installedLandscapeScannerVersion()
   );
   const scan = saveLandscapeScan(historyDir, metrics, raw);
   saveLandscapeRunStatus(historyDir, metrics.owner, {

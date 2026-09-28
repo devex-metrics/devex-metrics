@@ -52,8 +52,7 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_FEATURE_DEPENDENTS` | bool | Dependent-repo counts. Default `false`. |
 | `DEVEX_FEATURE_COPILOT_AGENT` | bool | Copilot agent metrics. Default `true`. |
 | `DEVEX_FEATURE_CI_HEALTH` | bool | CI health crawl (build success, duration, queue time, flaky re-runs). Default `false`. |
-| `DEVEX_FEATURE_LANDSCAPE` | bool | Opt in to the public-repository landscape scan and show its results on Pages. Default `false`; disabled preparation skips scanning and installation. |
-| `DEVEX_LANDSCAPE_CLI_VERSION` | string | Exact published `@devex-metrics/repo-landscape` version required when the landscape feature is enabled. Default empty; a missing or non-exact version fails preparation. Can also be set in `DEVEX_CONFIG`. |
+| `DEVEX_FEATURE_LANDSCAPE` | bool | Opt in to the public-repository landscape scan and show its results on Pages. Default `false`; disabled preparation skips scanning and requesting an additional token. The scanner is installed by the normal `npm ci` regardless of this flag. |
 | `DEVEX_LANDSCAPE_STALE_AFTER_DAYS` | int | Landscape file staleness threshold in days (`collection.landscapeStaleAfterDays`). Default `90`. |
 | `DEVEX_CI_PAGES_PER_RUN` | int | CI crawl budget per run, all repos. Default `20`. |
 | `DEVEX_CI_MAX_PAGES_PER_REPO` | int | CI crawl cap per repo per run. Default `5`. |
@@ -207,50 +206,44 @@ and `maxPagesPerRepo` keep their existing meaning.
 
 ## Public repository landscape (opt-in)
 
-The landscape scan is **off by default**. No scanner package is installed, no
-extra token is created and no repositories are scanned unless the feature is
-enabled via `DEVEX_FEATURE_LANDSCAPE` or `DEVEX_CONFIG`. Roll it out only after
-an exact version of `@devex-metrics/repo-landscape` has been published and
-verified; there is no assumed or default published version. The intended
-`0.1.0` release is not yet published (pending OIDC publishing), so leave the
-feature off and its version unset until that release is available:
+The landscape scan is **off by default**. The published
+`@devex-metrics/repo-landscape` scanner is a production npm dependency installed
+with the rest of the application by `npm ci` and updated through Dependabot.
+No additional token is created and no repositories are scanned unless the
+feature is enabled via `DEVEX_FEATURE_LANDSCAPE` or `DEVEX_CONFIG`:
 
 1. Ensure the GitHub App installed on the configured owner has `Contents: read`
    and configure its `APP_ID` variable and `APP_PRIVATE_KEY` secret (also used
    for the existing collection).
-2. Set `DEVEX_LANDSCAPE_CLI_VERSION` to that release's exact `X.Y.Z` version,
-   not a range, tag such as `latest`, or an empty value. Alternatively set
-   `collection.landscapeCliVersion` in `DEVEX_CONFIG`.
-3. Set `DEVEX_FEATURE_LANDSCAPE=true` (or
+2. Set `DEVEX_FEATURE_LANDSCAPE=true` (or
    `collection.features.landscape=true` in `DEVEX_CONFIG`) and run **Collect
    DevEx Metrics**. Disable that setting to stop scans and hide landscape
    results on Pages.
 
-Publishing via npm OIDC requires npm >=11.5.1 on the publishing side. This
-does not require a global npm upgrade for the collection workflow.
-
 After the normal collection, `landscape-cli.js prepare` always runs. It
 resolves `DEVEX_CONFIG` and discrete variables (discrete variables take
-precedence), then returns disabled without scanning or installing anything
-when the feature is off. When enabled, it requires an exact published CLI
-version and reads the latest selected `RepoMetrics` from `DEVEX_HISTORY_DIR`
-to write `data/landscape.config.json` with an explicit public-only
+precedence), then returns disabled without scanning or minting a token
+when the feature is off. When enabled, it reads the latest selected
+`RepoMetrics` from `DEVEX_HISTORY_DIR` to write `data/landscape.config.json`
+with an explicit public-only
 `{ "schema_version": 1, "repositories": ["owner/repo"], "stale_after_days": 90 }`
 config (shown with the default threshold). `stale_after_days` uses
 `collection.landscapeStaleAfterDays`, overridden by
 `DEVEX_LANDSCAPE_STALE_AFTER_DAYS`. The scanner does not rediscover
 repositories: prepare derives the public, same-owner subset from the
 DevEx-selected snapshot. Only if preparation says a scan is needed does the
-workflow mint an installation token
-scoped to the configured owner **and only the selected public repositories**
-with `Contents: read`, install the pinned CLI at the **resolved version from
-preparation** (not just the discrete version variable) without install scripts
-or lockfile changes, and scan that list. Prepare supplies comma-separated
-same-owner repository names to the token action; if that list is missing or
-invalid when a scan is needed, the workflow fails before minting a token
-rather than falling back to all repositories in the installation. The App
-private key is supplied only to the token-creation action, not the scanner;
-the scanner receives only the short-lived installation token.
+workflow mint an installation token scoped to the configured owner
+**and only the selected public repositories** with `Contents: read` and run
+the CLI already in `node_modules` with
+`npx --no-install`. The lockfile pins the installed version; ingestion verifies
+the raw scan's `scanner_version` matches that package's version before
+persisting the sanitized scan. The CLI requires Python 3.11 or newer.
+Prepare supplies comma-separated same-owner repository names to the token
+action; if that list is missing or invalid when a scan is needed, the workflow
+fails before minting a token rather than falling back to all repositories in
+the installation. The App private key is supplied only to the token-creation
+action, not the scanner; the scanner receives only the short-lived
+installation token.
 Ingestion uses that same restricted token to re-check every repository is
 still public before persisting any file paths. A privacy change, failed
 re-check or missing token fails the scan rather than publishing stale paths.
@@ -258,9 +251,9 @@ Stored observations of any repository that is no longer verified public are
 removed from the latest landscape observation and every stored snapshot, at
 three points: `prepare` drops every repository outside the refreshed public
 selection (now private, unknown visibility or no longer selected), before it
-checks the CLI version; any failure after the scan token is created (CLI
-install or scanner) re-checks the selection with that token; and ingestion
-re-checks the whole prepared selection before it reads the scanner output, so
+requests the scan token; any failure after the scan token is created
+re-checks the selection with that token; and ingestion re-checks the whole
+prepared selection before it reads the scanner output, so
 a partial or malformed output cannot skip it. Those repositories then show as
 unknown instead of keeping their old paths online. Earlier commits on the
 `metrics-data` branch still contain them.
