@@ -212,9 +212,11 @@ with the rest of the application by `npm ci` and updated through Dependabot.
 No additional token is created and no repositories are scanned unless the
 feature is enabled via `DEVEX_FEATURE_LANDSCAPE` or `DEVEX_CONFIG`:
 
-1. Ensure the GitHub App installed on the configured owner has `Contents: read`
-   and configure its `APP_ID` variable and `APP_PRIVATE_KEY` secret (also used
-   for the existing collection).
+1. Ensure the GitHub App has `Contents: read` and its installation on the
+   configured owner includes **every selected public repository**, including
+   the first one. Public visibility alone does not give the App access.
+   Configure its `APP_ID` variable and `APP_PRIVATE_KEY` secret (also used for
+   the existing collection).
 2. Set `DEVEX_FEATURE_LANDSCAPE=true` (or
    `collection.features.landscape=true` in `DEVEX_CONFIG`) and run **Collect
    DevEx Metrics**. Disable that setting to stop scans and hide landscape
@@ -244,6 +246,13 @@ fails before minting a token rather than falling back to all repositories in
 the installation. The App private key is supplied only to the token-creation
 action, not the scanner; the scanner receives only the short-lived
 installation token.
+If **Create landscape scan token** fails with a `404` for
+`GET /repos/{owner}/{first-repository}/installation`, check that the App
+identified by `APP_ID` is installed with access to that first selected
+repository, then confirm the installation covers every other selected public
+repository and grants `Contents: read`. The action accepts both comma- and
+newline-separated repository names; the comma-separated list is not the cause
+of this error. Upgrading the token action does not grant missing App access.
 Ingestion uses that same restricted token to re-check every repository is
 still public before persisting any file paths. A privacy change, failed
 re-check or missing token fails the scan rather than publishing stale paths.
