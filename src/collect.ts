@@ -34,6 +34,7 @@ interface ResolvedRepoRef {
   pushedAt: string;
   isTeamRepo: boolean;
   defaultBranch: string;
+  sizeKb?: number;
 }
 
 export interface CollectOptions {
@@ -141,6 +142,7 @@ export async function collectGroup(
         pushedAt: data.pushed_at ?? "",
         isTeamRepo: false,
         defaultBranch: data.default_branch ?? "",
+        sizeKb: data.size,
       });
     } catch (err: unknown) {
       const status = (err as { status?: number }).status;
@@ -210,7 +212,7 @@ async function collectMetricsForRepoList(
   // Collects pre-fetched GraphQL PR nodes per repo for the trends collector.
   const prDataByRepo = new Map<string, GraphQLPRNode[]>();
 
-  for (const { fullName, isPrivate, pushedAt, isTeamRepo, defaultBranch } of repoList) {
+  for (const { fullName, isPrivate, pushedAt, isTeamRepo, defaultBranch, sizeKb } of repoList) {
     // Reuse per-repo data if it is recent enough. The team flag comes from the
     // current config rather than the cache, so re-scoping a trial takes effect
     // without discarding collected data.
@@ -225,6 +227,7 @@ async function collectMetricsForRepoList(
           isPrivate,
           isTeamRepo,
           defaultBranch: defaultBranch || cached.defaultBranch,
+          sizeKb: sizeKb ?? cached.sizeKb,
         });
         continue;
       }
@@ -313,6 +316,7 @@ async function collectMetricsForRepoList(
       pushedAt,
       isTeamRepo,
       defaultBranch: defaultBranch || undefined,
+      sizeKb,
       collectedAt: new Date().toISOString(),
       issues,
       pullRequests: prCounts,
