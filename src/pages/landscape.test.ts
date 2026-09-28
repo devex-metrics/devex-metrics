@@ -234,6 +234,34 @@ describe("landscape dashboard view", () => {
     expect(dom.window.document.querySelectorAll("#landscapeRows > tr")).toHaveLength(4);
   });
 
+  it("keeps failed-scan timestamps visible but sorts every unobserved row after observations", () => {
+    const old = observed();
+    old.fullName = "acme/old";
+    old.collectedAt = "2026-09-23T10:30:00.000Z";
+    const recent = observed();
+    recent.fullName = "acme/recent";
+    const rows: LandscapeRepoView[] = [
+      { fullName: "acme/denied", status: "unknown", reason: "denied", collectedAt: "2026-09-29T10:30:00.000Z" },
+      old,
+      { fullName: "acme/failed", status: "unknown", reason: "scan_error", collectedAt: "2026-09-30T10:30:00.000Z" },
+      recent,
+      { fullName: "acme/unverified", status: "unknown", reason: "visibility_unknown" },
+    ];
+    const dom = mount(rows);
+    const doc = dom.window.document;
+    expect(doc.querySelectorAll('#landscapeRows > tr[data-landscape-observed=""]')).toHaveLength(3);
+    expect(doc.querySelector<HTMLTableRowElement>("#landscapeRows > tr")?.cells[3].textContent).toContain("2026-09-29");
+    const button = doc.querySelector<HTMLButtonElement>('[data-landscape-sort="observed"]')!;
+    button.click();
+    expect(visibleNames(dom)).toEqual([
+      "acme/recent", "acme/old", "acme/denied", "acme/failed", "acme/unverified",
+    ]);
+    button.click();
+    expect(visibleNames(dom)).toEqual([
+      "acme/old", "acme/recent", "acme/denied", "acme/failed", "acme/unverified",
+    ]);
+  });
+
   it("updates page counts when rows change and keeps the empty selected scope free of controls", async () => {
     const empty = mount([]);
     expect(empty.window.document.querySelector("#landscapeRows")).toBeNull();

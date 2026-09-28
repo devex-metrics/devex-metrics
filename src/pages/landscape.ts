@@ -111,7 +111,7 @@ export function buildLandscapeSection(
             ` data-landscape-index="${index}"` +
             ` data-landscape-count="${known ? row.summary?.count ?? "" : ""}"` +
             ` data-landscape-changes="${known && row.drift ? row.drift.added.length + row.drift.content_changed.length + row.drift.removed.length : ""}"` +
-            ` data-landscape-observed="${escapeHtml(row.collectedAt ?? "")}" data-landscape-detail="${known ? 1 : 0}"` +
+            ` data-landscape-observed="${known ? escapeHtml(row.collectedAt ?? "") : ""}" data-landscape-detail="${known ? 1 : 0}"` +
             (index >= 20 ? " hidden" : "");
           if (known) return observedRow(row, sortValues);
           return `<tr${sortValues}><th scope="row">${escapeHtml(row.fullName)}</th>` +
