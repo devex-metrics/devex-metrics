@@ -1831,7 +1831,9 @@ function setupControls(){
     var start=eligible.length?page*pageSize+1:0;
     var end=Math.min((page+1)*pageSize,eligible.length);
     range.textContent="Showing "+(start?start+"–"+end:"0")+" of "+eligible.length+
-      " repositories in expanded groups"+(matched>eligible.length?" ("+(matched-eligible.length)+" in collapsed groups)":"");
+      (eligible.length===1?" repository":" repositories")+
+      (grpHdrRows.length?" in expanded groups"+
+        (matched>eligible.length?" ("+(matched-eligible.length)+" in collapsed groups)":""):"");
     pageLabel.textContent="Page "+(page+1)+" of "+pages;
     prev.disabled=page===0;
     next.disabled=page===pages-1;

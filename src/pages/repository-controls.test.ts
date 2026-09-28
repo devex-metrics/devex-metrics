@@ -86,6 +86,11 @@ describe("repository table controls", () => {
       expect((doc.getElementById("repoPrev") as HTMLButtonElement).disabled).toBe(true);
       expect((doc.getElementById("repoNext") as HTMLButtonElement).disabled).toBe(count <= 20);
       expect(doc.getElementById("shown")?.textContent).toBe(String(Math.min(count, 20)));
+      if (count === 0) {
+        expect(doc.getElementById("repoRange")?.textContent).toBe("Showing 0 of 0 repositories");
+      } else {
+        expect(doc.getElementById("repoRange")?.textContent).toContain("in expanded groups");
+      }
       if (count > 20) {
         const next = doc.getElementById("repoNext") as HTMLButtonElement;
         next.click();
@@ -157,6 +162,24 @@ describe("repository table controls", () => {
     expect(names()).toEqual(["new", "old", "missing"]);
     sort.click();
     expect(names()).toEqual(["old", "new", "missing"]);
+    dom.window.close();
+  });
+
+  it("uses ungrouped range wording when no age-group headers are present", () => {
+    const { dom, doc } = render([repo("one"), repo("two")]);
+    expect(doc.getElementById("repoRange")?.textContent).toBe(
+      "Showing 1–2 of 2 repositories in expanded groups"
+    );
+    doc.querySelectorAll(".grp-hdr-row").forEach((header) => header.remove());
+    const search = doc.getElementById("repoFilter") as HTMLInputElement;
+    search.dispatchEvent(new dom.window.Event("input"));
+    expect(doc.getElementById("repoRange")?.textContent).toBe("Showing 1–2 of 2 repositories");
+    search.value = "one";
+    search.dispatchEvent(new dom.window.Event("input"));
+    expect(doc.getElementById("repoRange")?.textContent).toBe("Showing 1–1 of 1 repository");
+    search.value = "missing";
+    search.dispatchEvent(new dom.window.Event("input"));
+    expect(doc.getElementById("repoRange")?.textContent).toBe("Showing 0 of 0 repositories");
     dom.window.close();
   });
 
