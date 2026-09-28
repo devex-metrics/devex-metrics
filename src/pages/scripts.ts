@@ -1751,15 +1751,30 @@ function trendAnnotations(labels){
   return {annotations:merged};
 }
 var repoNameCollator=new Intl.Collator(undefined,{numeric:true,sensitivity:"base"});
+var repoIsoTimestamp=/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$/;
+function parsePushedTimestamp(value){
+  if(!value||!repoIsoTimestamp.test(value))return null;
+  var timestamp=Date.parse(value);
+  if(!Number.isFinite(timestamp))return null;
+  var day=value.slice(0,10);
+  var calendarDay=new Date(day+"T00:00:00Z");
+  if(!Number.isFinite(calendarDay.getTime())||calendarDay.toISOString().slice(0,10)!==day)return null;
+  if(Number(value.slice(11,13))>23||
+     Number(value.slice(14,16))>59||
+     Number(value.slice(17,19))>59)return null;
+  if(!value.endsWith("Z")&&
+     (Number(value.slice(-5,-3))>23||Number(value.slice(-2))>59))return null;
+  return timestamp;
+}
 function compareRows(a,b,by,direction){
   var original=Number(a.dataset.repoIndex)-Number(b.dataset.repoIndex);
   if(!by)return original;
   var result;
   if(by==="name")result=repoNameCollator.compare(a.dataset.name,b.dataset.name);
   else if(by==="pushed"){
-    var pa=Date.parse(a.dataset.pushed||""),pb=Date.parse(b.dataset.pushed||"");
-    if(!isFinite(pa))return isFinite(pb)?1:original;
-    if(!isFinite(pb))return -1;
+    var pa=parsePushedTimestamp(a.dataset.pushed),pb=parsePushedTimestamp(b.dataset.pushed);
+    if(pa===null)return pb===null?original:1;
+    if(pb===null)return -1;
     result=pa-pb;
   }else result=Number(a.dataset[by]||0)-Number(b.dataset[by]||0);
   return (direction==="descending"?-result:result)||original;

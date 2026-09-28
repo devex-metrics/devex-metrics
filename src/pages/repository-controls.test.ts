@@ -188,6 +188,51 @@ describe("repository table controls", () => {
     dom.window.close();
   });
 
+  it("ranks non-ISO and overflowing pushed timestamps last in both directions", () => {
+    const repos = [
+      repo("invalid-calendar", 0, "2026-02-31T10:30:00Z"),
+      repo("missing"),
+      repo("same-offset", 0, "2026-03-03T09:00:00-03:00"),
+      repo("non-iso", 0, "Sep 24 2026"),
+      repo("later-offset", 0, "2026-03-03T15:00:00+02:00"),
+      repo("invalid-hour", 0, "2026-03-03T24:00:00Z"),
+      repo("earlier-utc", 0, "2026-03-03T10:30:00Z"),
+      repo("same-utc", 0, "2026-03-03T12:00:00Z"),
+    ];
+    delete repos[1].pushedAt;
+    const { dom, doc } = render(repos);
+    const unknownNames = new Set(["invalid-calendar", "missing", "non-iso", "invalid-hour"]);
+    const unknownOrder = Array.from(
+      doc.querySelectorAll<HTMLTableRowElement>("#repoList tr.repo-row")
+    )
+      .filter((row) => unknownNames.has(row.dataset.repoName ?? ""))
+      .sort((a, b) => Number(a.dataset.repoIndex) - Number(b.dataset.repoIndex))
+      .map((row) => row.dataset.repoName);
+    doc.querySelectorAll(".grp-hdr-row").forEach((header) => header.remove());
+    (doc.getElementById("repoFilter") as HTMLInputElement).dispatchEvent(
+      new dom.window.Event("input")
+    );
+    const names = () => visibleRows(doc).map((row) => row.dataset.repoName);
+    const sort = doc.querySelector<HTMLButtonElement>('.repo-sort[data-sort="pushed"]')!;
+    sort.click();
+    expect(names()).toEqual([
+      "later-offset",
+      "same-offset",
+      "same-utc",
+      "earlier-utc",
+      ...unknownOrder,
+    ]);
+    sort.click();
+    expect(names()).toEqual([
+      "earlier-utc",
+      "same-offset",
+      "same-utc",
+      "later-offset",
+      ...unknownOrder,
+    ]);
+    dom.window.close();
+  });
+
   it("uses ungrouped range wording when no age-group headers are present", () => {
     const { dom, doc } = render([repo("one"), repo("two")]);
     expect(doc.getElementById("repoRange")?.textContent).toBe(
