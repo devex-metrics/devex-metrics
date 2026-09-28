@@ -81,7 +81,7 @@ export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string
 
   const detailRow =
     `<tr class="repo-detail-row" id="detail-${repoId}" hidden>` +
-    `<td colspan="9" class="repo-detail-cell">` +
+    `<td colspan="9" class="repo-detail-cell"><div class="repo-detail-inner">` +
     `<div class="stats-grid">` +
     `<div class="sg"><h4>Issues</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.issues.open}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.issues.closed}</dd></div></dl></div>` +
     `<div class="sg"><h4>Pull Requests</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.pullRequests.open}</dd></div><div class="dr"><dt>Merged</dt><dd>${repo.pullRequests.merged}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.pullRequests.closed}</dd></div></dl></div>` +
@@ -104,7 +104,7 @@ export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string
       : "") +
     `</div>` +
     prTable +
-    `</td>` +
+    `</div></td>` +
     `</tr>`;
 
   return dataRow + "\n" + detailRow;

@@ -68,11 +68,14 @@ a{color:var(--accent)}
 .repo-table{width:100%;border-collapse:collapse;background:var(--card);font-size:.85rem}
 .repo-table thead tr{border-bottom:2px solid var(--border)}
 .repo-table th{padding:.55rem .8rem;text-align:left;font-size:.75rem;text-transform:uppercase;
-  letter-spacing:.04em;color:var(--muted);font-weight:600;white-space:nowrap;background:var(--card);position:sticky;top:0;z-index:1}
+  letter-spacing:.04em;color:var(--muted);font-weight:600;background:var(--card);position:sticky;top:0;z-index:1}
 .repo-table td{padding:.5rem .8rem;border-bottom:1px solid var(--border);vertical-align:middle}
 .repo-row:hover>td{background:var(--accent-s)}
 .repo-row.expanded>td{background:var(--accent-s)}
 .repo-detail-cell{background:var(--bg);padding:1rem 1.25rem}
+/* Zero intrinsic width so an expanded repo's details never widen the table;
+   min-width:100% still lets them fill the cell. */
+.repo-detail-inner{width:0;min-width:100%}
 .repo-table tbody tr[hidden]{display:none}
 .repo-sort{font:inherit;font-weight:inherit;letter-spacing:inherit;text-transform:inherit;
   color:inherit;background:none;border:0;cursor:pointer;text-align:inherit;white-space:inherit}
@@ -88,7 +91,7 @@ a{color:var(--accent)}
 .chev{display:inline-block;transition:transform .2s}
 .repo-row.expanded .chev{transform:rotate(90deg)}
 .rname{font-weight:600;color:var(--accent);text-decoration:none;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.85rem}
+  overflow-wrap:anywhere;font-size:.85rem}
 .rname:hover{text-decoration:underline}
 .col-muted{color:var(--muted);font-size:.8rem}
 .col-num{text-align:right}
@@ -113,6 +116,7 @@ dl{display:flex;flex-direction:column;gap:.15rem}
 .pr-wrap{margin-top:.5rem}.pr-wrap h4{font-size:.85rem;margin-bottom:.5rem}
 .pr-tbl{width:100%;border-collapse:collapse;font-size:.8rem}
 .pr-tbl th,.pr-tbl td{text-align:left;padding:.35rem .5rem;border-bottom:1px solid var(--border)}
+.pr-tbl td:first-child{overflow-wrap:anywhere}
 .pr-tbl th{color:var(--muted);font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.03em}
 .add{color:var(--ok);font-weight:600}.del{color:var(--err);font-weight:600}
 .repo-count{text-align:center;font-size:.8rem;color:var(--muted);margin-top:.75rem}
