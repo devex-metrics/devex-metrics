@@ -86,6 +86,11 @@ describe("loadConfig", () => {
     expect(c.repos.excludeArchived).toBe(true);
     expect(c.collection.features.dependents).toBe(false);
     expect(c.collection.features.landscape).toBe(false);
+    expect(c.collection.features.publicDiscovery).toBe(false);
+    expect(c.collection.publicDiscoveryMaxRepos).toBe(0);
+    expect(c.collection.publicDiscoveryMaxSizeKb).toBe(512000);
+    expect(c.collection.publicDiscoveryMaxCloneSizeKb).toBe(8388608);
+    expect(c.collection.publicDiscoveryCloneMinutes).toBe(60);
     expect(c.collection.landscapeStaleAfterDays).toBe(90);
     expect(c.collection.incremental).toBe(false);
     expect(c.team).toBeUndefined();
@@ -123,6 +128,33 @@ describe("loadConfig", () => {
       .toThrow(/positive integer/);
     expect(() => loadConfig({ DEVEX_LANDSCAPE_STALE_AFTER_DAYS: "90days" }))
       .toThrow(/positive integer/);
+  });
+
+  it("parses and validates independent public discovery selection and clone-run budgets", () => {
+    const config = loadConfig({
+      DEVEX_CONFIG: JSON.stringify({ collection: { features: { publicDiscovery: true }, publicDiscoveryMaxRepos: 5 } }),
+      DEVEX_PUBLIC_DISCOVERY_MAX_REPOS: "20",
+      DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: "0",
+      DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB: "4096",
+      DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES: "30",
+    });
+    expect(config.collection.features.publicDiscovery).toBe(true);
+    expect(config.collection.features.landscape).toBe(false);
+    expect(config.collection.publicDiscoveryMaxRepos).toBe(20);
+    expect(config.collection.publicDiscoveryMaxSizeKb).toBe(0);
+    expect(config.collection.publicDiscoveryMaxCloneSizeKb).toBe(4096);
+    expect(config.collection.publicDiscoveryCloneMinutes).toBe(30);
+    expect(() => loadConfig({ DEVEX_PUBLIC_DISCOVERY_MAX_REPOS: "20.5" })).toThrow(/nonnegative integer/);
+    expect(() => loadConfig({ DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: "-1" })).toThrow(/nonnegative integer/);
+    expect(() => loadConfig({ DEVEX_CONFIG: JSON.stringify({
+      collection: { publicDiscoveryMaxSizeKb: -1 },
+    }) })).toThrow(/nonnegative integer/);
+    expect(() => loadConfig({ DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB: "0" })).toThrow(/positive integer/);
+    expect(() => loadConfig({ DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES: "0" })).toThrow(/positive integer/);
+    expect(() => loadConfig({ DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES: "361" })).toThrow(/between 1 and 360/);
+    expect(() => loadConfig({ DEVEX_CONFIG: JSON.stringify({
+      collection: { publicDiscoveryMaxCloneSizeKb: 0 },
+    }) })).toThrow(/positive safe KiB budget/);
   });
 
   it("ignores an owner type that is not org or user", () => {

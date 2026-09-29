@@ -92,11 +92,15 @@ export async function collect(
     config.collection.maxRepoAgeHours ??
     DEFAULT_MAX_REPO_AGE_HOURS;
   const incremental = !options.skipCache && config.collection.incremental;
-  // A landscape scan may expose instruction paths on public Pages. Refresh
-  // discovery first so same-day cached visibility cannot authorize a scan.
-  // An incremental run always looks for the delta instead of returning
-  // today's snapshot as-is.
-  if (!options.skipCache && !incremental && !config.collection.features.landscape) {
+  // Both optional scans may publish public repository facts, so refresh
+  // discovery first instead of trusting the same-day cached visibility.
+  // Incremental runs also need a fresh repository listing for the delta.
+  if (
+    !options.skipCache &&
+    !incremental &&
+    !config.collection.features.landscape &&
+    !config.collection.features.publicDiscovery
+  ) {
     const cached = loadCache(owner);
     if (cached) {
       console.log(`Using cached data for ${owner} (collected ${cached.collectedAt})`);

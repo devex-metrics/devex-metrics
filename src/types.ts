@@ -155,6 +155,86 @@ export interface LandscapeRunStatus {
   last_success_at?: string | null;
 }
 
+/** Independently versioned, allowlisted full-history public discovery snapshot. */
+export interface PublicDiscoveryScan {
+  /** Sanitized discovery contract version, independent of the AI scan. */
+  schema_version: 1;
+  /** Time at which the repository heads were analyzed. */
+  generated_at: string;
+  /** Installed CLI version which generated this observation. */
+  scanner_version: string;
+  /** Facts from successfully scanned public repository heads only. */
+  repositories: PublicDiscoveryRepository[];
+  /** Evidence-based, heuristic connections between scanned public repositories. */
+  connections: PublicDiscoveryConnection[];
+}
+
+/** A bounded public repository inventory with no README body or author identities. */
+export interface PublicDiscoveryRepository {
+  /** Selected owner/repository. */
+  full_name: string;
+  /** Pinned, observed commit. */
+  head_sha: string;
+  /** Count of tracked files. */
+  files: number;
+  /** Total bytes of tracked files. */
+  bytes: number;
+  /** Physical source lines according to the CLI's language classifier. */
+  source_loc: number;
+  /** Top five languages by physical source lines, ties broken by language name. */
+  languages: { name: string; files: number; loc: number }[];
+  /** Commits on the pinned branch; a separate measure from merged PRs. */
+  commits_30d: number;
+  /** Commits in the 90-day window ending at generated_at. */
+  commits_90d: number;
+  /** Daily commit counts, oldest first, exactly 90 entries. */
+  commits_90d_trend: number[];
+  /** Distinct author emails counted by the CLI; no identities are retained. */
+  contributor_count: number;
+  /** Heuristically identified architecture decision record count. */
+  adr_count: number;
+  /** Count of recognized manifests. */
+  manifest_count: number;
+  /** Count of produced artifacts detected from manifests and CI configuration. */
+  produces_count: number;
+  /** Count of consumed artifacts detected from manifests and CI configuration. */
+  consumes_count: number;
+}
+
+/** Evidence paths for one heuristic consumer-to-producer connection. */
+export interface PublicDiscoveryConnection {
+  /** Public consuming repository. */
+  source: string;
+  /** Public producing repository. */
+  target: string;
+  /** At most two matched manifest or CI file-path pairs, with artifact names stripped. */
+  evidence: { consumer_file: string; producer_file: string }[];
+}
+
+/** A DevEx repository joined with a discovery observation, including unknown states. */
+export interface PublicDiscoveryRepoView {
+  /** DevEx-selected owner/repository. */
+  fullName: string;
+  /** Only "observed" carries measurements; missing is never zero. */
+  status: "observed" | "unknown";
+  /** Why no verified full-history observation is available. */
+  reason?: "private" | "visibility_unknown" | "empty" | "cross_owner" | "oversized" | "size_unknown" | "ranking_unknown" | "not_selected" | "not_scanned";
+  /** Sanitized observation when successfully scanned. */
+  observation?: PublicDiscoveryRepository;
+  /** Previous successful observation's time and numeric differences when available. */
+  delta?: { compared_at: string; commits_90d: number; source_loc: number; files: number };
+}
+
+/** Outcome of the newest independent discovery attempt. */
+export interface PublicDiscoveryRunStatus {
+  /** When that attempt finished. */
+  attempted_at: string;
+  /** False marks any retained observations as stale. */
+  ok: boolean;
+  /** Time of the current successful snapshot, or null. */
+  last_success_at?: string | null;
+}
+
 /** The configured team, copied into the dataset so the site can render it. */
 export interface TeamSummary {
   /** Stable identifier, also used in share URLs. */

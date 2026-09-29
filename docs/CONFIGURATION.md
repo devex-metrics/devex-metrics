@@ -55,6 +55,11 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_FEATURE_CI_HEALTH` | bool | CI health crawl (build success, duration, queue time, flaky re-runs). Default `false`. |
 | `DEVEX_FEATURE_LANDSCAPE` | bool | Opt in to the public-repository landscape scan and show its results on Pages. Default `false`; disabled preparation skips scanning and requesting an additional token. The scanner is installed by the normal `npm ci` regardless of this flag. |
 | `DEVEX_LANDSCAPE_STALE_AFTER_DAYS` | int | Landscape file staleness threshold in days (`collection.landscapeStaleAfterDays`). Default `90`. |
+| `DEVEX_FEATURE_PUBLIC_DISCOVERY` | bool | Separate full-history public repository discovery panel (`collection.features.publicDiscovery`). Default `false`. |
+| `DEVEX_PUBLIC_DISCOVERY_MAX_REPOS` | int | Optional number of public repositories to scan ranked by merged PRs in the collected 90-day timeline (`collection.publicDiscoveryMaxRepos`). Default `0` means all eligible repositories. Set `20` for the initial public deployment. |
+| `DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB` | int | Maximum GitHub API repository size in KiB before skipping a full-history clone (`collection.publicDiscoveryMaxSizeKb`). Default `512000` (~500 MiB). `0` disables this safety limit deliberately. |
+| `DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB` | int | Maximum combined on-disk size of all full-history clones in KiB (`collection.publicDiscoveryMaxCloneSizeKb`). Default `8388608` (8 GiB). Must be positive; still enforced if the per-repo size limit is `0`. |
+| `DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES` | int | Maximum elapsed time for the entire full-history clone phase (`collection.publicDiscoveryCloneMinutes`). Default `60`; accepted range `1`–`360`. Each individual clone also has a 15-minute limit. |
 | `DEVEX_CI_PAGES_PER_RUN` | int | CI crawl budget per run, all repos. Default `20`. |
 | `DEVEX_CI_MAX_PAGES_PER_REPO` | int | CI crawl cap per repo per run. Default `5`. |
 | `DEVEX_CI_WINDOW_DAYS` | int | Days of CI history the dashboard reads back. Default `90`. |
@@ -340,6 +345,85 @@ unavailable, age, lag and stale are `null`, not zero or healthy; the summary
 reports `unknown_count` and `partial_unknown` status for incomplete coverage.
 Hash drift means recorded hashes changed between comparable snapshots; it is
 not a measure of code quality, security or freshness.
+
+## Full-history public repository discovery (opt-in)
+
+This is **separate** from `DEVEX_FEATURE_LANDSCAPE`: enabling either feature
+does not enable or alter the other. The new panel appears after all DevEx and
+AI-instruction sections. The base `data.json`, Markdown report, existing
+metrics and filters remain unchanged. To activate this deployment, its
+administrator must create Actions **variables**
+`DEVEX_FEATURE_PUBLIC_DISCOVERY=true` and
+`DEVEX_PUBLIC_DISCOVERY_MAX_REPOS=20`; repository variables cannot be set by
+this code change. The default count for other installations remains unlimited,
+subject to the default 512,000 KiB per-repository size limit. Operators can
+lower the size limit to stay within runner resources or deliberately set `0`
+to disable it. GitHub's size value estimates the current repository and may
+understate full Git history; the clone step also imposes a 15-minute timeout
+and a disk-space cap of twice the configured reported-size limit per repo.
+Disabling the per-repo size guard also disables that per-repo disk guard, **not**
+the combined 8 GiB on-disk clone budget or 60-minute total clone deadline.
+The entire clone directory is checked during and between clones; exceeding
+either total budget fails the scan instead of publishing partial observations,
+and the last safe data is marked stale once the history store is published.
+Increase the total budget only when the runner has enough disk and time; large
+installations should also set an explicit repository count.
+
+After normal collection, preparation derives the precise selection from its
+latest filtered `RepoMetrics`. Only repositories positively marked public,
+nonempty, within the configured owner, and within the size limit qualify.
+Unknown size is always skipped, including when the limit is disabled. The CLI
+accepts at most 500 selected repositories; if an installation exceeds that,
+set an explicit repository count cap. With a repository
+count cap, ranks are based on `mergedPRTimeline[].mergedAt` within the 90 days
+ending at `OrgMetrics.collectedAt` (not `pushedAt` or lifetime PR counts).
+Missing 90-day timeline is *ranking unknown* under a cap, not zero PRs;
+the underlying DevEx timeline is budgeted and its ranked count can be a
+lower bound. Ties break by case-insensitive full name. Oversized candidates
+are skipped and the next eligible ranked repository fills the count cap.
+Unselected, oversized, private, cross-owner, empty, or unverified repositories
+show an explicit unknown/not-scanned reason and have no discovery metrics.
+
+Only a **nonempty** selected list is sent to a Contents-read GitHub App token
+scoped to those exact names; otherwise no extra token is minted. The adapter
+independently confirms public visibility, same-owner identity, current size
+and default-branch SHA using that token before cloning. Anonymous HTTPS clones
+are full-history, not shallow; a repository whose HEAD moved between pinning
+and clone fails closed rather than scanning an unpinned checkout. The installed
+CLI runs in `local_git/full` mode with `--repos-dir`, `--expected-heads`, an
+explicit selection config and `--output`; only then does the adapter re-check
+public visibility using a fresh Contents-read App token scoped to the same
+exact repository list (the pre-clone token may have expired). If refreshing
+the token fails, ingestion is skipped and the run is marked stale. The adapter
+then validates scanner version, provenance, selected names, all required fields
+and every pinned HEAD. CLI denied, malformed, partial
+or missing output is not considered an empty repository. Raw CLI output and
+clones stay under gitignored `data/` and are never served or committed.
+The App must have Contents-read access to *all* selected repositories; a
+missing permission results in a stale notice and no new observation.
+
+The independently versioned `public-discovery/latest.json` and at most 14
+retained snapshots in `metrics-data` contain only allowlisted, bounded
+aggregates: file/byte/source LOC counts, top five languages by physical source
+LOC (ties by name), 30/90-day commit counts and a 90-point daily trend,
+anonymous contributor count, ADR count, and manifest/produced/consumed counts.
+Manifest count covers recognized manifests; produced/consumed artifact counts
+and connection evidence can also
+come from GitHub Actions and Jenkins configuration. Evidence-labeled heuristic
+connections between verified-public repositories retain at most 50 edges,
+two safe relative public file paths per edge, and **no** raw dependency names.
+README body, title/summary, author identities, commit messages, unreviewed
+paths and raw full-scan JSON are discarded. The site publishes a separate
+`public-discovery.json` and removes it when the feature is disabled. Deltas
+compare the latest successful observation with the previous successful
+snapshot; a failed attempt keeps previously safe data under a stale banner
+rather than replacing unknowns with zeros. Preparation scrubs newly
+unselected/now-private observations and their edges from latest and retained
+snapshots; failed scans and ingestion re-check visibility and scrub it again
+before publishing. Prior Git commits on the data-only `metrics-data` branch
+may still retain historical observations; access and retention of that
+branch should be reviewed before enabling publication. Only public file
+evidence from selected repositories can reach the site.
 
 ## CI health
 
