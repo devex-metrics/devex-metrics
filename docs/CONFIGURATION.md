@@ -392,8 +392,11 @@ are full-history, not shallow; a repository whose HEAD moved between pinning
 and clone fails closed rather than scanning an unpinned checkout. The installed
 CLI runs in `local_git/full` mode with `--repos-dir`, `--expected-heads`, an
 explicit selection config and `--output`; only then does the adapter re-check
-public visibility and validate scanner version, provenance, selected names,
-all required fields and every pinned HEAD. CLI denied, malformed, partial
+public visibility using a fresh Contents-read App token scoped to the same
+exact repository list (the pre-clone token may have expired). If refreshing
+the token fails, ingestion is skipped and the run is marked stale. The adapter
+then validates scanner version, provenance, selected names, all required fields
+and every pinned HEAD. CLI denied, malformed, partial
 or missing output is not considered an empty repository. Raw CLI output and
 clones stay under gitignored `data/` and are never served or committed.
 The App must have Contents-read access to *all* selected repositories; a

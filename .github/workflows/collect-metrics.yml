@@ -385,9 +385,21 @@ jobs:
         continue-on-error: true
         run: npx --no-install repo-landscape scan --repos-dir data/public-discovery-clones --expected-heads data/public-discovery.heads.json --config data/public-discovery.config.json --output data/public-discovery-raw.json
 
+      - name: Refresh public discovery ingestion token
+        id: discovery-ingest-token
+        if: always() && steps.discovery-scan.outcome == 'success'
+        continue-on-error: true
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ steps.discovery-prepare.outputs.discovery-owner }}
+          repositories: ${{ steps.discovery-prepare.outputs.discovery-repositories }}
+          permission-contents: read
+
       - name: Ingest sanitized public discovery
         id: discovery-ingest
-        if: always() && steps.discovery-scan.outcome == 'success'
+        if: always() && steps.discovery-ingest-token.outcome == 'success'
         continue-on-error: true
         env:
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
@@ -399,12 +411,12 @@ jobs:
           DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB }}
           DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES: ${{ vars.DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES }}
           DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
-          GITHUB_TOKEN: ${{ steps.discovery-token.outputs.token }}
+          GITHUB_TOKEN: ${{ steps.discovery-ingest-token.outputs.token }}
         run: node dist/public-discovery-cli.js ingest data/public-discovery-raw.json
 
       - name: Record failed public discovery
         id: discovery-failed
-        if: always() && (steps.collect.outcome == 'failure' || steps.discovery-prepare.outcome == 'failure' || steps.discovery-scope.outcome == 'failure' || steps.discovery-token.outcome == 'failure' || steps.discovery-pin.outcome == 'failure' || steps.discovery-clone.outcome == 'failure' || steps.discovery-scan.outcome == 'failure' || steps.discovery-ingest.outcome == 'failure')
+        if: always() && (steps.collect.outcome == 'failure' || steps.discovery-prepare.outcome == 'failure' || steps.discovery-scope.outcome == 'failure' || steps.discovery-token.outcome == 'failure' || steps.discovery-pin.outcome == 'failure' || steps.discovery-clone.outcome == 'failure' || steps.discovery-scan.outcome == 'failure' || steps.discovery-ingest-token.outcome == 'failure' || steps.discovery-ingest.outcome == 'failure')
         env:
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
           DEVEX_HISTORY_DIR: .metrics-data/data

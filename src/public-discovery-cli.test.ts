@@ -178,6 +178,69 @@ describe("full-history public discovery workflow adapter", () => {
     expect(script).toContain('[\".\", \"..\"].includes(name.split(\"/\")[1])');
   });
 
+  it("refreshes the exact scoped token after scanning and marks refresh failures stale", () => {
+    const workflow = fs.readFileSync(
+      path.resolve(".github", "workflows", "collect-metrics.yml"),
+      "utf8"
+    );
+    function step(name: string): string {
+      const block = workflow.split(`      - name: ${name}\n`)[1]?.split("\n      - name: ")[0];
+      expect(block).toBeDefined();
+      return block;
+    }
+    const initial = step("Create public discovery token");
+    const scan = step("Scan full-history public repositories");
+    const refresh = step("Refresh public discovery ingestion token");
+    const ingest = step("Ingest sanitized public discovery");
+    const failed = step("Record failed public discovery");
+    expect(workflow.indexOf(scan)).toBeLessThan(workflow.indexOf(refresh));
+    expect(workflow.indexOf(refresh)).toBeLessThan(workflow.indexOf(ingest));
+    expect(refresh).toContain("id: discovery-ingest-token");
+    expect(refresh).toContain("continue-on-error: true");
+    expect(initial).toContain("owner: ${{ steps.discovery-prepare.outputs.discovery-owner }}");
+    expect(initial).toContain(
+      "repositories: ${{ steps.discovery-prepare.outputs.discovery-repositories }}"
+    );
+    expect(initial).toContain("permission-contents: read");
+    expect(refresh.match(/uses: (.*)/)?.[1]).toBe(initial.match(/uses: (.*)/)?.[1]);
+    expect(refresh.split("        with:\n")[1]?.trim()).toBe(
+      initial.split("        with:\n")[1]?.trim()
+    );
+    expect(ingest).toContain("GITHUB_TOKEN: ${{ steps.discovery-ingest-token.outputs.token }}");
+    expect(ingest).not.toContain("steps.discovery-token.outputs.token");
+    expect(failed).toContain("run: node dist/public-discovery-cli.js mark-failed");
+
+    const evaluatesTo = (block: string, outcomes: Record<string, string>) => {
+      const condition = block.match(/^\s*if: (.*)$/m)?.[1];
+      expect(condition).toBeDefined();
+      return runInNewContext(
+        condition!.replace(
+          /steps\.([a-z-]+)\.outcome/g,
+          (_, name: string) => `steps["${name}"].outcome`
+        ),
+        {
+          always: () => true,
+          steps: new Proxy({}, {
+            get: (_, name: string) => ({ outcome: outcomes[name] ?? "success" }),
+          }),
+        }
+      );
+    };
+    for (const { scanOutcome, refreshOutcome, ingestOutcome, expected } of [
+      { scanOutcome: "success", refreshOutcome: "success", ingestOutcome: "success", expected: [true, true, false] },
+      { scanOutcome: "success", refreshOutcome: "failure", ingestOutcome: "skipped", expected: [true, false, true] },
+      { scanOutcome: "failure", refreshOutcome: "skipped", ingestOutcome: "skipped", expected: [false, false, true] },
+      { scanOutcome: "skipped", refreshOutcome: "skipped", ingestOutcome: "skipped", expected: [false, false, false] },
+    ]) {
+      const outcomes = {
+        "discovery-scan": scanOutcome,
+        "discovery-ingest-token": refreshOutcome,
+        "discovery-ingest": ingestOutcome,
+      };
+      expect([refresh, ingest, failed].map((block) => evaluatesTo(block, outcomes))).toEqual(expected);
+    }
+  });
+
   it("enforces combined disk and elapsed-time budgets across completed and active clones", () => {
     const root = path.join(work, "clones");
     const first = path.join(root, "acme", "first");
