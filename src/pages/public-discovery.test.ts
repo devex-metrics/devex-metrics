@@ -59,6 +59,12 @@ describe("public discovery bottom panel", () => {
     expect(doc.querySelector(".discovery-connections")?.textContent).toContain(
       'pkg/<script>alert("x")</script>'
     );
+    expect(doc.querySelector(".discovery-connections")?.textContent).toContain(
+      "Artifact matches from manifests and CI configuration are heuristic"
+    );
+    expect(doc.querySelector(".discovery-connections")?.textContent).not.toContain(
+      "Manifest matches"
+    );
     expect(doc.querySelector(".discovery-detail")?.textContent).toContain("TS<script>");
     expect(html).not.toContain("<script>alert");
     expect(html).toContain("not a verified runtime dependency");
@@ -67,6 +73,30 @@ describe("public discovery bottom panel", () => {
       "1 lifetime commit authors"
     );
     expect(doc.querySelector("#discoveryRows")?.textContent).not.toContain("0 files");
+  });
+
+  it("labels CI file evidence as a heuristic artifact match", () => {
+    const html = buildPublicDiscoverySection(
+      [observed()],
+      [
+        {
+          source: "acme/consumer",
+          target: "acme/producer",
+          evidence: [
+            {
+              consumer_file: ".github/workflows/use.yml",
+              producer_file: "Jenkinsfile",
+            },
+          ],
+        },
+      ]
+    );
+    const text = new JSDOM(html).window.document.querySelector(".discovery-connections")
+      ?.textContent;
+    expect(text).toContain("Artifact matches from manifests and CI configuration are heuristic");
+    expect(text).toContain(".github/workflows/use.yml");
+    expect(text).toContain("Jenkinsfile");
+    expect(text).not.toContain("Manifest matches");
   });
 
   it("has independent paginated rows and a valid empty state", () => {

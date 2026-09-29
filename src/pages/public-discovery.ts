@@ -117,7 +117,7 @@ export function buildPublicDiscoverySection(
       </nav>`
         : `<p class="landscape-empty">No repositories selected for DevEx collection.</p>`
     }
-    ${links ? `<div class="discovery-connections"><h3>Possible public connections</h3><p class="landscape-note">Manifest matches are heuristic; file evidence is from verified-public repositories only. Artifact identifiers are intentionally omitted.</p><ul>${links}</ul></div>` : ""}
+    ${links ? `<div class="discovery-connections"><h3>Possible public connections</h3><p class="landscape-note">Artifact matches from manifests and CI configuration are heuristic; file evidence is from verified-public repositories only. Artifact identifiers are intentionally omitted.</p><ul>${links}</ul></div>` : ""}
   </section>`;
 }
 

@@ -60,6 +60,27 @@ function count(value: unknown, label: string): number {
   return value as number;
 }
 
+function language(value: unknown): PublicDiscoveryRepository["languages"][number] {
+  const part = record(value, "language");
+  return {
+    name: text(part.name, "language name", 40),
+    files: count(part.files, "language files"),
+    loc: count(part.loc, "language loc"),
+  };
+}
+
+function compareLanguages(
+  a: PublicDiscoveryRepository["languages"][number],
+  b: PublicDiscoveryRepository["languages"][number]
+): number {
+  const nameA = a.name.toLowerCase();
+  const nameB = b.name.toLowerCase();
+  return (
+    b.loc - a.loc ||
+    (nameA < nameB ? -1 : nameA > nameB ? 1 : a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
+  );
+}
+
 function name(value: unknown, label: string): string {
   const valueName = text(value, label);
   if (!safeName(valueName)) throw new Error(`Public discovery ${label} is not a safe owner/repo`);
@@ -166,14 +187,7 @@ export function parsePublicDiscoveryScan(value: unknown): PublicDiscoveryScan {
         item.commits_90d_trend.length !== 90
       )
         throw new Error("Public discovery languages/trend exceed the bounded shape");
-      const languages = item.languages.map((language: unknown) => {
-        const part = record(language, "language");
-        return {
-          name: text(part.name, "language name", 40),
-          files: count(part.files, "language files"),
-          loc: count(part.loc, "language loc"),
-        };
-      });
+      const languages = item.languages.map(language);
       const trend = item.commits_90d_trend.map((point: unknown) => count(point, "trend point"));
       const result: PublicDiscoveryRepository = {
         full_name: fullName,
@@ -314,13 +328,14 @@ export function validatePublicDiscoveryOutput(
     const metrics = record(item.metrics, "CLI metrics");
     const git = record(item.git, "CLI git");
     const architecture = record(item.architecture, "CLI architecture");
+    const languages = item.languages.map(language).sort(compareLanguages).slice(0, 5);
     return {
       full_name: byName.get(key),
       head_sha: item.head_sha,
       files: metrics.files,
       bytes: metrics.bytes,
       source_loc: metrics.source_loc,
-      languages: item.languages.slice(0, 5),
+      languages,
       commits_30d: git.commits_30d,
       commits_90d: git.commits_90d,
       commits_90d_trend: git.commits_90d_trend,
@@ -355,7 +370,7 @@ export function validatePublicDiscoveryOutput(
       const evidence = edge.evidence
         .flatMap((value: unknown) => {
           const match = record(value, "CLI evidence");
-          // A synthetic repository-name match has no manifest evidence; do not publish it.
+          // A synthetic repository-name match has no matched file evidence; do not publish it.
           const consumes = sourceRepo.consumes as unknown[];
           const produces = targetRepo.produces as unknown[];
           if (

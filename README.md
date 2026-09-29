@@ -175,9 +175,10 @@ release prerequisites are in [docs/CONFIGURATION.md](docs/CONFIGURATION.md#publi
 Separate from the AI instruction landscape, `DEVEX_FEATURE_PUBLIC_DISCOVERY=true`
 adds a **final** dashboard section with public-repository inventory (files,
 bytes and physical source LOC), language counts, 30/90-day Git commit activity,
-ADR and manifest/artifact counts, and evidence-labeled heuristic cross-repo
-connections. It scans full-history clones at pinned HEADs, using the *already
-selected* DevEx repository snapshot. It does not change DevEx metrics, filters,
+ADR and manifest counts, manifest/CI-derived artifact counts, and
+evidence-labeled heuristic cross-repo connections. It scans full-history
+clones at pinned HEADs, using the *already selected* DevEx repository snapshot.
+It does not change DevEx metrics, filters,
 the report, `data.json`, or the AI-only scan.
 
 By default, all eligible public, nonempty, same-owner repositories are

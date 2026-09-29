@@ -181,7 +181,7 @@ export interface PublicDiscoveryRepository {
   bytes: number;
   /** Physical source lines according to the CLI's language classifier. */
   source_loc: number;
-  /** Top five languages by physical source lines. */
+  /** Top five languages by physical source lines, ties broken by language name. */
   languages: { name: string; files: number; loc: number }[];
   /** Commits on the pinned branch; a separate measure from merged PRs. */
   commits_30d: number;
@@ -195,9 +195,9 @@ export interface PublicDiscoveryRepository {
   adr_count: number;
   /** Count of recognized manifests. */
   manifest_count: number;
-  /** Count of produced artifacts detected from manifests. */
+  /** Count of produced artifacts detected from manifests and CI configuration. */
   produces_count: number;
-  /** Count of consumed artifacts detected from manifests. */
+  /** Count of consumed artifacts detected from manifests and CI configuration. */
   consumes_count: number;
 }
 
@@ -207,7 +207,7 @@ export interface PublicDiscoveryConnection {
   source: string;
   /** Public producing repository. */
   target: string;
-  /** At most two matched manifest-path pairs, with artifact names stripped. */
+  /** At most two matched manifest or CI file-path pairs, with artifact names stripped. */
   evidence: { consumer_file: string; producer_file: string }[];
 }
 

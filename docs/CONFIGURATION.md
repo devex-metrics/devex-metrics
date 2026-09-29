@@ -401,9 +401,12 @@ missing permission results in a stale notice and no new observation.
 
 The independently versioned `public-discovery/latest.json` and at most 14
 retained snapshots in `metrics-data` contain only allowlisted, bounded
-aggregates: file/byte/source LOC counts, top five language counts, 30/90-day
-commit counts and a 90-point daily trend, anonymous contributor count, ADR
-count, and manifest/produced/consumed counts. Evidence-labeled heuristic
+aggregates: file/byte/source LOC counts, top five languages by physical source
+LOC (ties by name), 30/90-day commit counts and a 90-point daily trend,
+anonymous contributor count, ADR count, and manifest/produced/consumed counts.
+Manifest count covers recognized manifests; produced/consumed artifact counts
+and connection evidence can also
+come from GitHub Actions and Jenkins configuration. Evidence-labeled heuristic
 connections between verified-public repositories retain at most 50 edges,
 two safe relative public file paths per edge, and **no** raw dependency names.
 README body, title/summary, author identities, commit messages, unreviewed

@@ -221,6 +221,71 @@ describe("independent public discovery contract and history", () => {
     ]);
   });
 
+  it("validates every scanner language and retains the top five by LOC, not file count", () => {
+    const first = fullRepo("acme/a", A);
+    first.languages = [
+      { name: "A", files: 100, loc: 10 },
+      { name: "B", files: 90, loc: 20 },
+      { name: "C", files: 80, loc: 30 },
+      { name: "D", files: 70, loc: 40 },
+      { name: "G", files: 60, loc: 50 },
+      { name: "E", files: 1, loc: 50 },
+      { name: "F", files: 1, loc: 100 },
+    ];
+    first.metrics = { ...first.metrics, files: 402, source_loc: 300 };
+    const scan = validatePublicDiscoveryOutput(
+      scanner([first, fullRepo("acme/b", B)]),
+      selected,
+      config,
+      heads
+    );
+    expect(scan.repositories[0].languages.map(({ name }) => name)).toEqual([
+      "F",
+      "E",
+      "G",
+      "D",
+      "C",
+    ]);
+    savePublicDiscoveryScan(root, selected, scan);
+    expect(
+      JSON.parse(fs.readFileSync(discoveryLatestPath(root, "acme"), "utf8")).repositories[0]
+        .languages.map(({ name }: { name: string }) => name)
+    ).toEqual(["F", "E", "G", "D", "C"]);
+  });
+
+  it("keeps CI-derived artifact evidence without calling it a manifest", () => {
+    const consumer = fullRepo("acme/a", A);
+    const producer = fullRepo("acme/b", B);
+    consumer.consumes = [{ name: "build", source: ".github/workflows/use.yml" }];
+    producer.produces = [{ name: "build", source: ".github/workflows/upload.yml" }];
+    const ciEdge = {
+      ...edge,
+      evidence: [
+        {
+          consumer_file: ".github/workflows/use.yml",
+          consumed: "build",
+          producer_file: ".github/workflows/upload.yml",
+          produced: "build",
+        },
+      ],
+    };
+    const scan = validatePublicDiscoveryOutput(
+      scanner([consumer, producer], [ciEdge]),
+      selected,
+      config,
+      heads
+    );
+    expect(scan.repositories[0]).toMatchObject({ manifest_count: 1, consumes_count: 1 });
+    expect(scan.repositories[1]).toMatchObject({ manifest_count: 1, produces_count: 1 });
+    expect(scan.connections[0].evidence).toEqual([
+      {
+        consumer_file: ".github/workflows/use.yml",
+        producer_file: ".github/workflows/upload.yml",
+      },
+    ]);
+    expect(JSON.stringify(scan)).not.toContain('"build"');
+  });
+
   it("accepts the CLI's second-resolution timestamp after a millisecond-resolution DevEx collection", () => {
     const recent = { ...selected, collectedAt: "2026-09-29T12:05:00.500Z" };
     expect(
@@ -269,6 +334,13 @@ describe("independent public discovery contract and history", () => {
         (raw.repositories as Record<string, unknown>[])[0].git = {};
       },
       /trend/,
+    ],
+    [
+      (raw: Record<string, unknown>) => {
+        const first = (raw.repositories as Record<string, unknown>[])[0];
+        (first.languages as unknown[]).push({ name: "unranked", files: 0, loc: -1 });
+      },
+      /language loc/,
     ],
     [
       (raw: Record<string, unknown>) => {
