@@ -13,13 +13,21 @@ document.addEventListener("DOMContentLoaded",function(){
   var pageLabel=document.getElementById("landscapePage");
   var prev=document.getElementById("landscapePrev");
   var next=document.getElementById("landscapeNext");
-  var rows=Array.from(tbody.rows);
+  function repoRows(){
+    return Array.from(tbody.rows).filter(function(row){return !row.classList.contains("landscape-detail-row");});
+  }
+  function detailOf(row){
+    var toggle=row.querySelector(".landscape-toggle");
+    if(!toggle)return null;
+    return row.landscapeDetail||(row.landscapeDetail=document.getElementById(toggle.getAttribute("aria-controls")));
+  }
+  var rows=repoRows();
   var key=null, direction=null, page=0;
   var collator=new Intl.Collator(undefined,{numeric:true,sensitivity:"base"});
   var isoTimestamp=/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$/;
   var pageSize=20;
   var observer=new MutationObserver(function(){
-    rows=Array.from(tbody.rows);
+    rows=repoRows();
     var nextIndex=rows.reduce(function(max,row){
       return Math.max(max,Number(row.dataset.landscapeIndex??-1));
     },-1)+1;
@@ -64,11 +72,21 @@ document.addEventListener("DOMContentLoaded",function(){
   function render(){
     var sorted=rows.slice().sort(compare);
     observer.disconnect();
-    tbody.replaceChildren.apply(tbody,sorted);
+    var nodes=[];
+    sorted.forEach(function(row){
+      nodes.push(row);
+      var detail=detailOf(row);
+      if(detail)nodes.push(detail);
+    });
+    tbody.replaceChildren.apply(tbody,nodes);
     observer.observe(tbody,{childList:true});
     var pages=Math.max(1,Math.ceil(sorted.length/pageSize));
     page=Math.min(page,pages-1);
-    sorted.forEach(function(row,i){row.hidden=i<page*pageSize||i>=(page+1)*pageSize;});
+    sorted.forEach(function(row,i){
+      row.hidden=i<page*pageSize||i>=(page+1)*pageSize;
+      var detail=detailOf(row);
+      if(detail)detail.hidden=row.hidden||row.querySelector(".landscape-toggle").getAttribute("aria-expanded")!=="true";
+    });
     var start=sorted.length?page*pageSize+1:0;
     var end=Math.min((page+1)*pageSize,sorted.length);
     range.textContent="Showing "+start+"–"+end+" of "+sorted.length+" repositories";
@@ -100,6 +118,14 @@ document.addEventListener("DOMContentLoaded",function(){
       page=0;
       render();
     });
+  });
+  tbody.addEventListener("click",function(event){
+    var toggle=event.target.closest(".landscape-toggle");
+    if(!toggle)return;
+    var expanded=toggle.getAttribute("aria-expanded")!=="true";
+    toggle.setAttribute("aria-expanded",String(expanded));
+    var detail=detailOf(toggle.closest("tr"));
+    if(detail)detail.hidden=!expanded;
   });
   reset.addEventListener("click",function(){key=null;direction=null;page=0;render();});
   prev.addEventListener("click",function(){page=Math.max(0,page-1);render();});

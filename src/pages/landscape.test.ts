@@ -49,7 +49,7 @@ function mount(rows: LandscapeRepoView[]): JSDOM {
 }
 
 function visibleNames(dom: JSDOM): string[] {
-  return Array.from(dom.window.document.querySelectorAll<HTMLTableRowElement>("#landscapeRows > tr"))
+  return Array.from(dom.window.document.querySelectorAll<HTMLTableRowElement>("#landscapeRows > tr:not(.landscape-detail-row)"))
     .filter((row) => !row.hidden)
     .map((row) => row.cells[0].textContent ?? "");
 }
@@ -67,10 +67,12 @@ describe("landscape dashboard view", () => {
     expect(doc.querySelector(".landscape-path")?.textContent).toContain(
       '<script>alert("x")</script>'
     );
-    expect(doc.querySelector("details summary")?.getAttribute("aria-label")).toBe(
-      "View AI instruction files for acme/public"
-    );
-    expect(doc.querySelector("details")?.hasAttribute("open")).toBe(false);
+    const toggle = doc.querySelector(".landscape-toggle");
+    expect(toggle?.getAttribute("aria-label")).toBe("View AI instruction files for acme/public");
+    expect(toggle?.getAttribute("aria-expanded")).toBe("false");
+    const detail = doc.getElementById(toggle!.getAttribute("aria-controls")!);
+    expect(detail?.hidden).toBe(true);
+    expect(detail?.querySelector("td")?.getAttribute("colspan")).toBe("5");
     expect(doc.querySelector("table")?.getAttribute("aria-label")).toBe(
       "AI instruction file observations by repository"
     );
@@ -231,7 +233,7 @@ describe("landscape dashboard view", () => {
     expect(visibleNames(dom)).toEqual(["acme/tied", "acme/public", "acme/zero", "acme/unverified"]);
     button.click();
     expect(visibleNames(dom)).toEqual(["acme/zero", "acme/tied", "acme/public", "acme/unverified"]);
-    expect(dom.window.document.querySelectorAll("#landscapeRows > tr")).toHaveLength(4);
+    expect(dom.window.document.querySelectorAll("#landscapeRows > tr:not(.landscape-detail-row)")).toHaveLength(4);
   });
 
   it("labels failed scans as attempts without treating them as observations", () => {
@@ -287,7 +289,9 @@ describe("landscape dashboard view", () => {
     const doc = dom.window.document;
     const tbody = doc.querySelector("#landscapeRows")!;
     const sort = (key: string) => doc.querySelector<HTMLButtonElement>(`[data-landscape-sort="${key}"]`)!;
-    const names = () => Array.from((tbody as HTMLTableSectionElement).rows, (row) => row.cells[0].textContent);
+    const names = () => Array.from((tbody as HTMLTableSectionElement).rows)
+      .filter((row) => !row.classList.contains("landscape-detail-row"))
+      .map((row) => row.cells[0].textContent);
     const insert = (name: string, metadata?: { count?: string; observed?: string }) => {
       const row = doc.createElement("tr");
       row.innerHTML = `<th scope="row">${name}</th><td>—</td><td>—</td><td>—</td><td>—</td>`;
@@ -339,6 +343,40 @@ describe("landscape dashboard view", () => {
       "acme/non-iso-date", "acme/invalid-calendar",
     ]);
     expect(doc.querySelector("#landscapePage")?.textContent).toBe("Page 1 of 2");
+  });
+
+  it("expands the file table in a full-width row that follows its repository through sorting and paging", () => {
+    const first = observed();
+    first.fullName = "acme/z-repo";
+    const second = observed();
+    second.fullName = "acme/a-repo";
+    const dom = mount([
+      first, second,
+      ...Array.from({ length: 19 }, (_, i): LandscapeRepoView => ({
+        fullName: `acme/m-${String(i).padStart(2, "0")}`, status: "unknown", reason: "not_scanned",
+      })),
+    ]);
+    const doc = dom.window.document;
+    const repoRow = (name: string) => Array.from(doc.querySelectorAll<HTMLTableRowElement>("#landscapeRows > tr"))
+      .find((row) => row.cells[0].textContent === name)!;
+    const toggle = repoRow("acme/z-repo").querySelector<HTMLButtonElement>(".landscape-toggle")!;
+    const detail = doc.getElementById(toggle.getAttribute("aria-controls")!) as HTMLTableRowElement;
+    toggle.click();
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(detail.hidden).toBe(false);
+    expect(detail.previousElementSibling).toBe(repoRow("acme/z-repo"));
+
+    doc.querySelector<HTMLButtonElement>('[data-landscape-sort="name"]')!.click();
+    expect(detail.previousElementSibling).toBe(repoRow("acme/z-repo"));
+    expect(repoRow("acme/z-repo").hidden).toBe(true);
+    expect(detail.hidden).toBe(true);
+    doc.querySelector<HTMLButtonElement>("#landscapeNext")!.click();
+    expect(detail.hidden).toBe(false);
+    expect(visibleNames(dom)).toEqual(["acme/z-repo"]);
+
+    toggle.click();
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(detail.hidden).toBe(true);
   });
 
   it("updates page counts when rows change and keeps the empty selected scope free of controls", async () => {

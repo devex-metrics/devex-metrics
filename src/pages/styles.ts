@@ -291,10 +291,13 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
 .landscape-table tbody tr:last-child>th,.landscape-table tbody tr:last-child>td{border-bottom:0}
 .landscape-path{overflow-wrap:anywhere;max-width:270px}
 .landscape-hash{display:block;font-size:.75rem;color:var(--muted);font-variant-numeric:tabular-nums}
-.landscape-details summary{color:var(--accent);cursor:pointer;font-weight:600;white-space:nowrap}
-.landscape-details summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
-.landscape-details[open]{min-width:520px}
-.landscape-details .landscape-file-scroll{margin:.45rem 0}
+.landscape-toggle{font:inherit;font-weight:600;color:var(--accent);background:none;border:0;padding:0;cursor:pointer;white-space:nowrap}
+.landscape-toggle::before{content:"▶";display:inline-block;font-size:.7em;margin-right:.35rem;transition:transform .15s}
+.landscape-toggle[aria-expanded="true"]::before{transform:rotate(90deg)}
+.landscape-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+.landscape-table tbody tr:has(+ .landscape-detail-row:not([hidden]))>*{border-bottom:0}
+.landscape-detail-row>td{padding-top:0}
+.landscape-detail-row .landscape-file-scroll{margin:.45rem 0}
 .landscape-note,.landscape-empty{font-size:.78rem;color:var(--muted);margin:.5rem 0;max-width:75ch}
 .landscape-unknown{color:var(--muted)}
 .landscape-stale{background:var(--warn-s);color:var(--warn);border:1px solid var(--warn);border-radius:6px;padding:.6rem .8rem;margin:.5rem 0 1rem;font-size:.85rem}
