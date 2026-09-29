@@ -207,10 +207,10 @@ describe("landscape workflow adapter", () => {
     );
     expect(workflow).toContain("run: node dist/landscape-cli.js mark-failed");
     expect(workflow).toContain(
-      "      - name: Publish history store\n        if: success() || (failure() && steps.landscape-failed.outputs.landscape-publish == 'true')"
+      "      - name: Publish history store\n        if: success() || (failure() && (steps.landscape-failed.outputs.landscape-publish == 'true' || steps.discovery-failed.outputs.discovery-publish == 'true'))"
     );
     expect(workflow).toContain(
-      "    needs: collect\n    if: success() || (failure() && needs.collect.outputs.landscape-publish == 'true')"
+      "    needs: collect\n    if: success() || (failure() && (needs.collect.outputs.landscape-publish == 'true' || needs.collect.outputs.discovery-publish == 'true'))"
     );
     expect(workflow).toContain(
       "        if: failure() && steps.landscape-token.outcome == 'success'\n"

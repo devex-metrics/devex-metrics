@@ -2,6 +2,9 @@ import type {
   CiRunSample,
   LandscapeRepoView,
   LandscapeRunStatus,
+  PublicDiscoveryConnection,
+  PublicDiscoveryRepoView,
+  PublicDiscoveryRunStatus,
   OrgMetrics,
   RepoMetrics,
 } from "../types.js";
@@ -15,6 +18,7 @@ import { getJS } from "./scripts.js";
 import { buildRepoRow } from "./repo-row.js";
 import { buildLandscapeSection } from "./landscape.js";
 import { getLandscapeControlsJS } from "./landscape-controls.js";
+import { buildPublicDiscoverySection, getPublicDiscoveryControlsJS } from "./public-discovery.js";
 
 interface Totals {
   openIssues: number;
@@ -83,6 +87,12 @@ export interface DashboardExtras {
   landscape?: LandscapeRepoView[];
   /** Outcome of the latest landscape scan attempt; a failure marks the data as stale. */
   landscapeStatus?: LandscapeRunStatus;
+  /** Independently collected and sanitized public repository discovery rows. */
+  publicDiscovery?: PublicDiscoveryRepoView[];
+  /** Heuristic links only between observed public repositories. */
+  publicDiscoveryConnections?: PublicDiscoveryConnection[];
+  /** The most recent independent discovery attempt. */
+  publicDiscoveryStatus?: PublicDiscoveryRunStatus;
 }
 
 const DEFAULT_BRANDING: BrandingConfig = {
@@ -698,6 +708,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
   </section>
 
   ${extras.landscape ? buildLandscapeSection(extras.landscape, extras.landscapeStatus) : ""}
+  ${extras.publicDiscovery ? buildPublicDiscoverySection(extras.publicDiscovery, extras.publicDiscoveryConnections ?? [], extras.publicDiscoveryStatus) : ""}
 </main>
 
 <footer>Data cached on ${escapeHtml(date)}.${deployedFrom} Served via GitHub Pages. <a href="data.json">Raw JSON</a> &middot; <a href="report.md">Markdown</a></footer>
@@ -706,6 +717,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
 var CHART_DATA=${chartPayload};
 ${getJS()}
 ${extras.landscape ? getLandscapeControlsJS() : ""}
+${extras.publicDiscovery ? getPublicDiscoveryControlsJS() : ""}
 </script>
 
 <a href="https://github.com/devex-metrics/devex-metrics" class="github-corner" aria-label="View source on GitHub" target="_blank" rel="noopener noreferrer">

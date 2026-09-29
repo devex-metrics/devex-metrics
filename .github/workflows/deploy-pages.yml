@@ -14,6 +14,7 @@ on:
       - "src/history.ts"
       - "src/stats.ts"
       - "src/landscape.ts"
+      - "src/public-discovery.ts"
       - "src/pages/**"
       - ".github/workflows/deploy-pages.yml"
       - ".github/workflows/pages.yml"

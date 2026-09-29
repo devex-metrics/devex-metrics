@@ -36,6 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       landscape-publish: ${{ steps.landscape-failed.outputs.landscape-publish }}
+      discovery-publish: ${{ steps.discovery-failed.outputs.discovery-publish }}
     permissions:
       # The job also publishes the append-only metrics-data branch.
       contents: write
@@ -87,6 +88,7 @@ jobs:
           fi
 
       - name: Collect metrics
+        id: collect-metrics
         env:
           APP_ID: ${{ vars.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
@@ -118,6 +120,9 @@ jobs:
           DEVEX_FEATURE_COPILOT_AGENT: ${{ vars.DEVEX_FEATURE_COPILOT_AGENT }}
           DEVEX_FEATURE_CI_HEALTH: ${{ vars.DEVEX_FEATURE_CI_HEALTH }}
           DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
+          DEVEX_FEATURE_PUBLIC_DISCOVERY: ${{ vars.DEVEX_FEATURE_PUBLIC_DISCOVERY }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_REPOS: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_REPOS }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB }}
           DEVEX_CI_PAGES_PER_RUN: ${{ vars.DEVEX_CI_PAGES_PER_RUN }}
           DEVEX_CI_MAX_PAGES_PER_REPO: ${{ vars.DEVEX_CI_MAX_PAGES_PER_REPO }}
           DEVEX_CI_WINDOW_DAYS: ${{ vars.DEVEX_CI_WINDOW_DAYS }}
@@ -248,17 +253,121 @@ jobs:
           DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
         run: node dist/landscape-cli.js mark-failed
 
+      # Independent of the existing AI-only GitHub API landscape scan. No extra
+      # token or clone is requested while public discovery is disabled.
+      - name: Prepare full-history public discovery
+        id: discovery-prepare
+        if: always() && steps.collect-metrics.outcome == 'success'
+        continue-on-error: true
+        env:
+          DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
+          DEVEX_HISTORY_DIR: .metrics-data/data
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+          DEVEX_FEATURE_PUBLIC_DISCOVERY: ${{ vars.DEVEX_FEATURE_PUBLIC_DISCOVERY }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_REPOS: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_REPOS }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB }}
+          DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
+        run: node dist/public-discovery-cli.js prepare
+
+      - name: Check public discovery token scope
+        id: discovery-scope
+        if: always() && steps.discovery-prepare.outcome == 'success' && steps.discovery-prepare.outputs.discovery-scan-needed == 'true'
+        continue-on-error: true
+        env:
+          DISCOVERY_REPOSITORIES: ${{ steps.discovery-prepare.outputs.discovery-repositories }}
+        run: |
+          if [[ ! "$DISCOVERY_REPOSITORIES" =~ ^[A-Za-z0-9._-]+(,[A-Za-z0-9._-]+)*$ ]]; then
+            echo "Public discovery cannot request an empty or invalid owner-wide token" >&2
+            exit 1
+          fi
+
+      - name: Create public discovery token
+        id: discovery-token
+        if: always() && steps.discovery-scope.outcome == 'success'
+        continue-on-error: true
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ steps.discovery-prepare.outputs.discovery-owner }}
+          repositories: ${{ steps.discovery-prepare.outputs.discovery-repositories }}
+          permission-contents: read
+
+      - name: Verify public visibility and pin selected heads
+        id: discovery-pin
+        if: always() && steps.discovery-token.outcome == 'success'
+        continue-on-error: true
+        env:
+          DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
+          DEVEX_HISTORY_DIR: .metrics-data/data
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+          DEVEX_FEATURE_PUBLIC_DISCOVERY: ${{ vars.DEVEX_FEATURE_PUBLIC_DISCOVERY }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_REPOS: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_REPOS }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB }}
+          DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
+          GITHUB_TOKEN: ${{ steps.discovery-token.outputs.token }}
+        run: node dist/public-discovery-cli.js pin
+
+      - name: Clone pinned public histories
+        id: discovery-clone
+        if: always() && steps.discovery-pin.outcome == 'success'
+        continue-on-error: true
+        env:
+          DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: ${{ steps.discovery-prepare.outputs.discovery-max-size-kb }}
+        run: node scripts/public-discovery-clone.mjs
+
+      - name: Scan full-history public repositories
+        id: discovery-scan
+        if: always() && steps.discovery-clone.outcome == 'success'
+        continue-on-error: true
+        run: npx --no-install repo-landscape scan --repos-dir data/public-discovery-clones --expected-heads data/public-discovery.heads.json --config data/public-discovery.config.json --output data/public-discovery-raw.json
+
+      - name: Ingest sanitized public discovery
+        id: discovery-ingest
+        if: always() && steps.discovery-scan.outcome == 'success'
+        continue-on-error: true
+        env:
+          DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
+          DEVEX_HISTORY_DIR: .metrics-data/data
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+          DEVEX_FEATURE_PUBLIC_DISCOVERY: ${{ vars.DEVEX_FEATURE_PUBLIC_DISCOVERY }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_REPOS: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_REPOS }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB }}
+          DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
+          GITHUB_TOKEN: ${{ steps.discovery-token.outputs.token }}
+        run: node dist/public-discovery-cli.js ingest data/public-discovery-raw.json
+
+      - name: Record failed public discovery
+        id: discovery-failed
+        if: always() && (steps.collect-metrics.outcome == 'failure' || steps.discovery-prepare.outcome == 'failure' || steps.discovery-scope.outcome == 'failure' || steps.discovery-token.outcome == 'failure' || steps.discovery-pin.outcome == 'failure' || steps.discovery-clone.outcome == 'failure' || steps.discovery-scan.outcome == 'failure' || steps.discovery-ingest.outcome == 'failure')
+        env:
+          DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
+          DEVEX_HISTORY_DIR: .metrics-data/data
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+          DEVEX_FEATURE_PUBLIC_DISCOVERY: ${{ vars.DEVEX_FEATURE_PUBLIC_DISCOVERY }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_REPOS: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_REPOS }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB }}
+          DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node dist/public-discovery-cli.js mark-failed
+
       - name: Publish history store
-        if: success() || (failure() && steps.landscape-failed.outputs.landscape-publish == 'true')
+        if: success() || (failure() && (steps.landscape-failed.outputs.landscape-publish == 'true' || steps.discovery-failed.outputs.discovery-publish == 'true'))
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           scripts/metrics-data.sh publish .metrics-data \
             "data: ${{ inputs.owner || vars.DEVEX_OWNER }} ${{ steps.date.outputs.date }}"
 
+      - name: Report failed public discovery
+        if: always() && steps.discovery-failed.outputs.discovery-publish == 'true'
+        run: |
+          echo "::error title=Public discovery failed::The last safe observation was retained and marked stale."
+          exit 1
+
   pages:
     needs: collect
-    if: success() || (failure() && needs.collect.outputs.landscape-publish == 'true')
+    if: success() || (failure() && (needs.collect.outputs.landscape-publish == 'true' || needs.collect.outputs.discovery-publish == 'true'))
     # A called workflow can never hold more than its caller grants, and this
     # workflow denies everything by default — so the permissions pages.yml needs
     # must be granted here or the run fails before any job starts.

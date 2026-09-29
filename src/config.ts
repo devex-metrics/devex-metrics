@@ -97,6 +97,8 @@ export interface FeatureFlags {
   ciHealth: boolean;
   /** Scan public repositories for AI instruction files via repo-landscape. Off by default. */
   landscape: boolean;
+  /** Scan full history of selected public repositories for repository discovery. Off by default. */
+  publicDiscovery: boolean;
 }
 
 /**
@@ -172,6 +174,10 @@ export interface CollectionConfig {
   maxRepoAgeHours: number;
   /** Days before the external scanner marks a file-age signal stale. */
   landscapeStaleAfterDays: number;
+  /** Maximum repositories to scan, ranked by merged PRs in the last 90 days. 0 means all. */
+  publicDiscoveryMaxRepos: number;
+  /** Maximum GitHub-reported repository size in KiB for a full-history clone. 0 disables. */
+  publicDiscoveryMaxSizeKb: number;
   features: FeatureFlags;
   backfill: BackfillConfig;
   ciHealth: CiHealthConfig;
@@ -222,7 +228,9 @@ export function defaultConfig(): DevexConfig {
       maxPRPages: 10,
       maxRepoAgeHours: 8,
       landscapeStaleAfterDays: 90,
-      features: { dependents: false, copilotAgent: true, ciHealth: false, landscape: false },
+      publicDiscoveryMaxRepos: 0,
+      publicDiscoveryMaxSizeKb: 512000,
+      features: { dependents: false, copilotAgent: true, ciHealth: false, landscape: false, publicDiscovery: false },
       backfill: {
         enabled: true,
         pagesPerRun: 200,
@@ -301,6 +309,16 @@ function positiveInt(env: Env, key: string): number | undefined {
   const n = Number(value);
   if (!/^[1-9]\d*$/.test(value) || !Number.isSafeInteger(n)) {
     throw new Error(`${key} must be a positive integer, got "${value}".`);
+  }
+  return n;
+}
+
+function nonnegativeInt(env: Env, key: string): number | undefined {
+  const value = str(env, key);
+  if (value === undefined) return undefined;
+  const n = Number(value);
+  if (!/^(0|[1-9]\d*)$/.test(value) || !Number.isSafeInteger(n)) {
+    throw new Error(`${key} must be a nonnegative integer, got "${value}".`);
   }
   return n;
 }
@@ -395,10 +413,13 @@ function applyEnv(config: DevexConfig, env: Env): void {
   assign(config.collection, "maxPRPages", int(env, "DEVEX_MAX_PR_PAGES"));
   assign(config.collection, "maxRepoAgeHours", int(env, "DEVEX_MAX_REPO_AGE_HOURS"));
   assign(config.collection, "landscapeStaleAfterDays", positiveInt(env, "DEVEX_LANDSCAPE_STALE_AFTER_DAYS"));
+  assign(config.collection, "publicDiscoveryMaxRepos", nonnegativeInt(env, "DEVEX_PUBLIC_DISCOVERY_MAX_REPOS"));
+  assign(config.collection, "publicDiscoveryMaxSizeKb", nonnegativeInt(env, "DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB"));
   assign(config.collection.features, "dependents", bool(env, "DEVEX_FEATURE_DEPENDENTS"));
   assign(config.collection.features, "copilotAgent", bool(env, "DEVEX_FEATURE_COPILOT_AGENT"));
   assign(config.collection.features, "ciHealth", bool(env, "DEVEX_FEATURE_CI_HEALTH"));
   assign(config.collection.features, "landscape", bool(env, "DEVEX_FEATURE_LANDSCAPE"));
+  assign(config.collection.features, "publicDiscovery", bool(env, "DEVEX_FEATURE_PUBLIC_DISCOVERY"));
 
   assign(config.collection.ciHealth, "pagesPerRun", int(env, "DEVEX_CI_PAGES_PER_RUN"));
   assign(config.collection.ciHealth, "maxPagesPerRepo", int(env, "DEVEX_CI_MAX_PAGES_PER_REPO"));
@@ -550,6 +571,14 @@ export function loadConfig(env: Env = process.env): DevexConfig {
   if (!Number.isSafeInteger(config.collection.landscapeStaleAfterDays) ||
     config.collection.landscapeStaleAfterDays < 1) {
     throw new Error("Landscape staleAfterDays must be a positive integer");
+  }
+  for (const [name, value] of [
+    ["publicDiscoveryMaxRepos", config.collection.publicDiscoveryMaxRepos],
+    ["publicDiscoveryMaxSizeKb", config.collection.publicDiscoveryMaxSizeKb],
+  ] as const) {
+    if (!Number.isSafeInteger(value) || value < 0) {
+      throw new Error(`${name} must be a nonnegative integer`);
+    }
   }
   return config;
 }

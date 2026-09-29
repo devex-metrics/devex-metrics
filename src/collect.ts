@@ -74,9 +74,13 @@ export async function collect(
     options.maxRepoAgeHours ??
     config.collection.maxRepoAgeHours ??
     DEFAULT_MAX_REPO_AGE_HOURS;
-  // A landscape scan may expose instruction paths on public Pages. Refresh
-  // discovery first so same-day cached visibility cannot authorize a scan.
-  if (!options.skipCache && !config.collection.features.landscape) {
+  // Both optional scans can publish public repo paths. Refresh discovery so
+  // same-day cached visibility cannot authorize either scan.
+  if (
+    !options.skipCache &&
+    !config.collection.features.landscape &&
+    !config.collection.features.publicDiscovery
+  ) {
     const cached = loadCache(owner);
     if (cached) {
       console.log(`Using cached data for ${owner} (collected ${cached.collectedAt})`);

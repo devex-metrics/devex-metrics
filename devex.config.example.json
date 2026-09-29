@@ -51,11 +51,14 @@
     "maxPRPages": 10,
     "maxRepoAgeHours": 8,
     "landscapeStaleAfterDays": 90,
+    "publicDiscoveryMaxRepos": 0,
+    "publicDiscoveryMaxSizeKb": 512000,
     "features": {
       "dependents": false,
       "copilotAgent": true,
       "ciHealth": false,
-      "landscape": false
+      "landscape": false,
+      "publicDiscovery": false
     },
     "backfill": {
       "enabled": true,

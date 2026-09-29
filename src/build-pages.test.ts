@@ -5,6 +5,7 @@ import { execFileSync } from "node:child_process";
 import { JSDOM, VirtualConsole } from "jsdom";
 import { CURRENT_SCHEMA_VERSION } from "./cache.js";
 import { landscapeLatestPath } from "./landscape.js";
+import { discoveryLatestPath } from "./public-discovery.js";
 import type { CacheEnvelope, WeeklyTrendPoint } from "./types.js";
 
 type TrendDataset = {
@@ -124,6 +125,59 @@ describe("build-pages", () => {
       const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf8");
       expect(html).not.toContain('id="ai-landscape"');
       expect(fs.existsSync(path.join(siteDir, "landscape.json"))).toBe(false);
+  });
+
+  it("adds public discovery last with its own JSON, leaving data.json, report and AI landscape alone", () => {
+    const historyDir = path.join(dataDir, "test-pages-discovery-history");
+    const snapshot = discoveryLatestPath(historyDir, "test-pages-owner");
+    fs.mkdirSync(path.dirname(snapshot), { recursive: true });
+    const envelope: CacheEnvelope = JSON.parse(fs.readFileSync(cacheFile, "utf8"));
+    envelope.data.repos[0].isPrivate = false;
+    envelope.data.repos[0].sizeKb = 100;
+    fs.writeFileSync(cacheFile, JSON.stringify(envelope));
+    fs.writeFileSync(snapshot, JSON.stringify({
+      schema_version: 1, generated_at: "2026-03-29T12:00:00Z",
+      scanner_version: "0.1.1", connections: [],
+      repositories: [{
+        full_name: "test-pages-owner/repo-a", head_sha: "a".repeat(40),
+        files: 2, bytes: 100, source_loc: 10,
+        languages: [{ name: "TypeScript", files: 1, loc: 10 }],
+        commits_30d: 1, commits_90d: 1,
+        commits_90d_trend: [...Array(89).fill(0), 1],
+        contributor_count: 1, adr_count: 0, manifest_count: 0, produces_count: 0, consumes_count: 0,
+        title: "NEVER PUBLISH",
+      }],
+      content: "NEVER PUBLISH",
+    }));
+    try {
+      execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+        cwd: process.cwd(), env: {
+          ...process.env, DEVEX_HISTORY_DIR: historyDir,
+          DEVEX_FEATURE_PUBLIC_DISCOVERY: "true", DEVEX_FEATURE_LANDSCAPE: "true",
+        },
+      });
+      const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf8");
+      const publicJson = fs.readFileSync(path.join(siteDir, "public-discovery.json"), "utf8");
+      expect(html.indexOf('id="ai-landscape"')).toBeLessThan(html.indexOf('id="public-discovery"'));
+      expect(html.indexOf('id="public-discovery"')).toBeLessThan(html.indexOf("</main>"));
+      expect(publicJson).not.toContain("NEVER PUBLISH");
+      expect(publicJson).toContain('"source_loc": 10');
+      const data = JSON.parse(fs.readFileSync(path.join(siteDir, "data.json"), "utf8"));
+      expect(data.repos[0]).not.toHaveProperty("publicDiscovery");
+      expect(fs.readFileSync(path.join(siteDir, "report.md"), "utf8")).not.toContain("Public repository discovery");
+      expect(fs.existsSync(path.join(siteDir, "landscape.json"))).toBe(true);
+      execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+        cwd: process.cwd(), env: {
+          ...process.env, DEVEX_HISTORY_DIR: historyDir,
+          DEVEX_FEATURE_PUBLIC_DISCOVERY: "false", DEVEX_FEATURE_LANDSCAPE: "true",
+        },
+      });
+      expect(fs.existsSync(path.join(siteDir, "public-discovery.json"))).toBe(false);
+      expect(fs.readFileSync(path.join(siteDir, "index.html"), "utf8")).not.toContain('id="public-discovery"');
+      expect(fs.existsSync(path.join(siteDir, "landscape.json"))).toBe(true);
+    } finally {
+      fs.rmSync(historyDir, { recursive: true, force: true });
+    }
   });
 
   it("should generate a data.json file", () => {

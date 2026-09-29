@@ -302,5 +302,22 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
 .landscape-unknown{color:var(--muted)}
 .landscape-stale{background:var(--warn-s);color:var(--warn);border:1px solid var(--warn);border-radius:6px;padding:.6rem .8rem;margin:.5rem 0 1rem;font-size:.85rem}
 .landscape-stale a{color:inherit;font-weight:600}
+.discovery-section{margin-bottom:2rem}
+.discovery-table{min-width:840px}
+.discovery-table tbody tr[hidden]{display:none}
+.discovery-table tbody th{max-width:190px;overflow-wrap:anywhere}
+.discovery-table td{min-width:100px}
+.discovery-unknown{color:var(--muted)}
+.discovery-authors{display:block;color:var(--muted);font-size:.78rem}
+.discovery-trend{display:block;width:96px;height:28px;color:var(--accent);margin-top:.25rem}
+.discovery-detail{max-width:34ch;color:var(--muted);font-size:.78rem;margin-top:.25rem}
+.discovery-detail summary{cursor:pointer;color:var(--accent);font-weight:600}
+.discovery-detail summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.discovery-detail p{margin:.35rem 0;overflow-wrap:anywhere}
+.discovery-connections{border-top:1px solid var(--border);margin-top:1.25rem;padding-top:.75rem}
+.discovery-connections h3{font-size:.9rem}
+.discovery-connections>ul{margin:.5rem 0 0 1.2rem;font-size:.82rem}
+.discovery-connections li{margin:.35rem 0;overflow-wrap:anywhere}
+.discovery-connections li ul{color:var(--muted);margin-left:1.2rem}
 `;
 }

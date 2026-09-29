@@ -170,6 +170,30 @@ files were added, removed or changed content since the last successful scan —
 not that older files are incorrect. Configuration, privacy constraints and
 release prerequisites are in [docs/CONFIGURATION.md](docs/CONFIGURATION.md#public-repository-landscape-opt-in).
 
+### Optional full-history public repository discovery
+
+Separate from the AI instruction landscape, `DEVEX_FEATURE_PUBLIC_DISCOVERY=true`
+adds a **final** dashboard section with public-repository inventory (files,
+bytes and physical source LOC), language counts, 30/90-day Git commit activity,
+ADR and manifest/artifact counts, and evidence-labeled heuristic cross-repo
+connections. It scans full-history clones at pinned HEADs, using the *already
+selected* DevEx repository snapshot. It does not change DevEx metrics, filters,
+the report, `data.json`, or the AI-only scan.
+
+By default, all eligible public, nonempty, same-owner repositories are
+considered, subject to a 512,000 KiB (~500 MiB) per-repository size guard.
+Set `DEVEX_PUBLIC_DISCOVERY_MAX_REPOS=20` to rank and scan at most 20 by
+**merged PRs in the last 90 days** (ties break by repository name). Oversized
+repositories are explicitly unknown and replaced by the next eligible
+repository; a repo outside the cap is **not scanned**, never measured as zero.
+Set `DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB=0` only if the deployment can safely
+handle unbounded clone sizes. Neither setting is activated automatically for
+this repository: its live administrator must set the feature toggle and
+`DEVEX_PUBLIC_DISCOVERY_MAX_REPOS=20` in Actions variables. The published
+`public-discovery.json` is a separate, bounded, sanitized API; no raw README
+body, author identity, dependency name, private path or CLI output is published.
+See [deployment details](docs/CONFIGURATION.md#full-history-public-repository-discovery-opt-in).
+
 ### Getting the full history
 
 The scheduled collection walks back two years to stay cheap. A background crawl

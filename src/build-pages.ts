@@ -6,6 +6,7 @@ import { loadConfig, applyScope } from "./config.js";
 import { latestPath, loadRollup } from "./history.js";
 import { loadCiRuns, toCiSamples } from "./ci-health.js";
 import { loadLandscapeRunStatus, loadLandscapeView } from "./landscape.js";
+import { loadPublicDiscoveryView } from "./public-discovery.js";
 import type { CacheEnvelope, OrgMetrics } from "./types.js";
 import { buildDashboardHtml } from "./pages/dashboard.js";
 
@@ -170,6 +171,17 @@ function main(): void {
   } else if (fs.existsSync(landscapeFile)) {
     fs.unlinkSync(landscapeFile);
   }
+  const discovery = config.collection.features.publicDiscovery
+    ? loadPublicDiscoveryView(historyDir, data, config)
+    : undefined;
+  const discoveryFile = path.join(siteDir, "public-discovery.json");
+  if (discovery) {
+    fs.writeFileSync(discoveryFile, JSON.stringify({
+      schema_version: 1, rows: discovery.rows, connections: discovery.connections, status: discovery.status ?? null,
+    }, null, 2));
+  } else if (fs.existsSync(discoveryFile)) {
+    fs.unlinkSync(discoveryFile);
+  }
 
   const html = buildDashboardHtml(data, date, process.env.GITHUB_REF_NAME, buildRunUrl(), {
     branding: config.branding,
@@ -178,6 +190,9 @@ function main(): void {
     ciWindowDays: config.collection.ciHealth.windowDays,
     landscape,
     landscapeStatus: landscape ? loadLandscapeRunStatus(historyDir, data.owner) : undefined,
+    publicDiscovery: discovery?.rows,
+    publicDiscoveryConnections: discovery?.connections,
+    publicDiscoveryStatus: discovery?.status,
   });
   fs.writeFileSync(path.join(siteDir, "index.html"), html);
 
