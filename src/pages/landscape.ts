@@ -33,7 +33,7 @@ function fileRow(file: LandscapeFile, added: Set<string>, changed: Set<string>):
   </tr>`;
 }
 
-function observedRow(row: LandscapeRepoView, attributes: string): string {
+function observedRow(row: LandscapeRepoView, attributes: string, index: number): string {
   const files = row.files ?? [];
   const summary = row.summary;
   if (!summary || !row.headSha || !row.collectedAt || !row.scannerVersion) {
@@ -60,17 +60,21 @@ function observedRow(row: LandscapeRepoView, attributes: string): string {
   const counts =
     `${summary.count} observed · ${summary.stale_count} older signals` +
     (summary.unknown_count ? ` · ${summary.unknown_count} unknown ages` : "");
+  // The file table lives in its own full-width row; landscape-controls.js keeps it
+  // attached to its repository row through sorting and pagination.
+  const detailId = `landscape-detail-${index}`;
   return `<tr${attributes}>
     <th scope="row">${escapeHtml(row.fullName)}</th>
     <td>${counts}</td>
     <td>${escapeHtml(driftLabel)}</td>
     <td><time datetime="${escapeHtml(row.collectedAt)}">${escapeHtml(row.collectedAt.slice(0, 10))}</time>
       <span class="landscape-hash" title="Observed head SHA">${escapeHtml(row.headSha.slice(0, 12))}</span></td>
-    <td><details class="landscape-details"><summary aria-label="View AI instruction files for ${escapeHtml(row.fullName)}">View files</summary>
+    <td><button type="button" class="landscape-toggle" aria-expanded="false" aria-controls="${detailId}" aria-label="View AI instruction files for ${escapeHtml(row.fullName)}">View files</button></td>
+  </tr>
+  <tr class="landscape-detail-row" id="${detailId}" hidden><td colspan="5">
       <p class="landscape-note">Scanner ${escapeHtml(row.scannerVersion)} · head ${escapeHtml(row.headSha)}. Older file age is not evidence of incorrect instructions.</p>
       ${compared}${fileTable}${removed}
-    </details></td>
-  </tr>`;
+  </td></tr>`;
 }
 
 function timeTag(iso: string): string {
@@ -113,7 +117,7 @@ export function buildLandscapeSection(
             ` data-landscape-changes="${known && row.drift ? row.drift.added.length + row.drift.content_changed.length + row.drift.removed.length : ""}"` +
             ` data-landscape-observed="${escapeHtml(known ? row.collectedAt ?? "" : "")}" data-landscape-detail="${known ? 1 : 0}"` +
             (index >= 20 ? " hidden" : "");
-          if (known) return observedRow(row, sortValues);
+          if (known) return observedRow(row, sortValues, index);
           return `<tr${sortValues}><th scope="row">${escapeHtml(row.fullName)}</th>` +
             `<td class="landscape-unknown">${unknownLabel(row.reason)}${row.collectedAt ? ` (scan attempted <time datetime="${escapeHtml(row.collectedAt)}">${escapeHtml(row.collectedAt.slice(0, 10))}</time>)` : ""}</td>` +
             `<td class="landscape-unknown">—</td>` +
