@@ -2,10 +2,16 @@ name: Collect DevEx Metrics
 
 on:
   schedule:
-    # Run daily at 06:00 UTC
+    # Run daily at 06:00 UTC. The scheduled run is always a full collection
+    # and seeds the day's snapshot cache that manual runs build on.
     - cron: "0 6 * * *"
   workflow_dispatch:
     inputs:
+      full_refresh:
+        description: "Ignore today's cached snapshot and re-collect every repository"
+        required: false
+        default: false
+        type: boolean
       owner:
         description: "GitHub org or user to collect. Defaults to the DEVEX_OWNER variable."
         required: false
@@ -59,6 +65,39 @@ jobs:
         id: date
         run: echo "date=$(date -u +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
+      # Scheduled runs (and manual runs asking for it) collect everything.
+      # Other manual runs only re-collect repositories that changed since
+      # today's snapshot.
+      - name: Choose collection mode
+        id: mode
+        env:
+          FULL: ${{ github.event_name != 'workflow_dispatch' || inputs.full_refresh }}
+        run: |
+          if [ "$FULL" = "true" ]; then
+            echo "incremental=false" >> "$GITHUB_OUTPUT"
+            echo "Full collection" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "incremental=true" >> "$GITHUB_OUTPUT"
+            echo "Incremental collection (delta since today's snapshot)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # The collected snapshot is keyed by UTC date, so a new day never builds
+      # on yesterday's data. Every successful run saves a new entry (cache keys
+      # are immutable) and a manual run restores the newest one from today.
+      - name: Restore today's metrics snapshot
+        if: steps.mode.outputs.incremental == 'true'
+        uses: actions/cache/restore@v6
+        with:
+          # The owner may only be set inside DEVEX_CONFIG, so match the
+          # snapshot by pattern rather than by name.
+          path: |
+            data/*.json
+            !data/*.fixture.json
+            !data/agents-*.json
+          key: metrics-snapshot-${{ inputs.owner || vars.DEVEX_OWNER || github.repository_owner }}-${{ steps.date.outputs.date }}
+          restore-keys: |
+            metrics-snapshot-${{ inputs.owner || vars.DEVEX_OWNER || github.repository_owner }}-${{ steps.date.outputs.date }}-
+
       # Per-repo Copilot agent data is expensive to re-fetch and terminal tasks
       # never change, so it stays in the Actions cache. The durable record lives
       # on the metrics-data branch instead — the cache is only a speed-up.
@@ -88,7 +127,7 @@ jobs:
           fi
 
       - name: Collect metrics
-        id: collect-metrics
+        id: collect
         env:
           APP_ID: ${{ vars.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
@@ -116,6 +155,7 @@ jobs:
           DEVEX_HISTORY_WEEKS: ${{ vars.DEVEX_HISTORY_WEEKS }}
           DEVEX_MAX_PR_PAGES: ${{ vars.DEVEX_MAX_PR_PAGES }}
           DEVEX_MAX_REPO_AGE_HOURS: ${{ vars.DEVEX_MAX_REPO_AGE_HOURS }}
+          DEVEX_INCREMENTAL: ${{ steps.mode.outputs.incremental }}
           DEVEX_FEATURE_DEPENDENTS: ${{ vars.DEVEX_FEATURE_DEPENDENTS }}
           DEVEX_FEATURE_COPILOT_AGENT: ${{ vars.DEVEX_FEATURE_COPILOT_AGENT }}
           DEVEX_FEATURE_CI_HEALTH: ${{ vars.DEVEX_FEATURE_CI_HEALTH }}
@@ -126,7 +166,9 @@ jobs:
           DEVEX_CI_PAGES_PER_RUN: ${{ vars.DEVEX_CI_PAGES_PER_RUN }}
           DEVEX_CI_MAX_PAGES_PER_REPO: ${{ vars.DEVEX_CI_MAX_PAGES_PER_REPO }}
           DEVEX_CI_WINDOW_DAYS: ${{ vars.DEVEX_CI_WINDOW_DAYS }}
-          DEVEX_BACKFILL_ENABLED: ${{ vars.DEVEX_BACKFILL_ENABLED }}
+          # The historical crawl is left to the nightly run so a manual refresh
+          # stays quick, unless the run explicitly asks for a crawl budget.
+          DEVEX_BACKFILL_ENABLED: ${{ (steps.mode.outputs.incremental == 'true' && !inputs.backfill_pages) && 'false' || vars.DEVEX_BACKFILL_ENABLED }}
           DEVEX_BACKFILL_PAGES_PER_RUN: ${{ inputs.backfill_pages || vars.DEVEX_BACKFILL_PAGES_PER_RUN }}
           DEVEX_BACKFILL_MAX_PAGES_PER_REPO: ${{ vars.DEVEX_BACKFILL_MAX_PAGES_PER_REPO }}
           DEVEX_BACKFILL_RECOMPUTE: ${{ vars.DEVEX_BACKFILL_RECOMPUTE }}
@@ -135,6 +177,18 @@ jobs:
           DEVEX_BACKFILL_ADAPTIVE_PAGE_SIZE: ${{ vars.DEVEX_BACKFILL_ADAPTIVE_PAGE_SIZE }}
           DEVEX_HISTORY_DIR: .metrics-data/data
         run: node dist/index.js
+
+      - name: Save metrics snapshot
+        if: always() && steps.collect.outcome == 'success'
+        uses: actions/cache/save@v6
+        with:
+          # The owner may only be set inside DEVEX_CONFIG, so match the
+          # snapshot by pattern rather than by name.
+          path: |
+            data/*.json
+            !data/*.fixture.json
+            !data/agents-*.json
+          key: metrics-snapshot-${{ inputs.owner || vars.DEVEX_OWNER || github.repository_owner }}-${{ steps.date.outputs.date }}-${{ github.run_id }}-${{ github.run_attempt }}
 
       # Prepare resolves DEVEX_CONFIG and the discrete variables; it returns
       # without scanning when landscape is disabled.
@@ -257,7 +311,7 @@ jobs:
       # token or clone is requested while public discovery is disabled.
       - name: Prepare full-history public discovery
         id: discovery-prepare
-        if: always() && steps.collect-metrics.outcome == 'success'
+        if: always() && steps.collect.outcome == 'success'
         continue-on-error: true
         env:
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
@@ -339,7 +393,7 @@ jobs:
 
       - name: Record failed public discovery
         id: discovery-failed
-        if: always() && (steps.collect-metrics.outcome == 'failure' || steps.discovery-prepare.outcome == 'failure' || steps.discovery-scope.outcome == 'failure' || steps.discovery-token.outcome == 'failure' || steps.discovery-pin.outcome == 'failure' || steps.discovery-clone.outcome == 'failure' || steps.discovery-scan.outcome == 'failure' || steps.discovery-ingest.outcome == 'failure')
+        if: always() && (steps.collect.outcome == 'failure' || steps.discovery-prepare.outcome == 'failure' || steps.discovery-scope.outcome == 'failure' || steps.discovery-token.outcome == 'failure' || steps.discovery-pin.outcome == 'failure' || steps.discovery-clone.outcome == 'failure' || steps.discovery-scan.outcome == 'failure' || steps.discovery-ingest.outcome == 'failure')
         env:
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
           DEVEX_HISTORY_DIR: .metrics-data/data

@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from "vitest";
 import { setOctokit, resetOctokit } from "../github-client.js";
 import type { Octokit } from "@octokit/rest";
-import { collectWeeklyTrends, toIsoWeekLabel } from "./trends.js";
+import { collectWeeklyTrends, sumWeeklyTrends, toIsoWeekLabel, weekLabels } from "./trends.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -502,3 +502,31 @@ describe("collectWeeklyTrends with prDataByRepo", () => {
   });
 });
 
+
+describe("weekLabels", () => {
+  it("returns consecutive ISO weeks ending with the current one", () => {
+    const now = new Date("2026-09-29T12:00:00Z");
+    expect(weekLabels(3, now)).toEqual(["2026-W38", "2026-W39", "2026-W40"]);
+  });
+});
+
+describe("sumWeeklyTrends", () => {
+  const zero = { prsOpened: 0, prsMerged: 0, issuesOpened: 0, issuesClosed: 0, linesAdded: 0, linesDeleted: 0 };
+
+  it("adds every field per week and ignores weeks outside the window", () => {
+    const summed = sumWeeklyTrends(
+      ["2026-W39", "2026-W40"],
+      [
+        [{ ...zero, week: "2026-W40", prsMerged: 1, linesAdded: 10 }],
+        [
+          { ...zero, week: "2026-W40", prsMerged: 2, issuesClosed: 1 },
+          { ...zero, week: "2026-W01", prsMerged: 99 },
+        ],
+      ]
+    );
+    expect(summed).toEqual([
+      { ...zero, week: "2026-W39" },
+      { ...zero, week: "2026-W40", prsMerged: 3, linesAdded: 10, issuesClosed: 1 },
+    ]);
+  });
+});

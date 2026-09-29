@@ -43,6 +43,7 @@ src/
     contributors.ts     # Committer & reviewer counts (last 90 days)
     dependents.ts       # Dependent repository count
     trends.ts           # Weekly activity trend aggregation
+    activity.ts         # Repos with issue/PR activity since a timestamp (incremental runs)
 data/                   # Local cache (gitignored); also holds local "group" datasets
 .metrics-data/          # Checkout of the metrics-data branch (gitignored)
 _site/                  # Generated GitHub Pages output (gitignored)
@@ -173,9 +174,32 @@ Mutation testing is provided by [Stryker](https://stryker-mutator.io/) with the 
 
 - **ci.yml**: two jobs on every push/PR to `main` — `test` (build + `npm test` + `npm run lint`, combined into one job since each is fast enough that the checkout/setup/install overhead of a separate job outweighs any parallelism benefit) and `coverage`. Each job caches `node_modules` (keyed on `package-lock.json`) via `actions/cache` and skips `npm ci` on a cache hit, so repeated installs across jobs don't each pay full install cost.
 - **mutation.yml**: daily (and `workflow_dispatch`). A first job checks for an open `mutation-improvement` issue and skips the run if there is one; otherwise it runs Stryker (which builds `dist` inside its own sandbox via `buildCommand`, since the sandbox copy respects `.gitignore`) and opens an issue when the score is below `break` (see the Mutation testing section above).
-- **collect-metrics.yml**: scheduled daily; checks out `metrics-data`, collects metrics, appends to the history store, pushes it back, then calls `pages.yml`. Does **not** commit to `main`.
+- **collect-metrics.yml**: scheduled daily; checks out `metrics-data`, collects metrics, appends to the history store, pushes it back, then calls `pages.yml`. Does **not** commit to `main`. The scheduled run is a full collection that saves a UTC-date-keyed snapshot to the Actions cache; manual runs restore today's newest snapshot and collect only the delta (`DEVEX_INCREMENTAL`, see "Fast manual refreshes" in `docs/CONFIGURATION.md`).
 - **pages.yml**: reusable (`workflow_call`); builds the site from the `metrics-data` checkout and deploys to Pages.
 - Always pin action versions to a full SHA or major-version tag.
+
+## Addressing review feedback
+
+Automated reviewers (Copilot code review and similar) re-review every push. Fixing only the exact line a comment points at invites the next round to flag the same mistake a few lines further on, which turns one finding into five review rounds, five CI runs and five sets of AI credits. Treat every finding as a possible **pattern**, not a one-off.
+
+### Before changing anything
+
+1. **Check what was reviewed.** Compare the commit the review ran on with the PR head. If newer commits exist (including a merge from `main`), check whether the finding still applies before acting on it. Don't fix what is already fixed.
+2. **Collect all open findings first.** Read every unresolved comment from the latest review before touching code, so they can be fixed together in one push.
+
+### For each finding
+
+1. **Name the underlying rule.** Restate the finding as a general rule, e.g. "`loadCache` does not check the schema version" becomes "every loader that reads persisted data must check `CURRENT_SCHEMA_VERSION`". If a rule cannot be stated, it is probably a one-off.
+2. **Sweep for other occurrences.** Search the whole codebase for the same shape (Grep for the API, the idiom or sibling functions/collectors/workflows), not just the file in the diff. Include code the PR did not touch when it is the same defect class, but keep unrelated clean-ups out of the PR; flag those separately instead.
+3. **Fix the class, not the instance.** Fix every occurrence in the same commit. If the fix is shared logic, extract it rather than repeating the patch.
+4. **Guard against regressions.** Where practical, add a test (or lint rule, or type) that fails for the whole class, so the reviewer and future changes cannot re-introduce it.
+5. **Decide deliberately when you disagree.** If a finding is wrong or not worth the change, reply with the reason and resolve it rather than making a token change that will draw a follow-up comment.
+
+### Pushing and replying
+
+- **One push per review round.** Batch all fixes, run `npm run build`, `npm test` and `npm run lint` locally, then push once. Never push per comment.
+- **Reply with the scope.** On each thread, say what the rule was and where else it was applied ("Fixed here and in `issues.ts`, `contributors.ts`; added a test covering all collectors"), so the reviewer and the human can see the pattern was closed.
+- **Recognise a loop.** If a new round raises a finding that is a variation of an earlier one, the earlier sweep was too narrow: widen it and say so. After three review rounds on the same PR, or when findings are becoming nitpicks, stop pushing and summarise the remaining open findings for a human to decide on.
 
 ## Auth
 

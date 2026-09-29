@@ -172,6 +172,13 @@ export interface CollectionConfig {
   maxPRPages: number;
   /** Hours before a per-repo cache entry is considered stale. */
   maxRepoAgeHours: number;
+  /**
+   * Collect only the delta since today's cached baseline: repos with no push
+   * and no issue/PR activity since they were cached are reused regardless of
+   * `maxRepoAgeHours`, and everything else is re-fetched. Baselines from an
+   * earlier UTC date are ignored, so the first run of a day is a full one.
+   */
+  incremental: boolean;
   /** Days before the external scanner marks a file-age signal stale. */
   landscapeStaleAfterDays: number;
   /** Maximum repositories to scan, ranked by merged PRs in the last 90 days. 0 means all. */
@@ -227,6 +234,7 @@ export function defaultConfig(): DevexConfig {
       historyWeeks: 104,
       maxPRPages: 10,
       maxRepoAgeHours: 8,
+      incremental: false,
       landscapeStaleAfterDays: 90,
       publicDiscoveryMaxRepos: 0,
       publicDiscoveryMaxSizeKb: 512000,
@@ -412,6 +420,7 @@ function applyEnv(config: DevexConfig, env: Env): void {
   assign(config.collection, "historyWeeks", int(env, "DEVEX_HISTORY_WEEKS"));
   assign(config.collection, "maxPRPages", int(env, "DEVEX_MAX_PR_PAGES"));
   assign(config.collection, "maxRepoAgeHours", int(env, "DEVEX_MAX_REPO_AGE_HOURS"));
+  assign(config.collection, "incremental", bool(env, "DEVEX_INCREMENTAL"));
   assign(config.collection, "landscapeStaleAfterDays", positiveInt(env, "DEVEX_LANDSCAPE_STALE_AFTER_DAYS"));
   assign(config.collection, "publicDiscoveryMaxRepos", nonnegativeInt(env, "DEVEX_PUBLIC_DISCOVERY_MAX_REPOS"));
   assign(config.collection, "publicDiscoveryMaxSizeKb", nonnegativeInt(env, "DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB"));

@@ -50,6 +50,7 @@
     "historyWeeks": 104,
     "maxPRPages": 10,
     "maxRepoAgeHours": 8,
+    "incremental": false,
     "landscapeStaleAfterDays": 90,
     "publicDiscoveryMaxRepos": 0,
     "publicDiscoveryMaxSizeKb": 512000,
