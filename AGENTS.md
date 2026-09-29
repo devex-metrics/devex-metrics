@@ -49,6 +49,7 @@ data/                   # Local cache (gitignored); also holds local "group" dat
 _site/                  # Generated GitHub Pages output (gitignored)
 .github/workflows/
   ci.yml                # Build + test on PR / push to main
+  mutation.yml          # Daily mutation run; opens an issue when the score is too low
   collect-metrics.yml   # Scheduled data collection, then calls pages.yml
   pages.yml             # Reusable: build from metrics-data and deploy
   deploy-pages.yml      # Rebuild the site without re-collecting
@@ -156,8 +157,8 @@ Mutation testing is provided by [Stryker](https://stryker-mutator.io/) with the 
 
 - **Config**: `stryker.config.mjs` (ESM). Mutates all `src/**/*.ts` except test files, `types.ts`, `index.ts`, `save-fixture.ts`, `build-pages.ts`, `collect-group.ts`, and `build-multi-site.ts` (CLI entry points excluded because they're hard to unit test or are tested via subprocess, so Stryker cannot track coverage that way).
 - **Run locally** (before creating a PR): `npm run mutation` — produces an HTML report at `reports/mutation/index.html` and a text summary in the terminal.
-- **Run in CI mode**: `npm run mutation:ci` — outputs JSON + text (no HTML). The `mutation` job in `ci.yml` reads `reports/mutation/mutation.json` and posts a Markdown summary to the GitHub Actions step summary via `node scripts/mutation-summary.mjs >> $GITHUB_STEP_SUMMARY`.
-- **Thresholds**: `high: 80`, `low: 60` for colour-coding; `break: 60` fails the run below 60% (baseline 61.87% measured 2026-09-27). Raise `break` as the score improves; never lower it to get a PR green.
+- **Run in CI mode**: `npm run mutation:ci` — outputs JSON + text (no HTML). It is too slow for PR checks, so it runs daily in `mutation.yml` rather than in `ci.yml`. That workflow posts a step summary via `scripts/mutation-summary.mjs`, uploads `mutation.json` as the `mutation-report` artifact, and runs `scripts/mutation-score-issue.mjs`, which opens an issue (label `mutation-improvement`) listing the files and functions with undetected mutants when the score is below `break`. While such an issue is open the workflow skips the run entirely; close the issue once the score is fixed. Preview the issue body locally with `node scripts/mutation-score-issue.mjs --dry-run` after `npm run mutation:ci`.
+- **Thresholds**: `high: 80`, `low: 60` for colour-coding; `break: 60` is the score below which the daily run opens an issue (baseline 61.87% measured 2026-09-27). Raise `break` as the score improves; never lower it to silence the alert.
 - **vitest 5 runner shim**: `stryker.config.mjs` loads `scripts/stryker-vitest5-runner.mjs` instead of `@stryker-mutator/vitest-runner` directly. The upstream runner (10.0.0) filters each mutant run by space-joined test names, but vitest 5 matches `testNamePattern` against `fullTestName` (`"suite > test"`), so every test inside a `describe` was skipped and every mutant "survived" (score ~0%). The shim lets spaces in the pattern also match `" > "`. Delete it once the upstream runner is fixed. (The `Converting circular structure to JSON` error seen with `--logLevel debug` is an unrelated upstream debug-logging bug.)
 - **Interpreting results**: a survived mutant means a code change was not caught by any test — it may indicate a test gap worth addressing. NoCoverage mutants mean no test exercises that line at all.
 - **reports/** is gitignored — never commit Stryker output.
@@ -171,10 +172,34 @@ Mutation testing is provided by [Stryker](https://stryker-mutator.io/) with the 
 
 ## GitHub Actions
 
-- **ci.yml**: three jobs on every push/PR to `main` — `test` (build + `npm test` + `npm run lint`, combined into one job since each is fast enough that the checkout/setup/install overhead of a separate job outweighs any parallelism benefit), `coverage`, and `mutation` (`needs: test`; Stryker builds `dist` inside its own sandbox via `buildCommand`, since the sandbox copy respects `.gitignore` and never contains a build produced by an outer CI step). Mutation posts a step summary and fails the build when the score drops below `break` (see the Mutation testing section above). Each job caches `node_modules` (keyed on `package-lock.json`) via `actions/cache` and skips `npm ci` on a cache hit, so repeated installs across jobs don't each pay full install cost.
+- **ci.yml**: two jobs on every push/PR to `main` — `test` (build + `npm test` + `npm run lint`, combined into one job since each is fast enough that the checkout/setup/install overhead of a separate job outweighs any parallelism benefit) and `coverage`. Each job caches `node_modules` (keyed on `package-lock.json`) via `actions/cache` and skips `npm ci` on a cache hit, so repeated installs across jobs don't each pay full install cost.
+- **mutation.yml**: daily (and `workflow_dispatch`). A first job checks for an open `mutation-improvement` issue and skips the run if there is one; otherwise it runs Stryker (which builds `dist` inside its own sandbox via `buildCommand`, since the sandbox copy respects `.gitignore`) and opens an issue when the score is below `break` (see the Mutation testing section above).
 - **collect-metrics.yml**: scheduled daily; checks out `metrics-data`, collects metrics, appends to the history store, pushes it back, then calls `pages.yml`. Does **not** commit to `main`. The scheduled run is a full collection that saves a UTC-date-keyed snapshot to the Actions cache; manual runs restore today's newest snapshot and collect only the delta (`DEVEX_INCREMENTAL`, see "Fast manual refreshes" in `docs/CONFIGURATION.md`).
 - **pages.yml**: reusable (`workflow_call`); builds the site from the `metrics-data` checkout and deploys to Pages.
 - Always pin action versions to a full SHA or major-version tag.
+
+## Addressing review feedback
+
+Automated reviewers (Copilot code review and similar) re-review every push. Fixing only the exact line a comment points at invites the next round to flag the same mistake a few lines further on, which turns one finding into five review rounds, five CI runs and five sets of AI credits. Treat every finding as a possible **pattern**, not a one-off.
+
+### Before changing anything
+
+1. **Check what was reviewed.** Compare the commit the review ran on with the PR head. If newer commits exist (including a merge from `main`), check whether the finding still applies before acting on it. Don't fix what is already fixed.
+2. **Collect all open findings first.** Read every unresolved comment from the latest review before touching code, so they can be fixed together in one push.
+
+### For each finding
+
+1. **Name the underlying rule.** Restate the finding as a general rule, e.g. "`loadCache` does not check the schema version" becomes "every loader that reads persisted data must check `CURRENT_SCHEMA_VERSION`". If a rule cannot be stated, it is probably a one-off.
+2. **Sweep for other occurrences.** Search the whole codebase for the same shape (Grep for the API, the idiom or sibling functions/collectors/workflows), not just the file in the diff. Include code the PR did not touch when it is the same defect class, but keep unrelated clean-ups out of the PR; flag those separately instead.
+3. **Fix the class, not the instance.** Fix every occurrence in the same commit. If the fix is shared logic, extract it rather than repeating the patch.
+4. **Guard against regressions.** Where practical, add a test (or lint rule, or type) that fails for the whole class, so the reviewer and future changes cannot re-introduce it.
+5. **Decide deliberately when you disagree.** If a finding is wrong or not worth the change, reply with the reason and resolve it rather than making a token change that will draw a follow-up comment.
+
+### Pushing and replying
+
+- **One push per review round.** Batch all fixes, run `npm run build`, `npm test` and `npm run lint` locally, then push once. Never push per comment.
+- **Reply with the scope.** On each thread, say what the rule was and where else it was applied ("Fixed here and in `issues.ts`, `contributors.ts`; added a test covering all collectors"), so the reviewer and the human can see the pattern was closed.
+- **Recognise a loop.** If a new round raises a finding that is a variation of an earlier one, the earlier sweep was too narrow: widen it and say so. After three review rounds on the same PR, or when findings are becoming nitpicks, stop pushing and summarise the remaining open findings for a human to decide on.
 
 ## Auth
 
