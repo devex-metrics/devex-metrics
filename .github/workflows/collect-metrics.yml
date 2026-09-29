@@ -43,6 +43,7 @@ jobs:
     outputs:
       landscape-publish: ${{ steps.landscape-failed.outputs.landscape-publish }}
       discovery-publish: ${{ steps.discovery-failed.outputs.discovery-publish }}
+      history-published: ${{ steps.publish-history.outcome }}
     permissions:
       # The job also publishes the append-only metrics-data branch.
       contents: write
@@ -163,6 +164,8 @@ jobs:
           DEVEX_FEATURE_PUBLIC_DISCOVERY: ${{ vars.DEVEX_FEATURE_PUBLIC_DISCOVERY }}
           DEVEX_PUBLIC_DISCOVERY_MAX_REPOS: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_REPOS }}
           DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB }}
+          DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES: ${{ vars.DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES }}
           DEVEX_CI_PAGES_PER_RUN: ${{ vars.DEVEX_CI_PAGES_PER_RUN }}
           DEVEX_CI_MAX_PAGES_PER_REPO: ${{ vars.DEVEX_CI_MAX_PAGES_PER_REPO }}
           DEVEX_CI_WINDOW_DAYS: ${{ vars.DEVEX_CI_WINDOW_DAYS }}
@@ -320,6 +323,8 @@ jobs:
           DEVEX_FEATURE_PUBLIC_DISCOVERY: ${{ vars.DEVEX_FEATURE_PUBLIC_DISCOVERY }}
           DEVEX_PUBLIC_DISCOVERY_MAX_REPOS: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_REPOS }}
           DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB }}
+          DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES: ${{ vars.DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES }}
           DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
         run: node dist/public-discovery-cli.js prepare
 
@@ -358,6 +363,8 @@ jobs:
           DEVEX_FEATURE_PUBLIC_DISCOVERY: ${{ vars.DEVEX_FEATURE_PUBLIC_DISCOVERY }}
           DEVEX_PUBLIC_DISCOVERY_MAX_REPOS: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_REPOS }}
           DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB }}
+          DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES: ${{ vars.DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES }}
           DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
           GITHUB_TOKEN: ${{ steps.discovery-token.outputs.token }}
         run: node dist/public-discovery-cli.js pin
@@ -368,6 +375,8 @@ jobs:
         continue-on-error: true
         env:
           DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: ${{ steps.discovery-prepare.outputs.discovery-max-size-kb }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB: ${{ steps.discovery-prepare.outputs.discovery-max-clone-size-kb }}
+          DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES: ${{ steps.discovery-prepare.outputs.discovery-clone-minutes }}
         run: node scripts/public-discovery-clone.mjs
 
       - name: Scan full-history public repositories
@@ -387,6 +396,8 @@ jobs:
           DEVEX_FEATURE_PUBLIC_DISCOVERY: ${{ vars.DEVEX_FEATURE_PUBLIC_DISCOVERY }}
           DEVEX_PUBLIC_DISCOVERY_MAX_REPOS: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_REPOS }}
           DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB }}
+          DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES: ${{ vars.DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES }}
           DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
           GITHUB_TOKEN: ${{ steps.discovery-token.outputs.token }}
         run: node dist/public-discovery-cli.js ingest data/public-discovery-raw.json
@@ -401,11 +412,14 @@ jobs:
           DEVEX_FEATURE_PUBLIC_DISCOVERY: ${{ vars.DEVEX_FEATURE_PUBLIC_DISCOVERY }}
           DEVEX_PUBLIC_DISCOVERY_MAX_REPOS: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_REPOS }}
           DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB }}
+          DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB: ${{ vars.DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB }}
+          DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES: ${{ vars.DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES }}
           DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
           GITHUB_TOKEN: ${{ github.token }}
         run: node dist/public-discovery-cli.js mark-failed
 
       - name: Publish history store
+        id: publish-history
         if: success() || (failure() && (steps.landscape-failed.outputs.landscape-publish == 'true' || steps.discovery-failed.outputs.discovery-publish == 'true'))
         env:
           GH_TOKEN: ${{ github.token }}
@@ -421,7 +435,7 @@ jobs:
 
   pages:
     needs: collect
-    if: success() || (failure() && (needs.collect.outputs.landscape-publish == 'true' || needs.collect.outputs.discovery-publish == 'true'))
+    if: needs.collect.outputs.history-published == 'success' && (success() || (failure() && (needs.collect.outputs.landscape-publish == 'true' || needs.collect.outputs.discovery-publish == 'true')))
     # A called workflow can never hold more than its caller grants, and this
     # workflow denies everything by default — so the permissions pages.yml needs
     # must be granted here or the run fails before any job starts.

@@ -54,6 +54,8 @@
     "landscapeStaleAfterDays": 90,
     "publicDiscoveryMaxRepos": 0,
     "publicDiscoveryMaxSizeKb": 512000,
+    "publicDiscoveryMaxCloneSizeKb": 8388608,
+    "publicDiscoveryCloneMinutes": 60,
     "features": {
       "dependents": false,
       "copilotAgent": true,

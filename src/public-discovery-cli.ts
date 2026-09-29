@@ -78,6 +78,8 @@ function prepare(): void {
   output("discovery-enabled", "true");
   output("discovery-scan-needed", String(names.length > 0));
   output("discovery-max-size-kb", String(config.collection.publicDiscoveryMaxSizeKb));
+  output("discovery-max-clone-size-kb", String(config.collection.publicDiscoveryMaxCloneSizeKb));
+  output("discovery-clone-minutes", String(config.collection.publicDiscoveryCloneMinutes));
   if (names.length) {
     output("discovery-owner", metrics.owner);
     output("discovery-repositories", names.map((item) => item.split("/")[1]).join(","));

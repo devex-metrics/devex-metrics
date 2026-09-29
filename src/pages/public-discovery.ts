@@ -11,6 +11,10 @@ function compact(value: number): string {
   );
 }
 
+function signedDelta(value: number): string {
+  return `${value >= 0 ? "+" : ""}${value}`;
+}
+
 function trend(points: number[]): string {
   const weeks = Array.from({ length: 13 }, (_, index) =>
     points.slice(index * 7, index === 12 ? 90 : index * 7 + 7).reduce((a, b) => a + b, 0)
@@ -60,7 +64,7 @@ function row(view: PublicDiscoveryRepoView, index: number): string {
         .join(" · ")
     : "No classified source language";
   const delta = view.delta
-    ? `Compared with ${escapeHtml(view.delta.compared_at.slice(0, 10))}: ${view.delta.files >= 0 ? "+" : ""}${view.delta.files} files; ${view.delta.source_loc >= 0 ? "+" : ""}${view.delta.source_loc} source LOC. Commit window counts are rolling, not cumulative (+${view.delta.commits_90d} difference).`
+    ? `Compared with ${escapeHtml(view.delta.compared_at.slice(0, 10))}: ${signedDelta(view.delta.files)} files; ${signedDelta(view.delta.source_loc)} source LOC. Commit window counts are rolling, not cumulative (${signedDelta(view.delta.commits_90d)} difference).`
     : "First successful observation; no comparison yet.";
   return `<tr${index >= 20 ? " hidden" : ""}>${repo}
     <td>${compact(observed.files)} files · ${compact(observed.bytes)} bytes · ${compact(observed.source_loc)} LOC

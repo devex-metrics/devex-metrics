@@ -58,6 +58,8 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_FEATURE_PUBLIC_DISCOVERY` | bool | Separate full-history public repository discovery panel (`collection.features.publicDiscovery`). Default `false`. |
 | `DEVEX_PUBLIC_DISCOVERY_MAX_REPOS` | int | Optional number of public repositories to scan ranked by merged PRs in the collected 90-day timeline (`collection.publicDiscoveryMaxRepos`). Default `0` means all eligible repositories. Set `20` for the initial public deployment. |
 | `DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB` | int | Maximum GitHub API repository size in KiB before skipping a full-history clone (`collection.publicDiscoveryMaxSizeKb`). Default `512000` (~500 MiB). `0` disables this safety limit deliberately. |
+| `DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB` | int | Maximum combined on-disk size of all full-history clones in KiB (`collection.publicDiscoveryMaxCloneSizeKb`). Default `8388608` (8 GiB). Must be positive; still enforced if the per-repo size limit is `0`. |
+| `DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES` | int | Maximum elapsed time for the entire full-history clone phase (`collection.publicDiscoveryCloneMinutes`). Default `60`; accepted range `1`–`360`. Each individual clone also has a 15-minute limit. |
 | `DEVEX_CI_PAGES_PER_RUN` | int | CI crawl budget per run, all repos. Default `20`. |
 | `DEVEX_CI_MAX_PAGES_PER_REPO` | int | CI crawl cap per repo per run. Default `5`. |
 | `DEVEX_CI_WINDOW_DAYS` | int | Days of CI history the dashboard reads back. Default `90`. |
@@ -359,8 +361,13 @@ lower the size limit to stay within runner resources or deliberately set `0`
 to disable it. GitHub's size value estimates the current repository and may
 understate full Git history; the clone step also imposes a 15-minute timeout
 and a disk-space cap of twice the configured reported-size limit per repo.
-Disabling the size guard also disables that per-repo disk guard. Large
-installations should set an explicit repository count and run budget.
+Disabling the per-repo size guard also disables that per-repo disk guard, **not**
+the combined 8 GiB on-disk clone budget or 60-minute total clone deadline.
+The entire clone directory is checked during and between clones; exceeding
+either total budget fails the scan instead of publishing partial observations,
+and the last safe data is marked stale once the history store is published.
+Increase the total budget only when the runner has enough disk and time; large
+installations should also set an explicit repository count.
 
 After normal collection, preparation derives the precise selection from its
 latest filtered `RepoMetrics`. Only repositories positively marked public,

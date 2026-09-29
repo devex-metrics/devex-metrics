@@ -96,4 +96,24 @@ describe("public discovery bottom panel", () => {
       )
     ).not.toBeNull();
   });
+
+  it.each([
+    { files: -2, loc: -3, commits: -4, expected: "-2 files; -3 source LOC. Commit window counts are rolling, not cumulative (-4 difference)." },
+    { files: 0, loc: 0, commits: 0, expected: "+0 files; +0 source LOC. Commit window counts are rolling, not cumulative (+0 difference)." },
+    { files: 2, loc: 3, commits: 4, expected: "+2 files; +3 source LOC. Commit window counts are rolling, not cumulative (+4 difference)." },
+  ])("formats $commits rolling-window difference with consistent signs", ({ files, loc, commits, expected }) => {
+    const repo: PublicDiscoveryRepoView = {
+      ...observed(),
+      delta: {
+        compared_at: "2026-09-29T12:00:00.000Z",
+        files,
+        source_loc: loc,
+        commits_90d: commits,
+      },
+    };
+    const text = new JSDOM(buildPublicDiscoverySection([repo], [])).window.document
+      .querySelector(".discovery-detail")?.textContent;
+    expect(text).toContain(expected);
+    expect(text).not.toContain("+-");
+  });
 });

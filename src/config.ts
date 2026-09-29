@@ -185,6 +185,10 @@ export interface CollectionConfig {
   publicDiscoveryMaxRepos: number;
   /** Maximum GitHub-reported repository size in KiB for a full-history clone. 0 disables. */
   publicDiscoveryMaxSizeKb: number;
+  /** Maximum combined clone-directory size in KiB; always enforced, even without a per-repo limit. */
+  publicDiscoveryMaxCloneSizeKb: number;
+  /** Maximum elapsed minutes for all public discovery clones combined. */
+  publicDiscoveryCloneMinutes: number;
   features: FeatureFlags;
   backfill: BackfillConfig;
   ciHealth: CiHealthConfig;
@@ -238,6 +242,8 @@ export function defaultConfig(): DevexConfig {
       landscapeStaleAfterDays: 90,
       publicDiscoveryMaxRepos: 0,
       publicDiscoveryMaxSizeKb: 512000,
+      publicDiscoveryMaxCloneSizeKb: 8388608,
+      publicDiscoveryCloneMinutes: 60,
       features: { dependents: false, copilotAgent: true, ciHealth: false, landscape: false, publicDiscovery: false },
       backfill: {
         enabled: true,
@@ -424,6 +430,8 @@ function applyEnv(config: DevexConfig, env: Env): void {
   assign(config.collection, "landscapeStaleAfterDays", positiveInt(env, "DEVEX_LANDSCAPE_STALE_AFTER_DAYS"));
   assign(config.collection, "publicDiscoveryMaxRepos", nonnegativeInt(env, "DEVEX_PUBLIC_DISCOVERY_MAX_REPOS"));
   assign(config.collection, "publicDiscoveryMaxSizeKb", nonnegativeInt(env, "DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB"));
+  assign(config.collection, "publicDiscoveryMaxCloneSizeKb", positiveInt(env, "DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB"));
+  assign(config.collection, "publicDiscoveryCloneMinutes", positiveInt(env, "DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES"));
   assign(config.collection.features, "dependents", bool(env, "DEVEX_FEATURE_DEPENDENTS"));
   assign(config.collection.features, "copilotAgent", bool(env, "DEVEX_FEATURE_COPILOT_AGENT"));
   assign(config.collection.features, "ciHealth", bool(env, "DEVEX_FEATURE_CI_HEALTH"));
@@ -589,6 +597,16 @@ export function loadConfig(env: Env = process.env): DevexConfig {
       throw new Error(`${name} must be a nonnegative integer`);
     }
   }
+  if (config.collection.publicDiscoveryMaxSizeKb > Math.floor(Number.MAX_SAFE_INTEGER / 2048))
+    throw new Error("publicDiscoveryMaxSizeKb exceeds the safe on-disk byte range");
+  if (!Number.isSafeInteger(config.collection.publicDiscoveryMaxCloneSizeKb) ||
+      config.collection.publicDiscoveryMaxCloneSizeKb < 1 ||
+      config.collection.publicDiscoveryMaxCloneSizeKb > Math.floor(Number.MAX_SAFE_INTEGER / 1024))
+    throw new Error("publicDiscoveryMaxCloneSizeKb must be a positive safe KiB budget");
+  if (!Number.isSafeInteger(config.collection.publicDiscoveryCloneMinutes) ||
+      config.collection.publicDiscoveryCloneMinutes < 1 ||
+      config.collection.publicDiscoveryCloneMinutes > 360)
+    throw new Error("publicDiscoveryCloneMinutes must be between 1 and 360");
   return config;
 }
 

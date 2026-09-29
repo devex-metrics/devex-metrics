@@ -187,7 +187,12 @@ Set `DEVEX_PUBLIC_DISCOVERY_MAX_REPOS=20` to rank and scan at most 20 by
 repositories are explicitly unknown and replaced by the next eligible
 repository; a repo outside the cap is **not scanned**, never measured as zero.
 Set `DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB=0` only if the deployment can safely
-handle unbounded clone sizes. Neither setting is activated automatically for
+handle individual large repositories: an independent combined 8 GiB clone
+directory budget (`DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB`) and 60-minute
+clone-phase deadline (`DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES`) still apply.
+Exceeding either total budget fails the scan and marks previous safe data stale
+after the history store is published; partial results are never published.
+Neither setting is activated automatically for
 this repository: its live administrator must set the feature toggle and
 `DEVEX_PUBLIC_DISCOVERY_MAX_REPOS=20` in Actions variables. The published
 `public-discovery.json` is a separate, bounded, sanitized API; no raw README

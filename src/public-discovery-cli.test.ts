@@ -1,6 +1,8 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { spawnSync } from "node:child_process";
+import { runInNewContext } from "node:vm";
+import { createCloneBudget } from "../scripts/public-discovery-clone-budget.mjs";
 import { latestPath } from "./history.js";
 
 const entry = path.resolve("dist", "public-discovery-cli.js");
@@ -72,6 +74,8 @@ describe("full-history public discovery workflow adapter", () => {
     ).toEqual({ schema_version: 1, repositories: ["acme/a", "acme/b"], stale_after_days: 90 });
     expect(fs.readFileSync(output, "utf8")).toContain("discovery-repositories=a,b\n");
     expect(fs.readFileSync(output, "utf8")).toContain("discovery-max-size-kb=512000\n");
+    expect(fs.readFileSync(output, "utf8")).toContain("discovery-max-clone-size-kb=8388608\n");
+    expect(fs.readFileSync(output, "utf8")).toContain("discovery-clone-minutes=60\n");
     expect(fs.readFileSync(output, "utf8")).not.toContain("huge");
     expect(fs.existsSync(path.join(work, "data", "public-discovery.heads.json"))).toBe(false);
   });
@@ -88,6 +92,7 @@ describe("full-history public discovery workflow adapter", () => {
     const bad = run("prepare", { DEVEX_PUBLIC_DISCOVERY_MAX_REPOS: "2.5" });
     expect(bad.status).not.toBe(0);
     expect(fs.existsSync(output)).toBe(false);
+    expect(run("prepare", { DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB: "0" }).status).not.toBe(0);
     expect(run("prepare").status).toBe(0);
     const pin = run("pin", { GITHUB_TOKEN: "" });
     expect(pin.status).not.toBe(0);
@@ -156,6 +161,10 @@ describe("full-history public discovery workflow adapter", () => {
       "if: always() && steps.discovery-failed.outputs.discovery-publish == 'true'"
     );
     expect(workflow).toContain("needs.collect.outputs.discovery-publish == 'true'");
+    expect(workflow).toContain("history-published: ${{ steps.publish-history.outcome }}");
+    expect(workflow).toContain("id: publish-history");
+    expect(workflow).toContain("DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB: ${{ steps.discovery-prepare.outputs.discovery-max-clone-size-kb }}");
+    expect(workflow).toContain("DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES: ${{ steps.discovery-prepare.outputs.discovery-clone-minutes }}");
     expect(pages).toContain(
       "DEVEX_FEATURE_PUBLIC_DISCOVERY: ${{ vars.DEVEX_FEATURE_PUBLIC_DISCOVERY }}"
     );
@@ -164,6 +173,69 @@ describe("full-history public discovery workflow adapter", () => {
     expect(script).toContain('"--no-tags"');
     expect(script).toContain("head !== heads[name]");
     expect(script).toContain("controller.abort()");
+    expect(script).toContain("budget.check(target)");
+    expect(script).toContain("budget.remainingMs()");
     expect(script).toContain('[\".\", \"..\"].includes(name.split(\"/\")[1])');
+  });
+
+  it("enforces combined disk and elapsed-time budgets across completed and active clones", () => {
+    const root = path.join(work, "clones");
+    const first = path.join(root, "acme", "first");
+    const second = path.join(root, "acme", "second");
+    fs.mkdirSync(first, { recursive: true });
+    fs.mkdirSync(second, { recursive: true });
+    let elapsed = 0;
+    const budget = createCloneBudget(root, 0, 3, 1, () => elapsed);
+    fs.writeFileSync(path.join(first, "data"), Buffer.alloc(2048));
+    budget.check(first);
+    fs.writeFileSync(path.join(second, "data"), Buffer.alloc(1024));
+    budget.check(second);
+    fs.appendFileSync(path.join(second, "data"), Buffer.alloc(1));
+    expect(() => budget.check(second)).toThrow(/clone directory exceeded 3072 bytes total/);
+    fs.truncateSync(path.join(second, "data"), 1024);
+    elapsed = 60_000;
+    expect(() => budget.check(first)).toThrow(/clone deadline exceeded \(1 minutes total\)/);
+  });
+
+  it("retains the independent per-repository disk guard", () => {
+    const root = path.join(work, "clones");
+    const target = path.join(root, "acme", "first");
+    fs.mkdirSync(target, { recursive: true });
+    const budget = createCloneBudget(root, 1, 4, 1, () => 0);
+    fs.writeFileSync(path.join(target, "data"), Buffer.alloc(2048));
+    budget.check(target);
+    fs.appendFileSync(path.join(target, "data"), Buffer.alloc(1));
+    expect(() => budget.check(target)).toThrow(/exceeded 2048 bytes per repository/);
+    expect(() => createCloneBudget(root, 0, 0, 1)).toThrow(/Invalid public discovery clone budget/);
+  });
+
+  it("deploys either failure notice only after a successful history-store publish", () => {
+    const workflow = fs.readFileSync(path.resolve(".github", "workflows", "collect-metrics.yml"), "utf8");
+    const expression = workflow.match(/  pages:\r?\n    needs: collect\r?\n    if: ([^\r\n]+)/)?.[1];
+    expect(expression).toBeDefined();
+    const javascript = expression!.replace(
+      /needs\.collect\.outputs\.([a-z-]+)/g,
+      (_, key: string) => `needs.collect.outputs["${key}"]`
+    );
+    for (const { collectSucceeded, publish, landscape, discovery, deploy } of [
+      { collectSucceeded: true, publish: "success", landscape: "false", discovery: "false", deploy: true },
+      { collectSucceeded: false, publish: "success", landscape: "true", discovery: "false", deploy: true },
+      { collectSucceeded: false, publish: "success", landscape: "false", discovery: "true", deploy: true },
+      { collectSucceeded: false, publish: "success", landscape: "false", discovery: "false", deploy: false },
+      { collectSucceeded: false, publish: "failure", landscape: "true", discovery: "true", deploy: false },
+      { collectSucceeded: false, publish: "skipped", landscape: "true", discovery: "false", deploy: false },
+      { collectSucceeded: true, publish: "failure", landscape: "false", discovery: "true", deploy: false },
+    ]) {
+      const result = runInNewContext(javascript, {
+        success: () => collectSucceeded,
+        failure: () => !collectSucceeded,
+        needs: { collect: { outputs: {
+          "history-published": publish,
+          "landscape-publish": landscape,
+          "discovery-publish": discovery,
+        } } },
+      });
+      expect(result).toBe(deploy);
+    }
   });
 });
