@@ -328,13 +328,20 @@ export function validatePublicDiscoveryOutput(
     const metrics = record(item.metrics, "CLI metrics");
     const git = record(item.git, "CLI git");
     const architecture = record(item.architecture, "CLI architecture");
-    const languages = item.languages.map(language).sort(compareLanguages).slice(0, 5);
+    const files = count(metrics.files, "files");
+    const bytes = count(metrics.bytes, "bytes");
+    const sourceLoc = count(metrics.source_loc, "source_loc");
+    const allLanguages = item.languages.map(language);
+    const languageLoc = allLanguages.reduce((sum, part) => sum + part.loc, 0);
+    if (!Number.isSafeInteger(languageLoc) || languageLoc !== sourceLoc)
+      throw new Error("Public discovery source_loc disagrees with the full language list");
+    const languages = allLanguages.sort(compareLanguages).slice(0, 5);
     return {
       full_name: byName.get(key),
       head_sha: item.head_sha,
-      files: metrics.files,
-      bytes: metrics.bytes,
-      source_loc: metrics.source_loc,
+      files,
+      bytes,
+      source_loc: sourceLoc,
       languages,
       commits_30d: git.commits_30d,
       commits_90d: git.commits_90d,

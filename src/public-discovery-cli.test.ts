@@ -209,6 +209,116 @@ describe("full-history public discovery workflow adapter", () => {
     expect(() => createCloneBudget(root, 0, 0, 1)).toThrow(/Invalid public discovery clone budget/);
   });
 
+  it("tolerates a renamed file only inside the active clone, then counts it on the next check", () => {
+    const root = path.join(work, "clones");
+    const target = path.join(root, "acme", "active");
+    const pack = path.join(target, ".git", "objects", "pack");
+    fs.mkdirSync(pack, { recursive: true });
+    const temporary = path.join(pack, "tmp.pack");
+    const renamed = path.join(pack, "final.pack");
+    fs.writeFileSync(temporary, Buffer.alloc(2048));
+    const missing = Object.assign(new Error("pack file renamed"), { code: "ENOENT" });
+    const files = {
+      existsSync: fs.existsSync,
+      readdirSync: fs.readdirSync,
+      statSync(file: string) {
+        if (file === temporary) {
+          fs.renameSync(temporary, renamed);
+          throw missing;
+        }
+        return fs.statSync(file);
+      },
+    };
+    const budget = createCloneBudget(root, 0, 1, 1, () => 0, files);
+    expect(() => budget.check(target, true)).not.toThrow();
+    expect(() => budget.check(target, true)).toThrow(/clone directory exceeded 1024 bytes total/);
+  });
+
+  it("tolerates a renamed active .git directory but counts its contents next time", () => {
+    const root = path.join(work, "clones");
+    const target = path.join(root, "acme", "active");
+    const objects = path.join(target, ".git", "objects");
+    const pack = path.join(objects, "pack");
+    const renamed = path.join(objects, "renamed");
+    fs.mkdirSync(pack, { recursive: true });
+    fs.writeFileSync(path.join(pack, "data"), Buffer.alloc(2048));
+    const files = {
+      existsSync: fs.existsSync,
+      statSync: fs.statSync,
+      readdirSync(folder: string, options: { withFileTypes: true }) {
+        if (folder === pack) {
+          fs.renameSync(pack, renamed);
+          throw Object.assign(new Error("pack directory renamed"), { code: "ENOENT" });
+        }
+        return fs.readdirSync(folder, options);
+      },
+    };
+    const budget = createCloneBudget(root, 0, 1, 1, () => 0, files);
+    expect(() => budget.check(target, true)).not.toThrow();
+    expect(() => budget.check(target, true)).toThrow(/clone directory exceeded 1024 bytes total/);
+  });
+
+  it("never ignores missing completed clones or non-ENOENT filesystem failures", () => {
+    const root = path.join(work, "clones");
+    const active = path.join(root, "acme", "active");
+    const completed = path.join(root, "acme", "completed");
+    fs.mkdirSync(active, { recursive: true });
+    fs.mkdirSync(completed, { recursive: true });
+    const file = path.join(completed, "data");
+    const activeFile = path.join(active, "data");
+    fs.writeFileSync(file, "a");
+    fs.writeFileSync(activeFile, "b");
+    const missing = Object.assign(new Error("completed clone vanished"), { code: "ENOENT" });
+    const denied = Object.assign(new Error("permission denied"), { code: "EACCES" });
+    const statRace = {
+      existsSync: fs.existsSync,
+      readdirSync: fs.readdirSync,
+      statSync(filePath: string) {
+        if (filePath === file) throw missing;
+        return fs.statSync(filePath);
+      },
+    };
+    expect(() => createCloneBudget(root, 0, 1, 1, () => 0, statRace).check(active, true))
+      .toThrow(missing);
+    const finishedTarget = {
+      ...statRace,
+      statSync(filePath: string) {
+        if (filePath === activeFile) throw missing;
+        return fs.statSync(filePath);
+      },
+    };
+    expect(() => createCloneBudget(root, 0, 1, 1, () => 0, finishedTarget).check(active))
+      .toThrow(missing);
+    const directoryRace = {
+      existsSync: fs.existsSync,
+      statSync: fs.statSync,
+      readdirSync(folder: string, options: { withFileTypes: true }) {
+        if (folder === completed) throw missing;
+        return fs.readdirSync(folder, options);
+      },
+    };
+    expect(() => createCloneBudget(root, 0, 1, 1, () => 0, directoryRace).check(active, true))
+      .toThrow(missing);
+    const deniedRead = {
+      ...directoryRace,
+      readdirSync(folder: string, options: { withFileTypes: true }) {
+        if (folder === active) throw denied;
+        return fs.readdirSync(folder, options);
+      },
+    };
+    expect(() => createCloneBudget(root, 0, 1, 1, () => 0, deniedRead).check(active, true))
+      .toThrow(denied);
+    const deniedStat = {
+      ...statRace,
+      statSync(filePath: string) {
+        if (filePath === activeFile) throw denied;
+        return fs.statSync(filePath);
+      },
+    };
+    expect(() => createCloneBudget(root, 0, 1, 1, () => 0, deniedStat).check(active, true))
+      .toThrow(denied);
+  });
+
   it("deploys either failure notice only after a successful history-store publish", () => {
     const workflow = fs.readFileSync(path.resolve(".github", "workflows", "collect-metrics.yml"), "utf8");
     const expression = workflow.match(/  pages:\r?\n    needs: collect\r?\n    if: ([^\r\n]+)/)?.[1];

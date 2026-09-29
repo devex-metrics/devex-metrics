@@ -26,6 +26,8 @@ if (!Array.isArray(config.repositories) || !config.repositories.length ||
   throw new Error("Invalid or empty public discovery clone selection and expected heads");
 }
 
+fs.mkdirSync(root, { recursive: true });
+
 function git(args, cwd, signal) {
   return new Promise((resolve, reject) => {
     const child = spawn("git", args, { cwd, signal, stdio: ["ignore", "ignore", "inherit"] });
@@ -44,7 +46,7 @@ async function clone(name) {
   let abortReason;
   const deadline = setTimeout(() => {
     try {
-      budget.check(target);
+      budget.check(target, true);
     } catch (error) {
       abortReason = error;
     }
@@ -53,7 +55,7 @@ async function clone(name) {
   }, Math.min(15 * 60_000, budget.remainingMs()));
   const watch = setInterval(() => {
     try {
-      budget.check(target);
+      budget.check(target, true);
     } catch (error) {
       abortReason = error;
       controller.abort();

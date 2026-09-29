@@ -253,6 +253,28 @@ describe("independent public discovery contract and history", () => {
     ).toEqual(["F", "E", "G", "D", "C"]);
   });
 
+  it.each([34, 36])("rejects full language LOC inconsistent with source_loc=%i before truncation", (sourceLoc) => {
+    const first = fullRepo("acme/a", A);
+    first.languages = [
+      { name: "Top", files: 1, loc: 20 },
+      { name: "B", files: 1, loc: 5 },
+      { name: "C", files: 1, loc: 4 },
+      { name: "D", files: 1, loc: 3 },
+      { name: "E", files: 1, loc: 2 },
+      { name: "Sixth", files: 1, loc: 1 },
+    ];
+    first.metrics = { ...first.metrics, source_loc: sourceLoc };
+    expect(() =>
+      validatePublicDiscoveryOutput(
+        scanner([first, fullRepo("acme/b", B)]),
+        selected,
+        config,
+        heads
+      )
+    ).toThrow(/source_loc disagrees with the full language list/);
+    expect(fs.existsSync(discoveryLatestPath(root, "acme"))).toBe(false);
+  });
+
   it("keeps CI-derived artifact evidence without calling it a manifest", () => {
     const consumer = fullRepo("acme/a", A);
     const producer = fullRepo("acme/b", B);
