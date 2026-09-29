@@ -162,9 +162,11 @@ collected snapshot to the Actions cache under a key that includes the UTC date
 A manual **Collect DevEx Metrics** run restores the newest snapshot from
 *today* and sets `DEVEX_INCREMENTAL=true`. It then collects only the delta:
 
-- A repository is re-collected if its `pushed_at` changed, or if the Search API
-  shows any issue or pull-request activity since the snapshot. That covers
-  reviews, comments, merges and PRs from forks.
+- A repository is re-collected if its `pushed_at` changed, if the Search API
+  shows issue or pull-request updates since the snapshot (comments, merges,
+  PRs from forks, issue triage), or if it had open pull requests in the
+  snapshot. A submitted review does not reliably bump a pull request's
+  `updated_at`, so repositories with open PRs are always refreshed.
 - Every other repository reuses its snapshot data, including its weekly
   trends. The org-wide trend series is re-summed from the per-repo series.
 - The historical backfill is skipped, because the nightly run does it. Pass

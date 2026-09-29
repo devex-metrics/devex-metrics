@@ -10,6 +10,7 @@ vi.mock("./cache.js", () => ({
 
 vi.mock("./collectors/index.js", () => ({
   collectRepos: vi.fn(),
+  resolveOwnerType: vi.fn(),
   collectIssueCounts: vi.fn(),
   collectIssueLeadTimes: vi.fn(),
   collectPullRequestCounts: vi.fn(),
@@ -33,6 +34,7 @@ import { setOctokit, resetOctokit } from "./github-client.js";
 import { loadCache, loadRawCache, isWithinHours, saveCache } from "./cache.js";
 import {
   collectRepos,
+  resolveOwnerType,
   collectIssueCounts,
   collectIssueLeadTimes,
   collectPullRequestCounts,
@@ -60,6 +62,7 @@ function setupDefaultMocks() {
   vi.mocked(isWithinHours).mockReturnValue(false);
   vi.mocked(saveCache).mockReturnValue(undefined);
   vi.mocked(collectRepos).mockResolvedValue([]);
+  vi.mocked(resolveOwnerType).mockImplementation(async (_owner, type) => type);
   // GraphQL path returns null by default → triggers REST fallback
   vi.mocked(collectRepoGraphQL).mockResolvedValue(null);
   vi.mocked(collectIssueCounts).mockResolvedValue({ open: 0, closed: 0 });
@@ -352,6 +355,32 @@ describe("collect (incremental)", () => {
     await collect("org", "org", { config: incrementalConfig() });
 
     expect(collectIssueCounts).toHaveBeenCalledWith("Org", "Mixed");
+  });
+
+  it("always re-collects a repo that had open pull requests", async () => {
+    setupDefaultMocks();
+    withBaseline([
+      cachedRepo("in-review", { pullRequests: { open: 1, closed: 0, merged: 0 } }),
+    ]);
+    vi.mocked(collectRepos).mockResolvedValue([
+      { name: "in-review", fullName: "org/in-review", pushedAt: "2026-01-01T00:00:00Z" },
+    ]);
+    vi.mocked(collectActiveRepos).mockResolvedValue(new Set());
+
+    await collect("org", "org", { config: incrementalConfig() });
+
+    expect(collectIssueCounts).toHaveBeenCalledWith("org", "in-review");
+  });
+
+  it("searches activity with the corrected owner type", async () => {
+    setupDefaultMocks();
+    withBaseline([cachedRepo("quiet")]);
+    vi.mocked(resolveOwnerType).mockResolvedValue("user");
+    vi.mocked(collectActiveRepos).mockResolvedValue(new Set());
+
+    await collect("someone", "org", { config: incrementalConfig() });
+
+    expect(collectActiveRepos).toHaveBeenCalledWith("someone", "user", baselineAt);
   });
 
   it("makes no per-repo calls when nothing changed", async () => {

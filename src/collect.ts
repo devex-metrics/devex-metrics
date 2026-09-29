@@ -3,6 +3,7 @@ import { slugifyDatasetKey } from "./dataset-key.js";
 import { getOctokit } from "./github-client.js";
 import {
   collectRepos,
+  resolveOwnerType,
   collectIssueCounts,
   collectIssueLeadTimes,
   collectPullRequestCounts,
@@ -66,7 +67,7 @@ const DEFAULT_MAX_REPO_AGE_HOURS = 8;
 /**
  * What changed since today's cached baseline, for an incremental collection.
  * A cached repo is reused only when it was collected today, its `pushedAt`
- * is unchanged and it is not in `active`.
+ * is unchanged, it is not in `active` and it had no open pull requests.
  */
 interface DeltaPlan {
   /** UTC date (YYYY-MM-DD) the baseline must have been collected on. */
@@ -113,7 +114,9 @@ export async function collect(
 
   let runOptions: CollectRunOptions = { ...options, config, maxRepoAgeHours: maxAgeHours };
   if (incremental) {
-    const delta = await planDelta(owner, ownerType);
+    // Discovery corrects a misconfigured owner type; the activity search
+    // needs the same correction or it would scope to `org:<username>`.
+    const delta = await planDelta(owner, await resolveOwnerType(owner, ownerType));
     // Without a trustworthy delta, reusing anything could hide changes.
     runOptions = delta ? { ...runOptions, delta } : { ...runOptions, skipCache: true };
   }
@@ -152,7 +155,11 @@ async function planDelta(
   return { today, active };
 }
 
-/** Whether a cached repo can stand in for a fresh collection in a delta run. */
+/**
+ * Whether a cached repo can stand in for a fresh collection in a delta run.
+ * A repo with open PRs is always re-collected: submitting a review does not
+ * reliably advance the PR's `updated_at`, so the activity search can miss it.
+ */
 function isUnchangedSinceBaseline(
   cached: RepoMetrics,
   pushedAt: string,
@@ -163,6 +170,7 @@ function isUnchangedSinceBaseline(
     Array.isArray(cached.weeklyTrends) &&
     pushedAt !== "" &&
     cached.pushedAt === pushedAt &&
+    cached.pullRequests.open === 0 &&
     !delta.active.has(cached.fullName.toLowerCase())
   );
 }

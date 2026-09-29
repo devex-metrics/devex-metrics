@@ -54,6 +54,30 @@ function toDiscovered(repo: RawRepo): DiscoveredRepo {
 }
 
 /**
+ * The owner type to collect `owner` as: a configured "org" that is not an
+ * organisation is corrected to "user" with a warning, since the owner's type
+ * is a discoverable fact rather than something a deployment must get right.
+ */
+export async function resolveOwnerType(
+  owner: string,
+  ownerType: "org" | "user"
+): Promise<"org" | "user"> {
+  if (ownerType === "user") return "user";
+  const octokit = await getOctokit();
+  try {
+    await octokit.rest.orgs.get({ org: owner });
+    return "org";
+  } catch (err: unknown) {
+    if ((err as { status?: number }).status !== 404) throw err;
+  }
+  console.warn(
+    `  ⚠ repos: "${owner}" is not an organisation. Collecting it as a user ` +
+      `instead. Set the DEVEX_OWNER_TYPE variable to "user" to silence this.`
+  );
+  return "user";
+}
+
+/**
  * Fetch all repos for an org or user.
  * Returns basic repo info used by downstream collectors.
  *
@@ -71,19 +95,7 @@ export async function collectRepos(
   const repos: DiscoveredRepo[] = [];
 
   if (ownerType === "org") {
-    let orgExists = true;
-    try {
-      await octokit.rest.orgs.get({ org: owner });
-    } catch (err: unknown) {
-      if ((err as { status?: number }).status !== 404) throw err;
-      orgExists = false;
-    }
-
-    if (!orgExists) {
-      console.warn(
-        `  ⚠ repos: "${owner}" is not an organisation. Collecting it as a user ` +
-          `instead. Set the DEVEX_OWNER_TYPE variable to "user" to silence this.`
-      );
+    if ((await resolveOwnerType(owner, ownerType)) === "user") {
       return collectRepos(owner, "user");
     }
 

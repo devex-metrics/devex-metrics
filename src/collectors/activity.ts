@@ -5,13 +5,13 @@ const SEARCH_RESULT_CAP = 1000;
 const PER_PAGE = 100;
 
 /**
- * Find the repositories owned by `owner` that had issue or pull-request
- * activity (opened, closed, merged, commented, reviewed, relabelled…) at or
- * after `since`.
+ * Find the repositories owned by `owner` whose issues or pull requests were
+ * updated (opened, closed, merged, commented, relabelled…) at or after
+ * `since`.
  *
- * Pushes are not covered here — callers compare `pushedAt` for that — but
- * everything that changes an issue or PR without a push to the repository
- * (reviews, comments, PRs from forks, issue triage) bumps its `updated_at`.
+ * Pushes are not covered here — callers compare `pushedAt` for that. Nor are
+ * reviews: submitting one does not reliably advance the PR's `updated_at`, so
+ * callers must not treat a repo with open PRs as unchanged on this alone.
  *
  * Returns lower-cased `owner/repo` names, or `null` when the answer is
  * incomplete (the Search API was unavailable, timed out, or the activity

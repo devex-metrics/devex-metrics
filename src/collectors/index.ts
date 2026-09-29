@@ -1,4 +1,4 @@
-export { collectRepos } from "./repos.js";
+export { collectRepos, resolveOwnerType } from "./repos.js";
 export { collectIssueCounts, collectIssueLeadTimes } from "./issues.js";
 export {
   collectPullRequestCounts,

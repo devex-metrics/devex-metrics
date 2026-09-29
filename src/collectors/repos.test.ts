@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach, vi } from "vitest";
 import { setOctokit, resetOctokit } from "../github-client.js";
 import type { Octokit } from "@octokit/rest";
-import { collectRepos } from "./repos.js";
+import { collectRepos, resolveOwnerType } from "./repos.js";
 
 type RepoPage = Array<{
   name: string;
@@ -229,6 +229,17 @@ describe("collectRepos", () => {
     await collectRepos("myuser", "user");
 
     expect(orgsGet).not.toHaveBeenCalled();
+  });
+
+  it("resolveOwnerType keeps an existing org and corrects a missing one to user", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    setOctokit(buildMockOctokit([[]], "myuser").mock);
+    expect(await resolveOwnerType("myorg", "org")).toBe("org");
+
+    setOctokit(buildMockOctokit([[]], "myuser", { orgExists: false }).mock);
+    expect(await resolveOwnerType("myuser", "org")).toBe("user");
+    expect(await resolveOwnerType("myuser", "user")).toBe("user");
+    warn.mockRestore();
   });
 
   it("rethrows a non-404 error from the org lookup rather than guessing", async () => {
