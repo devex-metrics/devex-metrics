@@ -1,0 +1,91 @@
+name: Mutation testing
+
+# Mutation testing takes too long to gate every PR, so it runs daily instead.
+# When the score drops below `thresholds.break` in stryker.config.mjs it opens
+# an issue listing the files and functions with undetected mutants. While that
+# issue is open the run is skipped, so there is only ever one.
+
+on:
+  schedule:
+    - cron: "0 4 * * *" # Daily at 04:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: mutation-testing
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  ISSUE_LABEL: mutation-improvement
+
+jobs:
+  check-open-issue:
+    name: Check for an open mutation issue
+    runs-on: ubuntu-latest
+    permissions:
+      issues: read
+    outputs:
+      open: ${{ steps.check.outputs.open }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          url=$(gh issue list --repo "$GITHUB_REPOSITORY" --label "$ISSUE_LABEL" --state open \
+            --json url --limit 1 --jq '.[0].url // ""')
+          if [ -n "$url" ]; then
+            echo "open=true" >> "$GITHUB_OUTPUT"
+            echo "Mutation issue already open: $url — skipping the mutation run." | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "open=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  mutation:
+    needs: check-open-issue
+    if: needs.check-open-issue.outputs.open == 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - id: node-modules-cache
+        uses: actions/cache@v6
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+
+      - if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      # Stryker exits non-zero when the score is below `break`; the issue step
+      # below makes that call (and fails the job) so the report is always read.
+      - name: Run mutation tests
+        continue-on-error: true
+        run: npm run mutation:ci
+
+      - name: Post mutation summary
+        if: always()
+        run: node scripts/mutation-summary.mjs >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload mutation report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mutation-report
+          path: reports/mutation/mutation.json
+          if-no-files-found: warn
+
+      - name: Open an issue if the score is below the threshold
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/mutation-score-issue.mjs
