@@ -73,6 +73,54 @@ function createWeekBuckets(
 }
 
 /**
+ * The ISO week labels, oldest first, that `collectWeeklyTrends` would bucket
+ * into when run at `now`.
+ */
+export function weekLabels(weeksBack: number, now = new Date()): string[] {
+  const startMonday = isoWeekMonday(now);
+  startMonday.setUTCDate(startMonday.getUTCDate() - (weeksBack - 1) * 7);
+  return [...createWeekBuckets(startMonday, weeksBack).keys()];
+}
+
+/**
+ * Sum per-repo weekly trends into an org-wide series over `weeks`. Points
+ * whose week is outside `weeks` are ignored, so a series collected under a
+ * different window cannot add stray buckets.
+ */
+export function sumWeeklyTrends(
+  weeks: readonly string[],
+  series: readonly (readonly WeeklyTrendPoint[])[]
+): WeeklyTrendPoint[] {
+  const totals = new Map<string, WeeklyTrendPoint>(
+    weeks.map((week) => [
+      week,
+      {
+        week,
+        prsOpened: 0,
+        prsMerged: 0,
+        issuesOpened: 0,
+        issuesClosed: 0,
+        linesAdded: 0,
+        linesDeleted: 0,
+      },
+    ])
+  );
+  for (const points of series) {
+    for (const p of points) {
+      const t = totals.get(p.week);
+      if (!t) continue;
+      t.prsOpened += p.prsOpened;
+      t.prsMerged += p.prsMerged;
+      t.issuesOpened += p.issuesOpened;
+      t.issuesClosed += p.issuesClosed;
+      t.linesAdded += p.linesAdded;
+      t.linesDeleted += p.linesDeleted;
+    }
+  }
+  return [...totals.values()];
+}
+
+/**
  * Collect weekly PR and issue activity trends aggregated across a list of
  * repos for the last `weeksBack` ISO weeks (including the current partial
  * week).
