@@ -70,6 +70,7 @@ jobs:
       # Stryker exits non-zero when the score is below `break`; the issue step
       # below makes that call (and fails the job) so the report is always read.
       - name: Run mutation tests
+        id: stryker
         continue-on-error: true
         run: npm run mutation:ci
 
@@ -89,3 +90,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: node scripts/mutation-score-issue.mjs
+
+      # Reached only when the score is at or above `break`, so a Stryker
+      # failure here has some other cause and must not pass silently.
+      - name: Fail if Stryker failed for another reason
+        if: steps.stryker.outcome == 'failure'
+        run: |
+          echo "::error::Stryker exited non-zero although the mutation score meets the threshold; see the 'Run mutation tests' log."
+          exit 1
