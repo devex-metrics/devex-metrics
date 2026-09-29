@@ -163,7 +163,9 @@ jobs:
         continue-on-error: true
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
-          app-id: ${{ vars.APP_ID }}
+          # GitHub accepts the App ID as the JWT issuer too, so the existing
+          # APP_ID variable works here without deployments adding a client ID.
+          client-id: ${{ vars.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: ${{ steps.landscape.outputs.landscape-owner }}
           repositories: ${{ steps.landscape.outputs.landscape-repositories }}
