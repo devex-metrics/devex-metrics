@@ -10,6 +10,7 @@ vi.mock("./cache.js", () => ({
 
 vi.mock("./collectors/index.js", () => ({
   collectRepos: vi.fn(),
+  resolveOwnerType: vi.fn(),
   collectIssueCounts: vi.fn(),
   collectIssueLeadTimes: vi.fn(),
   collectPullRequestCounts: vi.fn(),
@@ -25,6 +26,7 @@ vi.mock("./collectors/index.js", () => ({
   collectPullRequestDetailsFromNodes: vi.fn(),
   extractReviewerLogins: vi.fn(),
   collectCopilotAgentMetrics: vi.fn(),
+  collectActiveRepos: vi.fn(),
 }));
 
 import { collect, collectGroup } from "./collect.js";
@@ -32,6 +34,7 @@ import { setOctokit, resetOctokit } from "./github-client.js";
 import { loadCache, loadRawCache, isWithinHours, saveCache } from "./cache.js";
 import {
   collectRepos,
+  resolveOwnerType,
   collectIssueCounts,
   collectIssueLeadTimes,
   collectPullRequestCounts,
@@ -47,8 +50,10 @@ import {
   collectPullRequestDetailsFromNodes,
   extractReviewerLogins,
   collectCopilotAgentMetrics,
+  collectActiveRepos,
 } from "./collectors/index.js";
-import type { OrgMetrics } from "./types.js";
+import { weekLabels } from "./collectors/trends.js";
+import type { OrgMetrics, RepoMetrics, WeeklyTrendPoint } from "./types.js";
 import { defaultConfig } from "./config.js";
 
 function setupDefaultMocks() {
@@ -57,6 +62,7 @@ function setupDefaultMocks() {
   vi.mocked(isWithinHours).mockReturnValue(false);
   vi.mocked(saveCache).mockReturnValue(undefined);
   vi.mocked(collectRepos).mockResolvedValue([]);
+  vi.mocked(resolveOwnerType).mockImplementation(async (_owner, type) => type);
   // GraphQL path returns null by default → triggers REST fallback
   vi.mocked(collectRepoGraphQL).mockResolvedValue(null);
   vi.mocked(collectIssueCounts).mockResolvedValue({ open: 0, closed: 0 });
@@ -258,6 +264,166 @@ describe("collect", () => {
 
     // Trends should NOT be recollected since per-repo data already exists
     expect(collectWeeklyTrends).not.toHaveBeenCalled();
+  });
+});
+
+describe("collect (incremental)", () => {
+  afterEach(() => vi.resetAllMocks());
+
+  const today = new Date().toISOString().slice(0, 10);
+  const baselineAt = `${today}T00:00:01.000Z`;
+  const week = weekLabels(104).at(-1) ?? "";
+
+  function point(prsMerged: number): WeeklyTrendPoint {
+    return { week, prsOpened: 0, prsMerged, issuesOpened: 0, issuesClosed: 0, linesAdded: 0, linesDeleted: 0 };
+  }
+
+  function cachedRepo(name: string, overrides: Partial<RepoMetrics> = {}): RepoMetrics {
+    return {
+      name,
+      fullName: `org/${name}`,
+      pushedAt: "2026-01-01T00:00:00Z",
+      collectedAt: baselineAt,
+      issues: { open: 7, closed: 0 },
+      pullRequests: { open: 0, closed: 0, merged: 0 },
+      pullRequestDetails: [],
+      committerCount: 0,
+      reviewerCount: 0,
+      contributorCount: 0,
+      dependentCount: 0,
+      weeklyTrends: [point(1)],
+      ...overrides,
+    };
+  }
+
+  function incrementalConfig() {
+    const config = defaultConfig();
+    config.collection.incremental = true;
+    return config;
+  }
+
+  function withBaseline(repos: RepoMetrics[]) {
+    vi.mocked(loadRawCache).mockReturnValue({
+      owner: "org", ownerType: "org", collectedAt: baselineAt,
+      repoCount: repos.length, repos, weeklyTrends: [],
+    });
+  }
+
+  it("re-collects only repos that were pushed or had issue/PR activity", async () => {
+    setupDefaultMocks();
+    withBaseline([cachedRepo("quiet"), cachedRepo("pushed"), cachedRepo("reviewed")]);
+    vi.mocked(collectRepos).mockResolvedValue([
+      { name: "quiet", fullName: "org/quiet", pushedAt: "2026-01-01T00:00:00Z" },
+      { name: "pushed", fullName: "org/pushed", pushedAt: "2026-01-02T00:00:00Z" },
+      { name: "reviewed", fullName: "org/reviewed", pushedAt: "2026-01-01T00:00:00Z" },
+    ]);
+    vi.mocked(collectActiveRepos).mockResolvedValue(new Set(["org/reviewed"]));
+    vi.mocked(collectWeeklyTrends).mockResolvedValue({
+      orgTrends: [],
+      repoTrends: new Map([
+        ["org/pushed", [point(2)]],
+        ["org/reviewed", [point(3)]],
+      ]),
+    });
+
+    const result = await collect("org", "org", { config: incrementalConfig() });
+
+    expect(loadCache).not.toHaveBeenCalled();
+    expect(collectActiveRepos).toHaveBeenCalledWith("org", "org", baselineAt);
+    expect(collectIssueCounts).toHaveBeenCalledTimes(2);
+    expect(collectIssueCounts).not.toHaveBeenCalledWith("org", "quiet");
+    expect(collectWeeklyTrends).toHaveBeenCalledWith(
+      [{ owner: "org", name: "pushed" }, { owner: "org", name: "reviewed" }],
+      104,
+      expect.any(Number),
+      expect.any(Map)
+    );
+    expect(result.repos.find((r) => r.name === "quiet")?.issues.open).toBe(7);
+    // Org trends are the sum of the reused and the re-counted repos.
+    expect(result.weeklyTrends?.find((p) => p.week === week)?.prsMerged).toBe(6);
+    expect(result.weeklyTrends).toHaveLength(104);
+  });
+
+  it("matches active repos case-insensitively", async () => {
+    setupDefaultMocks();
+    withBaseline([cachedRepo("Mixed", { fullName: "Org/Mixed" })]);
+    vi.mocked(collectRepos).mockResolvedValue([
+      { name: "Mixed", fullName: "Org/Mixed", pushedAt: "2026-01-01T00:00:00Z" },
+    ]);
+    vi.mocked(collectActiveRepos).mockResolvedValue(new Set(["org/mixed"]));
+
+    await collect("org", "org", { config: incrementalConfig() });
+
+    expect(collectIssueCounts).toHaveBeenCalledWith("Org", "Mixed");
+  });
+
+  it("always re-collects a repo that had open pull requests", async () => {
+    setupDefaultMocks();
+    withBaseline([
+      cachedRepo("in-review", { pullRequests: { open: 1, closed: 0, merged: 0 } }),
+    ]);
+    vi.mocked(collectRepos).mockResolvedValue([
+      { name: "in-review", fullName: "org/in-review", pushedAt: "2026-01-01T00:00:00Z" },
+    ]);
+    vi.mocked(collectActiveRepos).mockResolvedValue(new Set());
+
+    await collect("org", "org", { config: incrementalConfig() });
+
+    expect(collectIssueCounts).toHaveBeenCalledWith("org", "in-review");
+  });
+
+  it("searches activity with the corrected owner type", async () => {
+    setupDefaultMocks();
+    withBaseline([cachedRepo("quiet")]);
+    vi.mocked(resolveOwnerType).mockResolvedValue("user");
+    vi.mocked(collectActiveRepos).mockResolvedValue(new Set());
+
+    await collect("someone", "org", { config: incrementalConfig() });
+
+    expect(collectActiveRepos).toHaveBeenCalledWith("someone", "user", baselineAt);
+  });
+
+  it("makes no per-repo calls when nothing changed", async () => {
+    setupDefaultMocks();
+    withBaseline([cachedRepo("quiet")]);
+    vi.mocked(collectRepos).mockResolvedValue([
+      { name: "quiet", fullName: "org/quiet", pushedAt: "2026-01-01T00:00:00Z" },
+    ]);
+    vi.mocked(collectActiveRepos).mockResolvedValue(new Set());
+
+    const result = await collect("org", "org", { config: incrementalConfig() });
+
+    expect(collectIssueCounts).not.toHaveBeenCalled();
+    expect(collectWeeklyTrends).not.toHaveBeenCalled();
+    expect(result.weeklyTrends?.find((p) => p.week === week)?.prsMerged).toBe(1);
+  });
+
+  it("ignores a baseline from an earlier day and collects everything", async () => {
+    setupDefaultMocks();
+    withBaseline([cachedRepo("quiet", { collectedAt: "2020-01-01T00:00:00Z" })]);
+    vi.mocked(isWithinHours).mockReturnValue(true);
+    vi.mocked(collectRepos).mockResolvedValue([
+      { name: "quiet", fullName: "org/quiet", pushedAt: "2026-01-01T00:00:00Z" },
+    ]);
+
+    await collect("org", "org", { config: incrementalConfig() });
+
+    expect(collectActiveRepos).not.toHaveBeenCalled();
+    expect(collectIssueCounts).toHaveBeenCalledTimes(1);
+  });
+
+  it("collects everything when the activity search cannot give a complete answer", async () => {
+    setupDefaultMocks();
+    withBaseline([cachedRepo("quiet")]);
+    vi.mocked(isWithinHours).mockReturnValue(true);
+    vi.mocked(collectRepos).mockResolvedValue([
+      { name: "quiet", fullName: "org/quiet", pushedAt: "2026-01-01T00:00:00Z" },
+    ]);
+    vi.mocked(collectActiveRepos).mockResolvedValue(null);
+
+    await collect("org", "org", { config: incrementalConfig() });
+
+    expect(collectIssueCounts).toHaveBeenCalledTimes(1);
   });
 });
 

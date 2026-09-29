@@ -49,6 +49,7 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_HISTORY_WEEKS` | int | Weeks of weekly trends to build. Default `104`. |
 | `DEVEX_MAX_PR_PAGES` | int | Pages of merged PRs per repo. Default `10`. |
 | `DEVEX_MAX_REPO_AGE_HOURS` | int | Per-repo cache freshness. Default `8`. |
+| `DEVEX_INCREMENTAL` | bool | Collect only repos with a push or issue/PR activity since today's cached baseline. Default `false`; the collect workflow turns it on for manual runs (see *Fast manual refreshes*). |
 | `DEVEX_FEATURE_DEPENDENTS` | bool | Dependent-repo counts. Default `false`. |
 | `DEVEX_FEATURE_COPILOT_AGENT` | bool | Copilot agent metrics. Default `true`. |
 | `DEVEX_FEATURE_CI_HEALTH` | bool | CI health crawl (build success, duration, queue time, flaky re-runs). Default `false`. |
@@ -151,6 +152,39 @@ during discovery, so the API cost drops to the team's repos alone.
 On a large org, start with `DEVEX_MAX_IDLE_DAYS=180` and
 `DEVEX_EXCLUDE_ARCHIVED=true`. Dormant repositories usually make up most of the
 repo count and none of the signal.
+
+## Fast manual refreshes
+
+The scheduled run is always a full collection. When it finishes, it saves the
+collected snapshot to the Actions cache under a key that includes the UTC date
+(`metrics-snapshot-<owner>-<YYYY-MM-DD>-<run>`).
+
+A manual **Collect DevEx Metrics** run restores the newest snapshot from
+*today* and sets `DEVEX_INCREMENTAL=true`. It then collects only the delta:
+
+- A repository is re-collected if its `pushed_at` changed, if the Search API
+  shows issue or pull-request updates since the snapshot (comments, merges,
+  PRs from forks, issue triage), or if it had open pull requests in the
+  snapshot. A submitted review does not reliably bump a pull request's
+  `updated_at`, so repositories with open PRs are always refreshed.
+- Every other repository reuses its snapshot data, including its weekly
+  trends. The org-wide trend series is re-summed from the per-repo series.
+- The historical backfill is skipped, because the nightly run does it. Pass
+  `backfill_pages` to crawl anyway.
+
+Every successful run saves a new snapshot, so later manual runs that day build
+on the newest one. The date in the key breaks the chain each day. If no
+snapshot from today exists, the run collects everything. That happens when a
+manual run starts before the scheduled one, or when the scheduled run failed.
+The same full collection happens when the activity search can't give a complete
+answer (it errors, or returns more than 1000 results).
+
+Tick **full_refresh** on a manual run to ignore the snapshot and re-collect
+everything.
+
+Some changes are only picked up by the next full run. The main ones are
+contributor counts drifting as the 90-day window moves, and Copilot agent tasks
+that have not yet produced a push or PR activity.
 
 ## Getting the full history
 

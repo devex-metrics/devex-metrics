@@ -1,4 +1,4 @@
-export { collectRepos } from "./repos.js";
+export { collectRepos, resolveOwnerType } from "./repos.js";
 export { collectIssueCounts, collectIssueLeadTimes } from "./issues.js";
 export {
   collectPullRequestCounts,
@@ -18,7 +18,8 @@ export {
 export type { ReviewFacts } from "./pull-requests.js";
 export { collectContributors } from "./contributors.js";
 export { collectDependentCount } from "./dependents.js";
-export { collectWeeklyTrends } from "./trends.js";
+export { collectWeeklyTrends, weekLabels, sumWeeklyTrends } from "./trends.js";
+export { collectActiveRepos } from "./activity.js";
 export type { WeeklyTrendsResult } from "./trends.js";
 export { collectRepoGraphQL } from "./repo-graphql.js";
 export type {

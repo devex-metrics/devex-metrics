@@ -87,6 +87,7 @@ describe("loadConfig", () => {
     expect(c.collection.features.dependents).toBe(false);
     expect(c.collection.features.landscape).toBe(false);
     expect(c.collection.landscapeStaleAfterDays).toBe(90);
+    expect(c.collection.incremental).toBe(false);
     expect(c.team).toBeUndefined();
     expect(c.trial).toBeUndefined();
   });
@@ -98,6 +99,7 @@ describe("loadConfig", () => {
       DEVEX_REPOS_INCLUDE: "api, web",
       DEVEX_MAX_IDLE_DAYS: "180",
       DEVEX_EXCLUDE_FORKS: "true",
+      DEVEX_INCREMENTAL: "true",
     });
 
     expect(c.owner).toBe("acme");
@@ -105,6 +107,7 @@ describe("loadConfig", () => {
     expect(c.repos.include).toEqual(["api", "web"]);
     expect(c.repos.maxIdleDays).toBe(180);
     expect(c.repos.excludeForks).toBe(true);
+    expect(c.collection.incremental).toBe(true);
   });
 
   it("supports opt-in landscape configuration and validates its age threshold", () => {

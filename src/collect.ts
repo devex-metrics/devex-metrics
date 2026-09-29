@@ -3,6 +3,7 @@ import { slugifyDatasetKey } from "./dataset-key.js";
 import { getOctokit } from "./github-client.js";
 import {
   collectRepos,
+  resolveOwnerType,
   collectIssueCounts,
   collectIssueLeadTimes,
   collectPullRequestCounts,
@@ -21,7 +22,9 @@ import {
   countReviewerLoad,
   extractReviewerLogins,
   collectCopilotAgentMetrics,
+  collectActiveRepos,
 } from "./collectors/index.js";
+import { sumWeeklyTrends, weekLabels } from "./collectors/trends.js";
 import { filterRepos, describeFiltering } from "./collectors/repos.js";
 import { loadConfig, describeConfig } from "./config.js";
 import type { DevexConfig } from "./config.js";
@@ -62,6 +65,20 @@ export interface GroupRepoRef {
 const DEFAULT_MAX_REPO_AGE_HOURS = 8;
 
 /**
+ * What changed since today's cached baseline, for an incremental collection.
+ * A cached repo is reused only when it was collected today, its `pushedAt`
+ * is unchanged, it is not in `active` and it had no open pull requests.
+ */
+interface DeltaPlan {
+  /** UTC date (YYYY-MM-DD) the baseline must have been collected on. */
+  today: string;
+  /** Lower-cased `owner/repo` names with issue/PR activity since the baseline. */
+  active: ReadonlySet<string>;
+}
+
+type CollectRunOptions = CollectOptions & { delta?: DeltaPlan };
+
+/**
  * Collect metrics for every repo owned by `owner`.
  */
 export async function collect(
@@ -74,9 +91,12 @@ export async function collect(
     options.maxRepoAgeHours ??
     config.collection.maxRepoAgeHours ??
     DEFAULT_MAX_REPO_AGE_HOURS;
+  const incremental = !options.skipCache && config.collection.incremental;
   // A landscape scan may expose instruction paths on public Pages. Refresh
   // discovery first so same-day cached visibility cannot authorize a scan.
-  if (!options.skipCache && !config.collection.features.landscape) {
+  // An incremental run always looks for the delta instead of returning
+  // today's snapshot as-is.
+  if (!options.skipCache && !incremental && !config.collection.features.landscape) {
     const cached = loadCache(owner);
     if (cached) {
       console.log(`Using cached data for ${owner} (collected ${cached.collectedAt})`);
@@ -92,12 +112,66 @@ export async function collect(
   console.log(`Found ${discovered.length} repositories`);
   console.log(`  ${describeFiltering(discovered.length, filtered)}`);
 
-  return collectMetricsForRepoList(
-    owner,
-    owner,
-    ownerType,
-    filtered.repos,
-    { ...options, config, maxRepoAgeHours: maxAgeHours }
+  let runOptions: CollectRunOptions = { ...options, config, maxRepoAgeHours: maxAgeHours };
+  if (incremental) {
+    // Discovery corrects a misconfigured owner type; the activity search
+    // needs the same correction or it would scope to `org:<username>`.
+    const delta = await planDelta(owner, await resolveOwnerType(owner, ownerType));
+    // Without a trustworthy delta, reusing anything could hide changes.
+    runOptions = delta ? { ...runOptions, delta } : { ...runOptions, skipCache: true };
+  }
+
+  return collectMetricsForRepoList(owner, owner, ownerType, filtered.repos, runOptions);
+}
+
+/**
+ * Work out which repos changed since today's cached baseline. Returns
+ * undefined when there is no baseline from today or the activity search
+ * could not give a complete answer, meaning: collect everything.
+ */
+async function planDelta(
+  owner: string,
+  ownerType: "org" | "user"
+): Promise<DeltaPlan | undefined> {
+  const today = new Date().toISOString().slice(0, 10);
+  const baseline = (loadRawCache(owner)?.repos ?? [])
+    .map((r) => r.collectedAt)
+    .filter((at): at is string => typeof at === "string" && at.startsWith(today))
+    .sort();
+  if (baseline.length === 0) {
+    console.log(`Incremental: no baseline collected today (${today}) — collecting everything`);
+    return undefined;
+  }
+
+  const since = baseline[0];
+  const active = await collectActiveRepos(owner, ownerType, since);
+  if (!active) {
+    console.log("Incremental: activity since the baseline is unknown — collecting everything");
+    return undefined;
+  }
+  console.log(
+    `Incremental: baseline from ${since}; ${active.size} repo(s) with issue/PR activity since`
+  );
+  return { today, active };
+}
+
+/**
+ * Whether a cached repo can stand in for a fresh collection in a delta run.
+ * A repo with open PRs is always re-collected: submitting a review does not
+ * reliably advance the PR's `updated_at`, so the activity search can miss it.
+ */
+function isUnchangedSinceBaseline(
+  cached: RepoMetrics,
+  pushedAt: string,
+  delta: DeltaPlan
+): boolean {
+  return (
+    cached.collectedAt?.startsWith(delta.today) === true &&
+    Array.isArray(cached.weeklyTrends) &&
+    pushedAt !== "" &&
+    cached.pushedAt === pushedAt &&
+    cached.pullRequests.open === 0 &&
+    !delta.active.has(cached.fullName.toLowerCase())
   );
 }
 
@@ -187,7 +261,7 @@ async function collectMetricsForRepoList(
   owner: string,
   ownerType: "org" | "user",
   repoList: ResolvedRepoRef[],
-  options: CollectOptions
+  options: CollectRunOptions
 ): Promise<OrgMetrics> {
   const config = options.config ?? loadConfig();
   const maxAgeHours =
@@ -208,7 +282,9 @@ async function collectMetricsForRepoList(
   }
 
   const repos: RepoMetrics[] = [];
+  const reused = new Set<string>();
   let freshCount = 0;
+  const { delta } = options;
   // Collects pre-fetched GraphQL PR nodes per repo for the trends collector.
   const prDataByRepo = new Map<string, GraphQLPRNode[]>();
 
@@ -218,8 +294,14 @@ async function collectMetricsForRepoList(
     // without discarding collected data.
     if (!options.skipCache) {
       const cached = cachedRepoMap.get(fullName);
-      if (cached && isWithinHours(cached.collectedAt, maxAgeHours)) {
-        console.log(`  → ${fullName} (cached)`);
+      const reusable =
+        cached !== undefined &&
+        (delta
+          ? isUnchangedSinceBaseline(cached, pushedAt, delta)
+          : isWithinHours(cached.collectedAt, maxAgeHours));
+      if (cached && reusable) {
+        console.log(`  → ${fullName} (${delta ? "unchanged" : "cached"})`);
+        reused.add(fullName);
         // The default branch, like the team flag, comes from this run's
         // discovery rather than from whatever the cache was written with.
         repos.push({
@@ -339,7 +421,29 @@ async function collectMetricsForRepoList(
   // already have per-repo weeklyTrends (i.e. cache was built with this version).
   let weeklyTrends = loadRawCache(cacheKey)?.weeklyTrends;
   const missingRepoTrends = repos.some((r) => !Array.isArray(r.weeklyTrends));
-  if (freshCount > 0 || !weeklyTrends || missingRepoTrends) {
+  if (delta) {
+    // Unchanged repos keep today's per-repo trends (same week window); only
+    // the changed ones are re-counted, and the org series is their sum.
+    const changed = repos.filter((r) => !reused.has(r.fullName));
+    console.log(
+      `Incremental: ${changed.length} of ${repos.length} repo(s) refreshed`
+    );
+    if (changed.length > 0) {
+      const result = await collectWeeklyTrends(
+        changed.map((r) => ({ owner: r.fullName.slice(0, r.fullName.indexOf("/")), name: r.name })),
+        config.collection.historyWeeks,
+        200,
+        prDataByRepo
+      );
+      for (const repo of changed) {
+        repo.weeklyTrends = result.repoTrends.get(repo.fullName) ?? [];
+      }
+    }
+    weeklyTrends = sumWeeklyTrends(
+      weekLabels(config.collection.historyWeeks),
+      repos.map((r) => r.weeklyTrends ?? [])
+    );
+  } else if (freshCount > 0 || !weeklyTrends || missingRepoTrends) {
     console.log(`Collecting weekly trends… (${freshCount} repos refreshed)`);
     const trendRepos = repos.map((r) => {
       const slash = r.fullName.indexOf("/");

@@ -43,6 +43,7 @@ src/
     contributors.ts     # Committer & reviewer counts (last 90 days)
     dependents.ts       # Dependent repository count
     trends.ts           # Weekly activity trend aggregation
+    activity.ts         # Repos with issue/PR activity since a timestamp (incremental runs)
 data/                   # Local cache (gitignored); also holds local "group" datasets
 .metrics-data/          # Checkout of the metrics-data branch (gitignored)
 _site/                  # Generated GitHub Pages output (gitignored)
@@ -173,7 +174,7 @@ Mutation testing is provided by [Stryker](https://stryker-mutator.io/) with the 
 
 - **ci.yml**: two jobs on every push/PR to `main` — `test` (build + `npm test` + `npm run lint`, combined into one job since each is fast enough that the checkout/setup/install overhead of a separate job outweighs any parallelism benefit) and `coverage`. Each job caches `node_modules` (keyed on `package-lock.json`) via `actions/cache` and skips `npm ci` on a cache hit, so repeated installs across jobs don't each pay full install cost.
 - **mutation.yml**: daily (and `workflow_dispatch`). A first job checks for an open `mutation-improvement` issue and skips the run if there is one; otherwise it runs Stryker (which builds `dist` inside its own sandbox via `buildCommand`, since the sandbox copy respects `.gitignore`) and opens an issue when the score is below `break` (see the Mutation testing section above).
-- **collect-metrics.yml**: scheduled daily; checks out `metrics-data`, collects metrics, appends to the history store, pushes it back, then calls `pages.yml`. Does **not** commit to `main`.
+- **collect-metrics.yml**: scheduled daily; checks out `metrics-data`, collects metrics, appends to the history store, pushes it back, then calls `pages.yml`. Does **not** commit to `main`. The scheduled run is a full collection that saves a UTC-date-keyed snapshot to the Actions cache; manual runs restore today's newest snapshot and collect only the delta (`DEVEX_INCREMENTAL`, see "Fast manual refreshes" in `docs/CONFIGURATION.md`).
 - **pages.yml**: reusable (`workflow_call`); builds the site from the `metrics-data` checkout and deploys to Pages.
 - Always pin action versions to a full SHA or major-version tag.
 
