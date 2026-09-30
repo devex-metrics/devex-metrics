@@ -707,7 +707,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
     <p class="repo-count"><span id="shown">${Math.min(20, data.repos.length)}</span> of ${data.repos.length} ${data.repos.length === 1 ? "repository" : "repositories"} shown</p>
   </section>
 
-  ${extras.landscape ? buildLandscapeSection(extras.landscape, extras.landscapeStatus) : ""}
+  ${extras.landscape ? buildLandscapeSection(extras.landscape, extras.landscapeStatus, data) : ""}
   ${extras.publicDiscovery ? buildPublicDiscoverySection(extras.publicDiscovery, extras.publicDiscoveryConnections ?? [], extras.publicDiscoveryStatus) : ""}
 </main>
 

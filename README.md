@@ -164,7 +164,11 @@ landscape scan or additional token is requested.
 
 Validated, sanitized observations and successive SHA-256 comparisons live in
 their own `metrics-data` history stream. Pages shows a compact per-repository
-summary and expandable public file paths, plus `landscape.json`. File contents,
+attention-first summary (observed gaps, older file signals, unavailable
+observations) and expandable public file paths, plus `landscape.json`. The
+dashboard can show **observed merged PRs in 90 days** from the separately
+collected DevEx timeline as activity context, not Git commits or an AI quality
+score; this timeline may be incomplete. File contents,
 scanner evidence and private repository paths are never included. Drift means
 files were added, removed or changed content since the last successful scan —
 not that older files are incorrect. Configuration, privacy constraints and

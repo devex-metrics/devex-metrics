@@ -346,6 +346,30 @@ reports `unknown_count` and `partial_unknown` status for incomplete coverage.
 Hash drift means recorded hashes changed between comparable snapshots; it is
 not a measure of code quality, security or freshness.
 
+The Pages landscape defaults to **attention first**, rather than repository
+name. Its overview distinguishes repositories with an observed zero AI
+instruction files, older file-age signals, incomplete file history, and no
+verified observation. Active repositories with an observed missing or older
+file signal lead the table; unavailable scans and private/unverified
+repositories stay unknown, not healthy or zero-readiness. Sortable columns
+include attention, observed 90-day merged PRs, file count, oldest known age
+(with head lag shown alongside), hash drift, and scan time. Sorting is local
+to this panel; restore attention order with its reset button.
+
+The **merged PRs / 90d** column comes from each repository's DevEx
+`mergedPRTimeline` within the 90 days ending at `OrgMetrics.collectedAt`.
+It counts observed PRs, including bot-authored ones, not Git commits or
+team-attributed work; the budgeted timeline may be incomplete, so even a
+displayed zero means no PR was *observed* in that window, not proven
+inactivity. Missing or invalid timelines show **Unknown**. The landscape
+scan itself has no commit-activity counts, per-file commits since the AI file
+changed, team attribution, ADR count, or AI-instruction quality verdict. Optional
+full-history public discovery can provide separate public commit/ADR metrics
+when independently enabled, but never supplies or gates this AI-only view.
+Age, lag, stale and hash drift are maintenance/observation signals only.
+The landscape's 90-day window does not change with dashboard period or
+bot filters, and it does not change `data.json` or `landscape.json`.
+
 ## Full-history public repository discovery (opt-in)
 
 This is **separate** from `DEVEX_FEATURE_LANDSCAPE`: enabling either feature
