@@ -144,6 +144,7 @@ jobs:
           DEVEX_EXCLUDE_FORKS: ${{ vars.DEVEX_EXCLUDE_FORKS }}
           DEVEX_MAX_IDLE_DAYS: ${{ vars.DEVEX_MAX_IDLE_DAYS }}
           DEVEX_TEAM_REPOS: ${{ vars.DEVEX_TEAM_REPOS }}
+          DEVEX_TEAM_HANDLES: ${{ vars.DEVEX_TEAM_HANDLES }}
           DEVEX_TEAM_NAME: ${{ vars.DEVEX_TEAM_NAME }}
           DEVEX_TEAM_ID: ${{ vars.DEVEX_TEAM_ID }}
           DEVEX_DISCOVER_ALL: ${{ vars.DEVEX_DISCOVER_ALL }}
@@ -203,6 +204,7 @@ jobs:
           DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
           DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
           DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
+          DEVEX_TEAM_HANDLES: ${{ vars.DEVEX_TEAM_HANDLES }}
         run: node dist/landscape-cli.js prepare
 
       # An empty repositories input with owner would grant every installed repo.
@@ -286,6 +288,7 @@ jobs:
       - name: Ingest sanitized landscape snapshots
         id: landscape-ingest
         if: steps.landscape-token.outcome == 'success'
+        timeout-minutes: 20
         env:
           GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
@@ -293,6 +296,7 @@ jobs:
           DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
           DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
           DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
+          DEVEX_TEAM_HANDLES: ${{ vars.DEVEX_TEAM_HANDLES }}
         run: node dist/landscape-cli.js ingest data/landscape-raw.json
 
       # On any failure with landscape enabled, keep the last good landscape

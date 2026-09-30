@@ -38,6 +38,8 @@ export interface TeamConfig {
   name: string;
   /** Glob patterns matching the team's repositories. */
   repos: string[];
+  /** GitHub logins whose linked Git commits count as team activity; empty leaves it unknown. */
+  handles?: string[];
   /**
    * When true, collect every repo the owner has (subject to `repos` filters)
    * so the whole org forms the baseline, and flag the team subset within it.
@@ -392,6 +394,7 @@ function mergePartial(target: DevexConfig, partial: Partial<DevexConfig>): void 
       id: partial.team.id ?? "team",
       name: partial.team.name ?? "Team",
       repos: partial.team.repos ?? [],
+      handles: partial.team.handles ?? [],
       discoverAll: partial.team.discoverAll ?? true,
     };
   }
@@ -458,17 +461,20 @@ function applyEnv(config: DevexConfig, env: Env): void {
   assign(config.history, "dir", str(env, "DEVEX_HISTORY_DIR"));
 
   const teamRepos = list(env, "DEVEX_TEAM_REPOS");
+  const teamHandles = list(env, "DEVEX_TEAM_HANDLES");
   const teamName = str(env, "DEVEX_TEAM_NAME");
   const teamId = str(env, "DEVEX_TEAM_ID");
   const discoverAll = bool(env, "DEVEX_DISCOVER_ALL");
-  if (teamRepos !== undefined || teamName || teamId || discoverAll !== undefined) {
+  if (teamRepos !== undefined || teamHandles !== undefined || teamName || teamId || discoverAll !== undefined) {
     const team: TeamConfig = config.team ?? {
       id: "team",
       name: "Team",
       repos: [],
+      handles: [],
       discoverAll: true,
     };
     assign(team, "repos", teamRepos);
+    assign(team, "handles", teamHandles);
     assign(team, "name", teamName);
     assign(team, "id", teamId);
     assign(team, "discoverAll", discoverAll);
@@ -584,6 +590,15 @@ export function loadConfig(env: Env = process.env): DevexConfig {
   }
 
   applyEnv(config, env);
+  if (config.team) {
+    const handles = config.team.handles ?? [];
+    if (!Array.isArray(handles) || handles.length > 100 ||
+      handles.some((handle) => typeof handle !== "string" ||
+        !/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(handle)) ||
+      new Set(handles.map((handle) => handle.toLowerCase())).size !== handles.length) {
+      throw new Error("Team handles must be at most 100 distinct GitHub logins");
+    }
+  }
   validateBackfillPageSizes(config.collection.backfill);
   if (!Number.isSafeInteger(config.collection.landscapeStaleAfterDays) ||
     config.collection.landscapeStaleAfterDays < 1) {

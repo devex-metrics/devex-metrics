@@ -37,6 +37,7 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_EXCLUDE_FORKS` | bool | Skip forks. Default `false`. |
 | `DEVEX_MAX_IDLE_DAYS` | int | Skip repos with no push in N days. `0` disables. |
 | `DEVEX_TEAM_REPOS` | list | Globs marking the trial team's repos. |
+| `DEVEX_TEAM_HANDLES` | list | GitHub logins for conservatively attributed Git commit activity in the public AI landscape. No handles means Unknown, not zero. |
 | `DEVEX_TEAM_NAME` | string | Team display name. |
 | `DEVEX_TEAM_ID` | string | Stable id used in history rows and share URLs. |
 | `DEVEX_DISCOVER_ALL` | bool | Collect the whole org as a baseline. Default `true`. |
@@ -352,23 +353,66 @@ instruction files, older file-age signals, incomplete file history, and no
 verified observation. Active repositories with an observed missing or older
 file signal lead the table; unavailable scans and private/unverified
 repositories stay unknown, not healthy or zero-readiness. Sortable columns
-include attention, observed 90-day merged PRs, file count, oldest known age
-(with head lag shown alongside), hash drift, and scan time. Sorting is local
+include attention, observed 90-day merged PRs, 90-day Git commits, configured
+team commits, file count, quality cues, oldest known age (with head lag shown
+alongside), hash drift, and scan time. Sorting is local
 to this panel; restore attention order with its reset button.
+
+The **Git commits** column counts actual repository Git commits at the scanner's
+pinned public HEAD in the 30 and 90 days ending at `generated_at`, via GitHub's
+commit-history API. These are not merged PRs or a substitute for public
+discovery's separate full-history clone metrics; enabling public discovery is
+not required. Its independently selected head and observation window are never
+joined to the AI scan. The **Team commits** column counts commits whose linked
+GitHub `author.user.login` matches a login explicitly configured in
+`DEVEX_TEAM_HANDLES` (or `team.handles` in `DEVEX_CONFIG`), case-insensitively.
+Team repo globs, PR authors, generic contributor counts and unlinked email/name
+matches do **not** establish team identity. When no roster is configured, any
+commit lacks a linked login, the 90-day history exceeds 500 commits, or
+pagination/HEAD verification is incomplete, team counts are **Unknown**, not
+zero. Removing the roster hides stored team counts on the next Pages build;
+changing one configured roster to another requires a fresh collection because
+stored counts reflect the roster at scan time. The 30/90-day windows are fixed
+and do not follow PR filters.
+
+Each observed AI file shows **commits since change**, the number of branch
+commits from the pinned HEAD since the scanner's `last_changed` timestamp
+(including that timestamp, like
+`git rev-list --count --since=<last_changed> HEAD`), not commits modifying the
+file. Missing file history means Unknown.
+For content at the pinned HEAD, four deterministic 25-point cues look for
+scope/purpose, actionable instructions, verification/checks and explicit
+guardrails. The **Quality cues** score is the rounded mean across *all*
+observed files only when every file's bytes have been hash-verified and scored;
+no files or incomplete coverage shows Unknown with the scored-file count.
+0/100 means verified content lacked these cues, **not** incorrect instructions.
+No instruction text is executed, retained, published or sent to a third-party
+grader. API responses are limited to 64 KiB of accepted UTF-8 text per file,
+200 files per repo, 1,000 files and 150 repos per run; excess files/repositories
+remain Unknown. Invalid or mismatched public heads and unavailable/oversized
+content are Unknown, not fabricated zeros. The App token remains limited to
+the existing explicitly selected verified-public repositories; visibility is
+rechecked after enrichment before any sanitized data is saved. No clone or
+extra workflow token is needed for these Git-history measurements. API
+requests time out after 20 seconds, and the ingestion step is limited to
+20 minutes; a failure retains the last safe observation under the stale notice.
+Existing portable scanner v1 input stays v1; sanitized history and the `landscape.json`
+array gain only optional, numeric/null signal fields and boolean rubric flags.
+Older snapshots show Unknown rather than invented measurements.
 
 The **merged PRs / 90d** column comes from each repository's DevEx
 `mergedPRTimeline` within the 90 days ending at `OrgMetrics.collectedAt`.
 It counts observed PRs, including bot-authored ones, not Git commits or
 team-attributed work; the budgeted timeline may be incomplete, so even a
 displayed zero means no PR was *observed* in that window, not proven
-inactivity. Missing or invalid timelines show **Unknown**. The landscape
-scan itself has no commit-activity counts, per-file commits since the AI file
-changed, team attribution, ADR count, or AI-instruction quality verdict. Optional
-full-history public discovery can provide separate public commit/ADR metrics
-when independently enabled, but never supplies or gates this AI-only view.
+inactivity. Missing or invalid timelines show **Unknown**. Triage prefers
+verified Git activity and falls back to the observed PR timeline when commit
+history is unavailable; private/unverified repositories remain unknown.
+The landscape does not claim an ADR count or AI-instruction correctness verdict.
+Optional full-history public discovery remains an independent panel.
 Age, lag, stale and hash drift are maintenance/observation signals only.
 The landscape's 90-day window does not change with dashboard period or
-bot filters, and it does not change `data.json` or `landscape.json`.
+bot filters; `data.json` is unchanged.
 
 ## Full-history public repository discovery (opt-in)
 

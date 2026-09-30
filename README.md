@@ -166,9 +166,12 @@ Validated, sanitized observations and successive SHA-256 comparisons live in
 their own `metrics-data` history stream. Pages shows a compact per-repository
 attention-first summary (observed gaps, older file signals, unavailable
 observations) and expandable public file paths, plus `landscape.json`. The
-dashboard can show **observed merged PRs in 90 days** from the separately
-collected DevEx timeline as activity context, not Git commits or an AI quality
-score; this timeline may be incomplete. File contents,
+dashboard shows pinned-head **Git commits in 30/90 days**, file-level commits
+since the last change, and a four-cue content quality score where verified
+evidence is available. With `DEVEX_TEAM_HANDLES`, it also counts linked commits
+from those GitHub accounts; missing identity or incomplete history is unknown,
+not zero. The separate observed merged-PR timeline remains context and may be
+incomplete. The cue score is not a correctness or readiness verdict. File contents,
 scanner evidence and private repository paths are never included. Drift means
 files were added, removed or changed content since the last successful scan —
 not that older files are incorrect. Configuration, privacy constraints and

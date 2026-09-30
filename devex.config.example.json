@@ -34,6 +34,7 @@
     "id": "team-alpha",
     "name": "Team Alpha",
     "repos": ["devex-*", "rajbos/some-repo"],
+    "handles": [],
     "discoverAll": true
   },
 

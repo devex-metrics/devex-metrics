@@ -83,8 +83,11 @@ describe("build-pages", () => {
           ai_files: [{
             path: "AGENTS.md", kind: "instructions", sha256: "b".repeat(64),
             last_changed: null, age_days: null, lag_days: null, stale: null,
+            commits_since_change: null,
+            content_signal: { score: 75, scope: true, actions: true, verification: true, guardrails: false },
           }],
           ai_summary: { count: 1, stale_count: 0, max_lag_days: null, unknown_count: 1 },
+          commits_30d: 2, commits_90d: 5, team_commits_30d: 1, team_commits_90d: 1,
         }],
         content: "NEVER PUBLISH",
       }));
@@ -95,6 +98,7 @@ describe("build-pages", () => {
             ...process.env,
             DEVEX_HISTORY_DIR: historyDir,
             DEVEX_FEATURE_LANDSCAPE: "true",
+            DEVEX_TEAM_HANDLES: "Alice",
           },
         });
         const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf8");
@@ -105,6 +109,13 @@ describe("build-pages", () => {
         expect(html).toContain("AGENTS.md");
         expect(html).toContain("Sanitized JSON");
         expect(landscape[0]).toMatchObject({ status: "observed", summary: { count: 1 } });
+        expect(landscape[0]).toMatchObject({
+          commits30d: 2, commits90d: 5, teamCommits30d: 1, teamCommits90d: 1,
+          qualityScore: 75, qualityScored: 1,
+          files: [{ commits_since_change: null, content_signal: { score: 75 } }],
+        });
+        expect(html).toContain("Quality cues");
+        expect(html).toContain("75/100");
         expect(html).not.toContain("NEVER PUBLISH");
         expect(fs.readFileSync(path.join(siteDir, "landscape.json"), "utf8"))
           .not.toContain("NEVER PUBLISH");

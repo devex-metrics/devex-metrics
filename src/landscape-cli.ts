@@ -14,6 +14,7 @@ import {
   unverifiedLandscapeRepositories,
   validateLandscapeScannerOutput,
 } from "./landscape.js";
+import { enrichLandscapeScan } from "./landscape-signals.js";
 
 function prepare(): void {
   const config = loadConfig();
@@ -93,7 +94,9 @@ async function recheckAndScrub(
   names: readonly string[],
   token: string
 ): Promise<string[]> {
-  const unverified = await unverifiedLandscapeRepositories(names, new Octokit({ auth: token }));
+  const unverified = await unverifiedLandscapeRepositories(
+    names, new Octokit({ auth: token, request: { timeout: 20_000 } })
+  );
   if (unverified.length > 0) {
     const removed = scrubLandscapeRepositories(historyDir, owner, unverified);
     console.error(
@@ -133,13 +136,19 @@ async function ingest(file: string | undefined): Promise<void> {
     );
   }
   const raw = JSON.parse(fs.readFileSync(path.resolve(file), "utf8")) as unknown;
-  validateLandscapeScannerOutput(
+  const validated = validateLandscapeScannerOutput(
     raw,
     metrics,
     config.collection.landscapeStaleAfterDays,
     installedLandscapeScannerVersion()
   );
-  const scan = saveLandscapeScan(historyDir, metrics, raw);
+  const enriched = await enrichLandscapeScan(
+    validated, new Octokit({ auth: token, request: { timeout: 20_000 } }),
+    config.team?.handles ?? []
+  );
+  if ((await recheckAndScrub(historyDir, metrics.owner, names, token)).length > 0)
+    throw new Error("Landscape visibility changed during enrichment; refusing to persist paths");
+  const scan = saveLandscapeScan(historyDir, metrics, raw, enriched);
   saveLandscapeRunStatus(historyDir, metrics.owner, {
     attempted_at: new Date().toISOString(),
     ok: true,

@@ -210,7 +210,18 @@ describe("loadConfig", () => {
     expect(c.team?.name).toBe("Team Alpha");
     expect(c.team?.id).toBe("team-alpha");
     expect(c.team?.repos).toEqual(["acme/api"]);
+    expect(c.team?.handles).toEqual([]);
     expect(c.team?.discoverAll).toBe(true);
+  });
+
+  it("accepts explicit team GitHub handles but rejects ambiguous or malformed rosters", () => {
+    const c = loadConfig({
+      DEVEX_CONFIG: JSON.stringify({ team: { repos: ["acme/api"], handles: ["old"] } }),
+      DEVEX_TEAM_HANDLES: "Alice, bob",
+    });
+    expect(c.team?.handles).toEqual(["Alice", "bob"]);
+    expect(() => loadConfig({ DEVEX_TEAM_HANDLES: "alice,ALICE" })).toThrow(/Team handles/);
+    expect(() => loadConfig({ DEVEX_TEAM_HANDLES: "alice@example.com" })).toThrow(/Team handles/);
   });
 
   it("builds a trial from discrete variables alone", () => {
