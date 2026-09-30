@@ -71,6 +71,22 @@ export interface LandscapeRepository {
   ai_files: LandscapeFile[];
   /** Counts derived from the observed files. */
   ai_summary: LandscapeSummary;
+  /** Commits observed in the 90 days before enrichment, or null when unavailable. */
+  commits_90d?: number | null;
+}
+
+/** Static rubric signals derived from a hash-verified instruction file. */
+export interface LandscapeContentSignal {
+  /** Rubric score from 0 to 100 in 25-point increments. */
+  score: number;
+  /** Whether the file describes its scope or purpose. */
+  scope: boolean;
+  /** Whether the file contains actionable instructions. */
+  actions: boolean;
+  /** Whether the file describes verification commands or checks. */
+  verification: boolean;
+  /** Whether the file contains explicit guardrails. */
+  guardrails: boolean;
 }
 
 /** Public instruction-file metadata, sanitized from the scanner's output. */
@@ -91,6 +107,10 @@ export interface LandscapeFile {
   stale: boolean | null;
   /** Whether historical file signals could be established. */
   status: "known" | "unknown";
+  /** Commits since this file last changed, or null when unavailable. */
+  commits_since_change?: number | null;
+  /** Hash-verified static content rubric, or null when unavailable. */
+  content_signal?: LandscapeContentSignal | null;
 }
 
 /** File counts and known/unknown age-signal coverage. */

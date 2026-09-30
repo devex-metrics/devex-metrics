@@ -1,5 +1,73 @@
-import type { LandscapeFile, LandscapeRepoView, LandscapeRunStatus } from "../types.js";
+import type { LandscapeFile, LandscapeRepoView, LandscapeRunStatus, OrgMetrics, RepoMetrics } from "../types.js";
 import { escapeHtml } from "./utils.js";
+
+interface TriageRow {
+  view: LandscapeRepoView;
+  activity: number | null;
+  priority: number;
+  attention: string;
+  reason: string;
+  oldestAge: number | null;
+}
+
+const DAY = 24 * 60 * 60 * 1000;
+
+function timestamp(value: unknown): number | null {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(value)) return null;
+  const date = value.slice(0, 10);
+  const time = Date.parse(value);
+  return Number.isFinite(time) && new Date(`${date}T00:00:00Z`).toISOString().slice(0, 10) === date
+    ? time : null;
+}
+
+function mergedPRs(repo: RepoMetrics | undefined, collectedAt: string): number | null {
+  const end = timestamp(collectedAt);
+  if (end === null || !Array.isArray(repo?.mergedPRTimeline)) return null;
+  let count = 0;
+  for (const pr of repo.mergedPRTimeline) {
+    const merged = timestamp(pr?.mergedAt);
+    if (merged === null) return null;
+    if (merged >= end - 90 * DAY && merged <= end) count++;
+  }
+  return count;
+}
+
+function triage(view: LandscapeRepoView, activity: number | null): TriageRow {
+  const summary = view.summary;
+  const oldestAge = view.status === "observed"
+    ? view.files?.reduce<number | null>((max, file) =>
+        file.age_days === null ? max : Math.max(max ?? 0, file.age_days), null) ?? null
+    : null;
+  if (view.status !== "observed") {
+    const restricted = view.reason === "private" || view.reason === "visibility_unknown";
+    return { view, activity, oldestAge, priority: restricted ? 6 : 4,
+      attention: restricted ? "Not assessed" : "Observation gap",
+      reason: unknownLabel(view.reason) };
+  }
+  if (!summary) throw new Error("Observed landscape rows require summary and provenance");
+  if (summary.count === 0) {
+    return { view, activity, oldestAge, priority: activity !== null && activity > 0 ? 0 : 2,
+      attention: activity !== null && activity > 0 ? "Review first" : "Review coverage",
+      reason: "No AI instruction files observed" };
+  }
+  if (summary.stale_count > 0) {
+    return { view, activity, oldestAge, priority: activity !== null && activity > 0 ? 1 : 3,
+      attention: activity !== null && activity > 0 ? "Review first" : "Review age signal",
+      reason: `${summary.stale_count} older file ${summary.stale_count === 1 ? "signal" : "signals"}` };
+  }
+  if (summary.unknown_count > 0) {
+    return { view, activity, oldestAge, priority: 5, attention: "History unknown",
+      reason: `${summary.unknown_count} file ${summary.unknown_count === 1 ? "history" : "histories"} unavailable` };
+  }
+  return { view, activity, oldestAge, priority: 7, attention: "No age flag",
+    reason: "Age within threshold; quality not assessed" };
+}
+
+function compareTriage(a: TriageRow, b: TriageRow): number {
+  return a.priority - b.priority ||
+    (b.activity ?? -1) - (a.activity ?? -1) ||
+    a.view.fullName.localeCompare(b.view.fullName, undefined, { numeric: true, sensitivity: "base" });
+}
 
 function unknownLabel(reason: LandscapeRepoView["reason"]): string {
   switch (reason) {
@@ -33,7 +101,8 @@ function fileRow(file: LandscapeFile, added: Set<string>, changed: Set<string>):
   </tr>`;
 }
 
-function observedRow(row: LandscapeRepoView, attributes: string, index: number): string {
+function observedRow(item: TriageRow, attributes: string, index: number): string {
+  const row = item.view;
   const files = row.files ?? [];
   const summary = row.summary;
   if (!summary || !row.headSha || !row.collectedAt || !row.scannerVersion) {
@@ -60,21 +129,39 @@ function observedRow(row: LandscapeRepoView, attributes: string, index: number):
   const counts =
     `${summary.count} observed · ${summary.stale_count} older signals` +
     (summary.unknown_count ? ` · ${summary.unknown_count} unknown ages` : "");
+  const age = summary.count === 0 ? "Not applicable" :
+    item.oldestAge === null ? "Unknown age" : `Oldest ${item.oldestAge} d`;
+  const lag = summary.count === 0 ? "No observed files" :
+    summary.max_lag_days === null ? "Unknown lag" : `Lag up to ${summary.max_lag_days} d`;
   // The file table lives in its own full-width row; landscape-controls.js keeps it
   // attached to its repository row through sorting and pagination.
   const detailId = `landscape-detail-${index}`;
   return `<tr${attributes}>
+    <td>${attentionCell(item)}</td>
     <th scope="row">${escapeHtml(row.fullName)}</th>
+    <td class="landscape-activity">${activityCell(item.activity)}</td>
     <td>${counts}</td>
+    <td>${age}<span class="landscape-secondary">${lag}</span></td>
     <td>${escapeHtml(driftLabel)}</td>
     <td><time datetime="${escapeHtml(row.collectedAt)}">${escapeHtml(row.collectedAt.slice(0, 10))}</time>
       <span class="landscape-hash" title="Observed head SHA">${escapeHtml(row.headSha.slice(0, 12))}</span></td>
     <td><button type="button" class="landscape-toggle" aria-expanded="false" aria-controls="${detailId}" aria-label="View AI instruction files for ${escapeHtml(row.fullName)}">View files</button></td>
   </tr>
-  <tr class="landscape-detail-row" id="${detailId}" hidden><td colspan="5">
+  <tr class="landscape-detail-row" id="${detailId}" hidden><td colspan="8">
       <p class="landscape-note">Scanner ${escapeHtml(row.scannerVersion)} · head ${escapeHtml(row.headSha)}. Older file age is not evidence of incorrect instructions.</p>
       ${compared}${fileTable}${removed}
   </td></tr>`;
+}
+
+function attentionCell(item: TriageRow): string {
+  const tone = item.priority <= 3 ? "review" : item.priority === 7 ? "clear" : "unknown";
+  return `<span class="landscape-attention ${tone}">${escapeHtml(item.attention)}</span>` +
+    `<span class="landscape-secondary">${escapeHtml(item.reason)}</span>`;
+}
+
+function activityCell(activity: number | null): string {
+  return activity === null ? `<span class="landscape-unknown">Unknown</span>` :
+    `${activity} <span class="landscape-secondary">observed</span>`;
 }
 
 function timeTag(iso: string): string {
@@ -96,32 +183,49 @@ function staleNotice(status: LandscapeRunStatus | undefined): string {
 /** Render the opt-in landscape panel after the dashboard's other metrics. */
 export function buildLandscapeSection(
   rows: readonly LandscapeRepoView[],
-  status?: LandscapeRunStatus
+  status?: LandscapeRunStatus,
+  metrics?: Pick<OrgMetrics, "repos" | "collectedAt">
 ): string {
   const observed = rows.filter((row) => row.status === "observed").length;
+  const repos = new Map(metrics?.repos.map((repo) => [repo.fullName.toLowerCase(), repo]) ?? []);
+  const ranked = rows.map((row) =>
+    triage(row, metrics ? mergedPRs(repos.get(row.fullName.toLowerCase()), metrics.collectedAt) : null)
+  ).sort(compareTriage);
+  const missing = ranked.filter((row) => row.view.status === "observed" && row.view.summary?.count === 0).length;
+  const older = ranked.filter((row) => row.view.status === "observed" && (row.view.summary?.stale_count ?? 0) > 0).length;
+  const unknown = ranked.filter((row) => row.view.status === "unknown").length;
+  const historyUnknown = ranked.filter((row) => row.view.status === "observed" && (row.view.summary?.unknown_count ?? 0) > 0).length;
   const content = rows.length
     ? `<div class="landscape-table-wrap"><table class="landscape-table" aria-label="AI instruction file observations by repository">
       <thead><tr>
+        <th scope="col" aria-sort="ascending"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="priority" data-landscape-default="ascending" data-landscape-label="Attention">Attention <span class="landscape-sort-ind" aria-hidden="true">↑</span></button></th>
         <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="name" data-landscape-default="ascending" data-landscape-label="Repository">Repository <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
+        <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="activity" data-landscape-default="descending" data-landscape-label="Observed merged PRs in 90 days">Merged PRs / 90d <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
         <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="count" data-landscape-default="descending" data-landscape-label="AI instruction files">AI instruction files <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
+        <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="age" data-landscape-default="descending" data-landscape-label="Oldest known file age">File age / lag <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
         <th scope="col" title="Total files added, changed and removed since the previous observation"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="changes" data-landscape-default="descending" data-landscape-label="File drift (total changes)">File drift <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
         <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="observed" data-landscape-default="descending" data-landscape-label="Observed at">Observed at <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
         <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="detail" data-landscape-default="descending" data-landscape-label="Detail availability">Detail <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
       </tr></thead>
-      <tbody id="landscapeRows">${rows
-        .map((row, index) => {
+      <tbody id="landscapeRows">${ranked
+        .map((item, index) => {
+          const row = item.view;
           const known = row.status === "observed";
           const sortValues =
             ` data-landscape-index="${index}"` +
+            ` data-landscape-priority="${item.priority}" data-landscape-activity="${item.activity ?? ""}"` +
             ` data-landscape-count="${known ? row.summary?.count ?? "" : ""}"` +
+            ` data-landscape-age="${item.oldestAge ?? ""}"` +
             ` data-landscape-changes="${known && row.drift ? row.drift.added.length + row.drift.content_changed.length + row.drift.removed.length : ""}"` +
             ` data-landscape-observed="${escapeHtml(known ? row.collectedAt ?? "" : "")}" data-landscape-detail="${known ? 1 : 0}"` +
             (index >= 20 ? " hidden" : "");
-          if (known) return observedRow(row, sortValues, index);
-          return `<tr${sortValues}><th scope="row">${escapeHtml(row.fullName)}</th>` +
-            `<td class="landscape-unknown">${unknownLabel(row.reason)}${row.collectedAt ? ` (scan attempted <time datetime="${escapeHtml(row.collectedAt)}">${escapeHtml(row.collectedAt.slice(0, 10))}</time>)` : ""}</td>` +
+          if (known) return observedRow(item, sortValues, index);
+          return `<tr${sortValues}><td>${attentionCell(item)}</td><th scope="row">${escapeHtml(row.fullName)}</th>` +
+            `<td class="landscape-activity">${activityCell(item.activity)}</td>` +
             `<td class="landscape-unknown">—</td>` +
             `<td class="landscape-unknown">—</td>` +
+            `<td class="landscape-unknown">—</td>` +
+            `<td class="landscape-unknown">${row.collectedAt ? `Scan attempted <time datetime="${escapeHtml(row.collectedAt)}">${escapeHtml(row.collectedAt.slice(0, 10))}</time>` : "—"}</td>` +
             `<td class="landscape-unknown">—</td></tr>`;
         })
         .join("\n")}</tbody>
@@ -138,10 +242,17 @@ export function buildLandscapeSection(
   return `<section class="card landscape-section" id="ai-landscape" aria-labelledby="landscape-heading">
     <div class="landscape-heading"><div>
       <h2 id="landscape-heading">AI instruction landscape</h2>
-      <p class="metric-lede">Observed files and content-hash drift at each repository head. Presence and age are not a readiness score or a correctness assessment; this snapshot does not follow the PR period or bot filters.</p>
+      <p class="metric-lede">Review attention first: observed gaps and older file signals alongside recent PR activity. Presence, age and lag are maintenance signals, not a readiness score or a correctness assessment.</p>
     </div><div class="landscape-actions"><span class="landscape-coverage">${observed} / ${rows.length} observed</span><a href="landscape.json">Sanitized JSON</a></div></div>
     ${staleNotice(status)}
-    ${rows.length ? '<div class="landscape-sort-toolbar"><span id="landscapeSortStatus" aria-live="polite">Original order</span><button type="button" id="landscapeSortReset" aria-controls="landscapeRows" disabled>Clear sort</button></div>' : ""}
+    ${rows.length ? `<div class="landscape-triage" aria-label="Landscape overview">
+      <div><strong>${missing}</strong><span>No files observed</span></div>
+      <div><strong>${older}</strong><span>Older age signals</span></div>
+      <div><strong>${historyUnknown}</strong><span>History incomplete</span></div>
+      <div><strong>${unknown}</strong><span>Observation unknown</span></div>
+    </div>
+    <p class="landscape-context">Overview categories can overlap. Activity is <strong>observed merged PRs / 90d</strong> ending at the DevEx collection time; the budgeted PR timeline can be incomplete. Unknown means no usable timeline, not zero. This view does not follow the dashboard PR period or bot filters. File ages and lag refer only to verified-public, observed files.</p>
+    <div class="landscape-sort-toolbar"><span id="landscapeSortStatus" aria-live="polite">Attention first</span><button type="button" id="landscapeSortReset" aria-controls="landscapeRows" disabled>Restore attention order</button></div>` : ""}
     ${content}
   </section>`;
 }

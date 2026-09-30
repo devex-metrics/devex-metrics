@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded",function(){
   tbody.dataset.landscapeReady="true";
   var table=tbody.closest("table");
   var buttons=Array.from(table.querySelectorAll(".landscape-sort"));
+  var priorityButton=buttons.find(function(btn){return btn.dataset.landscapeSort==="priority";});
   var reset=document.getElementById("landscapeSortReset");
   var status=document.getElementById("landscapeSortStatus");
   var range=document.getElementById("landscapeRange");
@@ -55,18 +56,20 @@ document.addEventListener("DOMContentLoaded",function(){
   function compare(a,b){
     if(!key)return Number(a.dataset.landscapeIndex)-Number(b.dataset.landscapeIndex);
     var prop="landscape"+key.charAt(0).toUpperCase()+key.slice(1);
-    var x=key==="name"?a.cells[0].textContent:a.dataset[prop];
-    var y=key==="name"?b.cells[0].textContent:b.dataset[prop];
+    var x=key==="name"?a.cells[1].textContent:a.dataset[prop];
+    var y=key==="name"?b.cells[1].textContent:b.dataset[prop];
     var xValue=key==="name"?null:sortValue(x);
     var yValue=key==="name"?null:sortValue(y);
     if(key!=="name"){
       if(xValue===null||yValue===null){
-        if(xValue===null&&yValue===null)return Number(a.dataset.landscapeIndex)-Number(b.dataset.landscapeIndex);
+        if(xValue===null&&yValue===null)return collator.compare(a.cells[1].textContent,b.cells[1].textContent)||
+          Number(a.dataset.landscapeIndex)-Number(b.dataset.landscapeIndex);
         return xValue===null?1:-1;
       }
     }
     var result=key==="name"?collator.compare(x,y):xValue-yValue;
     return (direction==="descending"?-result:result)||
+      collator.compare(a.cells[1].textContent,b.cells[1].textContent)||
       Number(a.dataset.landscapeIndex)-Number(b.dataset.landscapeIndex);
   }
   function render(){
@@ -97,9 +100,9 @@ document.addEventListener("DOMContentLoaded",function(){
     var active=buttons.find(function(btn){return btn.dataset.landscapeSort===key;});
     status.textContent=active
       ?"Sorted by "+active.dataset.landscapeLabel+" ("+(direction==="ascending"?"ascending":"descending")+")"
-      :"Original order";
+      :"Attention first";
     buttons.forEach(function(btn){
-      var current=btn===active?direction:"none";
+      var current=btn===active?direction:!key&&btn===priorityButton?"ascending":"none";
       if(current==="none")btn.closest("th").removeAttribute("aria-sort");
       else btn.closest("th").setAttribute("aria-sort",current);
       btn.querySelector(".landscape-sort-ind").textContent=current==="none"?"↕":

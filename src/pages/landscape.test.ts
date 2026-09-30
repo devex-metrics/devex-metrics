@@ -1,7 +1,8 @@
 import { JSDOM } from "jsdom";
+import { buildDashboardHtml } from "./dashboard.js";
 import { buildLandscapeSection } from "./landscape.js";
 import { getLandscapeControlsJS } from "./landscape-controls.js";
-import type { LandscapeRepoView } from "../types.js";
+import type { LandscapeRepoView, OrgMetrics, RepoMetrics } from "../types.js";
 
 const SHA = "a".repeat(40);
 
@@ -41,8 +42,46 @@ function observed(): LandscapeRepoView {
   };
 }
 
-function mount(rows: LandscapeRepoView[]): JSDOM {
-  const dom = new JSDOM(buildLandscapeSection(rows), { runScripts: "outside-only" });
+function activitySnapshot(entries: [string, string[] | null][]): Pick<OrgMetrics, "repos" | "collectedAt"> {
+  return {
+    collectedAt: "2026-09-30T12:00:00.000Z",
+    repos: entries.map(([fullName, dates]): RepoMetrics => ({
+      name: fullName.split("/")[1],
+      fullName,
+      issues: { open: 0, closed: 0 },
+      pullRequests: { open: 0, merged: 0, closed: 0 },
+      pullRequestDetails: [],
+      ...(dates === null ? {} : {
+        mergedPRTimeline: dates.map((date, index) => ({
+          number: index + 1, createdAt: date, mergedAt: date, author: "tester",
+          isBotAuthor: false, isCopilotAuthored: false, timeToMergeHours: 0, closesIssues: [],
+        })),
+      }),
+      committerCount: 0, reviewerCount: 0, contributorCount: 0, dependentCount: 0,
+    })),
+  };
+}
+
+function empty(name: string): LandscapeRepoView {
+  const row = observed();
+  row.fullName = name;
+  row.files = [];
+  row.summary = { count: 0, stale_count: 0, unknown_count: 0, max_lag_days: null, status: "known" };
+  return row;
+}
+
+function aged(name: string, stale: boolean): LandscapeRepoView {
+  const row = observed();
+  row.fullName = name;
+  row.files = [{ ...row.files![0], path: "AGENTS.md", age_days: stale ? 140 : 12,
+    lag_days: stale ? 100 : 3, stale, status: "known", last_changed: "2026-09-18T12:00:00Z" }];
+  row.summary = { count: 1, stale_count: stale ? 1 : 0, unknown_count: 0,
+    max_lag_days: stale ? 100 : 3, status: "known" };
+  return row;
+}
+
+function mount(rows: LandscapeRepoView[], metrics?: Pick<OrgMetrics, "repos" | "collectedAt">): JSDOM {
+  const dom = new JSDOM(buildLandscapeSection(rows, undefined, metrics), { runScripts: "outside-only" });
   dom.window.eval(getLandscapeControlsJS());
   dom.window.document.dispatchEvent(new dom.window.Event("DOMContentLoaded"));
   return dom;
@@ -51,10 +90,132 @@ function mount(rows: LandscapeRepoView[]): JSDOM {
 function visibleNames(dom: JSDOM): string[] {
   return Array.from(dom.window.document.querySelectorAll<HTMLTableRowElement>("#landscapeRows > tr:not(.landscape-detail-row)"))
     .filter((row) => !row.hidden)
-    .map((row) => row.cells[0].textContent ?? "");
+    .map((row) => row.cells[1].textContent ?? "");
 }
 
 describe("landscape dashboard view", () => {
+  it("prioritizes active observed gaps and older age signals without scoring unknown or private repositories", () => {
+    const rows = [
+      aged("acme/quiet-fresh", false),
+      { fullName: "acme/private", status: "unknown", reason: "private" } as LandscapeRepoView,
+      empty("acme/active-missing"),
+      aged("acme/active-old", true),
+      empty("acme/quiet-missing"),
+      { fullName: "acme/failed", status: "unknown", reason: "scan_error" } as LandscapeRepoView,
+      observed(),
+    ];
+    const metrics = activitySnapshot([
+      ["acme/active-missing", ["2026-09-29T12:00:00Z", "2026-09-28T12:00:00Z", "2026-05-01T12:00:00Z"]],
+      ["acme/active-old", ["2026-09-29T12:00:00Z"]],
+      ["acme/quiet-missing", []],
+      ["acme/quiet-fresh", []],
+      ["acme/private", ["2026-09-29T12:00:00Z"]],
+      ["acme/failed", null],
+      ["acme/public", null],
+    ]);
+    const dom = mount(rows, metrics);
+    const doc = dom.window.document;
+    expect(visibleNames(dom)).toEqual([
+      "acme/active-missing", "acme/active-old", "acme/quiet-missing",
+      "acme/failed", "acme/public", "acme/private", "acme/quiet-fresh",
+    ]);
+    const byName = (name: string) => Array.from(doc.querySelectorAll<HTMLTableRowElement>("#landscapeRows > tr:not(.landscape-detail-row)"))
+      .find((row) => row.cells[1].textContent === name)!;
+    expect(byName("acme/active-missing").cells[2].textContent).toBe("2 observed");
+    expect(byName("acme/quiet-missing").cells[2].textContent).toBe("0 observed");
+    expect(byName("acme/quiet-missing").cells[4].textContent).toContain("Not applicable");
+    expect(byName("acme/failed").cells[2].textContent).toBe("Unknown");
+    expect(byName("acme/private").cells[3].textContent).toBe("—");
+    expect(byName("acme/private").textContent).toContain("Private repository; not scanned");
+    expect(byName("acme/active-old").cells[4].textContent).toContain("Oldest 140 d");
+    expect(byName("acme/active-old").cells[4].textContent).toContain("Lag up to 100 d");
+    expect(doc.querySelector(".landscape-triage")?.textContent).toContain("Observation unknown");
+    expect(doc.querySelector(".landscape-context")?.textContent).toContain("budgeted PR timeline can be incomplete");
+    expect(doc.querySelector<HTMLButtonElement>('[data-landscape-sort="priority"]')!.closest("th")?.getAttribute("aria-sort")).toBe("ascending");
+
+    const sort = (key: string) => doc.querySelector<HTMLButtonElement>(`[data-landscape-sort="${key}"]`)!;
+    sort("activity").click();
+    expect(visibleNames(dom).slice(0, 3)).toEqual(["acme/active-missing", "acme/active-old", "acme/private"]);
+    expect(visibleNames(dom).at(-1)).toBe("acme/public");
+    sort("activity").click();
+    expect(visibleNames(dom).slice(0, 2)).toEqual(["acme/quiet-fresh", "acme/quiet-missing"]);
+    expect(visibleNames(dom).at(-1)).toBe("acme/public");
+    sort("age").click();
+    expect(visibleNames(dom).slice(0, 2)).toEqual(["acme/active-old", "acme/quiet-fresh"]);
+    sort("priority").click();
+    expect(visibleNames(dom)[0]).toBe("acme/active-missing");
+    doc.querySelector<HTMLButtonElement>("#landscapeSortReset")!.click();
+    expect(visibleNames(dom)[0]).toBe("acme/active-missing");
+  });
+
+  it("does not turn absent or malformed timeline dates into zero activity", () => {
+    const rows = ["missing", "bad", "empty", "recent", "old", "future"].map((name) => empty(`acme/${name}`));
+    const metrics = activitySnapshot([
+      ["acme/bad", ["2026-02-31T00:00:00Z"]],
+      ["acme/empty", []],
+      ["acme/recent", ["2026-09-30T12:00:00Z"]],
+      ["acme/old", ["2025-01-01T12:00:00Z"]],
+      ["acme/future", ["2026-10-01T12:00:00Z"]],
+    ]);
+    const doc = mount(rows, metrics).window.document;
+    const values = Object.fromEntries(
+      Array.from(doc.querySelectorAll<HTMLTableRowElement>("#landscapeRows > tr:not(.landscape-detail-row)"))
+        .map((row) => [row.cells[1].textContent, row.cells[2].textContent])
+    );
+    expect(values).toMatchObject({
+      "acme/missing": "Unknown", "acme/bad": "Unknown",
+      "acme/empty": "0 observed", "acme/recent": "1 observed",
+      "acme/old": "0 observed", "acme/future": "0 observed",
+    });
+  });
+
+  it("passes the DevEx PR timeline into the landscape without altering its sanitized data", () => {
+    const metrics = activitySnapshot([["acme/with-work", ["2026-09-29T12:00:00Z"]]]);
+    const data: OrgMetrics = {
+      ...metrics, owner: "acme", ownerType: "org", repoCount: 1,
+    };
+    const html = buildDashboardHtml(data, "2026-09-30", undefined, undefined, {
+      landscape: [empty("acme/with-work")],
+    });
+    const doc = new JSDOM(html).window.document;
+    expect(doc.querySelector("#landscapeRows .landscape-activity")?.textContent).toBe("1 observed");
+    expect(doc.querySelector("#landscapeRows .landscape-attention")?.textContent).toBe("Review first");
+    expect(doc.querySelector('a[href="landscape.json"]')).not.toBeNull();
+    expect(doc.querySelector('a[href="data.json"]')).not.toBeNull();
+  });
+
+  it("escapes repository names in both visible rows and accessible controls", () => {
+    const name = 'acme/<img src=x onerror="alert(1)">';
+    const html = buildLandscapeSection([empty(name)], undefined,
+      activitySnapshot([[name, ["2026-09-29T12:00:00Z"]]]));
+    const doc = new JSDOM(html).window.document;
+    expect(doc.querySelector("img")).toBeNull();
+    expect(doc.querySelector("#landscapeRows th[scope=row]")?.textContent).toBe(name);
+    expect(doc.querySelector(".landscape-toggle")?.getAttribute("aria-label")).toContain(name);
+  });
+
+  it("places attention items on page one before alphabetical names and restores the default after sorting", () => {
+    const rows = [
+      ...Array.from({ length: 21 }, (_, index) => aged(`acme/a-${index}`, false)),
+      empty("acme/z-needs-review"),
+    ];
+    const metrics = activitySnapshot(rows.map((row) =>
+      [row.fullName, row.fullName.endsWith("needs-review") ? ["2026-09-29T12:00:00Z"] : []]
+    ));
+    const dom = mount(rows, metrics);
+    const doc = dom.window.document;
+    expect(visibleNames(dom)[0]).toBe("acme/z-needs-review");
+    const sort = doc.querySelector<HTMLButtonElement>('[data-landscape-sort="name"]')!;
+    sort.focus();
+    expect(doc.activeElement).toBe(sort);
+    sort.click();
+    expect(visibleNames(dom)[0]).toBe("acme/a-0");
+    doc.querySelector<HTMLButtonElement>("#landscapeNext")!.click();
+    expect(doc.querySelector("#landscapePage")?.textContent).toBe("Page 2 of 2");
+    doc.querySelector<HTMLButtonElement>("#landscapeSortReset")!.click();
+    expect(doc.querySelector("#landscapePage")?.textContent).toBe("Page 1 of 2");
+    expect(visibleNames(dom)[0]).toBe("acme/z-needs-review");
+  });
   it("renders observed file-level drift, provenance and unknowns without HTML injection", () => {
     const html = buildLandscapeSection([
       observed(),
@@ -72,12 +233,12 @@ describe("landscape dashboard view", () => {
     expect(toggle?.getAttribute("aria-expanded")).toBe("false");
     const detail = doc.getElementById(toggle!.getAttribute("aria-controls")!);
     expect(detail?.hidden).toBe(true);
-    expect(detail?.querySelector("td")?.getAttribute("colspan")).toBe("5");
+    expect(detail?.querySelector("td")?.getAttribute("colspan")).toBe("8");
     expect(doc.querySelector("table")?.getAttribute("aria-label")).toBe(
       "AI instruction file observations by repository"
     );
     expect(doc.querySelector(".landscape-coverage")?.textContent).toContain("1 / 4 observed");
-    expect(doc.querySelectorAll("#landscapeRows > tr .landscape-unknown")).toHaveLength(12);
+    expect(doc.querySelectorAll("#landscapeRows > tr .landscape-unknown")).toHaveLength(19);
     expect(html).toContain("Compared with");
     expect(html).toContain("2026-09-24T10:30:00.000Z");
     expect(html).toContain("Removed since comparison");
@@ -151,9 +312,9 @@ describe("landscape dashboard view", () => {
     expect(doc.querySelector("#landscapePage")?.textContent).toBe("Page 1 of 8");
     expect(prev.disabled).toBe(true);
     expect(doc.querySelector(".landscape-coverage")?.textContent).toBe("0 / 143 observed");
-    expect(doc.querySelectorAll("#landscapeRows tr:not([hidden]) .landscape-unknown")).toHaveLength(80);
+    expect(doc.querySelectorAll("#landscapeRows tr:not([hidden]) .landscape-unknown")).toHaveLength(120);
     expect(doc.querySelector(".landscape-pagination")?.outerHTML).not.toContain("acme/");
-    expect(doc.querySelectorAll(".landscape-sort")).toHaveLength(5);
+    expect(doc.querySelectorAll(".landscape-sort")).toHaveLength(8);
     for (let i = 0; i < 7; i++) next.click();
     expect(visibleNames(dom)).toHaveLength(3);
     expect(doc.querySelector("#landscapeRange")?.textContent).toBe("Showing 141–143 of 143 repositories");
@@ -202,14 +363,15 @@ describe("landscape dashboard view", () => {
     sort("observed").click();
     expect(visibleNames(dom)[0]).toBe("acme/a-2");
     sort("detail").click();
-    expect(visibleNames(dom).slice(0, 2)).toEqual(["acme/z-10", "acme/a-2"]);
+    expect(visibleNames(dom).slice(0, 2)).toEqual(["acme/a-2", "acme/z-10"]);
     sort("name").click();
     expect(visibleNames(dom).slice(0, 3)).toEqual(["acme/a-2", "acme/b-1", "acme/extra-0"]);
     expect(sort("name").getAttribute("aria-label")).toContain("descending");
     doc.querySelector<HTMLButtonElement>("#landscapeSortReset")!.click();
-    expect(visibleNames(dom).slice(0, 3)).toEqual(["acme/z-10", "acme/b-1", "acme/a-2"]);
-    expect(doc.querySelector("#landscapeSortStatus")?.textContent).toBe("Original order");
+    expect(visibleNames(dom).slice(0, 3)).toEqual(["acme/extra-0", "acme/extra-1", "acme/extra-2"]);
+    expect(doc.querySelector("#landscapeSortStatus")?.textContent).toBe("Attention first");
     expect(sort("name").closest("th")?.hasAttribute("aria-sort")).toBe(false);
+    expect(sort("priority").closest("th")?.getAttribute("aria-sort")).toBe("ascending");
     expect(doc.querySelector<HTMLButtonElement>("#landscapeSortReset")!.disabled).toBe(true);
   });
 
@@ -230,9 +392,9 @@ describe("landscape dashboard view", () => {
       '[data-landscape-sort="count"]'
     )!;
     button.click();
-    expect(visibleNames(dom)).toEqual(["acme/tied", "acme/public", "acme/zero", "acme/unverified"]);
+    expect(visibleNames(dom)).toEqual(["acme/public", "acme/tied", "acme/zero", "acme/unverified"]);
     button.click();
-    expect(visibleNames(dom)).toEqual(["acme/zero", "acme/tied", "acme/public", "acme/unverified"]);
+    expect(visibleNames(dom)).toEqual(["acme/zero", "acme/public", "acme/tied", "acme/unverified"]);
     expect(dom.window.document.querySelectorAll("#landscapeRows > tr:not(.landscape-detail-row)")).toHaveLength(4);
   });
 
@@ -256,11 +418,11 @@ describe("landscape dashboard view", () => {
       ["acme/denied", "2026-09-29T10:30:00.000Z"],
       ["acme/failed", "2026-09-30T10:30:00.000Z"],
     ]) {
-      const row = rows.find((candidate) => candidate.cells[0].textContent === name)!;
-      expect(row.cells[1].textContent).toContain(`scan attempted ${timestamp.slice(0, 10)}`);
-      expect(row.cells[1].querySelector("time")?.dateTime).toBe(timestamp);
-      expect(row.cells[3].textContent?.trim()).toBe("—");
-      expect(row.cells[3].querySelector("time")).toBeNull();
+      const row = rows.find((candidate) => candidate.cells[1].textContent === name)!;
+      expect(row.cells[6].textContent).toContain(`Scan attempted ${timestamp.slice(0, 10)}`);
+      expect(row.cells[6].querySelector("time")?.dateTime).toBe(timestamp);
+      expect(row.cells[4].textContent?.trim()).toBe("—");
+      expect(row.cells[4].querySelector("time")).toBeNull();
     }
     const button = doc.querySelector<HTMLButtonElement>('[data-landscape-sort="observed"]')!;
     button.click();
@@ -291,10 +453,10 @@ describe("landscape dashboard view", () => {
     const sort = (key: string) => doc.querySelector<HTMLButtonElement>(`[data-landscape-sort="${key}"]`)!;
     const names = () => Array.from((tbody as HTMLTableSectionElement).rows)
       .filter((row) => !row.classList.contains("landscape-detail-row"))
-      .map((row) => row.cells[0].textContent);
+      .map((row) => row.cells[1].textContent);
     const insert = (name: string, metadata?: { count?: string; observed?: string }) => {
       const row = doc.createElement("tr");
-      row.innerHTML = `<th scope="row">${name}</th><td>—</td><td>—</td><td>—</td><td>—</td>`;
+      row.innerHTML = `<td>—</td><th scope="row">${name}</th><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>`;
       if (metadata?.count !== undefined) row.dataset.landscapeCount = metadata.count;
       if (metadata?.observed !== undefined) row.dataset.landscapeObserved = metadata.observed;
       tbody.prepend(row);
@@ -307,13 +469,13 @@ describe("landscape dashboard view", () => {
     insert("acme/middle", { count: "2", observed: "2026-09-24T10:30:00.000Z" });
     await flush();
     expect(names().slice(0, 3)).toEqual(["acme/recent", "acme/middle", "acme/old"]);
-    expect(names().at(-1)).toBe("acme/missing-count");
+    expect(names().indexOf("acme/missing-count")).toBeGreaterThan(names().indexOf("acme/old"));
     expect(visibleNames(dom)).toHaveLength(20);
     expect(doc.querySelector("#landscapeRange")?.textContent).toBe("Showing 1–20 of 22 repositories");
     expect(doc.querySelector("#landscapePage")?.textContent).toBe("Page 1 of 2");
     sort("count").click();
     expect(names().slice(0, 3)).toEqual(["acme/old", "acme/middle", "acme/recent"]);
-    expect(names().at(-1)).toBe("acme/missing-count");
+    expect(names().indexOf("acme/missing-count")).toBeGreaterThan(names().indexOf("acme/recent"));
 
     sort("observed").click();
     insert("acme/missing-date");
@@ -327,9 +489,9 @@ describe("landscape dashboard view", () => {
     insert("acme/offset", { count: "2", observed: "2026-09-24T09:00:00-03:00" });
     await flush();
     expect(names().slice(0, 4)).toEqual(["acme/recent", "acme/offset", "acme/middle", "acme/old"]);
-    expect(names().slice(-5)).toEqual([
-      "acme/missing-count", "acme/missing-date", "acme/invalid-date",
-      "acme/non-iso-date", "acme/invalid-calendar",
+    expect(names().slice(4, 9)).toEqual([
+      "acme/invalid-calendar", "acme/invalid-date", "acme/missing-count",
+      "acme/missing-date", "acme/non-iso-date",
     ]);
     expect(visibleNames(dom)).toHaveLength(20);
     expect(doc.querySelector("#landscapePage")?.textContent).toBe("Page 1 of 2");
@@ -338,9 +500,9 @@ describe("landscape dashboard view", () => {
     expect(doc.querySelector("#landscapeRange")?.textContent).toBe("Showing 21–27 of 27 repositories");
     sort("observed").click();
     expect(names().slice(0, 4)).toEqual(["acme/old", "acme/middle", "acme/offset", "acme/recent"]);
-    expect(names().slice(-5)).toEqual([
-      "acme/missing-count", "acme/missing-date", "acme/invalid-date",
-      "acme/non-iso-date", "acme/invalid-calendar",
+    expect(names().slice(4, 9)).toEqual([
+      "acme/invalid-calendar", "acme/invalid-date", "acme/missing-count",
+      "acme/missing-date", "acme/non-iso-date",
     ]);
     expect(doc.querySelector("#landscapePage")?.textContent).toBe("Page 1 of 2");
   });
@@ -357,8 +519,8 @@ describe("landscape dashboard view", () => {
       })),
     ]);
     const doc = dom.window.document;
-    const repoRow = (name: string) => Array.from(doc.querySelectorAll<HTMLTableRowElement>("#landscapeRows > tr"))
-      .find((row) => row.cells[0].textContent === name)!;
+    const repoRow = (name: string) => Array.from(doc.querySelectorAll<HTMLTableRowElement>("#landscapeRows > tr:not(.landscape-detail-row)"))
+      .find((row) => row.cells[1].textContent === name)!;
     const toggle = repoRow("acme/z-repo").querySelector<HTMLButtonElement>(".landscape-toggle")!;
     const detail = doc.getElementById(toggle.getAttribute("aria-controls")!) as HTMLTableRowElement;
     toggle.click();
@@ -396,7 +558,7 @@ describe("landscape dashboard view", () => {
     );
     expect(dom.window.document.querySelector<HTMLButtonElement>("#landscapeNext")!.disabled).toBe(true);
     const added = dom.window.document.createElement("tr");
-    added.innerHTML = '<th scope="row">acme/new</th><td>Not scanned</td><td>—</td><td>—</td><td>—</td>';
+    added.innerHTML = '<td>Not assessed</td><th scope="row">acme/new</th><td>Unknown</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>';
     dom.window.document.querySelector("#landscapeRows")!.appendChild(added);
     await new Promise((resolve) => dom.window.setTimeout(resolve, 0));
     expect(dom.window.document.querySelector("#landscapeRange")?.textContent).toBe(

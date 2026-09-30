@@ -264,10 +264,29 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
 .landscape-heading>div{max-width:75ch}
 .landscape-coverage{font-size:.82rem;font-weight:600;color:var(--accent);white-space:nowrap}
 .landscape-actions{display:flex;align-items:center;gap:.75rem;font-size:.82rem;white-space:nowrap}
+.landscape-triage{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.6rem;margin:1rem 0}
+.landscape-triage>div{border:1px solid var(--border);border-radius:var(--rs);padding:.65rem .8rem;
+  background:var(--bg);display:flex;align-items:baseline;gap:.55rem}
+.landscape-triage strong{font-size:1.3rem;font-variant-numeric:tabular-nums;line-height:1.2}
+.landscape-triage span{font-size:.78rem;color:var(--muted)}
+.landscape-context{font-size:.78rem;color:var(--muted);max-width:95ch;margin:.4rem 0 .8rem}
+.landscape-context strong{color:var(--fg)}
+@media(max-width:760px){.landscape-triage{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.landscape-triage>div{display:block}.landscape-triage span{display:block}}
 .landscape-table-wrap,.landscape-file-scroll{overflow-x:auto}
 .landscape-table,.landscape-file-table{width:100%;border-collapse:collapse;font-size:.82rem}
-.landscape-table{min-width:740px}
+.landscape-table{min-width:1060px}
 .landscape-table tbody tr[hidden]{display:none}
+.landscape-table tbody tr:not(.landscape-detail-row):hover>*{background:var(--accent-s)}
+.landscape-table tbody th{max-width:195px;overflow-wrap:anywhere}
+.landscape-table tbody td:first-child{min-width:148px}
+.landscape-attention{display:inline-block;font-weight:600;font-size:.72rem;border-radius:1rem;
+  padding:.1rem .55rem;white-space:nowrap}
+.landscape-attention.review{background:var(--warn-s);color:var(--warn)}
+.landscape-attention.unknown{background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+.landscape-attention.clear{background:var(--ok-s);color:var(--ok)}
+.landscape-secondary{display:block;font-size:.75rem;color:var(--muted);line-height:1.35;margin-top:.2rem}
+.landscape-activity{font-variant-numeric:tabular-nums;white-space:nowrap}
 .landscape-file-table{min-width:680px}
 .landscape-table th,.landscape-table td,.landscape-file-table th,.landscape-file-table td{
   padding:.55rem .65rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--border)}
