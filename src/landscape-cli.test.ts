@@ -195,6 +195,11 @@ describe("landscape workflow adapter", () => {
     expect(ingest).toContain(
       "DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}"
     );
+    expect(ingest).toContain("DEVEX_TEAM_HANDLES: ${{ vars.DEVEX_TEAM_HANDLES }}");
+    const pages = fs.readFileSync(
+      path.resolve(".github", "workflows", "pages.yml"), "utf8"
+    );
+    expect(pages).toContain("DEVEX_TEAM_HANDLES: ${{ vars.DEVEX_TEAM_HANDLES }}");
   });
 
   it("records a failed run, then publishes the store and rebuilds Pages", () => {

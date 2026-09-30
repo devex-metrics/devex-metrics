@@ -275,7 +275,7 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
 @media(max-width:420px){.landscape-triage>div{display:block}.landscape-triage span{display:block}}
 .landscape-table-wrap,.landscape-file-scroll{overflow-x:auto}
 .landscape-table,.landscape-file-table{width:100%;border-collapse:collapse;font-size:.82rem}
-.landscape-table{min-width:1060px}
+.landscape-table{min-width:1420px}
 .landscape-table tbody tr[hidden]{display:none}
 .landscape-table tbody tr:not(.landscape-detail-row):hover>*{background:var(--accent-s)}
 .landscape-table tbody th{max-width:195px;overflow-wrap:anywhere}
@@ -287,7 +287,7 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
 .landscape-attention.clear{background:var(--ok-s);color:var(--ok)}
 .landscape-secondary{display:block;font-size:.75rem;color:var(--muted);line-height:1.35;margin-top:.2rem}
 .landscape-activity{font-variant-numeric:tabular-nums;white-space:nowrap}
-.landscape-file-table{min-width:680px}
+.landscape-file-table{min-width:940px}
 .landscape-table th,.landscape-table td,.landscape-file-table th,.landscape-file-table td{
   padding:.55rem .65rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--border)}
 .landscape-table thead th,.landscape-file-table thead th{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}

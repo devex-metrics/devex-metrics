@@ -123,14 +123,14 @@ describe("landscape dashboard view", () => {
       .find((row) => row.cells[1].textContent === name)!;
     expect(byName("acme/active-missing").cells[2].textContent).toBe("2 observed");
     expect(byName("acme/quiet-missing").cells[2].textContent).toBe("0 observed");
-    expect(byName("acme/quiet-missing").cells[4].textContent).toContain("Not applicable");
+    expect(byName("acme/quiet-missing").cells[7].textContent).toContain("Not applicable");
     expect(byName("acme/failed").cells[2].textContent).toBe("Unknown");
-    expect(byName("acme/private").cells[3].textContent).toBe("—");
+    expect(byName("acme/private").cells[5].textContent).toBe("—");
     expect(byName("acme/private").textContent).toContain("Private repository; not scanned");
-    expect(byName("acme/active-old").cells[4].textContent).toContain("Oldest 140 d");
-    expect(byName("acme/active-old").cells[4].textContent).toContain("Lag up to 100 d");
+    expect(byName("acme/active-old").cells[7].textContent).toContain("Oldest 140 d");
+    expect(byName("acme/active-old").cells[7].textContent).toContain("Lag up to 100 d");
     expect(doc.querySelector(".landscape-triage")?.textContent).toContain("Observation unknown");
-    expect(doc.querySelector(".landscape-context")?.textContent).toContain("budgeted PR timeline can be incomplete");
+    expect(doc.querySelector(".landscape-context")?.textContent).toContain("PR timeline can be incomplete");
     expect(doc.querySelector<HTMLButtonElement>('[data-landscape-sort="priority"]')!.closest("th")?.getAttribute("aria-sort")).toBe("ascending");
 
     const sort = (key: string) => doc.querySelector<HTMLButtonElement>(`[data-landscape-sort="${key}"]`)!;
@@ -167,6 +167,49 @@ describe("landscape dashboard view", () => {
       "acme/empty": "0 observed", "acme/recent": "1 observed",
       "acme/old": "0 observed", "acme/future": "0 observed",
     });
+  });
+
+  it("shows separate pinned Git, team and content scores, with unknowns last during keyboard sorting", () => {
+    const active = aged("acme/git-active", true);
+    active.commits30d = 3;
+    active.commits90d = 9;
+    active.teamCommits30d = 1;
+    active.teamCommits90d = 4;
+    active.qualityScore = 75;
+    active.qualityScored = 1;
+    active.files![0].commits_since_change = 5;
+    active.files![0].content_signal = {
+      score: 75, scope: true, actions: true, verification: true, guardrails: false,
+    };
+    const quiet = empty("acme/git-quiet");
+    quiet.commits30d = 0;
+    quiet.commits90d = 0;
+    quiet.teamCommits30d = 0;
+    quiet.teamCommits90d = 0;
+    quiet.qualityScore = null;
+    quiet.qualityScored = 0;
+    const dom = mount([quiet, active, observed()], activitySnapshot([
+      ["acme/git-active", []], ["acme/git-quiet", []], ["acme/public", []],
+    ]));
+    const doc = dom.window.document;
+    expect(visibleNames(dom)[0]).toBe("acme/git-active");
+    const row = Array.from(doc.querySelectorAll<HTMLTableRowElement>("#landscapeRows > tr:not(.landscape-detail-row)"))
+      .find((item) => item.cells[1].textContent === "acme/git-active")!;
+    expect(row.cells[3].textContent).toContain("3 30d9 90d");
+    expect(row.cells[4].textContent).toContain("1 30d4 90d");
+    expect(row.cells[6].textContent).toContain("75/100");
+    const detail = doc.getElementById(row.querySelector(".landscape-toggle")!.getAttribute("aria-controls")!)!;
+    expect(detail.textContent).toContain("Commits since change");
+    expect(detail.querySelector(".landscape-file-table tbody")?.textContent).toContain("5");
+    expect(detail.querySelector(".landscape-file-table tbody")?.textContent).toContain("Scope · Actions · Checks");
+    const sort = doc.querySelector<HTMLButtonElement>('[data-landscape-sort="commits90"]')!;
+    sort.focus();
+    expect(doc.activeElement).toBe(sort);
+    sort.click();
+    expect(visibleNames(dom)).toEqual(["acme/git-active", "acme/git-quiet", "acme/public"]);
+    doc.querySelector<HTMLButtonElement>('[data-landscape-sort="quality"]')!.click();
+    expect(visibleNames(dom)[0]).toBe("acme/git-active");
+    expect(doc.querySelector<HTMLButtonElement>('[data-landscape-sort="quality"]')!.closest("th")?.getAttribute("aria-sort")).toBe("descending");
   });
 
   it("passes the DevEx PR timeline into the landscape without altering its sanitized data", () => {
@@ -233,12 +276,12 @@ describe("landscape dashboard view", () => {
     expect(toggle?.getAttribute("aria-expanded")).toBe("false");
     const detail = doc.getElementById(toggle!.getAttribute("aria-controls")!);
     expect(detail?.hidden).toBe(true);
-    expect(detail?.querySelector("td")?.getAttribute("colspan")).toBe("8");
+    expect(detail?.querySelector("td")?.getAttribute("colspan")).toBe("11");
     expect(doc.querySelector("table")?.getAttribute("aria-label")).toBe(
       "AI instruction file observations by repository"
     );
     expect(doc.querySelector(".landscape-coverage")?.textContent).toContain("1 / 4 observed");
-    expect(doc.querySelectorAll("#landscapeRows > tr .landscape-unknown")).toHaveLength(19);
+    expect(doc.querySelectorAll("#landscapeRows > tr .landscape-unknown")).toHaveLength(35);
     expect(html).toContain("Compared with");
     expect(html).toContain("2026-09-24T10:30:00.000Z");
     expect(html).toContain("Removed since comparison");
@@ -312,9 +355,9 @@ describe("landscape dashboard view", () => {
     expect(doc.querySelector("#landscapePage")?.textContent).toBe("Page 1 of 8");
     expect(prev.disabled).toBe(true);
     expect(doc.querySelector(".landscape-coverage")?.textContent).toBe("0 / 143 observed");
-    expect(doc.querySelectorAll("#landscapeRows tr:not([hidden]) .landscape-unknown")).toHaveLength(120);
+    expect(doc.querySelectorAll("#landscapeRows tr:not([hidden]) .landscape-unknown")).toHaveLength(180);
     expect(doc.querySelector(".landscape-pagination")?.outerHTML).not.toContain("acme/");
-    expect(doc.querySelectorAll(".landscape-sort")).toHaveLength(8);
+    expect(doc.querySelectorAll(".landscape-sort")).toHaveLength(11);
     for (let i = 0; i < 7; i++) next.click();
     expect(visibleNames(dom)).toHaveLength(3);
     expect(doc.querySelector("#landscapeRange")?.textContent).toBe("Showing 141–143 of 143 repositories");
@@ -419,10 +462,10 @@ describe("landscape dashboard view", () => {
       ["acme/failed", "2026-09-30T10:30:00.000Z"],
     ]) {
       const row = rows.find((candidate) => candidate.cells[1].textContent === name)!;
-      expect(row.cells[6].textContent).toContain(`Scan attempted ${timestamp.slice(0, 10)}`);
-      expect(row.cells[6].querySelector("time")?.dateTime).toBe(timestamp);
-      expect(row.cells[4].textContent?.trim()).toBe("—");
-      expect(row.cells[4].querySelector("time")).toBeNull();
+      expect(row.cells[9].textContent).toContain(`Scan attempted ${timestamp.slice(0, 10)}`);
+      expect(row.cells[9].querySelector("time")?.dateTime).toBe(timestamp);
+      expect(row.cells[7].textContent?.trim()).toBe("—");
+      expect(row.cells[7].querySelector("time")).toBeNull();
     }
     const button = doc.querySelector<HTMLButtonElement>('[data-landscape-sort="observed"]')!;
     button.click();

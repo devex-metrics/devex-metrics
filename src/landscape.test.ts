@@ -178,6 +178,57 @@ describe("landscape history and DevEx join", () => {
     expect(view[1]).toEqual({ fullName: "acme/private", status: "unknown", reason: "private" });
   });
 
+  it("admits only internally enriched bounded signals, while preserving old v1 unknowns", () => {
+    const data = metrics([{ name: "public", isPrivate: false }]);
+    const raw = scan([{
+      ...repository(),
+      commits_30d: 999, team_commits_90d: 999,
+      ai_files: [{ ...file("AGENTS.md"), content: "DO NOT PUBLISH", commits_since_change: 999 }],
+    }]);
+    const sanitized = parseLandscapeScan(raw);
+    const known = sanitized.repositories[0];
+    if (!("head_sha" in known)) throw new Error("Expected observed repo");
+    expect(known.commits_30d).toBeUndefined();
+    expect(known.ai_files[0].commits_since_change).toBeUndefined();
+    const enriched = {
+      ...sanitized, repositories: [{
+        ...known, commits_30d: 2, commits_90d: 5, team_commits_30d: 0,
+        team_commits_90d: 1, ai_files: [{
+          ...known.ai_files[0], commits_since_change: 7,
+          content_signal: { score: 75, scope: true, actions: true, verification: false, guardrails: true },
+        }],
+      }],
+    };
+    expect(() => saveLandscapeScan(root, data, raw, {
+      ...enriched, repositories: [{ ...enriched.repositories[0], head_sha: SHA_B }],
+    })).toThrow(/differs/);
+    expect(fs.existsSync(landscapeLatestPath(root, "acme"))).toBe(false);
+    saveLandscapeScan(root, data, raw, enriched);
+    const stored = fs.readFileSync(landscapeLatestPath(root, "acme"), "utf8");
+    expect(stored).not.toContain("DO NOT PUBLISH");
+    expect(stored).not.toContain("999");
+    expect(loadLandscapeView(root, data, true)[0]).toMatchObject({
+      commits30d: 2, commits90d: 5, teamCommits30d: 0, teamCommits90d: 1,
+      qualityScore: 75, qualityScored: 1,
+      files: [{ commits_since_change: 7, content_signal: { score: 75 } }],
+    });
+    expect(loadLandscapeView(root, data, false)[0]).toMatchObject({
+      commits30d: 2, teamCommits30d: null, teamCommits90d: null,
+    });
+    expect(() => parseLandscapeScan({
+      ...enriched, repositories: [{
+        ...enriched.repositories[0], ai_files: [{
+          ...enriched.repositories[0].ai_files[0],
+          content_signal: { score: 100, scope: true, actions: true, verification: false, guardrails: true },
+        }],
+      }],
+    }, true)).toThrow(/score disagrees/);
+    saveLandscapeScan(root, data, scan([repository()], "2026-09-22T12:00:00Z"));
+    expect(loadLandscapeView(root, data)[0]).toMatchObject({
+      commits30d: null, teamCommits90d: null, qualityScore: null, qualityScored: 0,
+    });
+  });
+
   it("compares each repo with its last successful observation across denied scans", () => {
     const data = metrics([
       { name: "public", isPrivate: false },

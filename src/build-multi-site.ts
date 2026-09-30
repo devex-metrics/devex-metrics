@@ -57,6 +57,7 @@ function main(): void {
 
   const branch = process.env.GITHUB_REF_NAME;
   const runUrl = buildRunUrl();
+  const teamHandlesConfigured = (config.team?.handles?.length ?? 0) > 0;
 
   fs.mkdirSync(siteDir, { recursive: true });
 
@@ -69,7 +70,7 @@ function main(): void {
       current: d.key === ds.key,
     }));
     writeDatasetPage(folder, ds, branch, runUrl, nav, config.collection.features.landscape
-      ? path.resolve(config.history.dir) : undefined);
+      ? path.resolve(config.history.dir) : undefined, teamHandlesConfigured);
   }
 
   // Mirror the primary dataset at the site root so the multi-dataset site
@@ -80,7 +81,7 @@ function main(): void {
     current: d.key === primary.key,
   }));
   writeDatasetPage(siteDir, primary, branch, runUrl, rootNav, config.collection.features.landscape
-    ? path.resolve(config.history.dir) : undefined);
+    ? path.resolve(config.history.dir) : undefined, teamHandlesConfigured);
 
   fs.writeFileSync(
     path.join(siteDir, "manifest.json"),
@@ -109,12 +110,13 @@ function writeDatasetPage(
   runUrl: string | undefined,
   nav: DatasetNavEntry[],
   landscapeHistoryDir?: string,
+  teamHandlesConfigured = false,
 ): void {
   const markdown = generateReport(ds.data);
   fs.writeFileSync(path.join(folder, "report.md"), markdown);
   fs.writeFileSync(path.join(folder, "data.json"), JSON.stringify(ds.data, null, 2));
   const landscape = landscapeHistoryDir && !ds.data.groupName
-    ? loadLandscapeView(landscapeHistoryDir, ds.data) : undefined;
+    ? loadLandscapeView(landscapeHistoryDir, ds.data, teamHandlesConfigured) : undefined;
   const landscapeFile = path.join(folder, "landscape.json");
   if (landscape) {
     fs.writeFileSync(landscapeFile, JSON.stringify(landscape, null, 2));

@@ -163,7 +163,7 @@ function main(): void {
   fs.writeFileSync(path.join(siteDir, "report.md"), generateReport(data));
   fs.writeFileSync(path.join(siteDir, "data.json"), JSON.stringify(data, null, 2));
   const landscape = config.collection.features.landscape
-    ? loadLandscapeView(historyDir, data)
+    ? loadLandscapeView(historyDir, data, (config.team?.handles?.length ?? 0) > 0)
     : undefined;
   const landscapeFile = path.join(siteDir, "landscape.json");
   if (landscape) {

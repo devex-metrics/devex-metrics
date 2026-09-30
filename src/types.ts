@@ -71,8 +71,14 @@ export interface LandscapeRepository {
   ai_files: LandscapeFile[];
   /** Counts derived from the observed files. */
   ai_summary: LandscapeSummary;
-  /** Commits observed in the 90 days before enrichment, or null when unavailable. */
+  /** Git-history commits in the 30 days ending at generated_at; null if unmeasured. */
+  commits_30d?: number | null;
+  /** Git-history commits in the 90 days ending at generated_at; null if unmeasured. */
   commits_90d?: number | null;
+  /** Linked commits by explicitly configured GitHub team handles in 30 days; null if unverified. */
+  team_commits_30d?: number | null;
+  /** Linked commits by explicitly configured GitHub team handles in 90 days; null if unverified. */
+  team_commits_90d?: number | null;
 }
 
 /** Static rubric signals derived from a hash-verified instruction file. */
@@ -107,7 +113,7 @@ export interface LandscapeFile {
   stale: boolean | null;
   /** Whether historical file signals could be established. */
   status: "known" | "unknown";
-  /** Commits since this file last changed, or null when unavailable. */
+  /** All branch commits since the file's last_changed timestamp, including that date; null if unknown. */
   commits_since_change?: number | null;
   /** Hash-verified static content rubric, or null when unavailable. */
   content_signal?: LandscapeContentSignal | null;
@@ -161,6 +167,18 @@ export interface LandscapeRepoView {
   summary?: LandscapeSummary;
   /** Changes from its last successful observation, if one exists. */
   drift?: LandscapeDrift;
+  /** Pinned-head repository Git commits in the 30-day scan window. */
+  commits30d?: number | null;
+  /** Pinned-head repository Git commits in the 90-day scan window. */
+  commits90d?: number | null;
+  /** Commits attributed to a fully verified, explicitly configured roster (30 days). */
+  teamCommits30d?: number | null;
+  /** Commits attributed to a fully verified, explicitly configured roster (90 days). */
+  teamCommits90d?: number | null;
+  /** Mean of all hash-verified file rubric scores, or null when any file is unmeasured. */
+  qualityScore?: number | null;
+  /** Number of files with hash-verified rubric scores. */
+  qualityScored?: number;
 }
 
 /** Outcome of the most recent landscape scan attempt, stored beside latest.json. */

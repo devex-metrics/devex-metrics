@@ -5,6 +5,7 @@ import type { Octokit } from "@octokit/rest";
 import { latestPath, scopePath } from "./history.js";
 import type {
   LandscapeDrift,
+  LandscapeContentSignal,
   LandscapeFile,
   LandscapeRepoView,
   LandscapeRepository,
@@ -40,7 +41,9 @@ function timestamp(value: unknown, label: string): string {
     throw new Error(`Landscape ${label} must be an ISO-8601 timestamp`);
   }
   const time = new Date(text);
-  if (!Number.isFinite(time.getTime())) {
+  const day = text.slice(0, 10);
+  if (!Number.isFinite(time.getTime()) ||
+      new Date(`${day}T00:00:00Z`).toISOString().slice(0, 10) !== day) {
     throw new Error(`Landscape ${label} is not a valid timestamp`);
   }
   return time.toISOString();
@@ -71,7 +74,25 @@ function relativePath(value: unknown, label: string): string {
   return name;
 }
 
-function parseFile(value: unknown, label: string): LandscapeFile {
+function parseContentSignal(value: unknown, label: string): LandscapeContentSignal | null {
+  if (value === null) return null;
+  const signal = object(value, label);
+  for (const key of ["scope", "actions", "verification", "guardrails"] as const) {
+    if (typeof signal[key] !== "boolean") throw new Error(`Landscape ${label}.${key} must be boolean`);
+  }
+  const flags = ["scope", "actions", "verification", "guardrails"]
+    .filter((key) => signal[key] === true).length;
+  if (signal.score !== flags * 25) throw new Error(`Landscape ${label} score disagrees with rubric`);
+  return {
+    score: flags * 25,
+    scope: signal.scope === true,
+    actions: signal.actions === true,
+    verification: signal.verification === true,
+    guardrails: signal.guardrails === true,
+  };
+}
+
+function parseFile(value: unknown, label: string, includeSignals: boolean): LandscapeFile {
   const file = object(value, label);
   const filePath = relativePath(file.path, `${label}.path`);
   const kind = nonempty(file.kind, `${label}.kind`);
@@ -94,7 +115,7 @@ function parseFile(value: unknown, label: string): LandscapeFile {
   if (file.status === "known" && unknown) {
     throw new Error(`Landscape ${label} cannot be known with unavailable history`);
   }
-  return {
+  const result: LandscapeFile = {
     path: filePath,
     kind,
     sha256: hash.toLowerCase(),
@@ -104,11 +125,21 @@ function parseFile(value: unknown, label: string): LandscapeFile {
     stale: file.stale,
     status: unknown || file.status === "unknown" ? "unknown" : "known",
   };
+  if (includeSignals) {
+    if (file.commits_since_change !== undefined)
+      result.commits_since_change = nullableCount(file.commits_since_change, `${label}.commits_since_change`);
+    if (file.content_signal !== undefined)
+      result.content_signal = parseContentSignal(file.content_signal, `${label}.content_signal`);
+    if (lastChanged === null && result.commits_since_change != null)
+      throw new Error(`Landscape ${label} cannot count commits without a last change`);
+  }
+  return result;
 }
 
 function parseRepository(
   value: unknown,
-  label: string
+  label: string,
+  includeSignals: boolean
 ): LandscapeRepository | LandscapeUnavailableRepository {
   const repo = object(value, label);
   const fullName = nonempty(repo.full_name, `${label}.full_name`);
@@ -126,7 +157,7 @@ function parseRepository(
   if (!Array.isArray(repo.ai_files))
     throw new Error(`Landscape ${label}.ai_files must be an array`);
   const files = repo.ai_files.map((file: unknown, i: number) =>
-    parseFile(file, `${label}.ai_files[${i}]`)
+    parseFile(file, `${label}.ai_files[${i}]`, includeSignals)
   );
   const seen = new Set<string>();
   for (const file of files) {
@@ -157,7 +188,7 @@ function parseRepository(
   if (rawSummary.status !== undefined && rawSummary.status !== status) {
     throw new Error(`Landscape ${label}.ai_summary.status disagrees with observed files`);
   }
-  return {
+  const result: LandscapeRepository = {
     full_name: fullName,
     head_sha: head.toLowerCase(),
     ai_files: files,
@@ -169,10 +200,28 @@ function parseRepository(
       status,
     },
   };
+  if (includeSignals) {
+    for (const key of ["commits_30d", "commits_90d", "team_commits_30d", "team_commits_90d"] as const) {
+      if (repo[key] !== undefined) result[key] = nullableCount(repo[key], `${label}.${key}`);
+    }
+    if (result.commits_30d != null && result.commits_90d != null &&
+        result.commits_30d > result.commits_90d)
+      throw new Error(`Landscape ${label} 30-day commits exceed 90-day commits`);
+    for (const [teamKey, totalKey] of [
+      ["team_commits_30d", "commits_30d"],
+      ["team_commits_90d", "commits_90d"],
+    ] as const) {
+      const teamCount = result[teamKey];
+      const totalCount = result[totalKey];
+      if (teamCount != null && (totalCount == null || teamCount > totalCount))
+        throw new Error(`Landscape ${label} team commits exceed verified total`);
+    }
+  }
+  return result;
 }
 
-/** Validate the portable v1 contract and discard all unapproved evidence/content fields. */
-export function parseLandscapeScan(value: unknown): LandscapeScan {
+/** Validate the portable v1 contract; only internally enriched scans admit bounded signal fields. */
+export function parseLandscapeScan(value: unknown, includeSignals = false): LandscapeScan {
   const raw = object(value, "scan");
   if (raw.schema_version !== 1)
     throw new Error("Unsupported landscape schema_version (expected 1)");
@@ -181,7 +230,7 @@ export function parseLandscapeScan(value: unknown): LandscapeScan {
   if (scannerVersion.length > 100) throw new Error("Landscape scanner_version is too long");
   if (!Array.isArray(raw.repositories)) throw new Error("Landscape repositories must be an array");
   const repositories = raw.repositories.map((repo: unknown, i: number) =>
-    parseRepository(repo, `repositories[${i}]`)
+    parseRepository(repo, `repositories[${i}]`, includeSignals)
   );
   const seen = new Set<string>();
   for (const repo of repositories) {
@@ -199,7 +248,7 @@ export function parseLandscapeScan(value: unknown): LandscapeScan {
 }
 
 function readScan(file: string): LandscapeScan {
-  return parseLandscapeScan(JSON.parse(fs.readFileSync(file, "utf8")) as unknown);
+  return parseLandscapeScan(JSON.parse(fs.readFileSync(file, "utf8")) as unknown, true);
 }
 
 /** Path to the latest sanitized landscape observation in the data-only history branch. */
@@ -346,9 +395,13 @@ export function validateLandscapeScannerOutput(
 export function saveLandscapeScan(
   historyDir: string,
   metrics: OrgMetrics,
-  raw: unknown
+  raw: unknown,
+  enrichment?: LandscapeScan
 ): LandscapeScan {
-  const scan = parseLandscapeScan(raw);
+  const source = parseLandscapeScan(raw);
+  const scan = enrichment ? parseLandscapeScan(enrichment, true) : source;
+  if (enrichment && JSON.stringify(parseLandscapeScan(scan)) !== JSON.stringify(source))
+    throw new Error("Landscape enrichment differs from the sanitized scanner observation");
   const selectedAt = Date.parse(metrics.collectedAt);
   if (
     Number.isFinite(selectedAt) &&
@@ -389,7 +442,9 @@ export function saveLandscapeScan(
 }
 
 /** Join a sanitized scan to the current DevEx selection without conflating missing with absent. */
-export function loadLandscapeView(historyDir: string, metrics: OrgMetrics): LandscapeRepoView[] {
+export function loadLandscapeView(
+  historyDir: string, metrics: OrgMetrics, teamHandlesConfigured = false
+): LandscapeRepoView[] {
   const currentFile = landscapeLatestPath(historyDir, metrics.owner);
   const scan = fs.existsSync(currentFile) ? readScan(currentFile) : undefined;
   const observed = new Map(
@@ -439,6 +494,16 @@ export function loadLandscapeView(historyDir: string, metrics: OrgMetrics): Land
       files: known.ai_files,
       summary: known.ai_summary,
       drift: prior ? compareLandscape(known, prior.repo, prior.time) : undefined,
+      commits30d: known.commits_30d ?? null,
+      commits90d: known.commits_90d ?? null,
+      teamCommits30d: teamHandlesConfigured ? known.team_commits_30d ?? null : null,
+      teamCommits90d: teamHandlesConfigured ? known.team_commits_90d ?? null : null,
+      qualityScored: known.ai_files.filter((file) => file.content_signal != null).length,
+      qualityScore: known.ai_files.length > 0 &&
+        known.ai_files.every((file) => file.content_signal != null)
+        ? Math.round(known.ai_files.reduce((sum, file) => sum + file.content_signal!.score, 0) /
+          known.ai_files.length)
+        : null,
     };
   });
 }
