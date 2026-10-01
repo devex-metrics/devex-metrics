@@ -260,6 +260,8 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
 .review-pr-details ul{list-style:none;padding:.2rem 0 0 .5rem}
 .review-pr-details li{padding:.1rem 0;white-space:nowrap}
 .landscape-section{margin-bottom:2rem}
+.landscape-section,.discovery-section{width:min(100vw - 2rem,2400px);max-width:none;
+  margin-left:calc((100% - min(100vw - 2rem,2400px))/2)}
 .landscape-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap}
 .landscape-heading>div{max-width:75ch}
 .landscape-coverage{font-size:.82rem;font-weight:600;color:var(--accent);white-space:nowrap}
