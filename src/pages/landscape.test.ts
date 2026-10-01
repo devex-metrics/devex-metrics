@@ -94,7 +94,7 @@ function visibleNames(dom: JSDOM): string[] {
 }
 
 describe("landscape dashboard view", () => {
-  it("prioritizes active observed gaps and older age signals without scoring unknown or private repositories", () => {
+  it("prioritizes older age signals before active coverage gaps without scoring unknown or private repositories", () => {
     const rows = [
       aged("acme/quiet-fresh", false),
       { fullName: "acme/private", status: "unknown", reason: "private" } as LandscapeRepoView,
@@ -116,8 +116,8 @@ describe("landscape dashboard view", () => {
     const dom = mount(rows, metrics);
     const doc = dom.window.document;
     expect(visibleNames(dom)).toEqual([
-      "acme/active-missing", "acme/active-old", "acme/quiet-missing",
-      "acme/failed", "acme/public", "acme/private", "acme/quiet-fresh",
+      "acme/active-old", "acme/active-missing", "acme/quiet-missing",
+      "acme/public", "acme/failed", "acme/private", "acme/quiet-fresh",
     ]);
     const byName = (name: string) => Array.from(doc.querySelectorAll<HTMLTableRowElement>("#landscapeRows > tr:not(.landscape-detail-row)"))
       .find((row) => row.cells[1].textContent === name)!;
@@ -143,9 +143,25 @@ describe("landscape dashboard view", () => {
     sort("age").click();
     expect(visibleNames(dom).slice(0, 2)).toEqual(["acme/active-old", "acme/quiet-fresh"]);
     sort("priority").click();
-    expect(visibleNames(dom)[0]).toBe("acme/active-missing");
+    expect(visibleNames(dom)[0]).toBe("acme/active-old");
     doc.querySelector<HTMLButtonElement>("#landscapeSortReset")!.click();
-    expect(visibleNames(dom)[0]).toBe("acme/active-missing");
+    expect(visibleNames(dom)[0]).toBe("acme/active-old");
+  });
+
+  it("ranks quiet drift ahead of active repositories without customization files", () => {
+    const quietDrift = aged("acme/quiet-drift", true);
+    const activeMissing = empty("acme/active-missing");
+    const dom = mount([activeMissing, quietDrift], activitySnapshot([
+      ["acme/active-missing", ["2026-09-29T12:00:00Z"]],
+      ["acme/quiet-drift", []],
+    ]));
+
+    expect(visibleNames(dom)).toEqual(["acme/quiet-drift", "acme/active-missing"]);
+    const rows = Array.from(dom.window.document.querySelectorAll<HTMLTableRowElement>(
+      "#landscapeRows > tr:not(.landscape-detail-row)"
+    ));
+    expect(rows[0].textContent).toContain("Review first");
+    expect(rows[1].textContent).toContain("Review next");
   });
 
   it("does not turn absent or malformed timeline dates into zero activity", () => {
@@ -222,7 +238,7 @@ describe("landscape dashboard view", () => {
     });
     const doc = new JSDOM(html).window.document;
     expect(doc.querySelector("#landscapeRows .landscape-activity")?.textContent).toBe("1 observed");
-    expect(doc.querySelector("#landscapeRows .landscape-attention")?.textContent).toBe("Review first");
+    expect(doc.querySelector("#landscapeRows .landscape-attention")?.textContent).toBe("Review next");
     expect(doc.querySelector('a[href="landscape.json"]')).not.toBeNull();
     expect(doc.querySelector('a[href="data.json"]')).not.toBeNull();
   });
@@ -411,7 +427,7 @@ describe("landscape dashboard view", () => {
     expect(visibleNames(dom).slice(0, 3)).toEqual(["acme/a-2", "acme/b-1", "acme/extra-0"]);
     expect(sort("name").getAttribute("aria-label")).toContain("descending");
     doc.querySelector<HTMLButtonElement>("#landscapeSortReset")!.click();
-    expect(visibleNames(dom).slice(0, 3)).toEqual(["acme/extra-0", "acme/extra-1", "acme/extra-2"]);
+    expect(visibleNames(dom).slice(0, 3)).toEqual(["acme/z-10", "acme/extra-0", "acme/extra-1"]);
     expect(doc.querySelector("#landscapeSortStatus")?.textContent).toBe("Attention first");
     expect(sort("name").closest("th")?.hasAttribute("aria-sort")).toBe(false);
     expect(sort("priority").closest("th")?.getAttribute("aria-sort")).toBe("ascending");
@@ -455,7 +471,9 @@ describe("landscape dashboard view", () => {
       { fullName: "acme/unverified", status: "unknown", reason: "visibility_unknown" },
     ]);
     const doc = dom.window.document;
-    const rows = Array.from(doc.querySelectorAll<HTMLTableRowElement>("#landscapeRows > tr"));
+    const rows = Array.from(doc.querySelectorAll<HTMLTableRowElement>(
+      "#landscapeRows > tr:not(.landscape-detail-row)"
+    ));
     expect(rows.filter((row) => row.dataset.landscapeObserved === "")).toHaveLength(3);
     for (const [name, timestamp] of [
       ["acme/denied", "2026-09-29T10:30:00.000Z"],
