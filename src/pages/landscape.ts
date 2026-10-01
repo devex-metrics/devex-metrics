@@ -9,6 +9,7 @@ interface TriageRow {
   attention: string;
   reason: string;
   oldestAge: number | null;
+  maxLag: number | null;
 }
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -42,31 +43,32 @@ function triage(view: LandscapeRepoView, activity: number | null): TriageRow {
     : null;
   if (view.status !== "observed") {
     const restricted = view.reason === "private" || view.reason === "visibility_unknown";
-    return { view, activity, work, oldestAge, priority: restricted ? 6 : 4,
+    return { view, activity, work, oldestAge, maxLag: null, priority: restricted ? 5 : 4,
       attention: restricted ? "Not assessed" : "Observation gap",
       reason: unknownLabel(view.reason) };
   }
   if (!summary) throw new Error("Observed landscape rows require summary and provenance");
-  if (summary.count === 0) {
-    return { view, activity, work, oldestAge, priority: work !== null && work > 0 ? 0 : 2,
-      attention: work !== null && work > 0 ? "Review first" : "Review coverage",
-      reason: "No AI instruction files observed" };
-  }
   if (summary.stale_count > 0) {
-    return { view, activity, work, oldestAge, priority: work !== null && work > 0 ? 1 : 3,
-      attention: work !== null && work > 0 ? "Review first" : "Review age signal",
+    return { view, activity, work, oldestAge, maxLag: summary.max_lag_days, priority: 0,
+      attention: "Review first",
       reason: `${summary.stale_count} older file ${summary.stale_count === 1 ? "signal" : "signals"}` };
   }
+  if (summary.count === 0) {
+    return { view, activity, work, oldestAge, maxLag: null, priority: work !== null && work > 0 ? 1 : 2,
+      attention: work !== null && work > 0 ? "Review next" : "Review coverage",
+      reason: "No AI instruction files observed" };
+  }
   if (summary.unknown_count > 0) {
-    return { view, activity, work, oldestAge, priority: 5, attention: "History unknown",
+    return { view, activity, work, oldestAge, maxLag: summary.max_lag_days, priority: 3, attention: "History unknown",
       reason: `${summary.unknown_count} file ${summary.unknown_count === 1 ? "history" : "histories"} unavailable` };
   }
-  return { view, activity, work, oldestAge, priority: 7, attention: "No age flag",
+  return { view, activity, work, oldestAge, maxLag: summary.max_lag_days, priority: 6, attention: "No age flag",
     reason: "Age within threshold; inspect instruction cues separately" };
 }
 
 function compareTriage(a: TriageRow, b: TriageRow): number {
   return a.priority - b.priority ||
+    (a.priority === 0 ? (b.maxLag ?? -1) - (a.maxLag ?? -1) : 0) ||
     (b.work ?? -1) - (a.work ?? -1) ||
     a.view.fullName.localeCompare(b.view.fullName, undefined, { numeric: true, sensitivity: "base" });
 }
@@ -177,7 +179,7 @@ function observedRow(item: TriageRow, attributes: string, index: number): string
 }
 
 function attentionCell(item: TriageRow): string {
-  const tone = item.priority <= 3 ? "review" : item.priority === 7 ? "clear" : "unknown";
+  const tone = item.priority <= 2 ? "review" : item.priority === 6 ? "clear" : "unknown";
   return `<span class="landscape-attention ${tone}">${escapeHtml(item.attention)}</span>` +
     `<span class="landscape-secondary">${escapeHtml(item.reason)}</span>`;
 }
@@ -274,7 +276,7 @@ export function buildLandscapeSection(
   return `<section class="card landscape-section" id="ai-landscape" aria-labelledby="landscape-heading">
     <div class="landscape-heading"><div>
       <h2 id="landscape-heading">AI instruction landscape</h2>
-      <p class="metric-lede">Review attention first: observed gaps and older file signals alongside Git commits, configured team activity and measurable instruction cues. Presence and age are maintenance signals; the rubric is not a correctness verdict.</p>
+      <p class="metric-lede">Review older file signals first, followed by active repositories without AI instruction files, alongside Git commits, configured team activity and measurable instruction cues. Presence and age are maintenance signals; the rubric is not a correctness verdict.</p>
     </div><div class="landscape-actions"><span class="landscape-coverage">${observed} / ${rows.length} observed</span><a href="landscape.json">Sanitized JSON</a></div></div>
     ${staleNotice(status)}
     ${rows.length ? `<div class="landscape-triage" aria-label="Landscape overview">
