@@ -94,7 +94,10 @@ function fileRow(file: LandscapeFile, added: Set<string>, changed: Set<string>):
     : changed.has(file.path)
       ? "Content changed"
       : "No hash change";
-  const age = file.age_days === null ? "Unknown" : `${file.age_days} d`;
+  const older = file.stale === true;
+  const movedOn = older && (file.commits_since_change ?? 0) > 0;
+  const age = file.age_days === null ? `<span class="landscape-unknown">Unknown</span>`
+    : flagged(`${file.age_days} d`, older);
   const lag = file.lag_days === null ? "Unknown" : `${file.lag_days} d`;
   const signal = file.stale === null ? "Unknown" : file.stale ? "Older signal" : "Within threshold";
   const rubric = file.content_signal;
@@ -103,17 +106,23 @@ function fileRow(file: LandscapeFile, added: Set<string>, changed: Set<string>):
       ["Scope", rubric.scope], ["Actions", rubric.actions],
       ["Checks", rubric.verification], ["Guardrails", rubric.guardrails],
     ] as const).filter(([, present]) => present).map(([name]) => name).join(" · ") || "No rubric cues found"}</span>`;
-  return `<tr>
+  const rowClass = older ? ' class="landscape-file-attention"' : "";
+  return `<tr${rowClass}>
     <td class="landscape-path">${escapeHtml(file.path)}</td>
     <td>${escapeHtml(file.kind)}</td>
     <td>${file.last_changed ? `<time datetime="${escapeHtml(file.last_changed)}">${escapeHtml(file.last_changed.slice(0, 10))}</time>` : "Unknown"}</td>
     <td>${age}</td><td>${lag}</td><td>${signal}</td>
-    <td>${countCell(file.commits_since_change)}</td><td>${cues}</td><td>${change}</td>
+    <td>${countCell(file.commits_since_change, movedOn)}</td><td>${cues}</td><td>${change}</td>
   </tr>`;
 }
 
-function countCell(value: number | null | undefined): string {
-  return value == null ? `<span class="landscape-unknown">Unknown</span>` : String(value);
+/** Emphasise a value the reader should act on; plain text otherwise. */
+function flagged(text: string, on: boolean): string {
+  return on ? `<span class="landscape-flag">${text}</span>` : text;
+}
+
+function countCell(value: number | null | undefined, highlight = false): string {
+  return value == null ? `<span class="landscape-unknown">Unknown</span>` : flagged(String(value), highlight);
 }
 
 function windowCell(month: number | null | undefined, quarter: number | null | undefined): string {
@@ -134,8 +143,9 @@ function observedRow(item: TriageRow, attributes: string, index: number): string
   const driftLabel = drift
     ? `+${drift.added.length} added · ${drift.content_changed.length} changed · −${drift.removed.length} removed`
     : "First observation; no comparison yet";
+  // Row-specific provenance only; the shared methodology note lives once on the panel.
   const compared = drift
-    ? `<p class="landscape-note">Compared with <time datetime="${escapeHtml(drift.compared_at)}">${escapeHtml(drift.compared_at)}</time> at ${escapeHtml(drift.compared_head_sha.slice(0, 12))}.</p>`
+    ? `<span class="landscape-secondary">Compared with <time datetime="${escapeHtml(drift.compared_at)}">${escapeHtml(drift.compared_at.slice(0, 10))}</time> at ${escapeHtml(drift.compared_head_sha.slice(0, 12))}</span>`
     : "";
   const fileTable = files.length
     ? `<div class="landscape-file-scroll"><table class="landscape-file-table">
@@ -167,14 +177,13 @@ function observedRow(item: TriageRow, attributes: string, index: number): string
       ? `<span class="landscape-unknown">Unknown</span>`
       : `${row.qualityScore}/100`}<span class="landscape-secondary">${row.qualityScored ?? 0} / ${files.length} files scored</span></td>
     <td>${age}<span class="landscape-secondary">${lag}</span></td>
-    <td>${escapeHtml(driftLabel)}</td>
+    <td>${escapeHtml(driftLabel)}${compared}</td>
     <td><time datetime="${escapeHtml(row.collectedAt)}">${escapeHtml(row.collectedAt.slice(0, 10))}</time>
       <span class="landscape-hash" title="Observed head SHA">${escapeHtml(row.headSha.slice(0, 12))}</span></td>
     <td><button type="button" class="landscape-toggle" aria-expanded="false" aria-controls="${detailId}" aria-label="View AI instruction files for ${escapeHtml(row.fullName)}">View files</button></td>
   </tr>
   <tr class="landscape-detail-row" id="${detailId}" hidden><td colspan="11">
-      <p class="landscape-note">Scanner ${escapeHtml(row.scannerVersion)} · head ${escapeHtml(row.headSha)}. Commits since change include the file's last-changed date. Quality cues award 25 points each for scope, actions, checks and guardrails in hash-verified content; they do not establish correctness. Older age is not evidence of incorrect instructions.</p>
-      ${compared}${fileTable}${removed}
+      ${fileTable}${removed}
   </td></tr>`;
 }
 
@@ -220,6 +229,8 @@ export function buildLandscapeSection(
   const older = ranked.filter((row) => row.view.status === "observed" && (row.view.summary?.stale_count ?? 0) > 0).length;
   const unknown = ranked.filter((row) => row.view.status === "unknown").length;
   const historyUnknown = ranked.filter((row) => row.view.status === "observed" && (row.view.summary?.unknown_count ?? 0) > 0).length;
+  const scanners = [...new Set(rows.flatMap((row) => row.status === "observed" && row.scannerVersion ? [row.scannerVersion] : []))].sort();
+  const scannedBy = scanners.length ? ` Observations come from landscape scanner ${escapeHtml(scanners.join(", "))}.` : "";
   const content = rows.length
     ? `<div class="landscape-table-wrap"><table class="landscape-table" aria-label="AI instruction file observations by repository">
       <thead><tr>
@@ -285,7 +296,7 @@ export function buildLandscapeSection(
       <div><strong>${historyUnknown}</strong><span>History incomplete</span></div>
       <div><strong>${unknown}</strong><span>Observation unknown</span></div>
     </div>
-    <p class="landscape-context">Overview categories can overlap. Git commits (30d / 90d) come from pinned-head history ending at the AI scan time; team counts need a complete linked-author history and an explicit GitHub-handle roster. Triage prefers Git activity, falling back to observed merged PRs / 90d at the DevEx collection time when Git history is unknown. The PR timeline can be incomplete. Quality cues score observable content, not correctness. Unknown never means zero; this view ignores dashboard PR period and bot filters.</p>
+    <p class="landscape-context">Overview categories can overlap. Git commits (30d / 90d) come from pinned-head history ending at the AI scan time; team counts need a complete linked-author history and an explicit GitHub-handle roster. Triage prefers Git activity, falling back to observed merged PRs / 90d at the DevEx collection time when Git history is unknown. The PR timeline can be incomplete. Quality cues score observable content, not correctness: 25 points each for scope, actions, checks and guardrails in hash-verified content. Commits since change include the file's last-changed date, and older age is not evidence of incorrect instructions. Unknown never means zero; this view ignores dashboard PR period and bot filters.${scannedBy}</p>
     <div class="landscape-sort-toolbar"><span id="landscapeSortStatus" aria-live="polite">Attention first</span><button type="button" id="landscapeSortReset" aria-controls="landscapeRows" disabled>Restore attention order</button></div>` : ""}
     ${content}
   </section>`;

@@ -148,20 +148,39 @@ describe("landscape dashboard view", () => {
     expect(visibleNames(dom)[0]).toBe("acme/active-old");
   });
 
-  it("ranks quiet drift ahead of active repositories without customization files", () => {
-    const quietDrift = aged("acme/quiet-drift", true);
+  it("ranks quiet older-signal repositories ahead of active repositories without customization files", () => {
+    const quietOlder = aged("acme/quiet-older", true);
     const activeMissing = empty("acme/active-missing");
-    const dom = mount([activeMissing, quietDrift], activitySnapshot([
+    const dom = mount([activeMissing, quietOlder], activitySnapshot([
       ["acme/active-missing", ["2026-09-29T12:00:00Z"]],
-      ["acme/quiet-drift", []],
+      ["acme/quiet-older", []],
     ]));
 
-    expect(visibleNames(dom)).toEqual(["acme/quiet-drift", "acme/active-missing"]);
+    expect(visibleNames(dom)).toEqual(["acme/quiet-older", "acme/active-missing"]);
     const rows = Array.from(dom.window.document.querySelectorAll<HTMLTableRowElement>(
       "#landscapeRows > tr:not(.landscape-detail-row)"
     ));
     expect(rows[0].textContent).toContain("Review first");
     expect(rows[1].textContent).toContain("Review next");
+  });
+
+  it("orders older-signal repositories by largest head lag, including after re-sorting", () => {
+    const withLag = (name: string, lag: number) => {
+      const row = aged(name, true);
+      row.files![0].lag_days = lag;
+      row.summary!.max_lag_days = lag;
+      return row;
+    };
+    const dom = mount([withLag("acme/a-small-lag", 50), withLag("acme/z-large-lag", 200), withLag("acme/m-mid-lag", 120)]);
+    const doc = dom.window.document;
+    const expected = ["acme/z-large-lag", "acme/m-mid-lag", "acme/a-small-lag"];
+    expect(visibleNames(dom)).toEqual(expected);
+    doc.querySelector<HTMLButtonElement>('[data-landscape-sort="name"]')!.click();
+    expect(visibleNames(dom)[0]).toBe("acme/a-small-lag");
+    doc.querySelector<HTMLButtonElement>('[data-landscape-sort="priority"]')!.click();
+    expect(visibleNames(dom)).toEqual(expected);
+    doc.querySelector<HTMLButtonElement>("#landscapeSortReset")!.click();
+    expect(visibleNames(dom)).toEqual(expected);
   });
 
   it("does not turn absent or malformed timeline dates into zero activity", () => {
@@ -297,7 +316,7 @@ describe("landscape dashboard view", () => {
       "AI instruction file observations by repository"
     );
     expect(doc.querySelector(".landscape-coverage")?.textContent).toContain("1 / 4 observed");
-    expect(doc.querySelectorAll("#landscapeRows > tr .landscape-unknown")).toHaveLength(35);
+    expect(doc.querySelectorAll("#landscapeRows > tr .landscape-unknown")).toHaveLength(36);
     expect(html).toContain("Compared with");
     expect(html).toContain("2026-09-24T10:30:00.000Z");
     expect(html).toContain("Removed since comparison");
@@ -305,6 +324,41 @@ describe("landscape dashboard view", () => {
     expect(html).not.toContain("0 AI files");
   });
 
+  it("highlights older file ages and their commits since change, and states the method once", () => {
+    const view: LandscapeRepoView = {
+      fullName: "acme/public",
+      status: "observed",
+      collectedAt: "2026-09-25T10:30:00.000Z",
+      scannerVersion: "0.1.0",
+      headSha: SHA,
+      files: [
+        {
+          path: "AGENTS.md", kind: "instructions", sha256: "a".repeat(64),
+          last_changed: "2026-01-01T00:00:00.000Z", age_days: 267, lag_days: 180,
+          stale: true, status: "known", commits_since_change: 42,
+        },
+        {
+          path: "README.md", kind: "instructions", sha256: "b".repeat(64),
+          last_changed: "2026-09-20T00:00:00.000Z", age_days: 5, lag_days: 1,
+          stale: false, status: "known", commits_since_change: 3,
+        },
+      ],
+      summary: { count: 2, stale_count: 1, max_lag_days: 180, unknown_count: 0, status: "known" },
+    };
+    const html = buildLandscapeSection([view]);
+    const doc = new JSDOM(html).window.document;
+    const fileRows = doc.querySelectorAll(".landscape-file-table tbody tr");
+    expect(fileRows).toHaveLength(2);
+    expect(fileRows[0].classList.contains("landscape-file-attention")).toBe(true);
+    expect([...fileRows[0].querySelectorAll(".landscape-flag")].map((n) => n.textContent))
+      .toEqual(["267 d", "42"]);
+    expect(fileRows[1].classList.contains("landscape-file-attention")).toBe(false);
+    expect(fileRows[1].querySelectorAll(".landscape-flag")).toHaveLength(0);
+    // The shared methodology belongs on the panel, not repeated in every detail row.
+    expect(html.split("25 points each")).toHaveLength(2);
+    expect(html.split("landscape scanner")).toHaveLength(2);
+    expect(doc.querySelectorAll(".landscape-detail-row p")).toHaveLength(0);
+  });
   it("distinguishes an empty selected scope from unknown observations", () => {
     const doc = new JSDOM(buildLandscapeSection([])).window.document;
     expect(doc.querySelector(".landscape-empty")?.textContent).toContain(
