@@ -297,7 +297,7 @@ describe("landscape dashboard view", () => {
       "AI instruction file observations by repository"
     );
     expect(doc.querySelector(".landscape-coverage")?.textContent).toContain("1 / 4 observed");
-    expect(doc.querySelectorAll("#landscapeRows > tr .landscape-unknown")).toHaveLength(35);
+    expect(doc.querySelectorAll("#landscapeRows > tr .landscape-unknown")).toHaveLength(36);
     expect(html).toContain("Compared with");
     expect(html).toContain("2026-09-24T10:30:00.000Z");
     expect(html).toContain("Removed since comparison");
@@ -305,6 +305,41 @@ describe("landscape dashboard view", () => {
     expect(html).not.toContain("0 AI files");
   });
 
+  it("highlights older file ages and their commits since change, and states the method once", () => {
+    const view: LandscapeRepoView = {
+      fullName: "acme/public",
+      status: "observed",
+      collectedAt: "2026-09-25T10:30:00.000Z",
+      scannerVersion: "0.1.0",
+      headSha: SHA,
+      files: [
+        {
+          path: "AGENTS.md", kind: "instructions", sha256: "a".repeat(64),
+          last_changed: "2026-01-01T00:00:00.000Z", age_days: 267, lag_days: 180,
+          stale: true, status: "ok", commits_since_change: 42,
+        },
+        {
+          path: "README.md", kind: "instructions", sha256: "b".repeat(64),
+          last_changed: "2026-09-20T00:00:00.000Z", age_days: 5, lag_days: 1,
+          stale: false, status: "ok", commits_since_change: 3,
+        },
+      ],
+      summary: { count: 2, stale_count: 1, max_lag_days: 180, unknown_count: 0, status: "ok" },
+    };
+    const html = buildLandscapeSection([view]);
+    const doc = new JSDOM(html).window.document;
+    const fileRows = doc.querySelectorAll(".landscape-file-table tbody tr");
+    expect(fileRows).toHaveLength(2);
+    expect(fileRows[0].classList.contains("landscape-file-attention")).toBe(true);
+    expect([...fileRows[0].querySelectorAll(".landscape-flag")].map((n) => n.textContent))
+      .toEqual(["267 d", "42"]);
+    expect(fileRows[1].classList.contains("landscape-file-attention")).toBe(false);
+    expect(fileRows[1].querySelectorAll(".landscape-flag")).toHaveLength(0);
+    // The shared methodology belongs on the panel, not repeated in every detail row.
+    expect(html.split("25 points each")).toHaveLength(2);
+    expect(html.split("landscape scanner")).toHaveLength(2);
+    expect(doc.querySelectorAll(".landscape-detail-row p")).toHaveLength(0);
+  });
   it("distinguishes an empty selected scope from unknown observations", () => {
     const doc = new JSDOM(buildLandscapeSection([])).window.document;
     expect(doc.querySelector(".landscape-empty")?.textContent).toContain(

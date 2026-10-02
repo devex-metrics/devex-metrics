@@ -321,6 +321,8 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
 .landscape-detail-row .landscape-file-scroll{margin:.45rem 0}
 .landscape-note,.landscape-empty{font-size:.78rem;color:var(--muted);margin:.5rem 0;max-width:75ch}
 .landscape-unknown{color:var(--muted)}
+.landscape-flag{display:inline-block;font-weight:600;background:var(--warn-s);color:var(--warn);border-radius:4px;padding:.05rem .4rem}
+.landscape-file-attention>td:first-child{box-shadow:inset 3px 0 0 var(--warn)}
 .landscape-stale{background:var(--warn-s);color:var(--warn);border:1px solid var(--warn);border-radius:6px;padding:.6rem .8rem;margin:.5rem 0 1rem;font-size:.85rem}
 .landscape-stale a{color:inherit;font-weight:600}
 .discovery-section{margin-bottom:2rem}
