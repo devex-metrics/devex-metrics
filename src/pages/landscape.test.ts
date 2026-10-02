@@ -316,15 +316,15 @@ describe("landscape dashboard view", () => {
         {
           path: "AGENTS.md", kind: "instructions", sha256: "a".repeat(64),
           last_changed: "2026-01-01T00:00:00.000Z", age_days: 267, lag_days: 180,
-          stale: true, status: "ok", commits_since_change: 42,
+          stale: true, status: "known", commits_since_change: 42,
         },
         {
           path: "README.md", kind: "instructions", sha256: "b".repeat(64),
           last_changed: "2026-09-20T00:00:00.000Z", age_days: 5, lag_days: 1,
-          stale: false, status: "ok", commits_since_change: 3,
+          stale: false, status: "known", commits_since_change: 3,
         },
       ],
-      summary: { count: 2, stale_count: 1, max_lag_days: 180, unknown_count: 0, status: "ok" },
+      summary: { count: 2, stale_count: 1, max_lag_days: 180, unknown_count: 0, status: "known" },
     };
     const html = buildLandscapeSection([view]);
     const doc = new JSDOM(html).window.document;
