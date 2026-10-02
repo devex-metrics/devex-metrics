@@ -164,6 +164,25 @@ describe("landscape dashboard view", () => {
     expect(rows[1].textContent).toContain("Review next");
   });
 
+  it("orders older-signal repositories by largest head lag, including after re-sorting", () => {
+    const withLag = (name: string, lag: number) => {
+      const row = aged(name, true);
+      row.files![0].lag_days = lag;
+      row.summary!.max_lag_days = lag;
+      return row;
+    };
+    const dom = mount([withLag("acme/a-small-lag", 50), withLag("acme/z-large-lag", 200), withLag("acme/m-mid-lag", 120)]);
+    const doc = dom.window.document;
+    const expected = ["acme/z-large-lag", "acme/m-mid-lag", "acme/a-small-lag"];
+    expect(visibleNames(dom)).toEqual(expected);
+    doc.querySelector<HTMLButtonElement>('[data-landscape-sort="name"]')!.click();
+    expect(visibleNames(dom)[0]).toBe("acme/a-small-lag");
+    doc.querySelector<HTMLButtonElement>('[data-landscape-sort="priority"]')!.click();
+    expect(visibleNames(dom)).toEqual(expected);
+    doc.querySelector<HTMLButtonElement>("#landscapeSortReset")!.click();
+    expect(visibleNames(dom)).toEqual(expected);
+  });
+
   it("does not turn absent or malformed timeline dates into zero activity", () => {
     const rows = ["missing", "bad", "empty", "recent", "old", "future"].map((name) => empty(`acme/${name}`));
     const metrics = activitySnapshot([
