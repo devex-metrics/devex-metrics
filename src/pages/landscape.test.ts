@@ -148,15 +148,15 @@ describe("landscape dashboard view", () => {
     expect(visibleNames(dom)[0]).toBe("acme/active-old");
   });
 
-  it("ranks quiet drift ahead of active repositories without customization files", () => {
-    const quietDrift = aged("acme/quiet-drift", true);
+  it("ranks quiet older-signal repositories ahead of active repositories without customization files", () => {
+    const quietOlder = aged("acme/quiet-older", true);
     const activeMissing = empty("acme/active-missing");
-    const dom = mount([activeMissing, quietDrift], activitySnapshot([
+    const dom = mount([activeMissing, quietOlder], activitySnapshot([
       ["acme/active-missing", ["2026-09-29T12:00:00Z"]],
-      ["acme/quiet-drift", []],
+      ["acme/quiet-older", []],
     ]));
 
-    expect(visibleNames(dom)).toEqual(["acme/quiet-drift", "acme/active-missing"]);
+    expect(visibleNames(dom)).toEqual(["acme/quiet-older", "acme/active-missing"]);
     const rows = Array.from(dom.window.document.querySelectorAll<HTMLTableRowElement>(
       "#landscapeRows > tr:not(.landscape-detail-row)"
     ));

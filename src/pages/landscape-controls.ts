@@ -69,6 +69,7 @@ document.addEventListener("DOMContentLoaded",function(){
     }
     var result=key==="name"?collator.compare(x,y):xValue-yValue;
     return (direction==="descending"?-result:result)||
+      (key==="priority"?Number(a.dataset.landscapeIndex)-Number(b.dataset.landscapeIndex):0)||
       collator.compare(a.cells[1].textContent,b.cells[1].textContent)||
       Number(a.dataset.landscapeIndex)-Number(b.dataset.landscapeIndex);
   }

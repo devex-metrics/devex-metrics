@@ -350,8 +350,9 @@ not a measure of code quality, security or freshness.
 The Pages landscape defaults to **attention first**, rather than repository
 name. Its overview distinguishes repositories with an observed zero AI
 instruction files, older file-age signals, incomplete file history, and no
-verified observation. Active repositories with an observed missing or older
-file signal lead the table; unavailable scans and private/unverified
+verified observation. Repositories with an observed older file signal lead the table
+(largest head lag first, even when quiet), followed by active repositories with
+no observed instruction files; unavailable scans and private/unverified
 repositories stay unknown, not healthy or zero-readiness. Sortable columns
 include attention, observed 90-day merged PRs, 90-day Git commits, configured
 team commits, file count, quality cues, oldest known age (with head lag shown
