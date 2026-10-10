@@ -1049,3 +1049,279 @@ describe("toEventRow review and revert facts", () => {
     expect(row.changesRequestedCount).toBeUndefined();
   });
 });
+
+describe("toEventRow mapping edge cases", () => {
+  const withAuthor = (login: string, typename: string) =>
+    toEventRow("acme", "acme/api", node(1, { author: { login, __typename: typename } }));
+
+  const review = (submittedAt: string | null, state?: string, login = "bob") => ({
+    submittedAt,
+    author: { login },
+    ...(state !== undefined ? { state } : {}),
+  });
+
+  it("only treats the exact Copilot logins and the copilot-swe prefix as Copilot", () => {
+    expect(withAuthor("copilot", "User").aiAuthorType).toBe("copilot");
+    expect(withAuthor("copilot[bot]", "Bot").aiAuthorType).toBe("copilot");
+    expect(withAuthor("COPILOT[BOT]", "Bot").aiAuthorType).toBe("copilot");
+    expect(withAuthor("copilot-swe-agent", "Bot").aiAuthorType).toBe("copilot");
+    expect(withAuthor("copilotfan", "User").aiAuthorType).toBeUndefined();
+    expect(withAuthor("my-copilot[bot]", "Bot").aiAuthorType).toBeUndefined();
+    expect(withAuthor("agent-copilot-swe", "Bot").aiAuthorType).toBeUndefined();
+    expect(withAuthor("copilot-sw", "User").aiAuthorType).toBeUndefined();
+    expect(withAuthor("alice", "User").aiAuthorType).toBeUndefined();
+  });
+
+  it("matches claude and codex only as a login prefix", () => {
+    expect(withAuthor("Claude-Agent", "User").aiAuthorType).toBe("claude");
+    expect(withAuthor("my-claude", "User").aiAuthorType).toBeUndefined();
+    expect(withAuthor("CODEX", "User").aiAuthorType).toBe("codex");
+    expect(withAuthor("my-codex", "User").aiAuthorType).toBeUndefined();
+  });
+
+  it("flags a Bot typename even without a [bot] suffix", () => {
+    expect(withAuthor("renovate", "Bot").isBot).toBe(true);
+  });
+
+  it("flags a [bot] suffix even when the typename is not Bot", () => {
+    expect(withAuthor("dependabot[bot]", "User").isBot).toBe(true);
+  });
+
+  it("matches the [bot] suffix case-insensitively", () => {
+    expect(withAuthor("Foo[BOT]", "User").isBot).toBe(true);
+  });
+
+  it("does not flag a login that contains [bot] anywhere but the end", () => {
+    expect(withAuthor("foo[bot]bar", "User").isBot).toBe(false);
+    expect(withAuthor("[bot]foo", "Organization").isBot).toBe(false);
+  });
+
+  it("does not flag an ordinary user", () => {
+    expect(withAuthor("alice", "User").isBot).toBe(false);
+  });
+
+  it("treats a MERGED state without a merge time as closed", () => {
+    const row = toEventRow("acme", "acme/api", node(1, { state: "MERGED", mergedAt: null }));
+    expect(row.state).toBe("closed");
+    expect(row.mergedAt).toBeUndefined();
+    expect(row.timeToMergeHours).toBeUndefined();
+  });
+
+  it("treats a CLOSED state as closed even when a merge time is present", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, { state: "CLOSED", mergedAt: "2019-03-03T00:00:00Z" })
+    );
+    expect(row.state).toBe("closed");
+    expect(row.mergedAt).toBeUndefined();
+    expect(row.timeToMergeHours).toBeUndefined();
+  });
+
+  it("records the merge time only when both state and merge time agree", () => {
+    const row = toEventRow("acme", "acme/api", node(1));
+    expect(row.state).toBe("merged");
+    expect(row.mergedAt).toBe("2019-03-03T00:00:00Z");
+    expect(row.timeToMergeHours).toBe(48);
+  });
+
+  it("drops empty and null review timestamps from the first-review time", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: {
+          totalCount: 3,
+          nodes: [
+            review(""),
+            review(null),
+            review("2019-03-02T06:00:00Z"),
+          ],
+        },
+      })
+    );
+    expect(row.firstReviewAt).toBe("2019-03-02T06:00:00Z");
+  });
+
+  it("leaves the first-review time absent when every timestamp is null or empty", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: { totalCount: 2, nodes: [review(null), review("")] },
+      })
+    );
+    expect(row.firstReviewAt).toBeUndefined();
+    expect(row.firstApprovalAt).toBeUndefined();
+  });
+
+  it("drops empty and null approval timestamps from the first-approval time", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: {
+          totalCount: 3,
+          nodes: [
+            review("", "APPROVED"),
+            review(null, "APPROVED"),
+            review("2019-03-02T12:00:00Z", "APPROVED"),
+          ],
+        },
+      })
+    );
+    expect(row.firstApprovalAt).toBe("2019-03-02T12:00:00Z");
+  });
+
+  it("leaves the first-approval time absent when every approval timestamp is null or empty", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: {
+          totalCount: 3,
+          nodes: [
+            review(null, "APPROVED"),
+            review("", "APPROVED"),
+            review("2019-03-01T06:00:00Z", "COMMENTED"),
+          ],
+        },
+      })
+    );
+    expect(row.firstApprovalAt).toBeUndefined();
+    expect(row.firstReviewAt).toBe("2019-03-01T06:00:00Z");
+  });
+
+  it("counts only APPROVED reviews as approvals, not earlier non-approving reviews", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: {
+          totalCount: 4,
+          nodes: [
+            review("2019-03-01T01:00:00Z", "COMMENTED"),
+            review("2019-03-01T02:00:00Z", "CHANGES_REQUESTED"),
+            review("2019-03-01T03:00:00Z", "DISMISSED"),
+            review("2019-03-01T04:00:00Z", "APPROVED"),
+          ],
+        },
+      })
+    );
+    expect(row.firstReviewAt).toBe("2019-03-01T01:00:00Z");
+    expect(row.firstApprovalAt).toBe("2019-03-01T04:00:00Z");
+  });
+
+  it("picks the earliest approval regardless of node order", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: {
+          totalCount: 2,
+          nodes: [
+            review("2019-03-05T00:00:00Z", "APPROVED"),
+            review("2019-03-04T00:00:00Z", "APPROVED"),
+          ],
+        },
+      })
+    );
+    expect(row.firstApprovalAt).toBe("2019-03-04T00:00:00Z");
+  });
+
+  it("leaves a changes-requested review with a null or empty timestamp out of the round count", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: {
+          totalCount: 3,
+          nodes: [
+            review(null, "CHANGES_REQUESTED"),
+            review("", "CHANGES_REQUESTED"),
+            review("2019-03-01T00:00:00Z", "CHANGES_REQUESTED"),
+          ],
+        },
+      })
+    );
+    expect(row.changesRequestedCount).toBe(1);
+  });
+
+  it("drops reviewers with no login", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, {
+        reviews: {
+          totalCount: 3,
+          nodes: [
+            { submittedAt: "2019-03-01T00:00:00Z", author: null },
+            review("2019-03-01T00:00:00Z", undefined, ""),
+            review("2019-03-01T00:00:00Z", undefined, "bob"),
+          ],
+        },
+      })
+    );
+    expect(row.reviewers).toEqual(["bob"]);
+  });
+
+  it("records a zero merge time for a PR merged the instant it was opened", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, { createdAt: "2019-03-03T00:00:00Z", mergedAt: "2019-03-03T00:00:00Z" })
+    );
+    expect(row.timeToMergeHours).toBe(0);
+  });
+
+  it("omits a negative merge time caused by clock skew but keeps the merge date", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, { createdAt: "2019-03-04T00:00:00Z", mergedAt: "2019-03-03T00:00:00Z" })
+    );
+    expect(row.mergedAt).toBe("2019-03-03T00:00:00Z");
+    expect(row).not.toHaveProperty("timeToMergeHours");
+  });
+
+  it("trusts a zero totalCount over stray review nodes for the review count", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, { reviews: { totalCount: 0, nodes: [review("2019-03-01T00:00:00Z")] } })
+    );
+    expect(row).not.toHaveProperty("reviewCount");
+  });
+
+  it("does not write empty approval or reviewer keys onto the row", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, { reviews: { totalCount: 1, nodes: [{ submittedAt: "2019-03-01T00:00:00Z", author: null, state: "COMMENTED" }] } })
+    );
+    expect(row).not.toHaveProperty("firstApprovalAt");
+    expect(row).not.toHaveProperty("reviewers");
+  });
+
+  it("leaves optional keys off the row entirely when there is nothing to record", () => {
+    const row = toEventRow(
+      "acme",
+      "acme/api",
+      node(1, { state: "CLOSED", mergedAt: null, closedAt: null, reviews: { totalCount: 0, nodes: [] } })
+    );
+    for (const key of [
+      "aiAuthorType",
+      "closedAt",
+      "mergedAt",
+      "timeToMergeHours",
+      "reviewCount",
+      "firstReviewAt",
+      "firstApprovalAt",
+      "changesRequestedCount",
+      "reviewers",
+      "revertsPR",
+    ]) {
+      expect(row).not.toHaveProperty(key);
+    }
+  });
+});
