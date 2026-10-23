@@ -1,0 +1,5527 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-23T11:20:07.000Z",
+  "scanner_version": "0.1.1",
+  "repositories": [
+    {
+      "full_name": "rajbos/.github",
+      "head_sha": "035b6f38db82ef0e67c0e0ebdf4643ac29d82d57",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/acp-editor-demo",
+      "head_sha": "82b18f787c3c04f894e5ffe8ea70645fb45192a4",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/actions-load-test",
+      "head_sha": "f2ffb9bf250c9e72ed066aab111e0ae1d33ec7e0",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/actions-marketplace",
+      "head_sha": "2e228daa6775f0f445b46df2332d87a84b82ec1c",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 6,
+      "commits_90d": 9,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/actions-marketplace-checks",
+      "head_sha": "d5d65716aade01e8693343676aba6c96c73e6c38",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "9a64a475bbcbd7007f47e03817a6f01e7cfd135de818babd95173e0d42f726f5",
+          "last_changed": "2026-01-10T16:47:40.000Z",
+          "age_days": 285,
+          "lag_days": 282,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 301,
+          "content_signal": {
+            "score": 100,
+            "scope": true,
+            "actions": true,
+            "verification": true,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/instructions/api-upsert.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "0ab5f5cd5f4db8e214cb7b40cba116cde97c3c9aade5f59a6342253c07d291f7",
+          "last_changed": "2026-01-05T19:29:08.000Z",
+          "age_days": 290,
+          "lag_days": 287,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 347,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/instructions/github-actions.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "e6fe65e7131f451897e7d81b458fc93552b4fc9f5c277646a93e3ea56f2224d3",
+          "last_changed": "2026-02-15T14:52:04.000Z",
+          "age_days": 249,
+          "lag_days": 246,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 118,
+          "content_signal": {
+            "score": 75,
+            "scope": false,
+            "actions": true,
+            "verification": true,
+            "guardrails": true
+          }
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "4aef1f21ab17faa6b30da4d3927fc92a2f8f8b401fd8f7454e4a8170d6eff51f",
+          "last_changed": "2026-05-23T13:05:53.000Z",
+          "age_days": 152,
+          "lag_days": 149,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 59,
+          "content_signal": {
+            "score": 25,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 4,
+        "stale_count": 4,
+        "max_lag_days": 287,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 2,
+      "commits_90d": 43,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/actions-permissions",
+      "head_sha": "99a2a345e1797ce4900f62f0c39bb5a29c9c2735",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/actions-testing",
+      "head_sha": "fea030e694f8655b37c5ffca75fa5902917906d8",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/actions-testing-grounds",
+      "head_sha": "c0c86b94e8af4961f11932d3a6df71de1c78e203",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/actions-usage",
+      "head_sha": "db50b380df3f7960e86bd76684fb366506e92a5b",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/ai-engineering-fluency",
+      "head_sha": "a7fcbdc08ace22e375ddf79951cb62f8ce26be41",
+      "ai_files": [
+        {
+          "path": ".claude/agents/architecture-expert.md",
+          "kind": "tool_config",
+          "sha256": "2ee48d49876684f7c23d19e1a1e50e78c309ae104173cb0ff9e2c650a5b048a4",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 40,
+          "lag_days": 40,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 447,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/agents/code-quality-review.md",
+          "kind": "tool_config",
+          "sha256": "2e128e2583fe5e880be31ece8a5e49dd222d9bcd7a171ab18e0826c31ec9deed",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 40,
+          "lag_days": 40,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 447,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/agents/improve-mutation-score.md",
+          "kind": "tool_config",
+          "sha256": "84f8000f4d878e9314a22d824238cfd220b64598349f8f6a8af0c5637152e48b",
+          "last_changed": "2026-10-13T13:07:07.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 79,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/agents/new-editor-support.md",
+          "kind": "tool_config",
+          "sha256": "3d0f429757d5ad03e5fb8885eab04e12b8c11106111323ae5d09eb7488faf683",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/agents/performance-expert.md",
+          "kind": "tool_config",
+          "sha256": "2dfbb7271fdf10e06f93484ee9f41d1c832dccee0c302c8eba5349a86413a2c2",
+          "last_changed": "2026-10-04T10:36:27.000Z",
+          "age_days": 19,
+          "lag_days": 18,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 173,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/agents/prep-release.md",
+          "kind": "tool_config",
+          "sha256": "95c3d7523000d24bd4ad9fcd23e32db9c9dac93b6a2e151ba17602627881cee1",
+          "last_changed": "2026-10-13T13:07:07.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 79,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/agents/product-owner.md",
+          "kind": "tool_config",
+          "sha256": "f4c72379067557af1818d634ea3edc30aea2866ca4c2e859321d7543849fd4a4",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 40,
+          "lag_days": 40,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 447,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/agents/refactor-large-function.md",
+          "kind": "tool_config",
+          "sha256": "0347f3bf96594d5346ce0136159a6da41891a83db94380ad79361aed1f703754",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/agents/refactor.md",
+          "kind": "tool_config",
+          "sha256": "571f5f50c36247b0371fd707dc33db758d92ca46847eb11caf22eeb43e75a495",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 24,
+          "lag_days": 24,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 239,
+          "content_signal": {
+            "score": 25,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".claude/agents/repo-health-scan.md",
+          "kind": "tool_config",
+          "sha256": "748b06236cf9a1cf31f1171cfd378f8b5e1ba2818ee3e6dde431dce48866f987",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/agents/test-expert.md",
+          "kind": "tool_config",
+          "sha256": "65e535b438c31e5ba4f60b66a1f128a029bdb2ca142ddd9f245b0e545ab84b0e",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/agents/tool-names.md",
+          "kind": "tool_config",
+          "sha256": "b2f39ddafcf165da8a31a07c030bc111ec3cdd71b8ba4d837a0a37fb2f77fef9",
+          "last_changed": "2026-10-11T13:44:37.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 101,
+          "content_signal": {
+            "score": 75,
+            "scope": false,
+            "actions": true,
+            "verification": true,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/azure-storage-loader/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "c35e5f6a8c93ec285598e9078b35d8846356ca96bcf39ececc8a2070d4e7644f",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/check-urls/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "ff50287e1224c3c9d3918ac844f8dccb166919f144925a1d8b0a4fc576c994e2",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/copilot-log-analysis/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "91074609ead4981e1861313c4b8fda4c074c4e2564da330588db1aba4549d1d6",
+          "last_changed": "2026-10-10T18:45:10.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 118,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/create-issue/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "33b85723102e1de91fca10ea6e7e11be722cb69794f19cd290e80b547542d477",
+          "last_changed": "2026-10-11T16:29:00.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 95,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/deduplicate-code/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "a589e86a85daa34a7422b1e245a1afc7e88a348be0232d5caab135b5459c39dd",
+          "last_changed": "2026-10-11T13:51:34.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 98,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/discover-debug-log-schema/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "0d90ff7f70dbcbea34ea2c030069239802fc3af1046c3622f14c6fc9fd3d2b02",
+          "last_changed": "2026-09-03T21:02:54.000Z",
+          "age_days": 49,
+          "lag_days": 49,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 637,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/improve-tool-families/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "d5a20cbf06a176a983cd8f88cd7e2b077ef0c7a66ed093d7e567f17300674ae2",
+          "last_changed": "2026-10-13T13:07:07.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 79,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".claude/skills/load-cache-data/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "33d7b597468fc250e93124fa9672f7b1f7987344c342e11e06118b11a1a28e47",
+          "last_changed": "2026-10-11T09:29:36.000Z",
+          "age_days": 12,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 112,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/pr-review-readiness/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "e712a504f2d51dc9bd9e7641fcc1b35fb893a9afb1159b09ab1f796ee4fd4ab3",
+          "last_changed": "2026-10-04T10:36:27.000Z",
+          "age_days": 19,
+          "lag_days": 18,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 173,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/pr-risk-review/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "4d61232ecba17a66a7c8a90012f2cbb8e245603ecc364293c6d0e2031d0ede4e",
+          "last_changed": "2026-10-11T16:40:02.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 90,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/refactor-large-function/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "936cde47af2661f3d17f722c779e6bb9d2fa08c917a41f00a7ca97239845615c",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/refresh-json-data/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "bb0614d33f536cec60214b908d7824a21c6ccc940170cf9085b8daec2917b59b",
+          "last_changed": "2026-10-11T16:40:02.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 90,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/scan-hardcoded-strings/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "1f32f3ad0757090936936b8279c3f55ecf341af6d89d2a7ea2de00de56bfd83f",
+          "last_changed": "2026-10-11T16:29:00.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 95,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/session-log-data/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "30c85c53fc925f19df9063b546b13116e9f7db4f1f9cd2eb4816ac73e222df3c",
+          "last_changed": "2026-10-09T05:07:03.000Z",
+          "age_days": 14,
+          "lag_days": 14,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 131,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/sync-host-views/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "d755c80e1d90635c36c81859cf4e05cb579e1a0bc5b4e4947a5aaf33ef187db4",
+          "last_changed": "2026-10-13T21:32:39.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 64,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/validate-app-db-schema/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "57db660b4ed88e830c239b2b7c3901da431ecad1ce4020fd23a17dd38d3eeecd",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 108,
+          "lag_days": 108,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 1242,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".claude/skills/validate-editor-names/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "99bfeb8c884179c9facfa0bac8260ecb2f8c9266c5c6cdafda6a97b13d595090",
+          "last_changed": "2026-10-13T13:07:07.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 79,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".claude/skills/validate-model-pricing/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "6b1be476701ea21b40fe6c242c51b1cd08b04a491cd396475122666affac115c",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 108,
+          "lag_days": 108,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 1242,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/validate-session-schemas/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "b5de2a6a038164426e21529c8f905877cf9a633ccc9109216eeff05c6531f4ce",
+          "last_changed": "2026-10-21T06:37:08.000Z",
+          "age_days": 2,
+          "lag_days": 2,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 5,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/visual-view-diff/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "85f2edf55da01724c758fac285dc1e5fb1a2473270428f90df99fe36ad4185a2",
+          "last_changed": "2026-10-11T16:40:02.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 90,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".claude/skills/whats-new-catalog/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "aeeac6e347119c16c9e1c08720ab20552b19f2dc2c57aa0d7230c9c21eae19f6",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/agents/architecture-expert.agent.md",
+          "kind": "agent",
+          "sha256": "149969d8b7ca84807ed31cd3e9616cd7803ee18732daaab68371380312a3a1eb",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 40,
+          "lag_days": 40,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 447,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/agents/code-quality-review.agent.md",
+          "kind": "agent",
+          "sha256": "1ce1d11fddad0badc765863adfec1d2dbf30cc49734644955b393286211c50dc",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 40,
+          "lag_days": 40,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 447,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/agents/improve-mutation-score.agent.md",
+          "kind": "agent",
+          "sha256": "b0839086352ad6da98b374faf4d0a90eee2cd33ae337693bcba29720e42b84e8",
+          "last_changed": "2026-10-13T13:07:07.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 79,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/agents/new-editor-support.agent.md",
+          "kind": "agent",
+          "sha256": "7f750de7e50450f63af3a9e3e2a3580b3a730da4d8fa2e30ac177d2cf50a66ce",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/agents/performance-expert.agent.md",
+          "kind": "agent",
+          "sha256": "ebe871879471aa65ee76087981a2999ec8cacba2635ccebf26745175299bf7cf",
+          "last_changed": "2026-10-04T10:36:27.000Z",
+          "age_days": 19,
+          "lag_days": 18,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 173,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/agents/prep-release.agent.md",
+          "kind": "agent",
+          "sha256": "49fdd55824931bbcef3f7cbc6809716e5197b67767fbb98f29fd40b5cee96df3",
+          "last_changed": "2026-10-13T13:07:07.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 79,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/agents/product-owner.agent.md",
+          "kind": "agent",
+          "sha256": "1677a1bcf6ec91ff69c2c46b935e98c2f0842193f8567f964f84c81a185ee2dc",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 24,
+          "lag_days": 24,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 239,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/agents/refactor-large-function.agent.md",
+          "kind": "agent",
+          "sha256": "ff578a3f4004afa9288287e2a92172db1207566271487873b182672232e4b8e6",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/agents/refactor.agent.md",
+          "kind": "agent",
+          "sha256": "099c10afa1e4e2bcfd3007f483a9bcec2c2a900f7df48464f0724a6b32a2a068",
+          "last_changed": "2026-09-28T18:21:03.000Z",
+          "age_days": 24,
+          "lag_days": 24,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 239,
+          "content_signal": {
+            "score": 25,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/agents/repo-health-scan.agent.md",
+          "kind": "agent",
+          "sha256": "593cb48c86b4565403f77d132877d18cb2d1bf2be33471b92be987388ba3689c",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/agents/test-expert.agent.md",
+          "kind": "agent",
+          "sha256": "a5ad04514884f7326ea557251c7dbf6cce656639ced6875d33ad6af84b34aedb",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/agents/tool-names.agent.md",
+          "kind": "agent",
+          "sha256": "f800732df9b3ab0cd2944369fa02dc0d309d500d96f4d6cc5d78179acbd68266",
+          "last_changed": "2026-10-11T13:44:37.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 101,
+          "content_signal": {
+            "score": 75,
+            "scope": false,
+            "actions": true,
+            "verification": true,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "82b3a23111b1e510fad8cff91fab26fbcc61769bba950286e17c407fa5ef0580",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/instructions/cli.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "2d59f7533e037e5e71c2e399491a017d42995a0b9cf0ef71f99c454a79801e6a",
+          "last_changed": "2026-10-13T13:07:07.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 79,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/instructions/jetbrains-plugin.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "5c9683387971c0bdedfee3ff906dd9969161d94fe86d652f385da2e11acf0680",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 40,
+          "lag_days": 40,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 447,
+          "content_signal": {
+            "score": 100,
+            "scope": true,
+            "actions": true,
+            "verification": true,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/instructions/sharing-server.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "57f9bb6bd21d41610df05b8dfd2ce28c3309186f894f325995d672cef4dad563",
+          "last_changed": "2026-09-07T09:40:00.000Z",
+          "age_days": 46,
+          "lag_days": 45,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 535,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/instructions/visualstudio-extension.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "de34fc77a06fa8436d73c4040b32bef3669a7701de2b47421ef3fd181ff7d361",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 108,
+          "lag_days": 108,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 1242,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/instructions/vscode-extension.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "57c9c988eb06d87ce7b56a1399615ab1c7d891cbc2a07526f6cf052d622b195b",
+          "last_changed": "2026-10-13T13:07:07.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 79,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/instructions/workflows.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "1bba93c6df638459f7502a117c53a34eff174357b10306ce36a8d764d6798401",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/prompts/improve-mutation-score.prompt.md",
+          "kind": "prompt",
+          "sha256": "721db13d57c186e98b30279052fa5505d73bbfe87b144f830855beb980074a28",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 108,
+          "lag_days": 108,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 1242,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/prompts/pr-risk-review.prompt.md",
+          "kind": "prompt",
+          "sha256": "dc624c8dbd93cd20510f5c64482581b2ddadfd5f20ce286069b99012e16939ae",
+          "last_changed": "2026-08-29T14:31:46.000Z",
+          "age_days": 54,
+          "lag_days": 54,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 773,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/prompts/refactor-large-function.prompt.md",
+          "kind": "prompt",
+          "sha256": "31f9a8b4300f2d165b3c24e775a216484e2cb41ca210bfee352f015aca431222",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/prompts/sync-automatic-tools.prompt.md",
+          "kind": "prompt",
+          "sha256": "c002492f1587c318b1168c8f13e862ffd8c6378111a22e0aa7eee1b056ea4883",
+          "last_changed": "2026-04-21T18:34:44.000Z",
+          "age_days": 184,
+          "lag_days": 184,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 2637,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/prompts/sync-toolnames.prompt.md",
+          "kind": "prompt",
+          "sha256": "26d6e02669df9614b074ed902aff68c75a94719a1af74a5028d010fdf1876f6d",
+          "last_changed": "2026-07-20T11:21:49.000Z",
+          "age_days": 94,
+          "lag_days": 94,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 1013,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/.gitignore",
+          "kind": "skill",
+          "sha256": "aa9a3b93558793e98a67a2b325961847f0b190db552bd2a2cd7e7ce092188ef6",
+          "last_changed": "2026-01-30T19:33:02.000Z",
+          "age_days": 265,
+          "lag_days": 265,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 3850,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/example-usage.js",
+          "kind": "skill",
+          "sha256": "9daf57f72a9a88360e59b1fc6d2c68c73e75d032351954bcc94e1a5e5f45278a",
+          "last_changed": "2026-10-13T19:07:22.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 68,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/load-table-data.js",
+          "kind": "skill",
+          "sha256": "23554fb0f8519b299054ac979513d22324d65c37c96cf6659b36bc49ed4e1af9",
+          "last_changed": "2026-10-13T19:07:22.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 68,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/load-table-data.test.js",
+          "kind": "skill",
+          "sha256": "e5638406f1a8927ce64acbe8d3e343f72ea097d61e48478ea362a6f468b2d73f",
+          "last_changed": "2026-10-13T19:07:22.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 68,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/package.json",
+          "kind": "skill",
+          "sha256": "3c3387fe8afd0adf8a191aeeb6dbbd668fb662531736312ddc0d90e44ad5a860",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/pnpm-lock.yaml",
+          "kind": "skill",
+          "sha256": "3c96b99a78de518c7c701a50f3a379550f1b5bad2f30f6ed412ae872e37a8602",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/pnpm-workspace.yaml",
+          "kind": "skill",
+          "sha256": "b8a31a34177e3c194a0f8e6a8a736756d5aff8f4f33f2dda1f5dd7e86c4cdeae",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/README.md",
+          "kind": "skill",
+          "sha256": "f222b381dd63f0f35e603fb3799296a09fe740b1f6f445cbb2aa7d3464635dae",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/SECURITY.md",
+          "kind": "skill",
+          "sha256": "58cf34a2d36af7b09edfe3d0bd6ba75df336608058b33bf44afe4529e80ea364",
+          "last_changed": "2026-10-13T19:07:22.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 68,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/azure-storage-loader/SKILL.md",
+          "kind": "skill",
+          "sha256": "c35e5f6a8c93ec285598e9078b35d8846356ca96bcf39ececc8a2070d4e7644f",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/check-urls/check-urls.js",
+          "kind": "skill",
+          "sha256": "36d9203d6a65e514c865d3df42bbc442bd2b16130406f1ee11ef5c9eda6dca30",
+          "last_changed": "2026-10-10T17:44:31.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 120,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/check-urls/check-urls.test.js",
+          "kind": "skill",
+          "sha256": "1dd8c77af3101520ba974634de11826b7f0b905bb0fa05b63c033c4b58e40de2",
+          "last_changed": "2026-10-10T17:44:31.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 120,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/check-urls/README.md",
+          "kind": "skill",
+          "sha256": "66d657b9340a740487494f5579f63af99204efa0a9474b0e1281684b4e65c891",
+          "last_changed": "2026-10-10T17:44:31.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 120,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/check-urls/SECURITY.md",
+          "kind": "skill",
+          "sha256": "2304be762c6e48766752e1b35c35a9e38cbc2d8ac4b9a40be7afce15d8b478fe",
+          "last_changed": "2026-10-10T17:44:31.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 120,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/check-urls/SKILL.md",
+          "kind": "skill",
+          "sha256": "ff50287e1224c3c9d3918ac844f8dccb166919f144925a1d8b0a4fc576c994e2",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/copilot-log-analysis/analyze-session-schema.ps1",
+          "kind": "skill",
+          "sha256": "0fab3e967f0afe044590c62d4dd457226f9900a24e4ac34c3229a6fb50ad02cf",
+          "last_changed": "2026-10-10T18:45:10.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 118,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/copilot-log-analysis/diagnose-session-files.js",
+          "kind": "skill",
+          "sha256": "4a912ed5bcc08b726414265a06ae108e3be5aa203d23eae8cc9f0066e71fd9df",
+          "last_changed": "2026-10-10T18:45:10.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 118,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/copilot-log-analysis/evals/evals.json",
+          "kind": "skill",
+          "sha256": "484e83954ecf67603fe3c5a96a93cbf2e0ec57bfdb7d815c497e3c23cecc6a2d",
+          "last_changed": "2026-08-31T15:56:25.000Z",
+          "age_days": 52,
+          "lag_days": 52,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 718,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/copilot-log-analysis/get-session-files.js",
+          "kind": "skill",
+          "sha256": "f88951e065ba15c3f6177807990ac5cf60f229677bf952789a36c873af08e79f",
+          "last_changed": "2026-10-10T18:45:10.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 118,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/copilot-log-analysis/SECURITY.md",
+          "kind": "skill",
+          "sha256": "edf3e18021b58357179ab7cd7c557a5240f6e81116806528490ed9ff899acc38",
+          "last_changed": "2026-10-10T18:45:10.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 118,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/copilot-log-analysis/session-file-discovery.js",
+          "kind": "skill",
+          "sha256": "8b9ef6484ef7a0d80c2d11c11bbfecbee716622233f20faa26aed4e0edc2d0f8",
+          "last_changed": "2026-10-10T18:45:10.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 118,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/copilot-log-analysis/SKILL.md",
+          "kind": "skill",
+          "sha256": "91074609ead4981e1861313c4b8fda4c074c4e2564da330588db1aba4549d1d6",
+          "last_changed": "2026-10-10T18:45:10.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 118,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/create-issue/SKILL.md",
+          "kind": "skill",
+          "sha256": "33b85723102e1de91fca10ea6e7e11be722cb69794f19cd290e80b547542d477",
+          "last_changed": "2026-10-11T16:29:00.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 95,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/deduplicate-code/SKILL.md",
+          "kind": "skill",
+          "sha256": "a589e86a85daa34a7422b1e245a1afc7e88a348be0232d5caab135b5459c39dd",
+          "last_changed": "2026-10-11T13:51:34.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 98,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/discover-debug-log-schema/discover-debug-log-schema.js",
+          "kind": "skill",
+          "sha256": "cb7f4bac4c3abe93225eaca47c9bf3a415c719901a5f5fdfa7e626b0cf7aaf4e",
+          "last_changed": "2026-09-03T21:02:54.000Z",
+          "age_days": 49,
+          "lag_days": 49,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 637,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/discover-debug-log-schema/SKILL.md",
+          "kind": "skill",
+          "sha256": "0d90ff7f70dbcbea34ea2c030069239802fc3af1046c3622f14c6fc9fd3d2b02",
+          "last_changed": "2026-09-03T21:02:54.000Z",
+          "age_days": 49,
+          "lag_days": 49,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 637,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/improve-tool-families/analyze-tool-families.js",
+          "kind": "skill",
+          "sha256": "636e5ae0269cfae28e2d1bb70d8627661e0e46a3d64daaa29ff0672f4d5372d0",
+          "last_changed": "2026-10-13T13:07:07.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 79,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/improve-tool-families/SKILL.md",
+          "kind": "skill",
+          "sha256": "d5a20cbf06a176a983cd8f88cd7e2b077ef0c7a66ed093d7e567f17300674ae2",
+          "last_changed": "2026-10-13T13:07:07.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 79,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/load-cache-data/load-cache-data.js",
+          "kind": "skill",
+          "sha256": "f53dc1fcccad2e616ea482b1e97b7665bc48fc6bad0069e0ae45c08fe7e660dc",
+          "last_changed": "2026-10-15T21:27:37.000Z",
+          "age_days": 7,
+          "lag_days": 7,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 45,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/load-cache-data/load-cache-data.test.js",
+          "kind": "skill",
+          "sha256": "99224e296a57b9e5a1a57363b769bd758674d7729e2dc7db6b520fc7929e8f30",
+          "last_changed": "2026-10-21T08:18:55.000Z",
+          "age_days": 2,
+          "lag_days": 1,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 4,
+          "content_signal": {
+            "score": 25,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/load-cache-data/README.md",
+          "kind": "skill",
+          "sha256": "0add93a1c95194d1b50e1f236d5bfd7930ad4559db97f04f0391a820fc8bff33",
+          "last_changed": "2026-10-11T09:29:36.000Z",
+          "age_days": 12,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 112,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/load-cache-data/SECURITY.md",
+          "kind": "skill",
+          "sha256": "95ace7c8828fce61865b13709d6bdc0111dc4b8c50cc4b0f50142c4162fc7fc8",
+          "last_changed": "2026-10-21T08:18:55.000Z",
+          "age_days": 2,
+          "lag_days": 1,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 4,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/load-cache-data/SKILL.md",
+          "kind": "skill",
+          "sha256": "33d7b597468fc250e93124fa9672f7b1f7987344c342e11e06118b11a1a28e47",
+          "last_changed": "2026-10-11T09:29:36.000Z",
+          "age_days": 12,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 112,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/pr-review-readiness/SKILL.md",
+          "kind": "skill",
+          "sha256": "e712a504f2d51dc9bd9e7641fcc1b35fb893a9afb1159b09ab1f796ee4fd4ab3",
+          "last_changed": "2026-10-04T10:36:27.000Z",
+          "age_days": 19,
+          "lag_days": 18,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 173,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/pr-risk-review/collect-changeset.js",
+          "kind": "skill",
+          "sha256": "0b902b7e614f7b09c117a4a79da123720bfb34f6882cbeb4e02149c695f3d115",
+          "last_changed": "2026-10-10T19:54:32.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 117,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/pr-risk-review/README.md",
+          "kind": "skill",
+          "sha256": "b1c8a85ef1c395b898272619bbf4a39f8ddbc9f1f1fd795d09d2a003b7ccace4",
+          "last_changed": "2026-10-11T16:40:02.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 90,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/pr-risk-review/render-comment.js",
+          "kind": "skill",
+          "sha256": "22fbbf3d172728585b876d3296f60b6604e401c7c353ba349e544bf8c978c1d6",
+          "last_changed": "2026-10-10T19:54:32.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 117,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/pr-risk-review/risk-signals.json",
+          "kind": "skill",
+          "sha256": "548c14b1e427955d67946ab831349cbe8a532c95ed659996faf7b6d79510c73a",
+          "last_changed": "2026-10-11T16:40:02.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 90,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/pr-risk-review/SECURITY.md",
+          "kind": "skill",
+          "sha256": "cbbb1738418ab0bb2acf50cf7261274eaba4450ea853bbf973fabc48d1643b47",
+          "last_changed": "2026-10-10T19:54:32.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 117,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/pr-risk-review/SKILL.md",
+          "kind": "skill",
+          "sha256": "4d61232ecba17a66a7c8a90012f2cbb8e245603ecc364293c6d0e2031d0ede4e",
+          "last_changed": "2026-10-11T16:40:02.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 90,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/pr-risk-review/tests/pr-risk-review.test.js",
+          "kind": "skill",
+          "sha256": "9f60093b2c38694d3da96f52d9ddb65dd3b500a95aef87d7a726267032e357e5",
+          "last_changed": "2026-10-10T19:54:32.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 117,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/README.md",
+          "kind": "skill",
+          "sha256": "33e99cf7c3abd04198f5b7739049e04359bd6e6920c0298c62bb1fc8a9ed315d",
+          "last_changed": "2026-10-13T21:32:39.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 64,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/refactor-large-function/SKILL.md",
+          "kind": "skill",
+          "sha256": "936cde47af2661f3d17f722c779e6bb9d2fa08c917a41f00a7ca97239845615c",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/refresh-json-data/README.md",
+          "kind": "skill",
+          "sha256": "21d87c6e2077327e9cdd76784c88ad4527d8adfca0d72ace3909b82a85bcf6d8",
+          "last_changed": "2026-09-12T13:33:15.000Z",
+          "age_days": 40,
+          "lag_days": 40,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 447,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/refresh-json-data/SKILL.md",
+          "kind": "skill",
+          "sha256": "bb0614d33f536cec60214b908d7824a21c6ccc940170cf9085b8daec2917b59b",
+          "last_changed": "2026-10-11T16:40:02.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 90,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/refresh-json-data/validate-json.js",
+          "kind": "skill",
+          "sha256": "54b4c081512a44e47db85934f5526d354f65f2a4563d2011c455f76496024fde",
+          "last_changed": "2026-01-16T10:55:09.000Z",
+          "age_days": 280,
+          "lag_days": 279,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 4081,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/scan-hardcoded-strings/README.md",
+          "kind": "skill",
+          "sha256": "85d6a906ec82628816035a063fc42d189fac97ad4e847312b047554851c6146b",
+          "last_changed": "2026-10-11T16:29:00.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 95,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/scan-hardcoded-strings/scan-hardcoded-strings.js",
+          "kind": "skill",
+          "sha256": "12abf1bc80d5326c64d31b28613bcbeb6badf90b9c3ad810ac446fa82a4e8993",
+          "last_changed": "2026-10-11T16:29:00.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 95,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/scan-hardcoded-strings/scan-hardcoded-strings.test.js",
+          "kind": "skill",
+          "sha256": "8d74a70d0d143c2e20baec2edfbe70272361be0aff284f25588b829ce3c36047",
+          "last_changed": "2026-10-11T16:29:00.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 95,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/scan-hardcoded-strings/SKILL.md",
+          "kind": "skill",
+          "sha256": "1f32f3ad0757090936936b8279c3f55ecf341af6d89d2a7ea2de00de56bfd83f",
+          "last_changed": "2026-10-11T16:29:00.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 95,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/session-log-data/evals/evals.json",
+          "kind": "skill",
+          "sha256": "b77fa817a1c52370d117705da1feb81ff0b2f6573b816a788819017d3d884b12",
+          "last_changed": "2026-10-09T05:07:03.000Z",
+          "age_days": 14,
+          "lag_days": 14,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 131,
+          "content_signal": {
+            "score": 25,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/session-log-data/SKILL.md",
+          "kind": "skill",
+          "sha256": "30c85c53fc925f19df9063b546b13116e9f7db4f1f9cd2eb4816ac73e222df3c",
+          "last_changed": "2026-10-09T05:07:03.000Z",
+          "age_days": 14,
+          "lag_days": 14,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 131,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/skill-security-classification.json",
+          "kind": "skill",
+          "sha256": "aa8d28eea54d0e13b3d982630f11b998c94c957adc097bf8a4599ace455e1aa2",
+          "last_changed": "2026-10-13T13:07:07.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 79,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/sync-host-views/SECURITY.md",
+          "kind": "skill",
+          "sha256": "6852d1feaaaed4c13b77b7c4538eb33751db3e291c8d835103a563e0c541c887",
+          "last_changed": "2026-10-13T21:32:39.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 64,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/sync-host-views/SKILL.md",
+          "kind": "skill",
+          "sha256": "d755c80e1d90635c36c81859cf4e05cb579e1a0bc5b4e4947a5aaf33ef187db4",
+          "last_changed": "2026-10-13T21:32:39.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 64,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/sync-host-views/sync-host-views.js",
+          "kind": "skill",
+          "sha256": "7031c13fbd37a352ba0191c94f9b1975a940fbf3f8d52fce519130c135bf39ec",
+          "last_changed": "2026-10-13T21:32:39.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 64,
+          "content_signal": {
+            "score": 75,
+            "scope": false,
+            "actions": true,
+            "verification": true,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/validate-app-db-schema/SKILL.md",
+          "kind": "skill",
+          "sha256": "57db660b4ed88e830c239b2b7c3901da431ecad1ce4020fd23a17dd38d3eeecd",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 108,
+          "lag_days": 108,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 1242,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/validate-app-db-schema/validate-schema.js",
+          "kind": "skill",
+          "sha256": "64266f88353cddda657f60b1261651602fa2ef30cabc133f0f0afcbcd4fab2b2",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/validate-editor-names/SKILL.md",
+          "kind": "skill",
+          "sha256": "99bfeb8c884179c9facfa0bac8260ecb2f8c9266c5c6cdafda6a97b13d595090",
+          "last_changed": "2026-10-13T13:07:07.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 79,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/validate-editor-names/validate-editor-names.js",
+          "kind": "skill",
+          "sha256": "40f5ea8e5ae84414ca5778db911e6c6f64353eff91fc9980a377882446e474f3",
+          "last_changed": "2026-10-13T13:07:07.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 79,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/validate-model-pricing/SKILL.md",
+          "kind": "skill",
+          "sha256": "6b1be476701ea21b40fe6c242c51b1cd08b04a491cd396475122666affac115c",
+          "last_changed": "2026-07-06T20:05:00.000Z",
+          "age_days": 108,
+          "lag_days": 108,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 1242,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/validate-model-pricing/validate-model-pricing.js",
+          "kind": "skill",
+          "sha256": "00d1377ae414eb12956c81a5a4e15850227839f53e6c6c4eccbedd56b7b08bd0",
+          "last_changed": "2026-09-28T20:02:11.000Z",
+          "age_days": 24,
+          "lag_days": 24,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 238,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/validate-session-schemas/schema-baselines.json",
+          "kind": "skill",
+          "sha256": "9f31b46c3ede0982e02dd8fd44f3ed175191cbb507670c7871979b92fbb45ff3",
+          "last_changed": "2026-10-21T06:37:08.000Z",
+          "age_days": 2,
+          "lag_days": 2,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 5,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/validate-session-schemas/SECURITY.md",
+          "kind": "skill",
+          "sha256": "00801fcaeafef973089eae81beb8f94fc5ca86cb1f64679d28b234b84edefec1",
+          "last_changed": "2026-10-21T06:37:08.000Z",
+          "age_days": 2,
+          "lag_days": 2,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 5,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/validate-session-schemas/SKILL.md",
+          "kind": "skill",
+          "sha256": "b5de2a6a038164426e21529c8f905877cf9a633ccc9109216eeff05c6531f4ce",
+          "last_changed": "2026-10-21T06:37:08.000Z",
+          "age_days": 2,
+          "lag_days": 2,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 5,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/validate-session-schemas/validate-session-schemas.js",
+          "kind": "skill",
+          "sha256": "5762c11fc116a9a2020b260bc753999959d9b4f7d5d722d7b3b7f368a5f3c544",
+          "last_changed": "2026-10-21T06:37:08.000Z",
+          "age_days": 2,
+          "lag_days": 2,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 5,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/validate-session-schemas/validate-session-schemas.test.js",
+          "kind": "skill",
+          "sha256": "c9fe18938d0d25f0dfb0f104b10dc74dfe982898299c6533ba4eeae889f01e5f",
+          "last_changed": "2026-10-10T21:49:22.000Z",
+          "age_days": 12,
+          "lag_days": 12,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 115,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/diff-screenshots.js",
+          "kind": "skill",
+          "sha256": "e46b2c4245a7300fdc450537d9b2bf8488cb542f862fb468988ad3063a5b0250",
+          "last_changed": "2026-10-11T16:37:34.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 92,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/chart.json",
+          "kind": "skill",
+          "sha256": "59e49c9aad9f7376848d99101ce153b602eceff94430779edee34e47f44729ca",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 54,
+          "lag_days": 54,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 778,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/dashboard.json",
+          "kind": "skill",
+          "sha256": "3762235098387ed83439d38fedbf476d53e5e0b83f5cb340788901b647e9dcb0",
+          "last_changed": "2026-09-25T13:21:47.000Z",
+          "age_days": 27,
+          "lag_days": 27,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 258,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/details.json",
+          "kind": "skill",
+          "sha256": "ec9caab65e69c112c7d45902353c25c5bb033b35b24fbce4670317918157aa8f",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 54,
+          "lag_days": 54,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 778,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/diagnostics.json",
+          "kind": "skill",
+          "sha256": "02fcb8e4e186e3a35936eeb9224b86ef91a8722ebff8efad570400e3585f3e01",
+          "last_changed": "2026-10-02T17:47:10.000Z",
+          "age_days": 20,
+          "lag_days": 20,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 185,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/efficiency.json",
+          "kind": "skill",
+          "sha256": "74284fb3502860f7875ab9efc08b87fdaa6e3ef8552c72fe5a0bedbf63354b04",
+          "last_changed": "2026-10-21T08:18:55.000Z",
+          "age_days": 2,
+          "lag_days": 1,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 4,
+          "content_signal": null
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/environmental.json",
+          "kind": "skill",
+          "sha256": "7db633ca387a4eeb3e86f68a793b8a8d0aac348e0cd106880102510c8b9178f4",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 54,
+          "lag_days": 54,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 778,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/fluency-level-viewer.json",
+          "kind": "skill",
+          "sha256": "8e476645a53842efef7cce0c76bf8ef2ddb05c835127fb876ee3870510709266",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 54,
+          "lag_days": 54,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 778,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/logviewer.json",
+          "kind": "skill",
+          "sha256": "b5e76195b6273a8b3116728c43e42b861af408d9540f37339ecb3251800db3fb",
+          "last_changed": "2026-10-01T19:14:29.000Z",
+          "age_days": 21,
+          "lag_days": 21,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 195,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/maturity.json",
+          "kind": "skill",
+          "sha256": "b7815fc6cff857955519e20b2d9c861bf660accdcf166f5a7e5db73cc92cf331",
+          "last_changed": "2026-10-15T20:01:13.000Z",
+          "age_days": 7,
+          "lag_days": 7,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 52,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/repo-heatmap.json",
+          "kind": "skill",
+          "sha256": "b9b33c7a3c56b4889fcd0e86ca7247c6f880fdc2d2bc3a2f0817da2d7bbec6c1",
+          "last_changed": "2026-10-23T07:23:13.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 1,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/usage.json",
+          "kind": "skill",
+          "sha256": "ebcc7715c36cae78df4682bf8dcda373a36bea489f1bdab0a5ec91255213502c",
+          "last_changed": "2026-10-21T08:18:55.000Z",
+          "age_days": 2,
+          "lag_days": 1,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 4,
+          "content_signal": null
+        },
+        {
+          "path": ".github/skills/visual-view-diff/fixtures/whatsnew.json",
+          "kind": "skill",
+          "sha256": "41ba203e97c6dbb17b04f91303cc85422be7bfe07dfb4c724f83b242ebcce9f3",
+          "last_changed": "2026-10-14T06:46:48.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 58,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/browser.js",
+          "kind": "skill",
+          "sha256": "5f89393cc1c16c1a276eccbaa416f10f3eb2c8501ea1efc84af25d5a617f481c",
+          "last_changed": "2026-10-11T09:40:29.000Z",
+          "age_days": 12,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 111,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/config.js",
+          "kind": "skill",
+          "sha256": "5778971a2f50aa6f855a8575e73526c1e5ac6ed257077ed5a43076d1fbc46120",
+          "last_changed": "2026-10-11T16:37:34.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 92,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/harness.js",
+          "kind": "skill",
+          "sha256": "1c93769f7405dcf8c25115b8109edaede25c3f97d5ec7d75ef076af1313ef2ca",
+          "last_changed": "2026-10-11T16:37:34.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 92,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/imageDiff.js",
+          "kind": "skill",
+          "sha256": "4bcfdc04db549f42451c5f982ceb2f20b9e2877ed1808cacf68ffedde549d630",
+          "last_changed": "2026-08-29T13:39:37.000Z",
+          "age_days": 54,
+          "lag_days": 54,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 778,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/pool.js",
+          "kind": "skill",
+          "sha256": "5b3a98edd07334549d000e4a4ae863d2ddd685a13e298355fb832a79d7c3888b",
+          "last_changed": "2026-10-09T14:14:22.000Z",
+          "age_days": 13,
+          "lag_days": 13,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 129,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/report.js",
+          "kind": "skill",
+          "sha256": "fc8268de18b9d8b40eb0e4371fcdc2842c05bf82c11da315d4e59c8f017603e5",
+          "last_changed": "2026-09-17T15:19:44.000Z",
+          "age_days": 35,
+          "lag_days": 35,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 322,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/steps.js",
+          "kind": "skill",
+          "sha256": "afa85babdd51cc989b37784808e04d8bd6cb5cea8781d99aae5fab3728510436",
+          "last_changed": "2026-10-01T07:04:49.000Z",
+          "age_days": 22,
+          "lag_days": 22,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 205,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/theme-dark.css",
+          "kind": "skill",
+          "sha256": "916c92aea9829388054f67b8ac9da769fd116b89310594263e13fdf4798bd4d5",
+          "last_changed": "2026-10-13T21:32:39.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 64,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/theme-hc-light.css",
+          "kind": "skill",
+          "sha256": "760b7ee2bacf10bdc7c9ba589c3ca3ea4f510a7882ea0bfa4d1fc31d5cd219d4",
+          "last_changed": "2026-10-13T21:32:39.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 64,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/theme-hc.css",
+          "kind": "skill",
+          "sha256": "ef3ef66393cc37a235e4f3686127aa556ee4be8ba59ba143c22bf6791499087a",
+          "last_changed": "2026-10-13T21:32:39.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 64,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/lib/theme-light.css",
+          "kind": "skill",
+          "sha256": "5e5ab04dacf7de5461135e2a4fdb91a3b3e11e41cf5e82c3ba6af098c8b34150",
+          "last_changed": "2026-10-13T21:32:39.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 64,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/README.md",
+          "kind": "skill",
+          "sha256": "5e6bd7e99e97314381b8aa6fd4b7a1fc3b0e97b0fa2dbe8bbe1d64b8bbb044e6",
+          "last_changed": "2026-10-11T16:40:02.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 90,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/render-views.js",
+          "kind": "skill",
+          "sha256": "d5bc03c4fba668df15c1eded50107da038b45a20a0a40228961160c23c932d2a",
+          "last_changed": "2026-10-11T16:37:34.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 92,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/SECURITY.md",
+          "kind": "skill",
+          "sha256": "7e8b6a5c769195c1f23bc1c5dfba9bcbe93f673a86e76a9ceb44a67845ed0fe3",
+          "last_changed": "2026-10-11T16:37:34.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 92,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/SKILL.md",
+          "kind": "skill",
+          "sha256": "85f2edf55da01724c758fac285dc1e5fb1a2473270428f90df99fe36ad4185a2",
+          "last_changed": "2026-10-11T16:40:02.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 90,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/views.config.json",
+          "kind": "skill",
+          "sha256": "992088fdafd605ad6132b7f2ad76e7629ddc3a7ac9838666fcf08332539df3af",
+          "last_changed": "2026-10-23T07:23:13.000Z",
+          "age_days": 0,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 1,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/visual-view-diff/visual-diff.js",
+          "kind": "skill",
+          "sha256": "b0b5029aa98989266b10cba0807e73fd395eeb8a07af61a2811999c4f497ddd9",
+          "last_changed": "2026-10-11T16:37:34.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 92,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/whats-new-catalog/SKILL.md",
+          "kind": "skill",
+          "sha256": "aeeac6e347119c16c9e1c08720ab20552b19f2dc2c57aa0d7230c9c21eae19f6",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/whats-new-catalog/whats-new-catalog.js",
+          "kind": "skill",
+          "sha256": "cae167fb75de4c3582f3c86d5e668fecb0bd310db6595e9faa86383e9023eef2",
+          "last_changed": "2026-10-11T12:04:29.000Z",
+          "age_days": 11,
+          "lag_days": 11,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 108,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "ec249afa844ee09e5373af29247d92f723cd13d4524754a57c21a6d1783d6c76",
+          "last_changed": "2026-10-17T15:28:55.000Z",
+          "age_days": 5,
+          "lag_days": 5,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 30,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": "CLAUDE.md",
+          "kind": "claude",
+          "sha256": "7e6ee72a2db7f947e750f7ffc58e8d5fc7c942dab6694d644f99b9091ed75f4d",
+          "last_changed": "2026-09-07T09:40:00.000Z",
+          "age_days": 46,
+          "lag_days": 45,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 535,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": "sharing-server/AGENTS.md",
+          "kind": "agents",
+          "sha256": "d161097cee3b03dbeaaeb8a222e84d6d3e47707eaf711b9ee3f5e86095eb5668",
+          "last_changed": "2026-09-07T09:40:00.000Z",
+          "age_days": 46,
+          "lag_days": 45,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 535,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 159,
+        "stale_count": 10,
+        "max_lag_days": 279,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 280,
+      "commits_90d": 937,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/authority-contribution-scraper",
+      "head_sha": "1575ec9df99f7315e51a2daf44802a1bb073261f",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 4,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/awesome-ai-tokenomics",
+      "head_sha": "63d069fbece58d37e3689756f369e873b155ac6d",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 5,
+      "commits_90d": 48,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/azure-openai-service-proxy",
+      "head_sha": "a99fe303857f05e1e5dfb3d6c7c14394ac281641",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/Azure-scripts",
+      "head_sha": "89ac4520a17225d65ddd562d09c6d220d9da4a8f",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/centralPackageVersioningSample",
+      "head_sha": "e5e2fd314aba50a520f52621228d7f35c064fa4c",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 1,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/check-dependabot",
+      "head_sha": "349d265d40521d161ad54237b4e022b382335586",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/CleanupCopilotLicenses",
+      "head_sha": "098d72c6b3193d31482688f66b44cc4d1993a268",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/cli",
+      "head_sha": "c024e856dbf6323c04d0a642eb099c4b7634fed3",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/codespaces-models",
+      "head_sha": "ad17d151aa08707f7ea68a00f5a9ee2a6ba7d4f4",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/CodeToCloud-Student",
+      "head_sha": "a849006880dd2aa379a21ed8d175e39b09546dea",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/container-scan",
+      "head_sha": "1f8a3ee73316d6d494b274e97d6a904fe464443d",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/continuous-compliance-action",
+      "head_sha": "56bb06eb0ef5e0cbcb0f1ee3af3f5c57762537a9",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/Copilot-App-demo",
+      "head_sha": "2b7cc14f811e927cefd119e2df7a7ed0896ed39c",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 3,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/copilot-custom-agents",
+      "head_sha": "e2965ae2efde5c00ab6c74b2204540d6751f2975",
+      "ai_files": [
+        {
+          "path": ".github/agents/my-agent.agent.md",
+          "kind": "agent",
+          "sha256": "f8568db6fdab87edfe84dc7c144fc2cfa1a2f84c0320ddaab586c7d394acb8bf",
+          "last_changed": "2025-11-23T21:34:41.000Z",
+          "age_days": 333,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 1,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/agents/research.agent.md",
+          "kind": "agent",
+          "sha256": "e4493e4f5c8f022e03ff32954657caae1ff33e837141832c7e84ddfbba78be72",
+          "last_changed": "2025-11-23T21:31:08.000Z",
+          "age_days": 333,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 4,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/agents/ui.agent.md",
+          "kind": "agent",
+          "sha256": "12d8dc4aa5af0aac54df5f5031513f5537ac2947a629e964e36ba8d438f5b714",
+          "last_changed": "2025-11-23T21:34:06.000Z",
+          "age_days": 333,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 2,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 3,
+        "stale_count": 0,
+        "max_lag_days": 0,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/copilot-usage-advanced-dashboard",
+      "head_sha": "774aea9dd6708b2699e17e9132f0c44d89d7ab47",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/create-github-app-from-manifest",
+      "head_sha": "9fdfeecc1b7c0f8f97a6e9d932201bcfe65f9a4c",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 6,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/demo",
+      "head_sha": "8a2ee4ec1cbd9966cc799d05584bee934f1570fc",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/demo-actions",
+      "head_sha": "0e87ee76a8bbff51376c25f0f24ba8336a20318e",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 2,
+      "commits_90d": 5,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/demo-javascript-action",
+      "head_sha": "9eecaeed9878bbc6778272804dee8f17d6ed8247",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 2,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/Demo-Pages",
+      "head_sha": "eeeadc8c011df3586f8ea86a14ce7734a8e2bfb0",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/demo-repo-monday",
+      "head_sha": "a0eb9ecfe91977e2f9cb7ee5d15eb5a97fdbbdea",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/demo-webgoat",
+      "head_sha": "0be14388204a38e9e5864b3a0c32f24b107ee2dd",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 1,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/dependency-review-action",
+      "head_sha": "0a68c5dfa682385c4d52b3638b1c945b1e68caa1",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/dependency-updates",
+      "head_sha": "4a8231a6573dd7ba37d4219b5742c86c987a5ca3",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/dind-rootless-runner",
+      "head_sha": "7df18bcacb30df09ed763344fe6ddf4f211f2f27",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/dind-secure",
+      "head_sha": "fa9d024f9b4982a50586e2a4e5addfcb7f702596",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/docker-test",
+      "head_sha": "63f21e6b1003c2397cc4fc52b810642726899a0e",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 1,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/doom-sharp",
+      "head_sha": "bea390bee1ef9c3a05092aa281ba2e6980487917",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 1,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/dotnetcore-webapp",
+      "head_sha": "d52eb355f49db85c9cd871f9bc14cbcb3462bf42",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 3,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/eco-ci-activity-checker",
+      "head_sha": "2c156b32949dda507d95c4cdc5efa9d9fa52f43e",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/eco-ci-energy-estimation",
+      "head_sha": "376d2195df5eeaeac1d305cd93e15417ab79bfaf",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 1,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/find-action-used",
+      "head_sha": "9996e36ce16c98cfb037913cadcc64c0c1a44c15",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/game-center",
+      "head_sha": "5ed7031d757fec0d40ed535d581fb027579dc6c4",
+      "ai_files": [
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "4aebf0434052a432ec8cf5246c5dd652beeb2448c487cc815ab04dc1505fca05",
+          "last_changed": "2025-12-23T13:53:27.000Z",
+          "age_days": 303,
+          "lag_days": 187,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 33,
+          "content_signal": {
+            "score": 100,
+            "scope": true,
+            "actions": true,
+            "verification": true,
+            "guardrails": true
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 1,
+        "stale_count": 1,
+        "max_lag_days": 187,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/get-organization-repositories-fork",
+      "head_sha": "0e75130a3adede7958692a36c723db983ed42870",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/gh-developer-games",
+      "head_sha": "1d5ef981c8f8a67a5dbe2bd7ee6b9adcc3031354",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/GHAzDo-widget",
+      "head_sha": "c42863cbfe031d88a62e07acc9b349a70c6f1aef",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "0f55a480d3a9aa2224e36ec73b097fc4172b7347a304b0110127c58a97d8cbf3",
+          "last_changed": "2026-04-27T10:01:48.000Z",
+          "age_days": 179,
+          "lag_days": 157,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 63,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "b86ec5799034e0590473b7cb92e9a589589301961052be5441d33c2a3b362b60",
+          "last_changed": "2026-03-21T14:33:54.000Z",
+          "age_days": 215,
+          "lag_days": 193,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 118,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 2,
+        "stale_count": 2,
+        "max_lag_days": 193,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 9,
+      "commits_90d": 25,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/giphy-action",
+      "head_sha": "5fb58f255f99502efa07b0697b50ccbf774a1c79",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-action-composite-message",
+      "head_sha": "0bfb470db761e6b925a52f32a291f060134d6d5d",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-actions-requests",
+      "head_sha": "37e271512f09e80710f19ca4fc0f871e012e9240",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 1,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-azure-devops-marketplace-extension-news",
+      "head_sha": "919a759626b688d7395bbea780e974e172a20d84",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "66c1453a24f79fef0c0c65d262caecef1b47d452a760f5d484c6e9159b62d45c",
+          "last_changed": "2025-11-16T21:15:23.000Z",
+          "age_days": 340,
+          "lag_days": 318,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 167,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": true,
+            "guardrails": false
+          }
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "0cb2005f7882dd2d64545fca6354c309aba0a23f1029b9a54662f12e414064ec",
+          "last_changed": "2026-07-24T10:12:37.000Z",
+          "age_days": 91,
+          "lag_days": 69,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 20,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 2,
+        "stale_count": 1,
+        "max_lag_days": 318,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 8,
+      "commits_90d": 16,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-composite-action-goodbye",
+      "head_sha": "5580fb3eb7ed49c52bd19a40e4bf119c63fa99a9",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-config-as-code",
+      "head_sha": "2bc005ea3e7bfbfb59ba05b593464adad7a261b2",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-copilot-game-dev",
+      "head_sha": "78f4084ca4597b243ba8f8c0eb4ad37889f898d2",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "7950c2d46fd9d1b7a8d789b1258f1be506188f344e1d6f780312a98bcdafefdd",
+          "last_changed": "2026-04-01T09:55:18.000Z",
+          "age_days": 205,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 1,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 1,
+        "stale_count": 0,
+        "max_lag_days": 0,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-copilot-model-notifier",
+      "head_sha": "319b56f1a7db6ce43ab2b06073bb4dc1e37da02d",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 6,
+      "commits_90d": 30,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-copilot-premium-reqs-usage-fork",
+      "head_sha": "feb3e8090d5d19d771be56d9202ee5e533a69a69",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "325e243fb6852945143ac48b95c247a1cc55be621e797e5cc0553a54cdcaa725",
+          "last_changed": "2026-07-23T10:03:02.000Z",
+          "age_days": 92,
+          "lag_days": 54,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 22,
+          "content_signal": {
+            "score": 100,
+            "scope": true,
+            "actions": true,
+            "verification": true,
+            "guardrails": true
+          }
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "f643ad82b678f34cf0da9075e15da2d16d95be9a243542d28f7a1ab91d3c3a6d",
+          "last_changed": "2026-05-06T19:16:55.000Z",
+          "age_days": 169,
+          "lag_days": 131,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 85,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 2,
+        "stale_count": 1,
+        "max_lag_days": 131,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 14,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-fork-updater",
+      "head_sha": "ec65c39fad77dfb18776caeb4f8620df1df64ea8",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "ae254a4dfa5f212b2a2d8c4e14887ed889876b8fe149c864988ca88077c5580a",
+          "last_changed": "2026-04-20T18:57:30.000Z",
+          "age_days": 185,
+          "lag_days": 163,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 9,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "9cafb398baccff4522ec8070bd74ab65e6a2faf02cf2d3e0ea0581e2993ba9dd",
+          "last_changed": "2026-04-20T18:57:30.000Z",
+          "age_days": 185,
+          "lag_days": 163,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 9,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 2,
+        "stale_count": 2,
+        "max_lag_days": 163,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 1,
+      "commits_90d": 2,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-graphql-examples",
+      "head_sha": "7e1848cceb571476353404617ee4805fe785908b",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-mcp-server",
+      "head_sha": "644ab70cbfee0e37511a1c6228eb76c41eeaed9e",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-models-example",
+      "head_sha": "6a9f53a3ec65d90c5ade32d1643e2e219b3b2bf6",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-org-information",
+      "head_sha": "c0bc229fd752e8d8a341bacf1242b72197932c04",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/GitHub-ratelimit-research",
+      "head_sha": "dfd978133eeb9225be624a13a7a7f8a4b07ee7f8",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 4,
+      "commits_90d": 5,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-secure-code-game",
+      "head_sha": "8fce73a6bf014354ec6aa9b8fab0ba81b1771ea4",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-upload-action",
+      "head_sha": "997e5c85d66375559f76e55008ab63cbee71542e",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/github-vnext-chopin",
+      "head_sha": "d68bf51cb8febc41ad4eeba9b78b15e22017eedf",
+      "ai_files": [
+        {
+          "path": ".github/agents/agentic-workflows.agent.md",
+          "kind": "agent",
+          "sha256": "278b496534f443f7bffdddd9eed69dd65f8f56e7ba512efe8c6fa558e5c3baf2",
+          "last_changed": "2026-08-20T19:16:16.000Z",
+          "age_days": 63,
+          "lag_days": 16,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 296,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "fcdc3618c6c69ee0b9f0ba025656a8309b86dc5f1c095d0066bcf347ab871ffa",
+          "last_changed": "2026-09-05T21:10:53.000Z",
+          "age_days": 47,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 2,
+          "content_signal": {
+            "score": 100,
+            "scope": true,
+            "actions": true,
+            "verification": true,
+            "guardrails": true
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 2,
+        "stale_count": 0,
+        "max_lag_days": 16,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 598,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/GitHubBootcamp",
+      "head_sha": "c72941cb9f2e476a12a34cbc0620e687e3c7e949",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/greenframe-action",
+      "head_sha": "c3bc3203c2ad04ae8ecf46fe67cec1d10ce016fd",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/ha-config",
+      "head_sha": "8e6aff95526da946a9986c45ca2b0ed38b7edffa",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/hol-demo",
+      "head_sha": "8c3219143c542f9bcbd74016d0fb55b6ca66b6b1",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/home-automation",
+      "head_sha": "8bfaf59a7a92f6b68952aa3465b81fbe01452064",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/html-timer",
+      "head_sha": "f1a16aea458961186950cc4aa4b8917f2c012224",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/issue-labeler",
+      "head_sha": "37f2b4055e6c4f5ff8cded0dc8df24c3bdc90199",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/Jarvis",
+      "head_sha": "a66f759b415abdb28a1b145f73fa08f6e22f8e73",
+      "ai_files": [
+        {
+          "path": ".claude/agents/product-owner.md",
+          "kind": "tool_config",
+          "sha256": "f1ddbd8ace3bcfc891e86f4e8f8b086a81bd5036d4dbbfddcc457842681b60a4",
+          "last_changed": "2026-04-13T08:02:58.000Z",
+          "age_days": 193,
+          "lag_days": 192,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 543,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".claude/skills/check-db/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "03d494b9427b3ea850cd979f3e0ff01e6670b10816fc23d559ed2e4fab428fb1",
+          "last_changed": "2026-07-06T07:44:55.000Z",
+          "age_days": 109,
+          "lag_days": 108,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 350,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".claude/skills/onenote-caching/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "c5837075f7fa83c846ed186c30b5a4dcf0c5922f2fe2d7762ed0f1f6e31ea8bf",
+          "last_changed": "2026-07-06T07:44:55.000Z",
+          "age_days": 109,
+          "lag_days": 108,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 350,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".claude/skills/project-budget-actuals/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "d7f637b84b326300b312eec5644bf9f15699ffdd2c3bc90f9561fd5ddac3c872",
+          "last_changed": "2026-07-06T07:44:55.000Z",
+          "age_days": 109,
+          "lag_days": 108,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 350,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".claude/skills/visual-test/SKILL.md",
+          "kind": "tool_config",
+          "sha256": "576e57d6a0b67f3033a752c67f410d154cdabaf93fa0c79ea809ec917ca8ae29",
+          "last_changed": "2026-10-08T15:14:50.000Z",
+          "age_days": 14,
+          "lag_days": 14,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 75,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/agents/product-owner.agent.md",
+          "kind": "agent",
+          "sha256": "b3fc67e9b8d36016c74f890bb107186fea4cb2dd32a07c5fb7f2194f8b7455fa",
+          "last_changed": "2026-04-13T17:28:31.000Z",
+          "age_days": 192,
+          "lag_days": 192,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 535,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "b864a87a5b61a523b8c109fe0e42327198316f5bf084247b80666b866512f5df",
+          "last_changed": "2026-10-09T21:44:03.000Z",
+          "age_days": 13,
+          "lag_days": 13,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 53,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/check-db/check-db.js",
+          "kind": "skill",
+          "sha256": "c09dadd49c211e2692bd381ea30d79c6a15a3d0ba971189552e55dd301cdd2dd",
+          "last_changed": "2026-03-16T20:21:43.000Z",
+          "age_days": 220,
+          "lag_days": 220,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 615,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/check-db/SKILL.md",
+          "kind": "skill",
+          "sha256": "3d3ab0c8343a6825b1ddd3e247dffbcd59c19e44e0e65be55642eb18870d325e",
+          "last_changed": "2026-03-16T20:21:43.000Z",
+          "age_days": 220,
+          "lag_days": 220,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 615,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/onenote-caching/SKILL.md",
+          "kind": "skill",
+          "sha256": "d51dcf152319848d7d3b3d2762f6d22d9339a185b99db7d39165255b358f302b",
+          "last_changed": "2026-05-27T07:46:04.000Z",
+          "age_days": 149,
+          "lag_days": 148,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 451,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/project-budget-actuals/SKILL.md",
+          "kind": "skill",
+          "sha256": "091d5ae4e19645e950d957103285c8684a70faa21769a6c4ba8a28a107fb3e1d",
+          "last_changed": "2026-09-27T21:26:02.000Z",
+          "age_days": 25,
+          "lag_days": 25,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 152,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/visual-test/SKILL.md",
+          "kind": "skill",
+          "sha256": "42054ee23ea13933e60d4e54186d527a45377af806b4522506891d25ae7ece8d",
+          "last_changed": "2026-10-13T21:45:36.000Z",
+          "age_days": 9,
+          "lag_days": 9,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 34,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "90d8d492a59d56869bdf6020a14742246bfb4e6a1b9ae6cb6f69d0c4da7fecd5",
+          "last_changed": "2026-04-11T21:46:52.000Z",
+          "age_days": 194,
+          "lag_days": 194,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 549,
+          "content_signal": {
+            "score": 25,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 13,
+        "stale_count": 9,
+        "max_lag_days": 220,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 181,
+      "commits_90d": 336,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/juice-shop",
+      "head_sha": "d04751bf551e77b97894a90814dd81ad5cafdc0c",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/kvm",
+      "head_sha": "d81776dbbd821176195b0b2afe866ee814cdf234",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/legitify",
+      "head_sha": "038aa49473a6974a3ef79f6c76b949b689d23282",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/local-setup",
+      "head_sha": "9b31238e29a91baccaad25726b83bfe18e7ea2b4",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/mcp-agents-hub",
+      "head_sha": "6c0751082cd752f502ebbc978a09b3ac40ed4935",
+      "ai_files": [
+        {
+          "path": "CLAUDE.md",
+          "kind": "claude",
+          "sha256": "e1123523973396fef9778515b19023c4b5995111f70301260bd637ebbee4ba08",
+          "last_changed": "2025-06-05T03:43:29.000Z",
+          "age_days": 505,
+          "lag_days": 0,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 1,
+          "content_signal": {
+            "score": 100,
+            "scope": true,
+            "actions": true,
+            "verification": true,
+            "guardrails": true
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 1,
+        "stale_count": 0,
+        "max_lag_days": 0,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/mcp-registry-demo",
+      "head_sha": "5b66f6ce1e29e4d666266a2afbdd4a369d8041a0",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 1,
+      "commits_90d": 5,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/mcp-servers",
+      "head_sha": "5309e52de2703e0710e0e26244aca2b361cfed10",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/melos-action",
+      "head_sha": "ff94301d820b8b98bd1939f52e473a433f7bcaeb",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/microsoft-learn",
+      "head_sha": "2f4510d79e243280dc42f2df2554e959b553f87b",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/microsoft-todo-mcp-server",
+      "head_sha": "dd99cb7732f71ab5dadfbf385041a973a5d4a256",
+      "ai_files": [
+        {
+          "path": "CLAUDE.md",
+          "kind": "claude",
+          "sha256": "2e54651db4486e20d5d734d67293060d3d0640123e640b123c90b540f4f2d1f0",
+          "last_changed": "2025-06-08T22:16:04.000Z",
+          "age_days": 501,
+          "lag_days": 306,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 20,
+          "content_signal": {
+            "score": 25,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 1,
+        "stale_count": 1,
+        "max_lag_days": 306,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/modern-development",
+      "head_sha": "bad51b5ab0c26b35ca1fb2f019b11f666b54d04b",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/NuGetDefense.Core",
+      "head_sha": "9ec44fe022cff685d38e1d8070a49b64b22f0fa6",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/openssf-scorecard-monitor",
+      "head_sha": "e7e6c3cfad34d4bdcb0b36557c193332239858f0",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 3,
+      "commits_90d": 9,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/pages-test",
+      "head_sha": "853a7ec853628bf9e6237d3bad2d6eabca955f26",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/pipelines",
+      "head_sha": "aec3b5e5be011208602957110389cc896e907f8f",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 1,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/pr-template-test",
+      "head_sha": "3c7e828f435451744128ccfb5e113deca28f2836",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/PS-NetworkAnalyzer",
+      "head_sha": "1c5ae11121199e4934e60f501dc9ca8e20c66b4c",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/PublicGitHubActionsTest",
+      "head_sha": "453b284f09ac4eadc777adaa42b918626affea88",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/rajbos",
+      "head_sha": "cfbfb9611e8885667d16f35a3bffee289edd2c02",
+      "ai_files": [
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "b45700641527b42e08ee012c2a0bc4ddb0c42d3f0fa910c774f12be079143397",
+          "last_changed": "2025-11-30T21:39:21.000Z",
+          "age_days": 326,
+          "lag_days": 304,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 112,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 1,
+        "stale_count": 1,
+        "max_lag_days": 304,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 2,
+      "commits_90d": 25,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/rajbos.github.io",
+      "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894",
+      "ai_files": [
+        {
+          "path": ".github/agents/blog-interviewer.agent.md",
+          "kind": "agent",
+          "sha256": "cfc03d28a259c8028ad20ebb2c6f87ed168d03f7cbac59451466e8a551220f0e",
+          "last_changed": "2026-05-15T14:52:50.000Z",
+          "age_days": 160,
+          "lag_days": 155,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 48,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "6a1dea346cd99d816d55cb95ca27be88dc4da565208d4356b7c61242245ed798",
+          "last_changed": "2026-08-26T20:05:00.000Z",
+          "age_days": 57,
+          "lag_days": 52,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 26,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/prompts/check-ai-tropes.prompt.md",
+          "kind": "prompt",
+          "sha256": "788e3294807616e22a30ffe9ff3f6c29ed3e968dd6c792aaf2a45c7512967484",
+          "last_changed": "2026-08-26T20:05:00.000Z",
+          "age_days": 57,
+          "lag_days": 52,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 26,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/prompts/writing-style.prompt.md",
+          "kind": "prompt",
+          "sha256": "a1940d840253e500c09d6dd76a9a27bf489529cab3835d5f415b8c23afaf4b6e",
+          "last_changed": "2026-05-14T20:05:25.000Z",
+          "age_days": 161,
+          "lag_days": 156,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 66,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/blog-writing/references/ai-tropes.md",
+          "kind": "skill",
+          "sha256": "e73e61918dda9f07604ad55ccd8f6a63f800e6bcf3b2a9b5e91f56766b0f77ca",
+          "last_changed": "2026-08-26T20:05:00.000Z",
+          "age_days": 57,
+          "lag_days": 52,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 26,
+          "content_signal": {
+            "score": 50,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/blog-writing/SKILL.md",
+          "kind": "skill",
+          "sha256": "9a2ae13d06634ca0f2493b2f99d35f456aeff947bd7bbf897767d77b438fa8be",
+          "last_changed": "2026-08-26T20:05:00.000Z",
+          "age_days": 57,
+          "lag_days": 52,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 26,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/skills/youtube-transcript/fetch-transcript.mjs",
+          "kind": "skill",
+          "sha256": "829f0ab5ee576cc4eac5dc6ef9cae2e3e3f61424f1ea678ba24e5fbdc6f09a7b",
+          "last_changed": "2026-05-14T20:40:59.000Z",
+          "age_days": 161,
+          "lag_days": 156,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 60,
+          "content_signal": {
+            "score": 0,
+            "scope": false,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": ".github/skills/youtube-transcript/SKILL.md",
+          "kind": "skill",
+          "sha256": "9b3546a54e1e04f0620fd0bd196126841d7c134ff0e370427bfed1872bff0b6b",
+          "last_changed": "2026-05-14T20:40:59.000Z",
+          "age_days": 161,
+          "lag_days": 156,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 60,
+          "content_signal": {
+            "score": 25,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": false
+          }
+        },
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "4cf4e31105544beba76e5afeceaffe766474096b3f48a6af10df6b024e990f79",
+          "last_changed": "2026-05-14T20:34:17.000Z",
+          "age_days": 161,
+          "lag_days": 156,
+          "stale": true,
+          "status": "known",
+          "commits_since_change": 61,
+          "content_signal": {
+            "score": 25,
+            "scope": true,
+            "actions": false,
+            "verification": false,
+            "guardrails": false
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 9,
+        "stale_count": 5,
+        "max_lag_days": 156,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 15,
+      "commits_90d": 30,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/runner-tests",
+      "head_sha": "baeb5df1c9421accc2bdb6091f73ad94b69a7e84",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/sample-app-aoai-chatGPT",
+      "head_sha": "3bf6acaec8fc18177ce0797b319995d9c981823a",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/scorecard-action",
+      "head_sha": "33bb591983cdd3feffdbe87b9719c784f7e90ac1",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/scorecard-ghes",
+      "head_sha": "0e28115977cd0181df0f14185eec5f65efbcc17a",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 3,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/scorecard-webapp",
+      "head_sha": "29dafb779294cafb6f028bb56b4540f920832788",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/secret-scanning-custom-patterns",
+      "head_sha": "8c3ee9eb2fe1500a8ae9428e6e3fa5aba0f64c26",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/SonarQube-AzureAppService",
+      "head_sha": "e4348fab8f81cbe7593395921f913022a29621d9",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/Stryker.MultipleProjectRunner",
+      "head_sha": "aedd8fb99621014878f5b912f50ea97fbdf07b42",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/tag-npm-version",
+      "head_sha": "dce8f98ce1ba9730c5c2c7e1d76159af94b54747",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/TailwindTraders",
+      "head_sha": "8d9bb44793c2f2b5bbca275d4e2bfef2a69bca12",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/teams-automation",
+      "head_sha": "595fd667082aa35f49b1caf6af1d1c9f8dbd2e90",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/test-repo",
+      "head_sha": "213ecbc220d7570881edcbd6d25f12ad25fd9a8f",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/tfsec-sarif-action",
+      "head_sha": "bd17f78e6a7abc8c5033b53bf7e8d7d86217dc09",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/training-manual",
+      "head_sha": "5d0b9b1914336ff486616c3649d7c1ba74c65879",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/trivy-action",
+      "head_sha": "c03d123cb480c08c69b054af418ea5e69fe6e57e",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 1,
+      "commits_90d": 3,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/typescript-demo",
+      "head_sha": "df0b1f6f882978b989b672f85478439e2a1bd66f",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 1,
+      "commits_90d": 8,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/vscode-copilot-insights",
+      "head_sha": "734cce21ced8770099b2fcc43bef1d17cac4994a",
+      "ai_files": [
+        {
+          "path": ".github/agents/vscode-extension-developer.agent.md",
+          "kind": "agent",
+          "sha256": "b1edbacf56b426b3c19852f7e425a79c58e1ac9280cb99acd607d695685e77d6",
+          "last_changed": "2026-07-06T09:55:57.000Z",
+          "age_days": 109,
+          "lag_days": 21,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 20,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/copilot-instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "212f2ad2a52582900802bc3c7f54952585a3875571ea6978c8662eb260899226",
+          "last_changed": "2026-07-06T11:12:43.000Z",
+          "age_days": 109,
+          "lag_days": 20,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 19,
+          "content_signal": {
+            "score": 75,
+            "scope": true,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        },
+        {
+          "path": ".github/instructions/repo-validation.instructions.md",
+          "kind": "copilot_instructions",
+          "sha256": "3cb4ce9c864577dd54ebb6816a52b5cbf7ac165a665350720069a33651068cde",
+          "last_changed": "2026-07-06T11:12:43.000Z",
+          "age_days": 109,
+          "lag_days": 20,
+          "stale": false,
+          "status": "known",
+          "commits_since_change": 19,
+          "content_signal": {
+            "score": 50,
+            "scope": false,
+            "actions": true,
+            "verification": false,
+            "guardrails": true
+          }
+        }
+      ],
+      "ai_summary": {
+        "count": 3,
+        "stale_count": 0,
+        "max_lag_days": 21,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 8,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/vscode-github-ratelimit",
+      "head_sha": "baf9d2fff88d9f0fe4d566667b9ebb94c6ed44a3",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/webdis-fork",
+      "head_sha": "4b66bcf85bd4450575b4286aab9e9c58f7cebc5e",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/WebGoat.NETCore",
+      "head_sha": "a013533c494227bf1c08c118a659efd4a8008312",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    },
+    {
+      "full_name": "rajbos/workflow-composition",
+      "head_sha": "80f7ca440f547e42c22c05a8ad71bbfe1dd32f69",
+      "ai_files": [],
+      "ai_summary": {
+        "count": 0,
+        "stale_count": 0,
+        "max_lag_days": null,
+        "unknown_count": 0,
+        "status": "known"
+      },
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "team_commits_30d": null,
+      "team_commits_90d": null
+    }
+  ]
+}
