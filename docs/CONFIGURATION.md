@@ -460,7 +460,11 @@ and default-branch SHA using that token before cloning. Anonymous HTTPS clones
 are full-history, not shallow; a repository whose HEAD moved between pinning
 and clone fails closed rather than scanning an unpinned checkout. The installed
 CLI runs in `local_git/full` mode with `--repos-dir`, `--expected-heads`, an
-explicit selection config and `--output`; only then does the adapter re-check
+explicit selection config and `--output`. The scanner must be version `0.1.2`
+or newer: earlier versions incorrectly report an ambiguous clone for an
+owner's self-named repository (`owner/owner`) in the owner/repository clone
+layout. This is a scanner error, not a reason to exclude that repository or
+grant additional permissions. Only then does the adapter re-check
 public visibility using a fresh Contents-read App token scoped to the same
 exact repository list (the pre-clone token may have expired). If refreshing
 the token fails, ingestion is skipped and the run is marked stale. The adapter
