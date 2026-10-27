@@ -2,6 +2,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import type { Octokit } from "@octokit/rest";
 import { defaultConfig } from "./config.js";
+import { installedLandscapeScannerVersion } from "./landscape.js";
 import {
   discoveryLatestPath,
   loadPublicDiscoveryStatus,
@@ -19,7 +20,7 @@ import type { OrgMetrics, RepoMetrics } from "./types.js";
 const A = "a".repeat(40);
 const B = "b".repeat(40);
 const DATE = "2026-09-29T12:00:00Z";
-const VERSION = "0.1.1";
+const VERSION = installedLandscapeScannerVersion();
 
 function repo(
   name: string,
