@@ -2,7 +2,7 @@
   "schemaVersion": 14,
   "owner": "rajbos",
   "ownerType": "user",
-  "collectedAt": "2026-10-31T11:52:41.834Z",
+  "collectedAt": "2026-11-01T12:46:46.288Z",
   "repoCount": 145,
   "repos": [
     {
@@ -13,7 +13,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 6,
-      "collectedAt": "2026-10-31T11:33:01.756Z",
+      "collectedAt": "2026-11-01T12:30:23.483Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -983,17 +983,17 @@
       "name": "issue-comment-tag",
       "fullName": "devops-actions/issue-comment-tag",
       "isPrivate": false,
-      "pushedAt": "2026-10-30T07:16:33Z",
+      "pushedAt": "2026-11-01T01:36:19Z",
       "isTeamRepo": false,
       "defaultBranch": "main",
-      "sizeKb": 3952,
-      "collectedAt": "2026-10-31T11:33:45.168Z",
+      "sizeKb": 3961,
+      "collectedAt": "2026-11-01T12:30:47.026Z",
       "issues": {
         "open": 0,
         "closed": 12
       },
       "pullRequests": {
-        "open": 0,
+        "open": 1,
         "closed": 57,
         "merged": 453
       },
@@ -4292,92 +4292,6 @@
           ],
           "totalCommitCount": 2,
           "changesRequestedCount": 0
-        },
-        {
-          "number": 343,
-          "createdAt": "2024-11-01T01:06:42Z",
-          "mergedAt": "2024-11-01T01:15:51Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.15,
-          "closesIssues": [],
-          "linesAdded": 1,
-          "linesDeleted": 1,
-          "reviewCount": 0,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T01:14:15Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
-        },
-        {
-          "number": 344,
-          "createdAt": "2024-11-01T01:06:44Z",
-          "mergedAt": "2024-11-01T01:13:22Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.11,
-          "closesIssues": [],
-          "linesAdded": 1,
-          "linesDeleted": 1,
-          "firstReviewAt": "2024-11-01T01:07:40Z",
-          "firstApprovalAt": "2024-11-01T01:07:40Z",
-          "reviewCount": 6,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T01:11:49Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
-        },
-        {
-          "number": 342,
-          "createdAt": "2024-11-01T01:06:40Z",
-          "mergedAt": "2024-11-01T01:10:54Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.07,
-          "closesIssues": [],
-          "linesAdded": 11,
-          "linesDeleted": 11,
-          "firstReviewAt": "2024-11-01T01:07:19Z",
-          "firstApprovalAt": "2024-11-01T01:07:19Z",
-          "reviewCount": 4,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T01:09:14Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
-        },
-        {
-          "number": 341,
-          "createdAt": "2024-11-01T01:06:36Z",
-          "mergedAt": "2024-11-01T01:08:06Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.03,
-          "closesIssues": [],
-          "linesAdded": 3,
-          "linesDeleted": 3,
-          "firstReviewAt": "2024-11-01T01:07:19Z",
-          "firstApprovalAt": "2024-11-01T01:07:19Z",
-          "reviewCount": 1,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T01:06:35Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
         }
       ],
       "closedPRTimeline": [
@@ -4661,7 +4575,17 @@
           "linesDeleted": 8
         }
       ],
-      "openPRTimeline": [],
+      "openPRTimeline": [
+        {
+          "number": 523,
+          "title": "chore(deps): bump the github-actions group with 12 updates",
+          "createdAt": "2026-11-01T01:36:20Z",
+          "isDraft": false,
+          "hasReview": false,
+          "author": "dependabot",
+          "isBotAuthor": true
+        }
+      ],
       "reviewerLoad": [
         {
           "reviewer": "rajbos",
@@ -4675,7 +4599,7 @@
       "copilotAdoption": {
         "copilotAuthoredPRs": 12,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 149,
+        "totalMergedPRs": 145,
         "totalDetailedPRs": 10,
         "humanMergedPRs": 8
       },
@@ -5635,11 +5559,11 @@
       "name": "load-available-actions",
       "fullName": "devops-actions/load-available-actions",
       "isPrivate": false,
-      "pushedAt": "2026-10-09T22:39:33Z",
+      "pushedAt": "2026-10-31T23:09:11Z",
       "isTeamRepo": false,
       "defaultBranch": "main",
-      "sizeKb": 8129,
-      "collectedAt": "2026-10-31T11:34:37.383Z",
+      "sizeKb": 8224,
+      "collectedAt": "2026-11-01T12:31:53.022Z",
       "issues": {
         "open": 3,
         "closed": 47
@@ -5647,9 +5571,25 @@
       "pullRequests": {
         "open": 0,
         "closed": 68,
-        "merged": 617
+        "merged": 618
       },
       "pullRequestDetails": [
+        {
+          "number": 738,
+          "title": "chore(deps): bump undici from 6.29.0 to 6.29.1",
+          "state": "merged",
+          "createdAt": "2026-10-31T23:02:45Z",
+          "author": "dependabot[bot]",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 3,
+          "linesDeleted": 3,
+          "commentCount": 2,
+          "commitCount": 1,
+          "actionsMinutes": 19.4,
+          "timeToMergeHours": 0.11,
+          "mergedAt": "2026-10-31T23:09:09Z"
+        },
         {
           "number": 737,
           "title": "fix: prevent duplicate release issues for the same version",
@@ -5794,25 +5734,19 @@
           "actionsMinutes": 397.53,
           "timeToMergeHours": 0.32,
           "mergedAt": "2026-10-05T07:57:40Z"
-        },
-        {
-          "number": 724,
-          "title": "chore(deps): bump moment from 2.30.1 to 2.31.0",
-          "state": "merged",
-          "createdAt": "2026-10-01T17:08:48Z",
-          "author": "dependabot[bot]",
-          "isCopilotAuthored": false,
-          "hasCopilotReview": false,
-          "linesAdded": 5,
-          "linesDeleted": 5,
-          "commentCount": 2,
-          "commitCount": 1,
-          "actionsMinutes": 19.58,
-          "timeToMergeHours": 0.14,
-          "mergedAt": "2026-10-01T17:17:28Z"
         }
       ],
       "mergedPRTimeline": [
+        {
+          "number": 738,
+          "createdAt": "2026-10-31T23:02:45Z",
+          "mergedAt": "2026-10-31T23:09:09Z",
+          "author": "dependabot[bot]",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.11,
+          "closesIssues": []
+        },
         {
           "number": 737,
           "createdAt": "2026-10-09T22:09:29Z",
@@ -12030,7 +11964,7 @@
       "copilotAdoption": {
         "copilotAuthoredPRs": 23,
         "copilotReviewedPRs": 4,
-        "totalMergedPRs": 617,
+        "totalMergedPRs": 618,
         "totalDetailedPRs": 10,
         "humanMergedPRs": 121
       },
@@ -13040,12 +12974,12 @@
         },
         {
           "week": "2026-W44",
-          "prsOpened": 0,
-          "prsMerged": 0,
+          "prsOpened": 1,
+          "prsMerged": 1,
           "issuesOpened": 0,
           "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
+          "linesAdded": 3,
+          "linesDeleted": 3
         }
       ]
     },
@@ -13053,17 +12987,17 @@
       "name": "load-used-actions",
       "fullName": "devops-actions/load-used-actions",
       "isPrivate": false,
-      "pushedAt": "2026-10-19T07:28:00Z",
+      "pushedAt": "2026-11-01T07:27:20Z",
       "isTeamRepo": false,
       "defaultBranch": "main",
-      "sizeKb": 17669,
-      "collectedAt": "2026-10-31T11:35:13.441Z",
+      "sizeKb": 17685,
+      "collectedAt": "2026-11-01T12:32:24.282Z",
       "issues": {
         "open": 1,
         "closed": 14
       },
       "pullRequests": {
-        "open": 0,
+        "open": 3,
         "closed": 52,
         "merged": 284
       },
@@ -17305,158 +17239,6 @@
           ],
           "totalCommitCount": 1,
           "changesRequestedCount": 0
-        },
-        {
-          "number": 136,
-          "createdAt": "2024-11-01T07:08:41Z",
-          "mergedAt": "2024-11-01T07:12:25Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.06,
-          "closesIssues": [],
-          "linesAdded": 3,
-          "linesDeleted": 3,
-          "firstReviewAt": "2024-11-01T07:09:20Z",
-          "firstApprovalAt": "2024-11-01T07:09:20Z",
-          "reviewCount": 4,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T07:11:25Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
-        },
-        {
-          "number": 132,
-          "createdAt": "2024-11-01T07:04:34Z",
-          "mergedAt": "2024-11-01T07:11:55Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.12,
-          "closesIssues": [],
-          "linesAdded": 3,
-          "linesDeleted": 3,
-          "firstReviewAt": "2024-11-01T07:05:34Z",
-          "firstApprovalAt": "2024-11-01T07:05:34Z",
-          "reviewCount": 12,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T07:11:05Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
-        },
-        {
-          "number": 131,
-          "createdAt": "2024-11-01T07:04:31Z",
-          "mergedAt": "2024-11-01T07:10:28Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.1,
-          "closesIssues": [],
-          "linesAdded": 3,
-          "linesDeleted": 3,
-          "firstReviewAt": "2024-11-01T07:05:30Z",
-          "firstApprovalAt": "2024-11-01T07:05:30Z",
-          "reviewCount": 8,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T07:09:40Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
-        },
-        {
-          "number": 134,
-          "createdAt": "2024-11-01T07:08:32Z",
-          "mergedAt": "2024-11-01T07:09:22Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.01,
-          "closesIssues": [],
-          "linesAdded": 7,
-          "linesDeleted": 7,
-          "firstReviewAt": "2024-11-01T07:09:10Z",
-          "firstApprovalAt": "2024-11-01T07:09:10Z",
-          "reviewCount": 2,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T07:08:31Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
-        },
-        {
-          "number": 133,
-          "createdAt": "2024-11-01T07:04:37Z",
-          "mergedAt": "2024-11-01T07:08:36Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.07,
-          "closesIssues": [],
-          "linesAdded": 7,
-          "linesDeleted": 7,
-          "firstReviewAt": "2024-11-01T07:05:38Z",
-          "firstApprovalAt": "2024-11-01T07:05:38Z",
-          "reviewCount": 6,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T07:07:35Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
-        },
-        {
-          "number": 130,
-          "createdAt": "2024-11-01T07:04:26Z",
-          "mergedAt": "2024-11-01T07:07:13Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.05,
-          "closesIssues": [],
-          "linesAdded": 1,
-          "linesDeleted": 1,
-          "reviewCount": 0,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T07:06:16Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
-        },
-        {
-          "number": 129,
-          "createdAt": "2024-11-01T07:04:24Z",
-          "mergedAt": "2024-11-01T07:05:23Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.02,
-          "closesIssues": [],
-          "linesAdded": 1,
-          "linesDeleted": 1,
-          "firstReviewAt": "2024-11-01T07:05:20Z",
-          "firstApprovalAt": "2024-11-01T07:05:20Z",
-          "reviewCount": 2,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T07:04:23Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
         }
       ],
       "closedPRTimeline": [
@@ -17666,18 +17448,37 @@
           "isBotAuthor": true,
           "linesAdded": 1,
           "linesDeleted": 1
-        },
-        {
-          "number": 135,
-          "createdAt": "2024-11-01T07:08:38Z",
-          "closedAt": "2024-11-01T07:11:24Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "linesAdded": 3,
-          "linesDeleted": 3
         }
       ],
-      "openPRTimeline": [],
+      "openPRTimeline": [
+        {
+          "number": 352,
+          "title": "chore(deps): bump rajbos/actions-marketplace/powershell from `d656354` to `2b8e866`",
+          "createdAt": "2026-11-01T07:22:24Z",
+          "isDraft": false,
+          "hasReview": true,
+          "author": "dependabot",
+          "isBotAuthor": true
+        },
+        {
+          "number": 353,
+          "title": "chore(deps): bump the github-actions group with 14 updates",
+          "createdAt": "2026-11-01T07:26:25Z",
+          "isDraft": false,
+          "hasReview": false,
+          "author": "dependabot",
+          "isBotAuthor": true
+        },
+        {
+          "number": 354,
+          "title": "chore(deps): bump the github-actions group in /.github/workflows with 14 updates",
+          "createdAt": "2026-11-01T07:27:21Z",
+          "isDraft": false,
+          "hasReview": false,
+          "author": "dependabot",
+          "isBotAuthor": true
+        }
+      ],
       "reviewerLoad": [
         {
           "reviewer": "rajbos",
@@ -17696,7 +17497,7 @@
       "copilotAdoption": {
         "copilotAuthoredPRs": 12,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 197,
+        "totalMergedPRs": 190,
         "totalDetailedPRs": 10,
         "humanMergedPRs": 20
       },
@@ -18688,7 +18489,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 45,
-      "collectedAt": "2026-10-31T11:35:16.932Z",
+      "collectedAt": "2026-11-01T12:32:27.716Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -19672,7 +19473,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 7,
-      "collectedAt": "2026-10-31T11:35:18.417Z",
+      "collectedAt": "2026-11-01T12:32:29.452Z",
       "issues": {
         "open": 1,
         "closed": 3
@@ -20646,7 +20447,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 40,
-      "collectedAt": "2026-10-31T11:35:19.909Z",
+      "collectedAt": "2026-11-01T12:32:30.876Z",
       "issues": {
         "open": 2,
         "closed": 3
@@ -21620,7 +21421,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 117,
-      "collectedAt": "2026-10-31T11:35:32.383Z",
+      "collectedAt": "2026-11-01T12:32:41.779Z",
       "issues": {
         "open": 10,
         "closed": 102
@@ -24042,7 +23843,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 599,
-      "collectedAt": "2026-10-31T11:36:05.885Z",
+      "collectedAt": "2026-11-01T12:33:07.640Z",
       "issues": {
         "open": 4,
         "closed": 83
@@ -28123,7 +27924,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 304,
-      "collectedAt": "2026-10-31T11:36:07.492Z",
+      "collectedAt": "2026-11-01T12:33:08.768Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -29116,7 +28917,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 42354,
-      "collectedAt": "2026-10-31T11:36:14.971Z",
+      "collectedAt": "2026-11-01T12:33:15.207Z",
       "issues": {
         "open": 4,
         "closed": 13
@@ -30136,7 +29937,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 116,
-      "collectedAt": "2026-10-31T11:36:21.400Z",
+      "collectedAt": "2026-11-01T12:33:20.861Z",
       "issues": {
         "open": 4,
         "closed": 10
@@ -31391,7 +31192,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 26,
-      "collectedAt": "2026-10-31T11:36:22.711Z",
+      "collectedAt": "2026-11-01T12:33:21.905Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -32379,7 +32180,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 69,
-      "collectedAt": "2026-10-31T11:36:24.069Z",
+      "collectedAt": "2026-11-01T12:33:22.801Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -33378,7 +33179,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 17,
-      "collectedAt": "2026-10-31T11:36:25.507Z",
+      "collectedAt": "2026-11-01T12:33:24.270Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -34366,7 +34167,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 1214,
-      "collectedAt": "2026-10-31T11:36:40.361Z",
+      "collectedAt": "2026-11-01T12:33:36.710Z",
       "issues": {
         "open": 9,
         "closed": 14
@@ -36809,7 +36610,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 6448454,
-      "collectedAt": "2026-10-31T11:37:29.633Z",
+      "collectedAt": "2026-11-01T12:35:05.918Z",
       "issues": {
         "open": 2,
         "closed": 22
@@ -43766,7 +43567,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 11668,
-      "collectedAt": "2026-10-31T11:37:30.894Z",
+      "collectedAt": "2026-11-01T12:35:06.996Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -44754,7 +44555,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 2,
-      "collectedAt": "2026-10-31T11:37:31.960Z",
+      "collectedAt": "2026-11-01T12:35:08.017Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -45742,7 +45543,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 92,
-      "collectedAt": "2026-10-31T11:37:33.036Z",
+      "collectedAt": "2026-11-01T12:35:09.016Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -46730,7 +46531,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 57,
-      "collectedAt": "2026-10-31T11:37:34.226Z",
+      "collectedAt": "2026-11-01T12:35:10.044Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -47714,17 +47515,17 @@
       "name": "ai-engineering-fluency",
       "fullName": "rajbos/ai-engineering-fluency",
       "isPrivate": false,
-      "pushedAt": "2026-10-29T14:24:45Z",
+      "pushedAt": "2026-11-01T03:22:11Z",
       "isTeamRepo": true,
       "defaultBranch": "main",
-      "sizeKb": 29745,
-      "collectedAt": "2026-10-31T11:39:13.777Z",
+      "sizeKb": 29746,
+      "collectedAt": "2026-11-01T12:36:20.157Z",
       "issues": {
         "open": 8,
         "closed": 377
       },
       "pullRequests": {
-        "open": 4,
+        "open": 5,
         "closed": 76,
         "merged": 2081
       },
@@ -59108,14 +58909,14 @@
       "contributorCount": 9,
       "dependentCount": 0,
       "copilotAgentMetrics": {
-        "totalTasks": 17,
+        "totalTasks": 16,
         "completedTasks": 5,
         "failedTasks": 0,
         "cancelledTasks": 2,
         "timedOutTasks": 0,
-        "activeTasksCount": 10,
-        "totalSessions": 17,
-        "cloudAgentSessions": 14,
+        "activeTasksCount": 9,
+        "totalSessions": 16,
+        "cloudAgentSessions": 13,
         "cliRemoteSessions": 3,
         "totalCreditsUsed": 0,
         "avgCompletedSessionHours": 0.18,
@@ -60053,12 +59854,12 @@
         },
         {
           "week": "2026-W44",
-          "prsOpened": 34,
+          "prsOpened": 35,
           "prsMerged": 35,
           "issuesOpened": 2,
           "issuesClosed": 3,
-          "linesAdded": 758,
-          "linesDeleted": 142
+          "linesAdded": 752,
+          "linesDeleted": 136
         }
       ]
     },
@@ -60070,7 +59871,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 739,
-      "collectedAt": "2026-10-31T11:39:15.073Z",
+      "collectedAt": "2026-11-01T12:36:21.306Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -61058,7 +60859,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 682,
-      "collectedAt": "2026-10-31T11:39:16.421Z",
+      "collectedAt": "2026-11-01T12:36:22.572Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -62056,7 +61857,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 39385,
-      "collectedAt": "2026-10-31T11:39:17.490Z",
+      "collectedAt": "2026-11-01T12:36:23.677Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -63044,7 +62845,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 2,
-      "collectedAt": "2026-10-31T11:39:18.558Z",
+      "collectedAt": "2026-11-01T12:36:24.591Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -64032,7 +63833,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 14,
-      "collectedAt": "2026-10-31T11:39:20.404Z",
+      "collectedAt": "2026-11-01T12:36:26.196Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -65068,7 +64869,7 @@
       "isTeamRepo": false,
       "defaultBranch": "trunk",
       "sizeKb": 101,
-      "collectedAt": "2026-10-31T11:39:21.546Z",
+      "collectedAt": "2026-11-01T12:36:27.196Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -66056,7 +65857,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 27,
-      "collectedAt": "2026-10-31T11:39:22.674Z",
+      "collectedAt": "2026-11-01T12:36:28.268Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -67044,7 +66845,7 @@
       "isTeamRepo": false,
       "defaultBranch": "trunk",
       "sizeKb": 27258,
-      "collectedAt": "2026-10-31T11:39:23.844Z",
+      "collectedAt": "2026-11-01T12:36:29.296Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -68032,7 +67833,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 14040,
-      "collectedAt": "2026-10-31T11:39:25.065Z",
+      "collectedAt": "2026-11-01T12:36:30.782Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -69020,7 +68821,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 28449,
-      "collectedAt": "2026-10-31T11:39:26.303Z",
+      "collectedAt": "2026-11-01T12:36:31.854Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -70008,7 +69809,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 45,
-      "collectedAt": "2026-10-31T11:39:27.446Z",
+      "collectedAt": "2026-11-01T12:36:32.749Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -70996,7 +70797,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 115,
-      "collectedAt": "2026-10-31T11:39:28.553Z",
+      "collectedAt": "2026-11-01T12:36:33.867Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -71984,7 +71785,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 7,
-      "collectedAt": "2026-10-31T11:39:30.094Z",
+      "collectedAt": "2026-11-01T12:36:35.410Z",
       "issues": {
         "open": 6,
         "closed": 0
@@ -73012,7 +72813,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 7,
-      "collectedAt": "2026-10-31T11:39:31.076Z",
+      "collectedAt": "2026-11-01T12:36:36.368Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -74000,7 +73801,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 8784,
-      "collectedAt": "2026-10-31T11:39:32.120Z",
+      "collectedAt": "2026-11-01T12:36:37.406Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -74988,7 +74789,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 338,
-      "collectedAt": "2026-10-31T11:39:39.343Z",
+      "collectedAt": "2026-11-01T12:36:44.197Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -76546,7 +76347,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 2,
-      "collectedAt": "2026-10-31T11:39:40.503Z",
+      "collectedAt": "2026-11-01T12:36:45.064Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -77530,17 +77331,17 @@
       "name": "demo-actions",
       "fullName": "rajbos/demo-actions",
       "isPrivate": false,
-      "pushedAt": "2026-10-01T14:18:17Z",
+      "pushedAt": "2026-11-01T09:22:35Z",
       "isTeamRepo": false,
       "defaultBranch": "main",
-      "sizeKb": 467,
-      "collectedAt": "2026-10-31T11:39:51.882Z",
+      "sizeKb": 475,
+      "collectedAt": "2026-11-01T12:36:56.621Z",
       "issues": {
         "open": 6,
         "closed": 22
       },
       "pullRequests": {
-        "open": 4,
+        "open": 6,
         "closed": 48,
         "merged": 93
       },
@@ -77781,6 +77582,24 @@
           "number": 216,
           "title": "Bump github/codeql-action from 1 to 4",
           "createdAt": "2026-09-01T08:30:23Z",
+          "isDraft": false,
+          "hasReview": false,
+          "author": "dependabot",
+          "isBotAuthor": true
+        },
+        {
+          "number": 217,
+          "title": "Bump devops-actions/action-get-tag from 1.0.2 to 1.0.5",
+          "createdAt": "2026-11-01T09:22:36Z",
+          "isDraft": false,
+          "hasReview": false,
+          "author": "dependabot",
+          "isBotAuthor": true
+        },
+        {
+          "number": 218,
+          "title": "Bump github/issue-labeler from 3.1 to 3.5",
+          "createdAt": "2026-11-01T09:22:41Z",
           "isDraft": false,
           "hasReview": false,
           "author": "dependabot",
@@ -78761,7 +78580,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 1113,
-      "collectedAt": "2026-10-31T11:39:57.286Z",
+      "collectedAt": "2026-11-01T12:37:00.225Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -79969,7 +79788,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 2,
-      "collectedAt": "2026-10-31T11:39:58.327Z",
+      "collectedAt": "2026-11-01T12:37:01.165Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -80957,7 +80776,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 0,
-      "collectedAt": "2026-10-31T11:39:59.549Z",
+      "collectedAt": "2026-11-01T12:37:02.182Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -81945,7 +81764,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 3,
-      "collectedAt": "2026-10-31T11:40:00.736Z",
+      "collectedAt": "2026-11-01T12:37:03.150Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -82933,7 +82752,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 0,
-      "collectedAt": "2026-10-31T11:40:01.868Z",
+      "collectedAt": "2026-11-01T12:37:04.215Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -83921,7 +83740,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 2450,
-      "collectedAt": "2026-10-31T11:40:03.687Z",
+      "collectedAt": "2026-11-01T12:37:05.852Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -84957,7 +84776,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 0,
-      "collectedAt": "2026-10-31T11:40:04.709Z",
+      "collectedAt": "2026-11-01T12:37:06.832Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -85945,7 +85764,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 13124,
-      "collectedAt": "2026-10-31T11:40:05.842Z",
+      "collectedAt": "2026-11-01T12:37:07.896Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -86933,7 +86752,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 160,
-      "collectedAt": "2026-10-31T11:40:07.971Z",
+      "collectedAt": "2026-11-01T12:37:10.133Z",
       "issues": {
         "open": 2,
         "closed": 3
@@ -87921,7 +87740,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 0,
-      "collectedAt": "2026-10-31T11:40:09.139Z",
+      "collectedAt": "2026-11-01T12:37:11.195Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -88909,7 +88728,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 8,
-      "collectedAt": "2026-10-31T11:40:10.240Z",
+      "collectedAt": "2026-11-01T12:37:12.268Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -89897,7 +89716,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 4,
-      "collectedAt": "2026-10-31T11:40:11.408Z",
+      "collectedAt": "2026-11-01T12:37:13.232Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -90885,7 +90704,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 30,
-      "collectedAt": "2026-10-31T11:40:15.167Z",
+      "collectedAt": "2026-11-01T12:37:16.528Z",
       "issues": {
         "open": 0,
         "closed": 1
@@ -91958,7 +91777,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 4818,
-      "collectedAt": "2026-10-31T11:40:16.738Z",
+      "collectedAt": "2026-11-01T12:37:18.130Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -92984,7 +92803,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 0,
-      "collectedAt": "2026-10-31T11:40:17.794Z",
+      "collectedAt": "2026-11-01T12:37:19.109Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -93972,7 +93791,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 829,
-      "collectedAt": "2026-10-31T11:40:29.051Z",
+      "collectedAt": "2026-11-01T12:37:29.622Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -95171,7 +94990,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 33,
-      "collectedAt": "2026-10-31T11:40:30.228Z",
+      "collectedAt": "2026-11-01T12:37:30.627Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -96159,7 +95978,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 29,
-      "collectedAt": "2026-10-31T11:40:32.035Z",
+      "collectedAt": "2026-11-01T12:37:32.132Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -97185,7 +97004,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 33,
-      "collectedAt": "2026-10-31T11:40:33.168Z",
+      "collectedAt": "2026-11-01T12:37:33.304Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -98192,7 +98011,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 198,
-      "collectedAt": "2026-10-31T11:40:40.113Z",
+      "collectedAt": "2026-11-01T12:37:39.605Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -100023,7 +99842,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 15,
-      "collectedAt": "2026-10-31T11:40:41.242Z",
+      "collectedAt": "2026-11-01T12:37:40.630Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -101011,7 +100830,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 97,
-      "collectedAt": "2026-10-31T11:40:42.495Z",
+      "collectedAt": "2026-11-01T12:37:41.766Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -102014,17 +101833,17 @@
       "name": "GHAzDo-widget",
       "fullName": "rajbos/GHAzDo-widget",
       "isPrivate": false,
-      "pushedAt": "2026-10-19T20:24:48Z",
+      "pushedAt": "2026-11-01T04:06:11Z",
       "isTeamRepo": false,
       "defaultBranch": "main",
-      "sizeKb": 1840,
-      "collectedAt": "2026-10-31T11:41:16.091Z",
+      "sizeKb": 1851,
+      "collectedAt": "2026-11-01T12:38:03.470Z",
       "issues": {
         "open": 5,
         "closed": 18
       },
       "pullRequests": {
-        "open": 6,
+        "open": 7,
         "closed": 34,
         "merged": 181
       },
@@ -105301,15 +105120,6 @@
           "isBotAuthor": true,
           "linesAdded": 7,
           "linesDeleted": 7
-        },
-        {
-          "number": 75,
-          "createdAt": "2024-10-01T05:01:52Z",
-          "closedAt": "2024-11-01T04:18:08Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "linesAdded": 13,
-          "linesDeleted": 13
         }
       ],
       "openPRTimeline": [
@@ -105362,6 +105172,15 @@
           "number": 244,
           "title": "build(deps): bump the npm_and_yarn group across 1 directory with 2 updates",
           "createdAt": "2026-10-19T20:24:50Z",
+          "isDraft": false,
+          "hasReview": false,
+          "author": "dependabot",
+          "isBotAuthor": true
+        },
+        {
+          "number": 245,
+          "title": "build(deps): bump the all-in-one group with 8 updates",
+          "createdAt": "2026-11-01T04:06:13Z",
           "isDraft": false,
           "hasReview": false,
           "author": "dependabot",
@@ -106375,7 +106194,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 1322,
-      "collectedAt": "2026-10-31T11:41:17.447Z",
+      "collectedAt": "2026-11-01T12:38:04.538Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -107363,7 +107182,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 1,
-      "collectedAt": "2026-10-31T11:41:18.486Z",
+      "collectedAt": "2026-11-01T12:38:05.508Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -108351,7 +108170,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 1016,
-      "collectedAt": "2026-10-31T11:41:21.770Z",
+      "collectedAt": "2026-11-01T12:38:08.874Z",
       "issues": {
         "open": 19,
         "closed": 8
@@ -109373,21 +109192,37 @@
       "name": "github-azure-devops-marketplace-extension-news",
       "fullName": "rajbos/github-azure-devops-marketplace-extension-news",
       "isPrivate": false,
-      "pushedAt": "2026-10-01T14:18:48Z",
+      "pushedAt": "2026-11-01T09:37:43Z",
       "isTeamRepo": false,
       "defaultBranch": "main",
-      "sizeKb": 1078,
-      "collectedAt": "2026-10-31T11:41:45.485Z",
+      "sizeKb": 1141,
+      "collectedAt": "2026-11-01T12:38:31.435Z",
       "issues": {
         "open": 0,
         "closed": 7
       },
       "pullRequests": {
-        "open": 4,
-        "closed": 74,
-        "merged": 291
+        "open": 5,
+        "closed": 75,
+        "merged": 292
       },
       "pullRequestDetails": [
+        {
+          "number": 378,
+          "title": "chore(deps): bump the all-in-one group with 6 updates",
+          "state": "merged",
+          "createdAt": "2026-11-01T09:35:35Z",
+          "author": "dependabot",
+          "isCopilotAuthored": false,
+          "hasCopilotReview": false,
+          "linesAdded": 23,
+          "linesDeleted": 23,
+          "commentCount": 0,
+          "commitCount": 1,
+          "actionsMinutes": 37.53,
+          "timeToMergeHours": 0.04,
+          "mergedAt": "2026-11-01T09:37:43Z"
+        },
         {
           "number": 377,
           "title": "Bump NUnit from 4.6.1 to 5.0.0",
@@ -109532,26 +109367,31 @@
           "actionsMinutes": 10.57,
           "timeToMergeHours": 2.71,
           "mergedAt": "2026-07-24T10:27:30Z"
-        },
-        {
-          "number": 365,
-          "title": "fix(ci): rebase and retry upgrade-dependencies push on concurrent-run rejection",
-          "state": "merged",
-          "createdAt": "2026-07-24T07:52:14Z",
-          "author": "rajbos",
-          "isCopilotAuthored": true,
-          "aiAuthorType": "copilot",
-          "hasCopilotReview": false,
-          "linesAdded": 38,
-          "linesDeleted": 1,
-          "commentCount": 0,
-          "commitCount": 2,
-          "actionsMinutes": 8.27,
-          "timeToMergeHours": 0.07,
-          "mergedAt": "2026-07-24T07:56:29Z"
         }
       ],
       "mergedPRTimeline": [
+        {
+          "number": 378,
+          "createdAt": "2026-11-01T09:35:35Z",
+          "mergedAt": "2026-11-01T09:37:43Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "isCopilotAuthored": false,
+          "timeToMergeHours": 0.04,
+          "closesIssues": [],
+          "linesAdded": 23,
+          "linesDeleted": 23,
+          "firstReviewAt": "2026-11-01T09:36:05Z",
+          "firstApprovalAt": "2026-11-01T09:36:05Z",
+          "reviewCount": 2,
+          "conversationCommentCount": 0,
+          "reviewThreadCount": 0,
+          "recentCommitDates": [
+            "2026-11-01T08:35:33Z"
+          ],
+          "totalCommitCount": 1,
+          "changesRequestedCount": 0
+        },
         {
           "number": 377,
           "createdAt": "2026-10-01T08:41:47Z",
@@ -112398,93 +112238,18 @@
           ],
           "totalCommitCount": 2,
           "changesRequestedCount": 0
-        },
-        {
-          "number": 222,
-          "createdAt": "2024-11-01T08:46:09Z",
-          "mergedAt": "2024-11-01T08:48:53Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.05,
-          "closesIssues": [],
-          "linesAdded": 10,
-          "linesDeleted": 10,
-          "firstReviewAt": "2024-11-01T08:46:28Z",
-          "firstApprovalAt": "2024-11-01T08:46:28Z",
-          "reviewCount": 2,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T08:46:08Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
-        },
-        {
-          "number": 221,
-          "createdAt": "2024-11-01T08:45:42Z",
-          "mergedAt": "2024-11-01T08:48:12Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.04,
-          "closesIssues": [],
-          "linesAdded": 1,
-          "linesDeleted": 1,
-          "reviewCount": 0,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T08:45:41Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
-        },
-        {
-          "number": 220,
-          "createdAt": "2024-11-01T08:45:26Z",
-          "mergedAt": "2024-11-01T08:48:04Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.04,
-          "closesIssues": [],
-          "linesAdded": 1,
-          "linesDeleted": 1,
-          "reviewCount": 0,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T08:45:25Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
-        },
-        {
-          "number": 219,
-          "createdAt": "2024-11-01T08:45:05Z",
-          "mergedAt": "2024-11-01T08:47:32Z",
-          "author": "dependabot",
-          "isBotAuthor": true,
-          "isCopilotAuthored": false,
-          "timeToMergeHours": 0.04,
-          "closesIssues": [],
-          "linesAdded": 1,
-          "linesDeleted": 1,
-          "firstReviewAt": "2024-11-01T08:45:24Z",
-          "firstApprovalAt": "2024-11-01T08:45:24Z",
-          "reviewCount": 2,
-          "conversationCommentCount": 0,
-          "reviewThreadCount": 0,
-          "recentCommitDates": [
-            "2024-11-01T08:45:04Z"
-          ],
-          "totalCommitCount": 1,
-          "changesRequestedCount": 0
         }
       ],
       "closedPRTimeline": [
+        {
+          "number": 379,
+          "createdAt": "2026-11-01T09:37:16Z",
+          "closedAt": "2026-11-01T09:41:10Z",
+          "author": "dependabot",
+          "isBotAuthor": true,
+          "linesAdded": 367,
+          "linesDeleted": 370
+        },
         {
           "number": 374,
           "createdAt": "2026-09-01T08:44:30Z",
@@ -112749,6 +112514,15 @@
           "hasReview": true,
           "author": "dependabot",
           "isBotAuthor": true
+        },
+        {
+          "number": 380,
+          "title": "Bump the all-in-one group with 10 updates",
+          "createdAt": "2026-11-01T09:41:00Z",
+          "isDraft": false,
+          "hasReview": true,
+          "author": "dependabot",
+          "isBotAuthor": true
         }
       ],
       "reviewerLoad": [
@@ -112777,7 +112551,7 @@
       "copilotAdoption": {
         "copilotAuthoredPRs": 29,
         "copilotReviewedPRs": 0,
-        "totalMergedPRs": 127,
+        "totalMergedPRs": 124,
         "totalDetailedPRs": 10,
         "humanMergedPRs": 17
       },
@@ -113730,12 +113504,12 @@
         },
         {
           "week": "2026-W44",
-          "prsOpened": 0,
-          "prsMerged": 0,
+          "prsOpened": 2,
+          "prsMerged": 1,
           "issuesOpened": 0,
           "issuesClosed": 0,
-          "linesAdded": 0,
-          "linesDeleted": 0
+          "linesAdded": 23,
+          "linesDeleted": 23
         }
       ]
     },
@@ -113747,7 +113521,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 3,
-      "collectedAt": "2026-10-31T11:41:46.600Z",
+      "collectedAt": "2026-11-01T12:38:32.379Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -114735,7 +114509,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 3,
-      "collectedAt": "2026-10-31T11:41:47.821Z",
+      "collectedAt": "2026-11-01T12:38:33.904Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -115723,7 +115497,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 2,
-      "collectedAt": "2026-10-31T11:41:48.882Z",
+      "collectedAt": "2026-11-01T12:38:34.996Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -116711,7 +116485,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 145,
-      "collectedAt": "2026-10-31T11:41:55.336Z",
+      "collectedAt": "2026-11-01T12:38:40.105Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -118284,17 +118058,17 @@
       "name": "github-copilot-premium-reqs-usage-fork",
       "fullName": "rajbos/github-copilot-premium-reqs-usage-fork",
       "isPrivate": false,
-      "pushedAt": "2026-10-31T08:17:29Z",
+      "pushedAt": "2026-11-01T09:18:02Z",
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 936,
-      "collectedAt": "2026-10-31T11:42:09.067Z",
+      "collectedAt": "2026-11-01T12:38:51.738Z",
       "issues": {
         "open": 0,
         "closed": 19
       },
       "pullRequests": {
-        "open": 40,
+        "open": 41,
         "closed": 19,
         "merged": 27
       },
@@ -119658,6 +119432,15 @@
           "hasReview": false,
           "author": "github-actions",
           "isBotAuthor": true
+        },
+        {
+          "number": 107,
+          "title": "Update model multipliers from rajbos/github-copilot-model-notifier",
+          "createdAt": "2026-11-01T09:18:06Z",
+          "isDraft": false,
+          "hasReview": false,
+          "author": "github-actions",
+          "isBotAuthor": true
         }
       ],
       "reviewerLoad": [],
@@ -120736,17 +120519,17 @@
       "name": "github-fork-updater",
       "fullName": "rajbos/github-fork-updater",
       "isPrivate": false,
-      "pushedAt": "2026-10-01T14:18:44Z",
+      "pushedAt": "2026-11-01T00:04:16Z",
       "isTeamRepo": false,
       "defaultBranch": "main",
-      "sizeKb": 360,
-      "collectedAt": "2026-10-31T11:42:20.373Z",
+      "sizeKb": 369,
+      "collectedAt": "2026-11-01T12:39:02.833Z",
       "issues": {
         "open": 59,
         "closed": 86
       },
       "pullRequests": {
-        "open": 0,
+        "open": 1,
         "closed": 10,
         "merged": 66
       },
@@ -121866,7 +121649,17 @@
           "linesDeleted": 8
         }
       ],
-      "openPRTimeline": [],
+      "openPRTimeline": [
+        {
+          "number": 226,
+          "title": "Bump the github-actions group with 5 updates",
+          "createdAt": "2026-11-01T00:04:17Z",
+          "isDraft": false,
+          "hasReview": false,
+          "author": "dependabot",
+          "isBotAuthor": true
+        }
+      ],
       "reviewerLoad": [
         {
           "reviewer": "rajbos",
@@ -122852,7 +122645,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 3,
-      "collectedAt": "2026-10-31T11:42:21.457Z",
+      "collectedAt": "2026-11-01T12:39:03.838Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -123840,7 +123633,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 520,
-      "collectedAt": "2026-10-31T11:42:22.722Z",
+      "collectedAt": "2026-11-01T12:39:04.843Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -124828,7 +124621,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 29,
-      "collectedAt": "2026-10-31T11:42:23.903Z",
+      "collectedAt": "2026-11-01T12:39:05.875Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -125816,7 +125609,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 39,
-      "collectedAt": "2026-10-31T11:42:25.112Z",
+      "collectedAt": "2026-11-01T12:39:06.879Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -126800,11 +126593,11 @@
       "name": "GitHub-ratelimit-research",
       "fullName": "rajbos/GitHub-ratelimit-research",
       "isPrivate": false,
-      "pushedAt": "2026-10-31T11:32:26Z",
+      "pushedAt": "2026-11-01T12:21:09Z",
       "isTeamRepo": false,
       "defaultBranch": "main",
-      "sizeKb": 24915,
-      "collectedAt": "2026-10-31T11:42:34.198Z",
+      "sizeKb": 26114,
+      "collectedAt": "2026-11-01T12:39:16.487Z",
       "issues": {
         "open": 92,
         "closed": 45
@@ -128899,7 +128692,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 128,
-      "collectedAt": "2026-10-31T11:42:35.249Z",
+      "collectedAt": "2026-11-01T12:39:17.581Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -129887,7 +129680,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 921,
-      "collectedAt": "2026-10-31T11:42:36.485Z",
+      "collectedAt": "2026-11-01T12:39:18.599Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -130875,7 +130668,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 111854,
-      "collectedAt": "2026-10-31T11:42:39.843Z",
+      "collectedAt": "2026-11-01T12:39:21.848Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -131863,7 +131656,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 146,
-      "collectedAt": "2026-10-31T11:42:41.166Z",
+      "collectedAt": "2026-11-01T12:39:22.854Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -132851,7 +132644,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 0,
-      "collectedAt": "2026-10-31T11:42:42.260Z",
+      "collectedAt": "2026-11-01T12:39:23.711Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -133839,7 +133632,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 25,
-      "collectedAt": "2026-10-31T11:42:43.555Z",
+      "collectedAt": "2026-11-01T12:39:24.854Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -134827,7 +134620,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 4,
-      "collectedAt": "2026-10-31T11:42:44.552Z",
+      "collectedAt": "2026-11-01T12:39:25.809Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -135815,7 +135608,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 3,
-      "collectedAt": "2026-10-31T11:42:45.969Z",
+      "collectedAt": "2026-11-01T12:39:27.133Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -136803,7 +136596,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 43,
-      "collectedAt": "2026-10-31T11:42:47.118Z",
+      "collectedAt": "2026-11-01T12:39:28.164Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -137791,7 +137584,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 1952,
-      "collectedAt": "2026-10-31T11:42:48.890Z",
+      "collectedAt": "2026-11-01T12:39:29.812Z",
       "issues": {
         "open": 2,
         "closed": 2
@@ -138779,7 +138572,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 59,
-      "collectedAt": "2026-10-31T11:42:50.324Z",
+      "collectedAt": "2026-11-01T12:39:30.898Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -139767,7 +139560,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 9091,
-      "collectedAt": "2026-10-31T11:43:39.413Z",
+      "collectedAt": "2026-11-01T12:40:20.280Z",
       "issues": {
         "open": 9,
         "closed": 120
@@ -148871,7 +148664,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 113311,
-      "collectedAt": "2026-10-31T11:43:40.446Z",
+      "collectedAt": "2026-11-01T12:40:21.289Z",
       "issues": {
         "open": 2,
         "closed": 0
@@ -149859,7 +149652,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 231,
-      "collectedAt": "2026-10-31T11:43:41.847Z",
+      "collectedAt": "2026-11-01T12:40:22.666Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -150847,7 +150640,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 3839,
-      "collectedAt": "2026-10-31T11:43:42.970Z",
+      "collectedAt": "2026-11-01T12:40:23.798Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -151835,7 +151628,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 46,
-      "collectedAt": "2026-10-31T11:43:45.455Z",
+      "collectedAt": "2026-11-01T12:40:26.497Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -153000,7 +152793,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 4192,
-      "collectedAt": "2026-10-31T11:43:46.650Z",
+      "collectedAt": "2026-11-01T12:40:27.618Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -153998,7 +153791,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 732,
-      "collectedAt": "2026-10-31T11:43:53.010Z",
+      "collectedAt": "2026-11-01T12:40:33.808Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -155666,7 +155459,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 2272,
-      "collectedAt": "2026-10-31T11:43:54.061Z",
+      "collectedAt": "2026-11-01T12:40:34.726Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -156654,7 +156447,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 70,
-      "collectedAt": "2026-10-31T11:43:55.200Z",
+      "collectedAt": "2026-11-01T12:40:35.811Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -157642,7 +157435,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 21263,
-      "collectedAt": "2026-10-31T11:43:56.354Z",
+      "collectedAt": "2026-11-01T12:40:36.861Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -158630,7 +158423,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 151,
-      "collectedAt": "2026-10-31T11:43:58.119Z",
+      "collectedAt": "2026-11-01T12:40:38.467Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -159657,7 +159450,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 36,
-      "collectedAt": "2026-10-31T11:43:59.666Z",
+      "collectedAt": "2026-11-01T12:40:39.879Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -160645,7 +160438,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 338,
-      "collectedAt": "2026-10-31T11:44:00.830Z",
+      "collectedAt": "2026-11-01T12:40:40.972Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -161633,7 +161426,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 3327,
-      "collectedAt": "2026-10-31T11:44:06.129Z",
+      "collectedAt": "2026-11-01T12:40:46.389Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -163053,7 +162846,7 @@
       "isTeamRepo": false,
       "defaultBranch": "gh-pages",
       "sizeKb": 31,
-      "collectedAt": "2026-10-31T11:44:07.224Z",
+      "collectedAt": "2026-11-01T12:40:47.402Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -164041,7 +163834,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 828,
-      "collectedAt": "2026-10-31T11:44:16.578Z",
+      "collectedAt": "2026-11-01T12:40:57.505Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -165195,7 +164988,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 8,
-      "collectedAt": "2026-10-31T11:44:18.014Z",
+      "collectedAt": "2026-11-01T12:40:58.782Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -166202,7 +165995,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 64,
-      "collectedAt": "2026-10-31T11:44:21.124Z",
+      "collectedAt": "2026-11-01T12:41:01.413Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -167420,7 +167213,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 9,
-      "collectedAt": "2026-10-31T11:44:22.146Z",
+      "collectedAt": "2026-11-01T12:41:02.528Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -168408,7 +168201,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 978,
-      "collectedAt": "2026-10-31T11:44:47.496Z",
+      "collectedAt": "2026-11-01T12:41:41.535Z",
       "issues": {
         "open": 0,
         "closed": 29
@@ -172635,7 +172428,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 168126,
-      "collectedAt": "2026-10-31T11:45:01.083Z",
+      "collectedAt": "2026-11-01T12:41:53.769Z",
       "issues": {
         "open": 0,
         "closed": 2
@@ -175073,7 +174866,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 72,
-      "collectedAt": "2026-10-31T11:45:02.467Z",
+      "collectedAt": "2026-11-01T12:41:54.903Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -176061,7 +175854,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 78224,
-      "collectedAt": "2026-10-31T11:45:03.742Z",
+      "collectedAt": "2026-11-01T12:41:55.824Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -177049,7 +176842,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 6270,
-      "collectedAt": "2026-10-31T11:45:04.844Z",
+      "collectedAt": "2026-11-01T12:41:56.829Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -178037,7 +177830,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 123481,
-      "collectedAt": "2026-10-31T11:45:07.979Z",
+      "collectedAt": "2026-11-01T12:41:59.848Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -179254,7 +179047,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 19018,
-      "collectedAt": "2026-10-31T11:45:09.079Z",
+      "collectedAt": "2026-11-01T12:42:00.813Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -180242,7 +180035,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 4123,
-      "collectedAt": "2026-10-31T11:45:10.409Z",
+      "collectedAt": "2026-11-01T12:42:01.725Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -181230,7 +181023,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 0,
-      "collectedAt": "2026-10-31T11:45:11.702Z",
+      "collectedAt": "2026-11-01T12:42:02.769Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -182218,7 +182011,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 46,
-      "collectedAt": "2026-10-31T11:45:12.853Z",
+      "collectedAt": "2026-11-01T12:42:03.826Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -183206,7 +182999,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 13,
-      "collectedAt": "2026-10-31T11:45:14.288Z",
+      "collectedAt": "2026-11-01T12:42:05.282Z",
       "issues": {
         "open": 0,
         "closed": 4
@@ -184204,7 +183997,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 9,
-      "collectedAt": "2026-10-31T11:45:15.349Z",
+      "collectedAt": "2026-11-01T12:42:06.213Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -185192,7 +184985,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 49495,
-      "collectedAt": "2026-10-31T11:45:16.406Z",
+      "collectedAt": "2026-11-01T12:42:07.166Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -186180,7 +185973,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 52,
-      "collectedAt": "2026-10-31T11:45:18.060Z",
+      "collectedAt": "2026-11-01T12:42:08.778Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -187226,7 +187019,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 20536,
-      "collectedAt": "2026-10-31T11:45:19.637Z",
+      "collectedAt": "2026-11-01T12:42:10.062Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -188224,7 +188017,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 35,
-      "collectedAt": "2026-10-31T11:45:20.751Z",
+      "collectedAt": "2026-11-01T12:42:10.954Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -189212,7 +189005,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 55879,
-      "collectedAt": "2026-10-31T11:45:21.908Z",
+      "collectedAt": "2026-11-01T12:42:11.963Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -190200,7 +189993,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 958,
-      "collectedAt": "2026-10-31T11:45:23.015Z",
+      "collectedAt": "2026-11-01T12:42:13.002Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -191188,7 +190981,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 1444,
-      "collectedAt": "2026-10-31T11:45:29.972Z",
+      "collectedAt": "2026-11-01T12:42:19.957Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -192576,7 +192369,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 22,
-      "collectedAt": "2026-10-31T11:45:31.481Z",
+      "collectedAt": "2026-11-01T12:42:21.243Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -193603,7 +193396,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 1134,
-      "collectedAt": "2026-10-31T11:45:32.605Z",
+      "collectedAt": "2026-11-01T12:42:22.190Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -194591,7 +194384,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 1078,
-      "collectedAt": "2026-10-31T11:45:34.285Z",
+      "collectedAt": "2026-11-01T12:42:23.697Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -195635,7 +195428,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 996,
-      "collectedAt": "2026-10-31T11:45:35.402Z",
+      "collectedAt": "2026-11-01T12:42:24.601Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -196623,7 +196416,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 0,
-      "collectedAt": "2026-10-31T11:45:36.324Z",
+      "collectedAt": "2026-11-01T12:42:25.491Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -197611,7 +197404,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 4910,
-      "collectedAt": "2026-10-31T11:45:37.758Z",
+      "collectedAt": "2026-11-01T12:42:27.019Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -198599,7 +198392,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 39,
-      "collectedAt": "2026-10-31T11:45:38.912Z",
+      "collectedAt": "2026-11-01T12:42:27.924Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -199597,7 +199390,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 12290,
-      "collectedAt": "2026-10-31T11:45:40.052Z",
+      "collectedAt": "2026-11-01T12:42:28.865Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -200571,7 +200364,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 158,
-      "collectedAt": "2026-10-31T11:45:41.332Z",
+      "collectedAt": "2026-11-01T12:42:30.359Z",
       "issues": {
         "open": 6,
         "closed": 5
@@ -201545,7 +201338,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 722,
-      "collectedAt": "2026-10-31T11:45:50.479Z",
+      "collectedAt": "2026-11-01T12:42:38.568Z",
       "issues": {
         "open": 3,
         "closed": 17
@@ -203558,11 +203351,11 @@
       "name": "techhub",
       "fullName": "techhubms/techhub",
       "isPrivate": false,
-      "pushedAt": "2026-10-31T06:38:29Z",
+      "pushedAt": "2026-11-01T09:12:02Z",
       "isTeamRepo": false,
       "defaultBranch": "main",
-      "sizeKb": 130970,
-      "collectedAt": "2026-10-31T11:48:36.492Z",
+      "sizeKb": 131455,
+      "collectedAt": "2026-11-01T12:43:43.908Z",
       "issues": {
         "open": 10,
         "closed": 178
@@ -208499,7 +208292,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 2336,
-      "collectedAt": "2026-10-31T11:48:38.149Z",
+      "collectedAt": "2026-11-01T12:43:45.229Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -209493,7 +209286,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 3803,
-      "collectedAt": "2026-10-31T11:48:40.145Z",
+      "collectedAt": "2026-11-01T12:43:47.043Z",
       "issues": {
         "open": 1,
         "closed": 0
@@ -210467,7 +210260,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 92,
-      "collectedAt": "2026-10-31T11:48:47.554Z",
+      "collectedAt": "2026-11-01T12:43:52.879Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -211894,7 +211687,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 16,
-      "collectedAt": "2026-10-31T11:48:49.427Z",
+      "collectedAt": "2026-11-01T12:43:54.150Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -212909,7 +212702,7 @@
       "isTeamRepo": false,
       "defaultBranch": "main",
       "sizeKb": 4152,
-      "collectedAt": "2026-10-31T11:48:50.685Z",
+      "collectedAt": "2026-11-01T12:43:55.092Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -213883,7 +213676,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 1168,
-      "collectedAt": "2026-10-31T11:48:53.199Z",
+      "collectedAt": "2026-11-01T12:43:57.221Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -214885,7 +214678,7 @@
       "isTeamRepo": false,
       "defaultBranch": "master",
       "sizeKb": 29467,
-      "collectedAt": "2026-10-31T11:48:54.487Z",
+      "collectedAt": "2026-11-01T12:43:58.349Z",
       "issues": {
         "open": 0,
         "closed": 0
@@ -216782,12 +216575,12 @@
     },
     {
       "week": "2026-W44",
-      "prsOpened": 45,
-      "prsMerged": 49,
+      "prsOpened": 49,
+      "prsMerged": 51,
       "issuesOpened": 18,
       "issuesClosed": 3,
-      "linesAdded": 1171,
-      "linesDeleted": 438
+      "linesAdded": 1191,
+      "linesDeleted": 458
     }
   ],
   "dataSource": "fresh",
