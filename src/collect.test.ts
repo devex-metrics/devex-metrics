@@ -1,4 +1,7 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 
 vi.mock("./cache.js", () => ({
   loadCache: vi.fn(),
@@ -24,6 +27,9 @@ vi.mock("./collectors/index.js", () => ({
   buildPullRequestCounts: vi.fn(),
   buildMergedPRTimeline: vi.fn(),
   collectPullRequestDetailsFromNodes: vi.fn(),
+  buildClosedPRTimeline: vi.fn(),
+  buildOpenPRTimeline: vi.fn(),
+  countReviewerLoad: vi.fn(),
   extractReviewerLogins: vi.fn(),
   collectCopilotAgentMetrics: vi.fn(),
   collectActiveRepos: vi.fn(),
@@ -48,11 +54,16 @@ import {
   buildPullRequestCounts,
   buildMergedPRTimeline,
   collectPullRequestDetailsFromNodes,
+  buildClosedPRTimeline,
+  buildOpenPRTimeline,
+  countReviewerLoad,
   extractReviewerLogins,
   collectCopilotAgentMetrics,
   collectActiveRepos,
 } from "./collectors/index.js";
+import type { GraphQLRepoData } from "./collectors/index.js";
 import { weekLabels } from "./collectors/trends.js";
+import { latestPath } from "./history.js";
 import type { OrgMetrics, RepoMetrics, WeeklyTrendPoint } from "./types.js";
 import { defaultConfig } from "./config.js";
 
@@ -75,13 +86,346 @@ function setupDefaultMocks() {
   });
   vi.mocked(collectContributors).mockResolvedValue({ committerCount: 0, reviewerCount: 0, contributorCount: 0 });
   vi.mocked(collectDependentCount).mockResolvedValue(0);
-  vi.mocked(collectWeeklyTrends).mockResolvedValue({ orgTrends: [], repoTrends: new Map() });
+  vi.mocked(collectWeeklyTrends).mockResolvedValue({ orgTrends: [], repoTrends: new Map(), failedRepos: new Set() });
+  vi.mocked(buildClosedPRTimeline).mockReturnValue([]);
+  vi.mocked(buildOpenPRTimeline).mockReturnValue([]);
+  vi.mocked(countReviewerLoad).mockReturnValue([]);
   vi.mocked(buildPullRequestCounts).mockReturnValue({ open: 0, closed: 0, merged: 0 });
   vi.mocked(buildMergedPRTimeline).mockReturnValue([]);
   vi.mocked(collectPullRequestDetailsFromNodes).mockResolvedValue([]);
   vi.mocked(extractReviewerLogins).mockReturnValue(new Set());
   vi.mocked(collectCopilotAgentMetrics).mockResolvedValue(null);
 }
+
+describe("collect when a repository keeps failing", () => {
+  const gateway = () => Object.assign(new Error("Gateway timeout"), { status: 504 });
+  const unavailable = { unavailable: true as const, category: "repeated HTTP 502/504 gateway error" };
+  const graphqlData = (extra: Partial<GraphQLRepoData> = {}): GraphQLRepoData => ({
+    isFork: false,
+    openIssueCount: 1,
+    closedIssueCount: 2,
+    openPRCount: 3,
+    closedPRCount: 4,
+    mergedPRCount: 5,
+    prNodes: [],
+    openPRNodes: [],
+    ...extra,
+  });
+  const previous = (extra: Partial<RepoMetrics> = {}): RepoMetrics => ({
+    name: "big",
+    fullName: "org/big",
+    collectedAt: "2026-10-01T00:00:00Z",
+    issues: { open: 9, closed: 9 },
+    pullRequests: { open: 9, closed: 9, merged: 9 },
+    pullRequestDetails: [],
+    weeklyTrends: [{ week: "2026-W40", prsOpened: 7, prsMerged: 7, issuesOpened: 0, issuesClosed: 0, linesAdded: 0, linesDeleted: 0 }],
+    committerCount: 9,
+    reviewerCount: 9,
+    contributorCount: 9,
+    dependentCount: 0,
+    ...extra,
+  });
+  const twoRepos = [
+    { name: "big", fullName: "org/big", pushedAt: "" },
+    { name: "small", fullName: "org/small", pushedAt: "" },
+  ];
+  /** GraphQL and REST both fail for org/big; org/small is healthy. */
+  const failBigEverywhere = () => {
+    vi.mocked(collectRepos).mockResolvedValue(twoRepos);
+    vi.mocked(collectRepoGraphQL).mockImplementation(async (_owner, repo) =>
+      repo === "big" ? unavailable : graphqlData()
+    );
+    vi.mocked(collectIssueCounts).mockRejectedValue(gateway());
+  };
+
+  beforeEach(() => {
+    setupDefaultMocks();
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(console, "log").mockImplementation(() => {});
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.resetAllMocks();
+  });
+
+  it("falls back to REST and flags the repository when GraphQL is unavailable", async () => {
+    const config = defaultConfig();
+    config.collection.maxPRPages = 3;
+    vi.mocked(collectRepos).mockResolvedValue([twoRepos[0]]);
+    vi.mocked(collectRepoGraphQL).mockResolvedValue({ ...unavailable, requestId: "ABC:123" });
+    vi.mocked(collectPullRequestCounts).mockResolvedValue({ open: 1, closed: 2, merged: 3 });
+
+    const result = await collect("org", "org", { config });
+
+    expect(result.repos[0].pullRequests).toEqual({ open: 1, closed: 2, merged: 3 });
+    expect(result.repos[0].collectionWarning).toMatchObject({ state: "rest-fallback", requestId: "ABC:123" });
+    expect(result.repos[0].collectionWarning?.detail).toContain("502/504");
+    expect(collectMergedPRTimeline).toHaveBeenCalledWith("org", "big", 3);
+    // The fallback's trend walk is bounded by the same budget.
+    expect(vi.mocked(collectWeeklyTrends).mock.calls[0][0]).toEqual([{ owner: "org", name: "big", maxPRPages: 3 }]);
+  });
+
+  it("does not flag a repository GraphQL reports as not found or forbidden", async () => {
+    vi.mocked(collectRepos).mockResolvedValue([twoRepos[0]]);
+    vi.mocked(collectRepoGraphQL).mockResolvedValue(null);
+
+    const result = await collect("org", "org");
+
+    expect(result.repos[0].collectionWarning).toBeUndefined();
+  });
+
+  it("passes the configured budget and page sizing to the GraphQL crawl", async () => {
+    const config = defaultConfig();
+    config.collection.maxPRPages = 4;
+    config.collection.backfill.minPageSize = 20;
+    config.collection.backfill.adaptivePageSize = false;
+    vi.mocked(collectRepos).mockResolvedValue([twoRepos[0]]);
+
+    await collect("org", "org", { config });
+
+    expect(collectRepoGraphQL).toHaveBeenCalledWith("org", "big", 4, { minPageSize: 20, adaptive: false });
+  });
+
+  it("keeps collecting the other repositories when REST fails too", async () => {
+    failBigEverywhere();
+
+    const result = await collect("org", "org");
+
+    expect(result.repos.map((r) => r.fullName)).toEqual(["org/big", "org/small"]);
+    const [big, small] = result.repos;
+    expect(big.collectionWarning?.state).toBe("failed");
+    expect(big.collectedAt).toBeUndefined();
+    expect(small.collectionWarning).toBeUndefined();
+    expect(small.pullRequests).toBeDefined();
+    expect(saveCache).toHaveBeenCalled();
+  });
+
+  it("does not spend trend requests on a repository that just failed", async () => {
+    failBigEverywhere();
+
+    await collect("org", "org");
+
+    expect(vi.mocked(collectWeeklyTrends).mock.calls[0][0]).toEqual([{ owner: "org", name: "small" }]);
+  });
+
+  it("shows the last known metrics from the cache, flagged as not refreshed", async () => {
+    failBigEverywhere();
+    vi.mocked(loadRawCache).mockReturnValue({
+      owner: "org",
+      ownerType: "org",
+      collectedAt: "2026-10-01T00:00:00Z",
+      repoCount: 1,
+      repos: [previous()],
+    });
+
+    const result = await collect("org", "org");
+
+    const big = result.repos[0];
+    expect(big.pullRequests.merged).toBe(9);
+    expect(big.collectedAt).toBe("2026-10-01T00:00:00Z");
+    expect(big.weeklyTrends).toEqual(previous().weeklyTrends);
+    expect(big.collectionWarning).toMatchObject({ state: "stale", notRefreshed: true });
+    expect(big.collectionWarning?.detail).toContain("2026-10-01");
+  });
+
+  it("falls back to the history store when there is no local cache, as on a scheduled run", async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "devex-collect-"));
+    try {
+      const config = defaultConfig();
+      config.history.dir = dir;
+      const snapshot: OrgMetrics = {
+        owner: "org",
+        ownerType: "org",
+        collectedAt: "2026-10-01T00:00:00Z",
+        repoCount: 1,
+        repos: [previous()],
+      };
+      fs.mkdirSync(path.dirname(latestPath(dir, "org")), { recursive: true });
+      fs.writeFileSync(latestPath(dir, "org"), JSON.stringify(snapshot));
+      failBigEverywhere();
+
+      const result = await collect("org", "org", { config });
+
+      expect(result.repos[0].pullRequests.merged).toBe(9);
+      expect(result.repos[0].collectionWarning?.state).toBe("stale");
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("keeps a repository on rest-fallback when its last known data came from REST", async () => {
+    failBigEverywhere();
+    vi.mocked(loadRawCache).mockReturnValue({
+      owner: "org",
+      ownerType: "org",
+      collectedAt: "2026-10-01T00:00:00Z",
+      repoCount: 1,
+      repos: [previous({ collectionWarning: { state: "rest-fallback", detail: "lean" } })],
+    });
+
+    const result = await collect("org", "org");
+
+    expect(result.repos[0].collectionWarning).toMatchObject({ state: "rest-fallback", notRefreshed: true });
+    expect(vi.mocked(collectWeeklyTrends).mock.calls[0][0]).toEqual([{ owner: "org", name: "small" }]);
+  });
+
+  it("does not treat an earlier placeholder as known metrics", async () => {
+    failBigEverywhere();
+    vi.mocked(loadRawCache).mockReturnValue({
+      owner: "org",
+      ownerType: "org",
+      collectedAt: "2026-10-01T00:00:00Z",
+      repoCount: 1,
+      repos: [previous({ collectionWarning: { state: "failed", detail: "none" } })],
+    });
+
+    const result = await collect("org", "org");
+
+    expect(result.repos[0].collectionWarning?.state).toBe("failed");
+    expect(result.repos[0].pullRequests.merged).toBe(0);
+  });
+
+  it("still ends the run on a non-transient error such as bad credentials", async () => {
+    vi.mocked(collectRepos).mockResolvedValue(twoRepos);
+    vi.mocked(collectRepoGraphQL).mockRejectedValue(
+      Object.assign(new Error("Bad credentials"), { status: 401 })
+    );
+
+    await expect(collect("org", "org")).rejects.toMatchObject({ status: 401 });
+    expect(saveCache).not.toHaveBeenCalled();
+  });
+
+  it("still ends the run on a programming error", async () => {
+    vi.mocked(collectRepos).mockResolvedValue(twoRepos);
+    vi.mocked(collectRepoGraphQL).mockRejectedValue(new TypeError("boom"));
+
+    await expect(collect("org", "org")).rejects.toThrow("boom");
+  });
+
+  it("fails the run when every repository fails, leaving the last good data in place", async () => {
+    vi.mocked(collectRepos).mockResolvedValue(twoRepos);
+    vi.mocked(collectRepoGraphQL).mockResolvedValue(unavailable);
+    vi.mocked(collectIssueCounts).mockRejectedValue(gateway());
+
+    await expect(collect("org", "org")).rejects.toThrow(/All 2 repositories failed/);
+    expect(saveCache).not.toHaveBeenCalled();
+  });
+
+  it("flags pages lost part-way through the GraphQL crawl, keeping what was fetched", async () => {
+    vi.mocked(collectRepos).mockResolvedValue([twoRepos[0]]);
+    vi.mocked(collectRepoGraphQL).mockResolvedValue(
+      graphqlData({ truncation: { reason: "transient", category: "repeated HTTP 502/504 gateway error", requestId: "R1" } })
+    );
+    vi.mocked(buildPullRequestCounts).mockReturnValue({ open: 3, closed: 4, merged: 5 });
+
+    const result = await collect("org", "org");
+
+    expect(result.repos[0].pullRequests.merged).toBe(5);
+    expect(result.repos[0].collectionWarning).toMatchObject({ state: "partial", requestId: "R1" });
+    expect(collectIssueCounts).not.toHaveBeenCalled();
+  });
+
+  it("flags a repository that used up its PR budget as capped", async () => {
+    vi.mocked(collectRepos).mockResolvedValue([twoRepos[0]]);
+    vi.mocked(collectRepoGraphQL).mockResolvedValue(graphqlData({ truncation: { reason: "page-cap" } }));
+
+    const result = await collect("org", "org");
+
+    expect(result.repos[0].collectionWarning?.state).toBe("capped");
+    expect(result.repos[0].collectionWarning?.detail).toContain("DEVEX_MAX_PR_PAGES");
+  });
+
+  it("keeps the PR data when only an issue lead-time lookup fails", async () => {
+    vi.mocked(collectRepos).mockResolvedValue([twoRepos[0]]);
+    vi.mocked(collectRepoGraphQL).mockResolvedValue(graphqlData({ truncation: { reason: "page-cap" } }));
+    vi.mocked(buildPullRequestCounts).mockReturnValue({ open: 3, closed: 4, merged: 5 });
+    vi.mocked(collectIssueLeadTimes).mockRejectedValue(gateway());
+
+    const result = await collect("org", "org");
+
+    expect(result.repos[0].pullRequests.merged).toBe(5);
+    // A gap caused by a failure outranks the expected page cap, so it is retried.
+    expect(result.repos[0].collectionWarning?.state).toBe("partial");
+    expect(result.repos[0].collectionWarning?.detail).toContain("lead times");
+    expect(result.repos[0].collectionWarning?.detail).toContain("DEVEX_MAX_PR_PAGES");
+  });
+
+  it("keeps the PR data when only Copilot agent metrics fail", async () => {
+    vi.mocked(collectRepos).mockResolvedValue([twoRepos[0]]);
+    vi.mocked(collectRepoGraphQL).mockResolvedValue(graphqlData());
+    vi.mocked(collectCopilotAgentMetrics).mockRejectedValue(gateway());
+
+    const result = await collect("org", "org");
+
+    expect(result.repos[0].collectionWarning?.detail).toContain("Copilot agent");
+  });
+
+  it("flags a repository whose weekly trends failed", async () => {
+    vi.mocked(collectRepos).mockResolvedValue([twoRepos[0]]);
+    vi.mocked(collectRepoGraphQL).mockResolvedValue(graphqlData());
+    vi.mocked(collectWeeklyTrends).mockResolvedValue({
+      orgTrends: [],
+      repoTrends: new Map(),
+      failedRepos: new Set(["org/big"]),
+    });
+
+    const result = await collect("org", "org");
+
+    expect(result.repos[0].collectionWarning).toMatchObject({ state: "partial" });
+    expect(result.repos[0].collectionWarning?.detail).toContain("Weekly trends");
+  });
+
+  it("retries a flagged repository instead of reusing it within the freshness window", async () => {
+    vi.mocked(collectRepos).mockResolvedValue([twoRepos[0]]);
+    vi.mocked(isWithinHours).mockReturnValue(true);
+    vi.mocked(collectRepoGraphQL).mockResolvedValue(graphqlData());
+    vi.mocked(loadRawCache).mockReturnValue({
+      owner: "org",
+      ownerType: "org",
+      collectedAt: "2026-10-01T00:00:00Z",
+      repoCount: 1,
+      repos: [previous({ collectionWarning: { state: "rest-fallback", detail: "lean" } })],
+    });
+
+    const result = await collect("org", "org");
+
+    expect(collectRepoGraphQL).toHaveBeenCalledTimes(1);
+    expect(result.repos[0].collectionWarning).toBeUndefined();
+  });
+
+  it("reuses a capped repository within the freshness window: it succeeded", async () => {
+    vi.mocked(collectRepos).mockResolvedValue([twoRepos[0]]);
+    vi.mocked(isWithinHours).mockReturnValue(true);
+    vi.mocked(loadRawCache).mockReturnValue({
+      owner: "org",
+      ownerType: "org",
+      collectedAt: "2026-10-01T00:00:00Z",
+      repoCount: 1,
+      repos: [previous({ collectionWarning: { state: "capped", detail: "capped" } })],
+    });
+
+    const result = await collect("org", "org");
+
+    expect(collectRepoGraphQL).not.toHaveBeenCalled();
+    expect(result.repos[0].collectionWarning?.state).toBe("capped");
+  });
+
+  it("does not serve today's cached dataset while it holds a repository to retry", async () => {
+    vi.mocked(collectRepos).mockResolvedValue([twoRepos[0]]);
+    vi.mocked(collectRepoGraphQL).mockResolvedValue(graphqlData());
+    vi.mocked(loadCache).mockReturnValue({
+      owner: "org",
+      ownerType: "org",
+      collectedAt: "2026-10-01T00:00:00Z",
+      repoCount: 1,
+      repos: [previous({ collectionWarning: { state: "partial", detail: "gap" } })],
+    });
+
+    await collect("org", "org");
+
+    expect(collectRepos).toHaveBeenCalled();
+  });
+});
 
 describe("collect", () => {
   afterEach(() => vi.resetAllMocks());
@@ -225,6 +569,7 @@ describe("collect", () => {
     vi.mocked(collectWeeklyTrends).mockResolvedValue({
       orgTrends: [{ week: "2026-W01", prsOpened: 1, prsMerged: 0, issuesOpened: 2, issuesClosed: 0, linesAdded: 0, linesDeleted: 0 }],
       repoTrends: new Map([["org/r", [{ week: "2026-W01", prsOpened: 1, prsMerged: 0, issuesOpened: 2, issuesClosed: 0, linesAdded: 0, linesDeleted: 0 }]]]),
+      failedRepos: new Set(),
     });
 
     const result = await collect("org", "org");
@@ -340,6 +685,7 @@ describe("collect (incremental)", () => {
         ["org/pushed", [point(2)]],
         ["org/reviewed", [point(3)]],
       ]),
+      failedRepos: new Set(),
     });
 
     const result = await collect("org", "org", { config: incrementalConfig() });

@@ -709,6 +709,30 @@ describe("generateReport flow metrics", () => {
     });
   }
 
+  describe("incomplete repositories", () => {
+    const warned = repoWith({
+      fullName: "acme/big",
+      collectionWarning: { state: "rest-fallback", detail: "GraphQL unavailable.", requestId: "ABC:123" },
+    });
+
+    it("lists them before the summary, with what is missing and the request id", () => {
+      const report = reportFor([warned, repoWith({})]);
+
+      expect(report).toContain("## ⚠ Incomplete data");
+      expect(report).toContain("1 of 2 repositories have incomplete metrics");
+      expect(report).toContain("| acme/big | REST fallback | GraphQL unavailable. GitHub request id: ABC:123. |");
+      expect(report.indexOf("Incomplete data")).toBeLessThan(report.indexOf("## Summary"));
+    });
+
+    it("repeats the warning in the repository's own section", () => {
+      expect(reportFor([warned])).toContain("### acme/big\n\n> ⚠ **Incomplete data:** GraphQL unavailable.");
+    });
+
+    it("says nothing when every repository is complete", () => {
+      expect(reportFor([repoWith({})])).not.toContain("Incomplete data");
+    });
+  });
+
   const merged = {
     number: 1,
     createdAt: "2026-08-20T00:00:00Z",

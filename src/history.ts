@@ -386,6 +386,9 @@ export function buildRollupRows(metrics: OrgMetrics, date: string): RollupRow[] 
   let orgHuman = 0;
 
   for (const repo of metrics.repos) {
+    // Placeholder zeros are not a measurement; a row would read as a collapse.
+    if (repo.collectionWarning?.state === "failed") continue;
+
     const recent = mergedPRs(repo).filter(
       (pr) => new Date(pr.mergedAt).getTime() >= cutoff
     );
@@ -502,6 +505,10 @@ function orgOpenAgeMedian(repos: readonly RepoMetrics[], date: string): number |
 export function buildEventRows(metrics: OrgMetrics): EventRow[] {
   const rows: EventRow[] = [];
   for (const repo of metrics.repos) {
+    // Events are never rewritten, so a lean REST row would permanently block
+    // the fuller row a later GraphQL run or the backfill can still provide.
+    if (repo.collectionWarning?.state === "rest-fallback") continue;
+
     for (const pr of mergedPRs(repo)) {
       rows.push({
         v: HISTORY_SCHEMA_VERSION,

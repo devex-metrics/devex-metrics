@@ -385,6 +385,37 @@ export interface RepoMetrics {
   dependentCount: number;
   /** Copilot agent (coding agent) task metrics for this repository. */
   copilotAgentMetrics?: CopilotAgentMetrics;
+  /**
+   * Set when this repository's metrics are known to be incomplete, so the
+   * report and dashboard can say so. Absent means the collection succeeded.
+   */
+  collectionWarning?: RepoCollectionWarning;
+}
+
+/**
+ * How a repository's metrics fall short of a full collection:
+ * - `capped`: the PR budget (`DEVEX_MAX_PR_PAGES`) ran out before the two-year
+ *   cutoff. Expected on very active repositories; not retried early.
+ * - `partial`: some data is missing because GitHub kept failing part-way.
+ * - `rest-fallback`: GraphQL was unavailable, so the leaner REST path was used.
+ *   Its pull requests are kept out of the event stream, where first-writer-wins
+ *   would stop the richer GraphQL rows from ever replacing them.
+ * - `stale`: nothing could be fetched; these are the last known metrics.
+ * - `failed`: nothing could be fetched and no earlier data exists. The zeros are
+ *   placeholders, so the rollup leaves this repository out.
+ */
+export type RepoCollectionState = "capped" | "partial" | "rest-fallback" | "stale" | "failed";
+
+/** Why a repository's metrics are incomplete. */
+export interface RepoCollectionWarning {
+  /** Which kind of gap this is. */
+  state: RepoCollectionState;
+  /** Human-readable explanation; never a raw API payload. */
+  detail: string;
+  /** GitHub's support request id for the failure, when there was one. */
+  requestId?: string;
+  /** True when the latest run fetched nothing and these are older metrics. */
+  notRefreshed?: boolean;
 }
 
 export interface IssueCounts {

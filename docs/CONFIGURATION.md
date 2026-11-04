@@ -48,7 +48,7 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_BASELINE_TO` | date | Baseline window end. |
 | `DEVEX_TRIAL_MILESTONES` | list | `2026-04-01=Training complete; 2026-05-15=Rollout` |
 | `DEVEX_HISTORY_WEEKS` | int | Weeks of weekly trends to build. Default `104`. |
-| `DEVEX_MAX_PR_PAGES` | int | Pages of merged PRs per repo. Default `10`. |
+| `DEVEX_MAX_PR_PAGES` | int | PR budget per repo, in pages of 100, for the daily GraphQL crawl and its REST fallback. A repo that hits it is flagged as capped. Default `10`. See *Repositories GitHub struggles to serve*. |
 | `DEVEX_MAX_REPO_AGE_HOURS` | int | Per-repo cache freshness. Default `8`. |
 | `DEVEX_INCREMENTAL` | bool | Collect only repos with a push or issue/PR activity since today's cached baseline. Default `false`; the collect workflow turns it on for manual runs (see *Fast manual refreshes*). |
 | `DEVEX_FEATURE_DEPENDENTS` | bool | Dependent-repo counts. Default `false`. |
@@ -71,8 +71,8 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_BACKFILL_MAX_PAGES_PER_REPO` | int | Cap per repo per run. Default `20`. |
 | `DEVEX_BACKFILL_RECOMPUTE` | bool | Rebuild historical rollups from events. Default `true`. |
 | `DEVEX_BACKFILL_PAGE_SIZE` | int | Historical GraphQL page size, 1–100. Default `50`. |
-| `DEVEX_BACKFILL_MIN_PAGE_SIZE` | int | Floor for adaptive reduction, 1–100, ≤ page size. Default `10`. |
-| `DEVEX_BACKFILL_ADAPTIVE_PAGE_SIZE` | bool | Shrink a repo's page size after a timeout instead of giving up. Default `true`. |
+| `DEVEX_BACKFILL_MIN_PAGE_SIZE` | int | Floor for adaptive reduction, 1–100, ≤ page size. Also applies to the daily collection. Default `10`. |
+| `DEVEX_BACKFILL_ADAPTIVE_PAGE_SIZE` | bool | Shrink a repo's page size after a timeout instead of giving up. Also applies to the daily collection. Default `true`. |
 
 Lists accept commas, semicolons or newlines. Booleans accept
 `1/true/yes/on` — anything else is false. Setting a list variable to an empty
@@ -243,6 +243,43 @@ Because a "page" always means one *successful* page regardless of its size,
 shrinking the page size trades some pull requests per budgeted page for a
 crawl that reliably makes progress on expensive repositories; `pagesPerRun`
 and `maxPagesPerRepo` keep their existing meaning.
+
+## Repositories GitHub struggles to serve
+
+A very large repository can keep answering GraphQL with 502/504 even though REST
+works with the same token. One such repository never blocks the rest of the
+dataset, and its gaps are never silently counted as zero. Each step below is
+tried only when the one before it failed:
+
+1. **Smaller pages.** The daily query starts at 100 pull requests per page and
+   shrinks on the same `DEVEX_BACKFILL_ADAPTIVE_PAGE_SIZE` and
+   `DEVEX_BACKFILL_MIN_PAGE_SIZE` settings as the backfill. A page gets at most 5
+   attempts with 80 seconds of waiting between them, plus however long GitHub
+   takes to answer each attempt. `DEVEX_MAX_PR_PAGES` budgets pull requests rather
+   than requests, so smaller pages do not mean less history.
+2. **Keep what arrived.** If a later page still fails, the pages already fetched
+   are kept and the repository is flagged *Partial data*.
+3. **Bounded REST.** If not even the first page arrives, REST takes over: counts
+   from the Search API (a fixed number of requests) and at most
+   `DEVEX_MAX_PR_PAGES` pages of closed pull requests. REST has no cheap source
+   for line counts or review timings, so the repository is flagged *REST
+   fallback*. Its pull requests stay out of the event stream, because a lean row
+   would permanently block the fuller one for the same pull request; the backfill
+   or a later daily run can still record those.
+4. **Last known metrics.** If REST fails too, the repository keeps its metrics
+   from the local cache or the history store, flagged *Not refreshed*. With no
+   earlier data it is listed as *No data* with placeholder zeros, and left out of
+   that day's rollup.
+
+Flagged repositories are listed at the top of the report and the dashboard, and
+carry a badge in the repository table. Every run retries them, except *PR history
+capped*: that one means the repository succeeded but has more pull requests in
+the two-year window than `DEVEX_MAX_PR_PAGES` allows, so raise the setting if you
+need them.
+
+A run still fails when every repository fails, since that is a GitHub outage and
+the last good data should stay published, and on any authentication or validation
+error, since those would affect every repository alike.
 
 ## Public repository landscape (opt-in)
 

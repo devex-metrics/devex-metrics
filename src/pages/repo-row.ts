@@ -1,4 +1,5 @@
 import type { RepoMetrics } from "../types.js";
+import { collectionStateLabel } from "../collection-state.js";
 import { escapeHtml, formatDurationHtml } from "./utils.js";
 
 export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string {
@@ -49,6 +50,13 @@ export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string
     .replace(/-+/g, "-");
 
   const agentTaskCount = repo.copilotAgentMetrics?.totalTasks ?? 0;
+  const warning = repo.collectionWarning;
+  const warningBadge = warning
+    ? `<span class="bdg bdg-warn" title="${escapeHtml(warning.detail)}">&#9888; ${escapeHtml(collectionStateLabel(warning.state))}</span>`
+    : "";
+  const warningDetail = warning
+    ? `<p class="repo-incomplete" role="note"><strong>Incomplete data:</strong> ${escapeHtml(warning.detail)}</p>`
+    : "";
   const dataRow =
     `<tr class="repo-row"${initiallyHidden ? " hidden" : ""} ` +
     `data-name="${escapeHtml(repo.fullName.toLowerCase())}" ` +
@@ -68,6 +76,7 @@ export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string
     `<button class="repo-expand-btn" onclick="toggleRepo(this)" aria-expanded="false" aria-label="Toggle details for ${escapeHtml(repo.fullName)}"><span class="chev" aria-hidden="true">&rsaquo;</span></button>` +
     `<a class="rname" href="${repoUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(repo.fullName)}</a>` +
     `<span class="bdg bdg-age"></span>` +
+    warningBadge +
     `</div></td>` +
     `<td>${repo.issues.open}<span class="col-muted"> / ${repo.issues.closed}</span></td>` +
     `<td class="td-merged-prs">${repo.pullRequests.merged}</td>` +
@@ -82,6 +91,7 @@ export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string
   const detailRow =
     `<tr class="repo-detail-row" id="detail-${repoId}" hidden>` +
     `<td colspan="9" class="repo-detail-cell"><div class="repo-detail-inner">` +
+    warningDetail +
     `<div class="stats-grid">` +
     `<div class="sg"><h4>Issues</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.issues.open}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.issues.closed}</dd></div></dl></div>` +
     `<div class="sg"><h4>Pull Requests</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.pullRequests.open}</dd></div><div class="dr"><dt>Merged</dt><dd>${repo.pullRequests.merged}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.pullRequests.closed}</dd></div></dl></div>` +

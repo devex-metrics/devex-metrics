@@ -153,7 +153,8 @@ export interface BackfillConfig {
   pageSize: number;
   /**
    * Floor for adaptive page-size reduction (see `adaptivePageSize`). An
-   * integer from 1 through 100, and never greater than `pageSize`.
+   * integer from 1 through 100, and never greater than `pageSize`. The daily
+   * collection uses the same floor.
    */
   minPageSize: number;
   /**
@@ -162,6 +163,7 @@ export interface BackfillConfig {
    * retry the same cursor with a smaller page size instead of giving up on
    * the repository. The size is halved down to `minPageSize` and the
    * successful size is kept for the rest of the repository's crawl this run.
+   * Also governs the daily collection, which starts each repository at 100.
    */
   adaptivePageSize: boolean;
 }
@@ -170,7 +172,10 @@ export interface BackfillConfig {
 export interface CollectionConfig {
   /** Weeks of weekly-trend history to build. */
   historyWeeks: number;
-  /** Maximum pages of merged PRs to walk per repo. */
+  /**
+   * PR budget per repo, in pages of 100. Bounds both the daily GraphQL crawl and
+   * the REST fallback that replaces it when GraphQL keeps failing.
+   */
   maxPRPages: number;
   /** Hours before a per-repo cache entry is considered stale. */
   maxRepoAgeHours: number;

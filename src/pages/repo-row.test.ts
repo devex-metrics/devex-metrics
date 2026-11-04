@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildRepoRow } from "./repo-row.js";
+import { buildDashboardHtml, buildIncompleteNotice } from "./dashboard.js";
 import type { RepoMetrics, PullRequestDetail, CopilotAgentMetrics } from "../types.js";
 
 function pr(overrides: Partial<PullRequestDetail> = {}): PullRequestDetail {
@@ -392,5 +393,60 @@ describe("buildRepoRow", () => {
     expect(html).not.toContain("Avg&nbsp;duration");
     expect(html).not.toContain("<dt>PRs created</dt>");
     expect(html).not.toContain("Actions&nbsp;min");
+  });
+});
+
+describe("buildRepoRow collection warnings", () => {
+  it("shows a badge and an explanation for an incomplete repository", () => {
+    const html = buildRepoRow(
+      repo({ collectionWarning: { state: "stale", detail: 'Not refreshed "<today>".' } }),
+    );
+
+    expect(html).toContain('class="bdg bdg-warn"');
+    expect(html).toContain("Not refreshed</span>");
+    expect(html).toContain('class="repo-incomplete"');
+    expect(html).toContain("Not refreshed &quot;&lt;today&gt;&quot;.");
+    expect(html).not.toContain("<today>");
+  });
+
+  it("shows neither for a complete repository", () => {
+    const html = buildRepoRow(repo());
+
+    expect(html).not.toContain("bdg-warn");
+    expect(html).not.toContain("repo-incomplete");
+  });
+});
+
+describe("buildIncompleteNotice", () => {
+  it("names every incomplete repository and escapes what it shows", () => {
+    const notice = buildIncompleteNotice([
+      repo({ fullName: "acme/big", collectionWarning: { state: "failed", detail: "No <data>." } }),
+      repo({ fullName: "acme/ok" }),
+    ]);
+
+    expect(notice).toContain("1 of 2 repositories have incomplete metrics");
+    expect(notice).toContain("<strong>acme/big</strong> (No data): No &lt;data&gt;.");
+    expect(notice).not.toContain("acme/ok");
+  });
+
+  it("is empty when every repository is complete", () => {
+    expect(buildIncompleteNotice([repo()])).toBe("");
+  });
+
+  it("appears in the dashboard above the key metrics", () => {
+    const html = buildDashboardHtml(
+      {
+        owner: "acme",
+        ownerType: "org",
+        collectedAt: "2026-10-01T00:00:00Z",
+        repoCount: 1,
+        repos: [repo({ collectionWarning: { state: "failed", detail: "No data." } })],
+      },
+      "2026-10-01",
+    );
+
+    const notice = html.indexOf('class="incomplete-notice"');
+    expect(notice).toBeGreaterThan(-1);
+    expect(notice).toBeLessThan(html.indexOf('class="kpis"'));
   });
 });

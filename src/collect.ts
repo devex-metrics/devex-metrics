@@ -26,10 +26,19 @@ import {
 } from "./collectors/index.js";
 import { sumWeeklyTrends, weekLabels } from "./collectors/trends.js";
 import { filterRepos, describeFiltering } from "./collectors/repos.js";
+import { describeTransientError, isTransientCollectionError } from "./collectors/repo-graphql.js";
 import { loadConfig, describeConfig } from "./config.js";
 import type { DevexConfig } from "./config.js";
-import type { GraphQLPRNode } from "./collectors/index.js";
-import type { OrgMetrics, RepoMetrics, TeamSummary, TrialSummary } from "./types.js";
+import type { GraphQLPRNode, GraphQLRepoData } from "./collectors/index.js";
+import { loadLatest } from "./history.js";
+import type {
+  OrgMetrics,
+  RepoCollectionState,
+  RepoCollectionWarning,
+  RepoMetrics,
+  TeamSummary,
+  TrialSummary,
+} from "./types.js";
 
 interface ResolvedRepoRef {
   fullName: string;
@@ -102,7 +111,7 @@ export async function collect(
     !config.collection.features.publicDiscovery
   ) {
     const cached = loadCache(owner);
-    if (cached) {
+    if (cached && !cached.repos.some(needsRecollection)) {
       console.log(`Using cached data for ${owner} (collected ${cached.collectedAt})`);
       return cached;
     }
@@ -160,6 +169,109 @@ async function planDelta(
 }
 
 /**
+ * True when a repo's stored metrics came out of a failure, so the next run should
+ * try again rather than reuse them. A `capped` repo succeeded; retrying it within
+ * the freshness window would only hit the same budget.
+ */
+function needsRecollection(repo: RepoMetrics): boolean {
+  const state = repo.collectionWarning?.state;
+  return state !== undefined && state !== "capped";
+}
+
+/** True when nothing was fetched for a repo this run: its data is old or a placeholder. */
+function wasNotRefreshed(repo: RepoMetrics): boolean {
+  const state = repo.collectionWarning?.state;
+  return state === "stale" || state === "failed" || repo.collectionWarning?.notRefreshed === true;
+}
+
+/** Add a gap to a repo's warning, keeping the more serious state of the two. */
+function addGap(
+  current: RepoCollectionWarning | undefined,
+  state: RepoCollectionState,
+  detail: string
+): RepoCollectionWarning {
+  if (!current) return { state, detail };
+  return {
+    ...current,
+    state: current.state === "capped" ? state : current.state,
+    detail: `${current.detail} ${detail}`,
+  };
+}
+
+/** Describe why a GraphQL crawl stopped short of the two-year cutoff. */
+function truncationWarning(data: GraphQLRepoData): RepoCollectionWarning | undefined {
+  const { truncation, prNodes } = data;
+  if (!truncation) return undefined;
+  if (truncation.reason === "page-cap") {
+    return {
+      state: "capped",
+      detail:
+        `Only the ${prNodes.length} most recently updated closed PRs were collected; older PRs ` +
+        `in the two-year window are missing. Raise DEVEX_MAX_PR_PAGES to collect more.`,
+    };
+  }
+  return {
+    state: "partial",
+    detail:
+      `PR history stops after ${prNodes.length} PRs because of a ${truncation.category}. ` +
+      `Lifetime PR and issue counts are complete; timelines, review and size metrics undercount.`,
+    requestId: truncation.requestId,
+  };
+}
+
+/**
+ * The entry for a repo that could not be collected at all: its last known
+ * metrics when there are any, otherwise a placeholder that says so.
+ */
+function unavailableRepoEntry(
+  ref: ResolvedRepoRef,
+  repoName: string,
+  previous: RepoMetrics | undefined,
+  err: unknown
+): RepoMetrics {
+  const reason = describeTransientError(err);
+  if (previous && previous.collectionWarning?.state !== "failed") {
+    const asOf = previous.collectedAt?.slice(0, 10) ?? "an earlier run";
+    const leanRestData = previous.collectionWarning?.state === "rest-fallback";
+    return {
+      ...previous,
+      isPrivate: ref.isPrivate,
+      pushedAt: ref.pushedAt,
+      isTeamRepo: ref.isTeamRepo,
+      defaultBranch: ref.defaultBranch || previous.defaultBranch,
+      sizeKb: ref.sizeKb ?? previous.sizeKb,
+      collectionWarning: {
+        // Stays rest-fallback so its lean PRs still stay out of the event stream.
+        state: leanRestData ? "rest-fallback" : "stale",
+        notRefreshed: true,
+        detail: `Not refreshed because of a ${reason}; showing metrics from ${asOf}.`,
+      },
+    };
+  }
+  return {
+    name: repoName,
+    fullName: ref.fullName,
+    isPrivate: ref.isPrivate,
+    pushedAt: ref.pushedAt,
+    isTeamRepo: ref.isTeamRepo,
+    defaultBranch: ref.defaultBranch || undefined,
+    sizeKb: ref.sizeKb,
+    issues: { open: 0, closed: 0 },
+    pullRequests: { open: 0, closed: 0, merged: 0 },
+    pullRequestDetails: [],
+    weeklyTrends: [],
+    committerCount: 0,
+    reviewerCount: 0,
+    contributorCount: 0,
+    dependentCount: 0,
+    collectionWarning: {
+      state: "failed",
+      detail: `No data: collection failed because of a ${reason} and no earlier metrics exist. Its zeros are placeholders.`,
+    },
+  };
+}
+
+/**
  * Whether a cached repo can stand in for a fresh collection in a delta run.
  * A repo with open PRs is always re-collected: submitting a review does not
  * reliably advance the PR's `updated_at`, so the activity search can miss it.
@@ -201,7 +313,7 @@ export async function collectGroup(
 
   if (!options.skipCache) {
     const cached = loadCache(cacheKey);
-    if (cached) {
+    if (cached && !cached.repos.some(needsRecollection)) {
       console.log(`Using cached data for group "${groupName}" (collected ${cached.collectedAt})`);
       return cached;
     }
@@ -291,8 +403,23 @@ async function collectMetricsForRepoList(
   const { delta } = options;
   // Collects pre-fetched GraphQL PR nodes per repo for the trends collector.
   const prDataByRepo = new Map<string, GraphQLPRNode[]>();
+  let unavailableCount = 0;
+  let lastUnavailableError: unknown;
+  // Read only when a repo fails: the scheduled run starts with no local cache,
+  // so the history store is usually where its last known metrics live.
+  let lastSnapshot: Map<string, RepoMetrics> | undefined;
+  const previousMetrics = (fullName: string): RepoMetrics | undefined => {
+    if (options.skipCache) return undefined;
+    lastSnapshot ??= new Map(
+      (config.history.enabled ? (loadLatest(config.history.dir, owner)?.repos ?? []) : []).map(
+        (r): [string, RepoMetrics] => [r.fullName, r]
+      )
+    );
+    return cachedRepoMap.get(fullName) ?? lastSnapshot.get(fullName);
+  };
 
-  for (const { fullName, isPrivate, pushedAt, isTeamRepo, defaultBranch, sizeKb } of repoList) {
+  for (const ref of repoList) {
+    const { fullName, isPrivate, pushedAt, isTeamRepo, defaultBranch, sizeKb } = ref;
     // Reuse per-repo data if it is recent enough. The team flag comes from the
     // current config rather than the cache, so re-scoping a trial takes effect
     // without discarding collected data.
@@ -300,6 +427,7 @@ async function collectMetricsForRepoList(
       const cached = cachedRepoMap.get(fullName);
       const reusable =
         cached !== undefined &&
+        !needsRecollection(cached) &&
         (delta
           ? isUnchangedSinceBaseline(cached, pushedAt, delta)
           : isWithinHours(cached.collectedAt, maxAgeHours));
@@ -330,96 +458,44 @@ async function collectMetricsForRepoList(
     const repoOwner = fullName.slice(0, slashIndex);
     const repoName = fullName.slice(slashIndex + 1);
 
-    // Try the GraphQL path first (1-2 calls vs ~100 REST calls per repo).
-    const graphqlData = await collectRepoGraphQL(repoOwner, repoName);
-
-    let issues, prCounts, prDetails, mergedPRTimeline, contributors, dependentCount;
-    // Abandonment, open-PR age and review-load concentration are derived from
-    // nodes the GraphQL path already fetched; the REST fallback has no cheap
-    // equivalent, so they stay absent there rather than costing extra calls.
-    let closedPRTimeline: RepoMetrics["closedPRTimeline"];
-    let openPRTimeline: RepoMetrics["openPRTimeline"];
-    let reviewerLoad: RepoMetrics["reviewerLoad"];
-
-    if (graphqlData !== null) {
-      // Fast path: derive most data from the pre-fetched GraphQL result.
-      issues = {
-        open: graphqlData.openIssueCount,
-        closed: graphqlData.closedIssueCount,
-      };
-      prCounts = buildPullRequestCounts(graphqlData);
-      mergedPRTimeline = buildMergedPRTimeline(graphqlData.prNodes);
-      prDetails = await collectPullRequestDetailsFromNodes(
-        repoOwner,
-        repoName,
-        graphqlData.prNodes
-      );
-      closedPRTimeline = buildClosedPRTimeline(graphqlData.prNodes);
-      openPRTimeline = buildOpenPRTimeline(graphqlData.openPRNodes ?? []);
-      reviewerLoad = countReviewerLoad(graphqlData.prNodes);
-      const reviewerLogins = extractReviewerLogins(graphqlData.prNodes);
-      [contributors, dependentCount] = await Promise.all([
-        collectContributors(repoOwner, repoName, reviewerLogins),
-        config.collection.features.dependents
-          ? collectDependentCount(repoOwner, repoName)
-          : Promise.resolve(0),
-      ]);
-      // Store PR nodes for the trends collector (avoids pulls.get detail fetches).
-      prDataByRepo.set(fullName, graphqlData.prNodes);
-    } else {
-      // Fallback: full REST path (GraphQL returned null = not found/forbidden).
-      [issues, prCounts, prDetails, mergedPRTimeline, contributors, dependentCount] =
-        await Promise.all([
-          collectIssueCounts(repoOwner, repoName),
-          collectPullRequestCounts(repoOwner, repoName),
-          collectPullRequestDetails(repoOwner, repoName),
-          collectMergedPRTimeline(repoOwner, repoName),
-          collectContributors(repoOwner, repoName),
-          config.collection.features.dependents
-            ? collectDependentCount(repoOwner, repoName)
-            : Promise.resolve(0),
-        ]);
+    // One repository GitHub cannot serve must not cost the rest of the dataset.
+    // Anything but a transient failure (auth, validation, a bug) still ends the run.
+    try {
+      repos.push(await collectFreshRepo(ref, repoOwner, repoName, config, prDataByRepo));
+    } catch (err: unknown) {
+      if (!isTransientCollectionError(err)) throw err;
+      unavailableCount++;
+      lastUnavailableError = err;
+      const entry = unavailableRepoEntry(ref, repoName, previousMetrics(fullName), err);
+      console.warn(`  ⚠ ${fullName}: ${entry.collectionWarning?.detail}`);
+      repos.push(entry);
     }
-
-    // Fetch issue lead times for PRs that reference issues
-    const issueLeadTimes = await collectIssueLeadTimes(
-      repoOwner,
-      repoName,
-      mergedPRTimeline,
-    );
-
-    const copilotAdoption = computeCopilotAdoption(mergedPRTimeline, prDetails);
-
-    // Collect Copilot agent metrics (heavy, per-repo; uses its own cache).
-    const copilotAgentMetrics = config.collection.features.copilotAgent
-      ? ((await collectCopilotAgentMetrics(repoOwner, repoName)) ?? undefined)
-      : undefined;
-
-    repos.push({
-      name: repoName,
-      fullName,
-      isPrivate,
-      pushedAt,
-      isTeamRepo,
-      defaultBranch: defaultBranch || undefined,
-      sizeKb,
-      collectedAt: new Date().toISOString(),
-      issues,
-      pullRequests: prCounts,
-      pullRequestDetails: prDetails,
-      mergedPRTimeline,
-      closedPRTimeline,
-      openPRTimeline,
-      reviewerLoad,
-      copilotAdoption,
-      issueLeadTimes,
-      committerCount: contributors.committerCount,
-      reviewerCount: contributors.reviewerCount,
-      contributorCount: contributors.contributorCount,
-      dependentCount,
-      copilotAgentMetrics,
-    });
   }
+
+  if (repos.length > 0 && unavailableCount === repos.length) {
+    // Nothing succeeded, so this is a GitHub outage rather than one awkward
+    // repository. Fail the run and leave the last good data in place.
+    throw new Error(
+      `All ${repos.length} repositories failed to collect (last error: ` +
+        `${describeTransientError(lastUnavailableError)})`,
+      { cause: lastUnavailableError }
+    );
+  }
+
+  const recordTrendFailures = (failed: ReadonlySet<string>): void => {
+    for (const repo of repos) {
+      if (!failed.has(repo.fullName)) continue;
+      repo.weeklyTrends = [];
+      repo.collectionWarning = addGap(repo.collectionWarning, "partial", "Weekly trends could not be collected.");
+    }
+  };
+  // The REST fallback's trend walk is bounded; everything else keeps its window.
+  const toTrendRepo = (r: RepoMetrics): { owner: string; name: string; maxPRPages?: number } => {
+    const trendRepo = { owner: r.fullName.slice(0, r.fullName.indexOf("/")), name: r.name };
+    return r.collectionWarning?.state === "rest-fallback"
+      ? { ...trendRepo, maxPRPages: Math.max(1, config.collection.maxPRPages) }
+      : trendRepo;
+  };
 
   // Reuse cached weekly trends if every repo came from cache and all repos
   // already have per-repo weeklyTrends (i.e. cache was built with this version).
@@ -428,13 +504,13 @@ async function collectMetricsForRepoList(
   if (delta) {
     // Unchanged repos keep today's per-repo trends (same week window); only
     // the changed ones are re-counted, and the org series is their sum.
-    const changed = repos.filter((r) => !reused.has(r.fullName));
+    const changed = repos.filter((r) => !reused.has(r.fullName) && !wasNotRefreshed(r));
     console.log(
       `Incremental: ${changed.length} of ${repos.length} repo(s) refreshed`
     );
     if (changed.length > 0) {
       const result = await collectWeeklyTrends(
-        changed.map((r) => ({ owner: r.fullName.slice(0, r.fullName.indexOf("/")), name: r.name })),
+        changed.map(toTrendRepo),
         config.collection.historyWeeks,
         200,
         prDataByRepo
@@ -442,6 +518,7 @@ async function collectMetricsForRepoList(
       for (const repo of changed) {
         repo.weeklyTrends = result.repoTrends.get(repo.fullName) ?? [];
       }
+      recordTrendFailures(result.failedRepos);
     }
     weeklyTrends = sumWeeklyTrends(
       weekLabels(config.collection.historyWeeks),
@@ -449,20 +526,27 @@ async function collectMetricsForRepoList(
     );
   } else if (freshCount > 0 || !weeklyTrends || missingRepoTrends) {
     console.log(`Collecting weekly trends… (${freshCount} repos refreshed)`);
-    const trendRepos = repos.map((r) => {
-      const slash = r.fullName.indexOf("/");
-      return { owner: r.fullName.slice(0, slash), name: r.name };
-    });
+    // A repo that just failed would only fail again, and its last known trends
+    // are still the best figures available for it.
+    const notRefreshed = repos.filter(wasNotRefreshed);
+    const refreshed = repos.filter((r) => !wasNotRefreshed(r));
     const result = await collectWeeklyTrends(
-      trendRepos,
+      refreshed.map(toTrendRepo),
       config.collection.historyWeeks,
       200,
       prDataByRepo
     );
-    weeklyTrends = result.orgTrends;
-    for (const repo of repos) {
+    weeklyTrends =
+      notRefreshed.length > 0
+        ? sumWeeklyTrends(weekLabels(config.collection.historyWeeks), [
+            result.orgTrends,
+            ...notRefreshed.map((r) => r.weeklyTrends ?? []),
+          ])
+        : result.orgTrends;
+    for (const repo of refreshed) {
       repo.weeklyTrends = result.repoTrends.get(repo.fullName) ?? [];
     }
+    recordTrendFailures(result.failedRepos);
   } else {
     console.log(`Reusing cached weekly trends (all ${repos.length} repos were fresh)`);
   }
@@ -480,8 +564,161 @@ async function collectMetricsForRepoList(
     trial: toTrialSummary(config),
   };
 
+  const incomplete = repos.filter((r) => r.collectionWarning);
+  if (incomplete.length > 0) {
+    console.warn(
+      `  ⚠ ${incomplete.length} of ${repos.length} repositories have incomplete metrics: ` +
+        incomplete.map((r) => `${r.fullName} (${r.collectionWarning?.state})`).join(", ")
+    );
+  }
+
   saveCache(cacheKey, metrics);
   return metrics;
+}
+
+/**
+ * Collect one repository: GraphQL first, then the REST fallback when GraphQL is
+ * unavailable. A repository served only in part carries a `collectionWarning`
+ * saying what is missing. Throws when even the fallback fails.
+ */
+async function collectFreshRepo(
+  ref: ResolvedRepoRef,
+  repoOwner: string,
+  repoName: string,
+  config: DevexConfig,
+  prDataByRepo: Map<string, GraphQLPRNode[]>
+): Promise<RepoMetrics> {
+  const { fullName, isPrivate, pushedAt, isTeamRepo, defaultBranch, sizeKb } = ref;
+  const maxPRPages = Math.max(1, config.collection.maxPRPages);
+  const { minPageSize, adaptivePageSize } = config.collection.backfill;
+
+  // Try the GraphQL path first (1-2 calls vs ~100 REST calls per repo).
+  const graphql = await collectRepoGraphQL(repoOwner, repoName, maxPRPages, {
+    minPageSize,
+    adaptive: adaptivePageSize,
+  });
+
+  let issues, prCounts, prDetails, mergedPRTimeline, contributors, dependentCount;
+  // Abandonment, open-PR age and review-load concentration are derived from
+  // nodes the GraphQL path already fetched; the REST fallback has no cheap
+  // equivalent, so they stay absent there rather than costing extra calls.
+  let closedPRTimeline: RepoMetrics["closedPRTimeline"];
+  let openPRTimeline: RepoMetrics["openPRTimeline"];
+  let reviewerLoad: RepoMetrics["reviewerLoad"];
+  let collectionWarning: RepoCollectionWarning | undefined;
+
+  if (graphql !== null && !("unavailable" in graphql)) {
+    // Fast path: derive most data from the pre-fetched GraphQL result.
+    collectionWarning = truncationWarning(graphql);
+    issues = {
+      open: graphql.openIssueCount,
+      closed: graphql.closedIssueCount,
+    };
+    prCounts = buildPullRequestCounts(graphql);
+    mergedPRTimeline = buildMergedPRTimeline(graphql.prNodes);
+    prDetails = await collectPullRequestDetailsFromNodes(
+      repoOwner,
+      repoName,
+      graphql.prNodes
+    );
+    closedPRTimeline = buildClosedPRTimeline(graphql.prNodes);
+    openPRTimeline = buildOpenPRTimeline(graphql.openPRNodes ?? []);
+    reviewerLoad = countReviewerLoad(graphql.prNodes);
+    const reviewerLogins = extractReviewerLogins(graphql.prNodes);
+    [contributors, dependentCount] = await Promise.all([
+      collectContributors(repoOwner, repoName, reviewerLogins),
+      config.collection.features.dependents
+        ? collectDependentCount(repoOwner, repoName)
+        : Promise.resolve(0),
+    ]);
+    // Store PR nodes for the trends collector (avoids pulls.get detail fetches).
+    prDataByRepo.set(fullName, graphql.prNodes);
+  } else {
+    // Fallback: REST path (null = not found/forbidden, otherwise GraphQL kept failing).
+    [issues, prCounts, prDetails, mergedPRTimeline, contributors, dependentCount] =
+      await Promise.all([
+        collectIssueCounts(repoOwner, repoName),
+        collectPullRequestCounts(repoOwner, repoName),
+        collectPullRequestDetails(repoOwner, repoName),
+        collectMergedPRTimeline(repoOwner, repoName, maxPRPages),
+        collectContributors(repoOwner, repoName),
+        config.collection.features.dependents
+          ? collectDependentCount(repoOwner, repoName)
+          : Promise.resolve(0),
+      ]);
+    if (graphql !== null) {
+      collectionWarning = {
+        state: "rest-fallback",
+        detail:
+          `GraphQL unavailable (${graphql.category}), so the REST fallback was used: ` +
+          `counts are complete, the merged-PR timeline covers at most ${maxPRPages * 100} closed PRs, ` +
+          `and line counts, review timings, abandoned PRs and open-PR ages are missing or sampled. ` +
+          `Its PRs are left out of the event history until GraphQL succeeds.`,
+        requestId: graphql.requestId,
+      };
+    }
+  }
+
+  // Fetch issue lead times for PRs that reference issues
+  let issueLeadTimes: RepoMetrics["issueLeadTimes"];
+  try {
+    issueLeadTimes = await collectIssueLeadTimes(
+      repoOwner,
+      repoName,
+      mergedPRTimeline,
+    );
+  } catch (err: unknown) {
+    // One issue lookup among hundreds should not discard the PR data above.
+    if (!isTransientCollectionError(err)) throw err;
+    collectionWarning = addGap(
+      collectionWarning,
+      "partial",
+      `Issue lead times are missing because of a ${describeTransientError(err)}.`
+    );
+  }
+
+  const copilotAdoption = computeCopilotAdoption(mergedPRTimeline, prDetails);
+
+  // Collect Copilot agent metrics (heavy, per-repo; uses its own cache).
+  let copilotAgentMetrics: RepoMetrics["copilotAgentMetrics"];
+  if (config.collection.features.copilotAgent) {
+    try {
+      copilotAgentMetrics = (await collectCopilotAgentMetrics(repoOwner, repoName)) ?? undefined;
+    } catch (err: unknown) {
+      if (!isTransientCollectionError(err)) throw err;
+      collectionWarning = addGap(
+        collectionWarning,
+        "partial",
+        `Copilot agent metrics are missing because of a ${describeTransientError(err)}.`
+      );
+    }
+  }
+
+  return {
+    name: repoName,
+    fullName,
+    isPrivate,
+    pushedAt,
+    isTeamRepo,
+    defaultBranch: defaultBranch || undefined,
+    sizeKb,
+    collectedAt: new Date().toISOString(),
+    issues,
+    pullRequests: prCounts,
+    pullRequestDetails: prDetails,
+    mergedPRTimeline,
+    closedPRTimeline,
+    openPRTimeline,
+    reviewerLoad,
+    copilotAdoption,
+    issueLeadTimes,
+    committerCount: contributors.committerCount,
+    reviewerCount: contributors.reviewerCount,
+    contributorCount: contributors.contributorCount,
+    dependentCount,
+    copilotAgentMetrics,
+    collectionWarning,
+  };
 }
 
 /** Copy the configured team into the dataset, resolved to real repo names. */

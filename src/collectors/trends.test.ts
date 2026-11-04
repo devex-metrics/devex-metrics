@@ -530,3 +530,47 @@ describe("sumWeeklyTrends", () => {
     ]);
   });
 });
+
+describe("collectWeeklyTrends on a repository it cannot crawl in full", () => {
+  afterEach(() => resetOctokit());
+
+  /** An octokit whose PR walk serves one matching PR per page, forever. */
+  function endlessPRs() {
+    const now = new Date().toISOString();
+    let pagesServed = 0;
+    async function* iterator() {
+      for (;;) {
+        pagesServed++;
+        yield { data: [{ number: pagesServed, created_at: now, updated_at: now, merged_at: null }] };
+      }
+    }
+    const octokit = {
+      rest: { issues: { listForRepo: {} }, pulls: { list: {}, get: async () => ({ data: {} }) } },
+      paginate: Object.assign(async () => [], { iterator }),
+    } as unknown as Octokit;
+    return { octokit, pages: () => pagesServed };
+  }
+
+  it("stops the REST PR walk at the repo's page bound", async () => {
+    const { octokit, pages } = endlessPRs();
+    setOctokit(octokit);
+
+    const result = await collectWeeklyTrends([{ owner: "o", name: "big", maxPRPages: 3 }], 4);
+
+    expect(pages()).toBe(3);
+    expect(result.orgTrends.reduce((sum, w) => sum + w.prsOpened, 0)).toBe(3);
+    expect(result.failedRepos.size).toBe(0);
+  });
+
+  it("reports a server failure separately from an expected skip", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    setOctokit(buildMockOctokit({ issueError: { status: 502 } }));
+    const failed = await collectWeeklyTrends([{ owner: "o", name: "down" }], 4);
+    expect([...failed.failedRepos]).toEqual(["o/down"]);
+
+    setOctokit(buildMockOctokit({ issueError: { status: 404 } }));
+    const skipped = await collectWeeklyTrends([{ owner: "o", name: "gone" }], 4);
+    expect(skipped.failedRepos.size).toBe(0);
+    warnSpy.mockRestore();
+  });
+});

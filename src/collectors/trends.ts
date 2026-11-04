@@ -47,6 +47,11 @@ export interface WeeklyTrendsResult {
    * Skipped repos (inaccessible, 404, etc.) have no entry.
    */
   repoTrends: Map<string, WeeklyTrendPoint[]>;
+  /**
+   * Full names of repos whose trends failed on a server or network error, as
+   * opposed to the expected skips (inaccessible, 404) above.
+   */
+  failedRepos: Set<string>;
 }
 
 /** Create a fresh set of zero-filled week buckets starting at `startMonday`. */
@@ -131,9 +136,12 @@ export function sumWeeklyTrends(
  * When `prDataByRepo` is provided for a repo, its pre-fetched GraphQL PR nodes
  * (which include additions/deletions) are used instead of calling `pulls.get`
  * per merged PR, eliminating up to 200 REST detail fetches per run.
+ *
+ * `maxPRPages` on a repo bounds its REST pull-request walk; repos on the REST
+ * fallback path set it because they are the ones too large to crawl in full.
  */
 export async function collectWeeklyTrends(
-  repos: { owner: string; name: string }[],
+  repos: { owner: string; name: string; maxPRPages?: number }[],
   weeksBack = 12,
   maxDetailFetches = 200,
   prDataByRepo?: Map<string, GraphQLPRNode[]>
@@ -147,6 +155,7 @@ export async function collectWeeklyTrends(
 
   const weeks = createWeekBuckets(startMonday, weeksBack);
   const repoTrends = new Map<string, WeeklyTrendPoint[]>();
+  const failedRepos = new Set<string>();
 
   // cutoff = start of the oldest bucket (inclusive).
   const cutoff = startMonday;
@@ -155,7 +164,7 @@ export async function collectWeeklyTrends(
   // Budget for individual pulls.get() detail calls (to limit API fan-out).
   let detailFetchBudget = maxDetailFetches;
 
-  for (const { owner, name } of repos) {
+  for (const { owner, name, maxPRPages } of repos) {
     const repoKey = `${owner}/${name}`;
     const prefetchedPRs = prDataByRepo?.get(repoKey);
     const repoWeeks = createWeekBuckets(startMonday, weeksBack);
@@ -239,6 +248,7 @@ export async function collectWeeklyTrends(
       } else {
         // Slow path: paginate REST pulls.list; fetch details per merged PR.
         // Sorted by updated desc so we can exit early once we pass the cutoff.
+        let pagesLeft = maxPRPages ?? Infinity;
         for await (const response of octokit.paginate.iterator(
           octokit.rest.pulls.list,
           {
@@ -297,7 +307,7 @@ export async function collectWeeklyTrends(
               }
             }
           }
-          if (reachedCutoff) break;
+          if (reachedCutoff || --pagesLeft <= 0) break;
         }
       }
 
@@ -310,11 +320,13 @@ export async function collectWeeklyTrends(
       const status = (err as { status?: number }).status;
       if (status === 404 || status === 410 || status === 403) continue;
       console.warn(`  ⚠ trends: skipping ${owner}/${name}: ${String(err)}`);
+      failedRepos.add(repoKey);
     }
   }
 
   return {
     orgTrends: [...weeks.values()].sort((a, b) => a.week.localeCompare(b.week)),
     repoTrends,
+    failedRepos,
   };
 }

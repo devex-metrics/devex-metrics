@@ -3,6 +3,7 @@ import { gini, quantiles, shareAtLeast } from "./stats.js";
 import { LARGE_PR_LINES } from "./history.js";
 import { postReviewCommitFacts } from "./review-rework.js";
 import { renderMarkdownTableRow } from "./markdown.js";
+import { collectionStateLabel } from "./collection-state.js";
 
 /**
  * Measurement windows a summary metric can be reported over. Metrics counted
@@ -39,6 +40,8 @@ export function generateReport(metrics: OrgMetrics): string {
       `Owner type: **${metrics.ownerType}**`
   );
   lines.push("");
+
+  pushCollectionWarnings(lines, metrics.repos);
 
   // -- Summary --
   lines.push("## Summary");
@@ -244,6 +247,10 @@ export function generateReport(metrics: OrgMetrics): string {
   for (const repo of metrics.repos) {
     lines.push(`### ${repo.fullName}`);
     lines.push("");
+    if (repo.collectionWarning) {
+      lines.push(`> ⚠ **Incomplete data:** ${repo.collectionWarning.detail}`);
+      lines.push("");
+    }
     if (repo.pushedAt) {
       lines.push(`Last pushed: ${repo.pushedAt.slice(0, 10)}`);
     }
@@ -356,6 +363,30 @@ export function generateReport(metrics: OrgMetrics): string {
 /* ---- helpers ---- */
 
 /** Append a line to `lines` only when `condition` is truthy. The line is built lazily so its expression is not evaluated when skipped. */
+/** Put repositories with known gaps at the top, before any total that includes them. */
+function pushCollectionWarnings(lines: string[], repos: readonly RepoMetrics[]): void {
+  const incomplete = repos.filter((r) => r.collectionWarning);
+  if (incomplete.length === 0) return;
+  lines.push("## ⚠ Incomplete data");
+  lines.push("");
+  lines.push(
+    `> ${incomplete.length} of ${repos.length} ${repos.length === 1 ? "repository has" : "repositories have"} ` +
+      `incomplete metrics, so totals below may undercount.`
+  );
+  lines.push("");
+  lines.push("| Repository | Status | What is missing |");
+  lines.push("| ---------- | ------ | --------------- |");
+  for (const repo of incomplete) {
+    const warning = repo.collectionWarning;
+    if (!warning) continue;
+    const request = warning.requestId ? ` GitHub request id: ${warning.requestId}.` : "";
+    lines.push(
+      renderMarkdownTableRow([repo.fullName, collectionStateLabel(warning.state), `${warning.detail}${request}`])
+    );
+  }
+  lines.push("");
+}
+
 function pushIf(lines: string[], condition: boolean, line: () => string): void {
   if (condition) lines.push(line());
 }

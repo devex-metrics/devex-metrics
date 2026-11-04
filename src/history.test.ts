@@ -72,6 +72,42 @@ function metrics(repos: RepoMetrics[]): OrgMetrics {
   };
 }
 
+describe("incomplete repositories in the history store", () => {
+  const failed = () =>
+    repo("acme/down", [], {
+      pullRequests: { open: 0, closed: 0, merged: 0 },
+      collectionWarning: { state: "failed", detail: "No data" },
+    });
+
+  it("leaves a placeholder out of the rollup, so it cannot read as a collapse", () => {
+    const rows = buildRollupRows(metrics([repo("acme/ok", [pr(1, 1)]), failed()]), "2026-08-30");
+
+    expect(rows.map((r) => r.repo)).toEqual(["acme/ok", "*"]);
+    expect(rows.find((r) => r.repo === "*")?.committers).toBe(4);
+  });
+
+  it.each(["partial", "stale", "capped", "rest-fallback"] as const)(
+    "keeps a %s repository in the rollup: its figures are real",
+    (state) => {
+      const rows = buildRollupRows(
+        metrics([repo("acme/some", [pr(1, 1)], { collectionWarning: { state, detail: "gap" } })]),
+        "2026-08-30"
+      );
+      expect(rows.map((r) => r.repo)).toEqual(["acme/some", "*"]);
+    }
+  );
+
+  it("does not let lean REST rows take a pull request's only slot in the event stream", () => {
+    const rows = buildEventRows(
+      metrics([
+        repo("acme/lean", [pr(1, 1)], { collectionWarning: { state: "rest-fallback", detail: "lean" } }),
+        repo("acme/rich", [pr(2, 1)], { collectionWarning: { state: "partial", detail: "gap" } }),
+      ])
+    );
+    expect(rows.map((r) => r.repo)).toEqual(["acme/rich"]);
+  });
+});
+
 describe("buildRollupRows", () => {
   it("emits one row per repo plus an org row", () => {
     const rows = buildRollupRows(metrics([repo("acme/api", [pr(1, 5)]), repo("acme/web", [])]), "2026-08-30");

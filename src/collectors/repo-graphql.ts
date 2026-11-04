@@ -88,6 +88,8 @@ export interface GraphQLRepoData {
   mergedPRCount: number;
   /** PR nodes, sorted by updatedAt descending, up to maxPages*100. */
   prNodes: GraphQLPRNode[];
+  /** Set when `prNodes` stops short of the two-year cutoff. */
+  truncation?: GraphQLRepoTruncation;
   /**
    * Up to 100 of the oldest still-open pull requests. Requested only on the
    * first page (`@include(if: $firstPage)`), so paginating a busy repository
@@ -95,6 +97,40 @@ export interface GraphQLRepoData {
    */
   openPRNodes: OpenPRNode[];
 }
+
+/** Why a repository's `prNodes` stop short of the two-year cutoff. */
+export interface GraphQLRepoTruncation {
+  /** `page-cap`: the configured PR budget ran out. `transient`: GitHub kept failing. */
+  reason: "page-cap" | "transient";
+  /** Concise failure category for a `transient` truncation; never a raw payload. */
+  category?: string;
+  /** GitHub's support request id, when the response carried one. */
+  requestId?: string;
+}
+
+/**
+ * GraphQL could not return even the first page of a repository after bounded
+ * retries. Distinct from `null` (not found / forbidden), which is a real answer
+ * about the repository rather than a gap in the data.
+ */
+export interface GraphQLRepoUnavailable {
+  unavailable: true;
+  /** Concise failure category; never a raw payload. */
+  category: string;
+  /** GitHub's support request id, when the response carried one. */
+  requestId?: string;
+}
+
+/** Adaptive page-size policy for the daily query. */
+export interface RepoPageSizing {
+  /** Floor the adaptive reduction will not go below. */
+  minPageSize: number;
+  /** Retry a page at a smaller size after an expensive-query signal. */
+  adaptive: boolean;
+}
+
+/** Page size the daily query starts each repository at. */
+const DAILY_PAGE_SIZE = 100;
 
 /** Shape of one GraphQL page response. */
 interface GraphQLPageResponse {
@@ -114,7 +150,7 @@ interface GraphQLPageResponse {
 }
 
 const REPO_DATA_QUERY = `
-  query RepoData($owner: String!, $name: String!, $cursor: String, $firstPage: Boolean!) {
+  query RepoData($owner: String!, $name: String!, $cursor: String, $firstPage: Boolean!, $pageSize: Int!) {
     repository(owner: $owner, name: $name) {
       isFork
       openIssues: issues(states: [OPEN], first: 1) { totalCount }
@@ -139,7 +175,7 @@ const REPO_DATA_QUERY = `
         }
       }
       pullRequests(
-        first: 100
+        first: $pageSize
         states: [CLOSED, MERGED]
         orderBy: { field: UPDATED_AT, direction: DESC }
         after: $cursor
@@ -203,7 +239,14 @@ export function isCopilotLogin(login: string, typename?: string): boolean {
  *
  * Returns issue counts, PR counts, and an array of PR nodes (CLOSED+MERGED,
  * sorted by updatedAt descending). Stops paginating when all PRs on a page
- * were updated before the ~2-year cutoff, or when maxPages is reached.
+ * were updated before the ~2-year cutoff, or when the budget of
+ * `maxPages * 100` PRs is spent. The budget counts PRs rather than requests, so
+ * a repository that needed smaller pages is not also given less history.
+ *
+ * A page that keeps failing costs a bounded number of attempts (see
+ * `fetchRepoPage`) and then ends the crawl: pages already fetched are returned
+ * with `truncation` set, and a failure on the first page, when nothing is known
+ * yet, returns `GraphQLRepoUnavailable` so the caller can use REST.
  *
  * Returns null on 404 (repo not found) or 403 (access denied).
  * Re-throws other errors.
@@ -211,25 +254,33 @@ export function isCopilotLogin(login: string, typename?: string): boolean {
 export async function collectRepoGraphQL(
   owner: string,
   repo: string,
-  maxPages = 10
-): Promise<GraphQLRepoData | null> {
+  maxPages = 10,
+  sizing: RepoPageSizing = { minPageSize: 10, adaptive: true }
+): Promise<GraphQLRepoData | GraphQLRepoUnavailable | null> {
   const octokit = await getOctokit();
   const cutoff = new Date(Date.now() - 730 * 24 * 60 * 60 * 1000); // ~2 years
+  const prBudget = maxPages * DAILY_PAGE_SIZE;
 
   let cursor: string | null = null;
   let firstPage = true;
   let result: GraphQLRepoData | null = null;
   const allNodes: GraphQLPRNode[] = [];
+  let pageSize = DAILY_PAGE_SIZE;
+  let requested = 0;
+  let moreAvailable = false;
+  let truncation: GraphQLRepoTruncation | undefined;
 
-  for (let page = 0; page < maxPages; page++) {
+  while (requested < prBudget) {
     let response: GraphQLPageResponse;
     try {
-      response = await fetchGraphQLPage<GraphQLPageResponse>(
+      const fetched = await fetchRepoPage(
         octokit,
-        REPO_DATA_QUERY,
         { owner, name: repo, cursor, firstPage },
-        `${owner}/${repo}`
+        `${owner}/${repo}`,
+        { ...sizing, pageSize }
       );
+      response = fetched.response;
+      pageSize = fetched.pageSize;
     } catch (err: unknown) {
       if (isGraphQLNotFoundOrForbidden(err)) {
         if (hasGraphQLForbiddenError(err)) {
@@ -237,26 +288,32 @@ export async function collectRepoGraphQL(
         }
         return null;
       }
-      if (isTransientServerError(err)) {
-        console.warn(`  ⚠ graphql: giving up on ${owner}/${repo} after repeated 5xx errors, falling back to REST`);
-        return null;
+      if (!isTransientCollectionError(err)) throw err;
+      const category = describeTransientError(err);
+      const requestId = extractGitHubRequestId(err);
+      const note = `${category}${requestId ? ` (request ${requestId})` : ""}`;
+      if (result === null) {
+        console.warn(`  ⚠ graphql: giving up on ${owner}/${repo}: ${note}, falling back to REST`);
+        return { unavailable: true, category, requestId };
       }
-      if (isGenericGraphQLExecutionError(err)) {
-        const requestId = extractGitHubRequestId(err);
-        console.warn(
-          `  ⚠ graphql: giving up on ${owner}/${repo} after ${TRANSIENT_BACKOFF_MS.length} retries of a ` +
-            `generic GitHub execution error` +
-            (requestId ? ` (request ${requestId})` : "") +
-            `, falling back to REST`
-        );
-        return null;
-      }
-      throw err;
+      console.warn(
+        `  ⚠ graphql: stopping ${owner}/${repo} after ${allNodes.length} PRs: ${note}; keeping what was fetched`
+      );
+      truncation = { reason: "transient", category, requestId };
+      break;
     }
 
     if (!response?.repository) {
-      console.warn(`  ⚠ graphql: empty response for ${owner}/${repo}, falling back to REST`);
-      return null;
+      const category = "empty GraphQL response";
+      if (result === null) {
+        console.warn(`  ⚠ graphql: empty response for ${owner}/${repo}, falling back to REST`);
+        return { unavailable: true, category };
+      }
+      console.warn(
+        `  ⚠ graphql: empty response for ${owner}/${repo} after ${allNodes.length} PRs; keeping what was fetched`
+      );
+      truncation = { reason: "transient", category };
+      break;
     }
 
     const repoData = response.repository;
@@ -285,8 +342,10 @@ export async function collectRepoGraphQL(
       allNodes.push(node);
     }
 
+    requested += pageSize;
     const { hasNextPage, endCursor } = repoData.pullRequests.pageInfo;
-    if (!hasNextPage || reachedCutoff || endCursor === null) break;
+    moreAvailable = hasNextPage && !reachedCutoff && endCursor !== null;
+    if (!moreAvailable) break;
     cursor = endCursor;
   }
 
@@ -305,6 +364,11 @@ export async function collectRepoGraphQL(
   }
 
   result.prNodes = allNodes;
+  if (truncation) {
+    result.truncation = truncation;
+  } else if (moreAvailable) {
+    result.truncation = { reason: "page-cap" };
+  }
   return result;
 }
 
@@ -325,8 +389,6 @@ function isTransientServerError(err: unknown): boolean {
  * Deliberately narrower than {@link isTransientServerError}: a general 5xx
  * outage (500, 503, ...) is a server-side problem unrelated to the size of
  * this particular query, so it must not trigger a page-size reduction here.
- * The broader helper remains unchanged for the existing daily-query retry
- * path.
  */
 function isExpensiveQueryHttpError(err: unknown): boolean {
   const httpError = err as { status?: number };
@@ -357,9 +419,21 @@ function isGenericGraphQLExecutionError(err: unknown): boolean {
   return graphqlError.data === undefined || graphqlError.data === null;
 }
 
-/** True for any GraphQL failure we treat as transient and worth retrying. */
-function isRetryableTransientError(err: unknown): boolean {
-  return isTransientServerError(err) || isGenericGraphQLExecutionError(err);
+/**
+ * True for a GitHub failure that says nothing about the rest of the dataset: a
+ * 5xx (Octokit also reports network failures as 500), the generic execution
+ * error, or a query timeout. Authentication, permission and validation errors
+ * are excluded because they would fail every repository alike.
+ */
+export function isTransientCollectionError(err: unknown): boolean {
+  return isTransientServerError(err) || isExpensiveQuerySignal(err);
+}
+
+/** Concise, log-safe category for a transient failure; never a raw payload. */
+export function describeTransientError(err: unknown): string {
+  if (isExpensiveQueryHttpError(err)) return "repeated HTTP 502/504 gateway error";
+  if (isTransientServerError(err)) return `HTTP ${(err as { status: number }).status} server error`;
+  return "GitHub GraphQL transient execution error";
 }
 
 /**
@@ -380,40 +454,48 @@ function extractGitHubRequestId(err: unknown): string | undefined {
 const TRANSIENT_BACKOFF_MS = [5_000, 15_000, 30_000];
 
 /**
- * Execute a single GraphQL request with automatic retry on transient errors:
- * HTTP 5xx responses and GitHub's generic "something went wrong executing
- * your query" execution failure (which carries no `data` and no HTTP 5xx
- * status of its own, so it is otherwise indistinguishable from a permanent
- * error). Retries up to TRANSIENT_BACKOFF_MS.length times with increasing
- * delays. Non-transient errors (4xx, GraphQL validation/field errors, auth
- * failures) are re-thrown immediately without retrying.
+ * Fetch one page of the daily query with a bounded retry on transient errors.
+ *
+ * An expensive-query signal (502/504, generic execution error, query timeout)
+ * also moves to the next smaller page size; any other 5xx is unrelated to the
+ * size of the query and retries at the same one. Attempts are capped at the
+ * longer of the size sequence and the backoff schedule: 5 attempts and 80
+ * seconds of waiting by default. Non-transient errors (4xx, GraphQL
+ * validation/field errors, auth failures) are re-thrown immediately.
  */
-async function fetchGraphQLPage<T>(
+async function fetchRepoPage(
   octokit: Awaited<ReturnType<typeof getOctokit>>,
-  query: string,
   variables: Record<string, unknown>,
-  label: string
-): Promise<T> {
-  let lastErr: unknown;
-  for (let attempt = 0; attempt <= TRANSIENT_BACKOFF_MS.length; attempt++) {
+  label: string,
+  sizing: RepoPageSizing & { pageSize: number }
+): Promise<{ response: GraphQLPageResponse; pageSize: number }> {
+  const sizes = sizing.adaptive
+    ? pageSizeReductionSequence(sizing.pageSize, sizing.minPageSize)
+    : [sizing.pageSize];
+  const maxAttempts = Math.max(sizes.length, TRANSIENT_BACKOFF_MS.length + 1);
+  let sizeIndex = 0;
+  for (let attempt = 1; ; attempt++) {
+    const pageSize = sizes[sizeIndex];
     try {
-      return await octokit.graphql<T>(query, variables);
+      const response = await octokit.graphql<GraphQLPageResponse>(REPO_DATA_QUERY, {
+        ...variables,
+        pageSize,
+      });
+      return { response, pageSize };
     } catch (err) {
-      if (!isRetryableTransientError(err) || attempt === TRANSIENT_BACKOFF_MS.length) {
-        throw err;
-      }
-      lastErr = err;
-      const wait = TRANSIENT_BACKOFF_MS[attempt];
+      if (!isTransientCollectionError(err) || attempt >= maxAttempts) throw err;
+      const shrink = isExpensiveQuerySignal(err) && sizeIndex < sizes.length - 1;
+      if (shrink) sizeIndex++;
+      const wait = TRANSIENT_BACKOFF_MS[Math.min(attempt - 1, TRANSIENT_BACKOFF_MS.length - 1)];
       const requestId = extractGitHubRequestId(err);
       console.warn(
-        `  ⚠ graphql: transient error for ${label} (attempt ${attempt + 1}/${TRANSIENT_BACKOFF_MS.length})` +
+        `  ⚠ graphql: transient error for ${label} (attempt ${attempt}/${maxAttempts})` +
           (requestId ? ` [request ${requestId}]` : "") +
-          `, retrying in ${wait / 1000}s…`
+          `, retrying${shrink ? ` with page size ${sizes[sizeIndex]}` : ""} in ${wait / 1000}s…`
       );
       await sleep(wait);
     }
   }
-  throw lastErr;
 }
 
 /** Check if a GraphQL error indicates the resource was not found or is forbidden. */
@@ -719,9 +801,7 @@ export async function fetchHistoricalPRPage(
           continue;
         }
         const requestId = extractGitHubRequestId(err);
-        const category = isExpensiveQueryHttpError(err)
-          ? "repeated HTTP 502/504 gateway error"
-          : "GitHub GraphQL transient execution error";
+        const category = describeTransientError(err);
         const failureDescription = options.adaptive
           ? `still failing at the minimum page size (${size})`
           : `failed at page size ${size} with adaptive sizing disabled`;
@@ -736,6 +816,16 @@ export async function fetchHistoricalPRPage(
             attempts: i + 1,
             requestId,
           },
+        };
+      }
+      if (isTransientServerError(err)) {
+        // Says nothing about this query's size, so no smaller page is tried,
+        // but it is no more fatal to the run than a 502: defer this repository.
+        const category = describeTransientError(err);
+        console.warn(`  ⚠ backfill: ${owner}/${repo} got ${category}; will retry next run`);
+        return {
+          ok: false,
+          failure: { kind: "transient", category, attempts: i + 1, requestId: extractGitHubRequestId(err) },
         };
       }
       throw err;

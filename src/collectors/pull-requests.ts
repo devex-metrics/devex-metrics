@@ -1,6 +1,5 @@
 import { getOctokit } from "../github-client.js";
 import { isCopilotLogin } from "./repo-graphql.js";
-import { getCountFromLinkHeader } from "../link-header.js";
 import type {
   PullRequestCounts,
   PullRequestDetail,
@@ -316,40 +315,30 @@ function hoursBetween(a: string, b: string): number {
 /**
  * Count open, closed and merged pull requests for a repository.
  *
- * Uses the list-pull-requests endpoint.  Open PRs are counted via the
- * Link header; closed PRs are paginated so we can separate merged from
- * unmerged.
+ * REST fallback path. Uses the Search API, which returns `total_count` in a
+ * single request per state: this runs when a repository is too large for
+ * GraphQL to answer, so its cost must not grow with the size of its history.
  */
 export async function collectPullRequestCounts(
   owner: string,
   repo: string
 ): Promise<PullRequestCounts> {
   const octokit = await getOctokit();
+  const countMatching = async (qualifiers: string): Promise<number> => {
+    const { data } = await octokit.rest.search.issuesAndPullRequests({
+      q: `repo:${owner}/${repo} type:pr ${qualifiers}`,
+      per_page: 1,
+      advanced_search: "true",
+    });
+    return Math.max(0, data.total_count);
+  };
 
   try {
-    // Open count via Link header (single request)
-    const openRes = await octokit.rest.pulls.list({
-      owner,
-      repo,
-      state: "open",
-      per_page: 1,
-    });
-    const open = getCountFromLinkHeader(openRes);
-
-    // Paginate closed PRs to distinguish merged from unmerged
-    const closedPrs = await octokit.paginate(octokit.rest.pulls.list, {
-      owner,
-      repo,
-      state: "closed",
-      per_page: 100,
-    });
-    let merged = 0;
-    let closed = 0;
-    for (const pr of closedPrs) {
-      if (pr.merged_at) merged++;
-      else closed++;
-    }
-
+    const [open, merged, closed] = await Promise.all([
+      countMatching("state:open"),
+      countMatching("is:merged"),
+      countMatching("is:unmerged state:closed"),
+    ]);
     return { open, closed, merged };
   } catch (err: unknown) {
     const status = (err as { status?: number }).status;

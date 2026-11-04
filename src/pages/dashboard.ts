@@ -12,6 +12,7 @@ import type { BrandingConfig } from "../config.js";
 import type { RollupRow } from "../history.js";
 import { LARGE_PR_LINES } from "../history.js";
 import { postReviewCommitFacts } from "../review-rework.js";
+import { collectionStateLabel } from "../collection-state.js";
 import { escapeHtml, computeMedian, weekToDate, formatDurationHtml } from "./utils.js";
 import { getCSS } from "./styles.js";
 import { getJS } from "./scripts.js";
@@ -100,6 +101,25 @@ const DEFAULT_BRANDING: BrandingConfig = {
   attribution: "Made with \u2764\uFE0F by rajbos",
   attributionUrl: "https://github.com/rajbos",
 };
+
+/** A notice above the key metrics naming every repository whose data has known gaps. */
+export function buildIncompleteNotice(repos: readonly RepoMetrics[]): string {
+  const items = repos.flatMap((repo) =>
+    repo.collectionWarning
+      ? [
+          `<li><strong>${escapeHtml(repo.fullName)}</strong> (${escapeHtml(collectionStateLabel(repo.collectionWarning.state))}): ` +
+            `${escapeHtml(repo.collectionWarning.detail)}</li>`,
+        ]
+      : [],
+  );
+  if (items.length === 0) return "";
+  const subject = repos.length === 1 ? "repository has" : "repositories have";
+  return (
+    `<div class="incomplete-notice" role="status"><strong>Incomplete data:</strong> ` +
+    `${items.length} of ${repos.length} ${subject} incomplete metrics, so totals on this page may undercount.` +
+    `<ul>${items.join("")}</ul></div>`
+  );
+}
 
 export function buildDashboardHtml(
   data: OrgMetrics,
@@ -555,6 +575,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
 </div>
 
 <main>
+  ${buildIncompleteNotice(data.repos)}
   <section class="kpis" aria-label="Key metrics">
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x1F4E6;</div>
