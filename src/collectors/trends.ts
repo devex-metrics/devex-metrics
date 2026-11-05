@@ -1,4 +1,5 @@
 import { getOctokit } from "../github-client.js";
+import { hasNextPage } from "../link-header.js";
 import type { WeeklyTrendPoint } from "../types.js";
 import type { GraphQLPRNode } from "./repo-graphql.js";
 
@@ -196,7 +197,7 @@ export async function collectWeeklyTrends(
         )) {
           issues.push(...response.data);
           if (--issuePagesLeft <= 0) {
-            if (response.data.length >= 100) truncatedRepos.add(repoKey);
+            if (hasNextPage(response.headers)) truncatedRepos.add(repoKey);
             break;
           }
         }
@@ -330,7 +331,7 @@ export async function collectWeeklyTrends(
           }
           if (reachedCutoff) break;
           if (--pagesLeft <= 0) {
-            if (response.data.length >= 100) truncatedRepos.add(repoKey);
+            if (hasNextPage(response.headers)) truncatedRepos.add(repoKey);
             break;
           }
         }

@@ -1,4 +1,5 @@
 import { getOctokit } from "../github-client.js";
+import { allFatalFirst } from "./repo-graphql.js";
 
 /** The totals from {@link countSearchMatches}, in the order the queries were given. */
 export interface SearchCounts {
@@ -36,7 +37,7 @@ export async function countSearchMatches(
 ): Promise<SearchCounts> {
   const octokit = await getOctokit();
   try {
-    const responses = await Promise.all(
+    const responses = await allFatalFirst(
       qualifiers.map((q) =>
         octokit.rest.search.issuesAndPullRequests({
           q: `repo:${owner}/${repo} ${q}`,

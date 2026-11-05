@@ -429,6 +429,25 @@ export function isTransientCollectionError(err: unknown): boolean {
   return isTransientServerError(err) || isExpensiveQuerySignal(err);
 }
 
+/**
+ * `Promise.all` for requests that may fail in different ways. `Promise.all`
+ * rejects with whichever failure came first, so a 504 could hide a later 401
+ * and let the run carry on past the per-repository handling. This waits for
+ * every task, then rejects with a non-transient failure if there is one.
+ */
+export async function allFatalFirst<T extends readonly unknown[] | []>(
+  tasks: T
+): Promise<{ -readonly [K in keyof T]: Awaited<T[K]> }> {
+  const results = await Promise.allSettled(tasks);
+  const failures = results.flatMap((r) => (r.status === "rejected" ? [r.reason as unknown] : []));
+  if (failures.length > 0) {
+    throw failures.find((e) => !isTransientCollectionError(e)) ?? failures[0];
+  }
+  return results.map((r) => (r as PromiseFulfilledResult<unknown>).value) as {
+    -readonly [K in keyof T]: Awaited<T[K]>;
+  };
+}
+
 /** Concise, log-safe category for a transient failure; never a raw payload. */
 export function describeTransientError(err: unknown): string {
   if (isExpensiveQueryHttpError(err)) return "repeated HTTP 502/504 gateway error";

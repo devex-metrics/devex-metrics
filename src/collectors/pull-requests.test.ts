@@ -91,6 +91,17 @@ describe("collectPullRequestCounts", () => {
     await expect(collectPullRequestCounts("owner", "repo")).rejects.toMatchObject({ status: 422 });
   });
 
+  it("rethrows a query error even when another count hit a transient failure first", async () => {
+    const issuesAndPullRequests = vi.fn(async ({ q }: { q: string }) => {
+      if (q.includes("state:open")) throw Object.assign(new Error("Gateway"), { status: 504 });
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      throw Object.assign(new Error("Validation Failed"), { status: 422 });
+    });
+    setOctokit({ rest: { search: { issuesAndPullRequests } } } as unknown as Octokit);
+
+    await expect(collectPullRequestCounts("owner", "repo")).rejects.toMatchObject({ status: 422 });
+  });
+
   it("flags counts Search reports as partial, keeping the totals it did return", async () => {
     const issuesAndPullRequests = vi.fn(async ({ q }: { q: string }) => ({
       data: { total_count: 5, incomplete_results: q.includes("is:merged"), items: [] },

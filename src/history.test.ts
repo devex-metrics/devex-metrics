@@ -1,3 +1,4 @@
+import { CURRENT_SCHEMA_VERSION } from "./cache.js";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import * as fs from "node:fs";
 import * as os from "node:os";
@@ -257,9 +258,17 @@ describe("buildEventRows", () => {
   });
 });
 
+describe("loadLatest", () => {
+  it("ignores a snapshot written under another schema version", () => {
+    const m = metrics([repo("acme/api", [pr(1, 1)])]);
+    appendRun(dir, { ...m, schemaVersion: CURRENT_SCHEMA_VERSION - 1 });
+    expect(loadLatest(dir, "acme")).toBeNull();
+  });
+});
+
 describe("appendRun", () => {
   it("writes rollup, events and latest on a first run", () => {
-    const m = metrics([repo("acme/api", [pr(1, 1)])]);
+    const m = { ...metrics([repo("acme/api", [pr(1, 1)])]), schemaVersion: CURRENT_SCHEMA_VERSION };
     const result = appendRun(dir, m);
     expect(result.rollupRowsWritten).toBe(2); // repo + org
     expect(result.eventsAppended).toBe(1);

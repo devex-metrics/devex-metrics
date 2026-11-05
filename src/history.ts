@@ -19,6 +19,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { CURRENT_SCHEMA_VERSION } from "./cache.js";
 import { gini, quantiles, round } from "./stats.js";
 import type { MergedPRSummary, OrgMetrics, RepoMetrics } from "./types.js";
 
@@ -662,12 +663,13 @@ export function loadEvents(dir: string, scope: string): EventRow[] {
   return readNdjson<EventRow>(eventsPath(dir, scope));
 }
 
-/** Read back the newest snapshot for a scope, or null when absent. */
+/** Read back the newest snapshot for a scope, or null when absent or from another schema version. */
 export function loadLatest(dir: string, scope: string): OrgMetrics | null {
   const filePath = latestPath(dir, scope);
   if (!fs.existsSync(filePath)) return null;
   try {
-    return JSON.parse(fs.readFileSync(filePath, "utf-8")) as OrgMetrics;
+    const data = JSON.parse(fs.readFileSync(filePath, "utf-8")) as OrgMetrics;
+    return data.schemaVersion === CURRENT_SCHEMA_VERSION ? data : null;
   } catch {
     return null;
   }

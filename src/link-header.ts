@@ -1,3 +1,8 @@
+/** True when a GitHub list response says another page follows it. */
+export function hasNextPage(headers: { link?: string }): boolean {
+  return /rel="next"/.test(headers.link ?? "");
+}
+
 /**
  * Derive a total item count from a GitHub list response made with
  * `per_page=1`.

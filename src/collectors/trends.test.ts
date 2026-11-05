@@ -538,8 +538,9 @@ describe("collectWeeklyTrends on a repository it cannot crawl in full", () => {
    * An octokit whose issue and PR walks each serve full pages forever. The
    * issues endpoint returns pull requests too, so those pages count for nothing.
    */
-  function endlessWalks(issuePage: (now: string) => object[], prPageSize = 100) {
+  function endlessWalks(issuePage: (now: string) => object[], prPageSize = 100, moreToCome = true) {
     const now = new Date().toISOString();
+    const headers = moreToCome ? { link: '<https://api.github.com/x?page=2>; rel="next"' } : {};
     const served = { issues: 0, prs: 0 };
     const listForRepo = {};
     const list = {};
@@ -547,7 +548,7 @@ describe("collectWeeklyTrends on a repository it cannot crawl in full", () => {
       for (;;) {
         if (endpoint === listForRepo) {
           served.issues++;
-          yield { data: issuePage(now) };
+          yield { data: issuePage(now), headers };
         } else if (endpoint === list) {
           served.prs++;
           yield {
@@ -557,6 +558,7 @@ describe("collectWeeklyTrends on a repository it cannot crawl in full", () => {
               updated_at: now,
               merged_at: null,
             })),
+            headers,
           };
         }
       }
@@ -600,8 +602,8 @@ describe("collectWeeklyTrends on a repository it cannot crawl in full", () => {
     expect([...result.truncatedRepos]).toEqual(["o/big"]);
   });
 
-  it("does not flag a walk that ended on a short page at the bound", async () => {
-    const { octokit } = endlessWalks(() => [], 1);
+  it("does not flag a full page at the bound when it was the last page", async () => {
+    const { octokit } = endlessWalks(prsOnly, 100, false);
     setOctokit(octokit);
 
     const result = await collectWeeklyTrends([{ owner: "o", name: "big", maxPages: 1 }], 4);

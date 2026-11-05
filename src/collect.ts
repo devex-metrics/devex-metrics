@@ -26,7 +26,7 @@ import {
 } from "./collectors/index.js";
 import { sumWeeklyTrends, weekLabels } from "./collectors/trends.js";
 import { filterRepos, describeFiltering } from "./collectors/repos.js";
-import { describeTransientError, isTransientCollectionError } from "./collectors/repo-graphql.js";
+import { allFatalFirst, describeTransientError, isTransientCollectionError } from "./collectors/repo-graphql.js";
 import { loadConfig, describeConfig } from "./config.js";
 import type { DevexConfig } from "./config.js";
 import type { GraphQLPRNode, GraphQLRepoData } from "./collectors/index.js";
@@ -638,7 +638,7 @@ async function collectFreshRepo(
     openPRTimeline = buildOpenPRTimeline(graphql.openPRNodes ?? []);
     reviewerLoad = countReviewerLoad(graphql.prNodes);
     const reviewerLogins = extractReviewerLogins(graphql.prNodes);
-    [contributors, dependentCount] = await Promise.all([
+    [contributors, dependentCount] = await allFatalFirst([
       collectContributors(repoOwner, repoName, reviewerLogins),
       config.collection.features.dependents
         ? collectDependentCount(repoOwner, repoName)
@@ -649,7 +649,7 @@ async function collectFreshRepo(
   } else {
     // Fallback: REST path (null = not found/forbidden, otherwise GraphQL kept failing).
     [issues, prCounts, prDetails, mergedPRTimeline, contributors, dependentCount] =
-      await Promise.all([
+      await allFatalFirst([
         collectIssueCounts(repoOwner, repoName),
         collectPullRequestCounts(repoOwner, repoName),
         collectPullRequestDetails(repoOwner, repoName),

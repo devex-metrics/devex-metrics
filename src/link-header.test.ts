@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { getCountFromLinkHeader } from "./link-header.js";
+import { getCountFromLinkHeader, hasNextPage } from "./link-header.js";
+
+describe("hasNextPage", () => {
+  it("is true only when the Link header names a next page", () => {
+    expect(hasNextPage({ link: '<https://api.github.com/x?page=2>; rel="next", <https://api.github.com/x?page=9>; rel="last"' })).toBe(true);
+    expect(hasNextPage({ link: '<https://api.github.com/x?page=1>; rel="prev"' })).toBe(false);
+    expect(hasNextPage({})).toBe(false);
+  });
+});
 
 describe("getCountFromLinkHeader", () => {
   it("should return 0 when data is empty and there is no link header", () => {

@@ -188,6 +188,59 @@ describe("collect when a repository keeps failing", () => {
     expect(result.repos[0].collectionWarning?.detail).not.toContain("counts are complete");
   });
 
+  it("still ends the run when a fatal REST failure lands after a transient one", async () => {
+    vi.mocked(collectRepos).mockResolvedValue(twoRepos);
+    vi.mocked(collectRepoGraphQL).mockResolvedValue(unavailable);
+    vi.mocked(collectIssueCounts).mockRejectedValue(gateway());
+    vi.mocked(collectContributors).mockImplementation(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      throw Object.assign(new Error("Bad credentials"), { status: 401 });
+    });
+
+    await expect(collect("org", "org")).rejects.toMatchObject({ status: 401 });
+    expect(saveCache).not.toHaveBeenCalled();
+  });
+
+  it("still ends the run when a fatal failure lands after a transient one on the GraphQL path", async () => {
+    const config = defaultConfig();
+    config.collection.features.dependents = true;
+    vi.mocked(collectRepos).mockResolvedValue(twoRepos);
+    vi.mocked(collectRepoGraphQL).mockResolvedValue(graphqlData());
+    vi.mocked(collectContributors).mockRejectedValue(gateway());
+    vi.mocked(collectDependentCount).mockImplementation(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5));
+      throw new TypeError("boom");
+    });
+
+    await expect(collect("org", "org", { config })).rejects.toThrow("boom");
+  });
+
+  it("does not recover from a history snapshot of another schema version", async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "devex-collect-"));
+    try {
+      const config = defaultConfig();
+      config.history.dir = dir;
+      const snapshot: OrgMetrics = {
+        schemaVersion: 1,
+        owner: "org",
+        ownerType: "org",
+        collectedAt: "2026-10-01T00:00:00Z",
+        repoCount: 1,
+        repos: [previous()],
+      };
+      fs.mkdirSync(path.dirname(latestPath(dir, "org")), { recursive: true });
+      fs.writeFileSync(latestPath(dir, "org"), JSON.stringify(snapshot));
+      failBigEverywhere();
+
+      const result = await collect("org", "org", { config });
+
+      expect(result.repos[0].collectionWarning?.state).toBe("failed");
+      expect(result.repos[0].pullRequests.merged).toBe(0);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
   it("keeps the last known metrics when a forced recollection fails", async () => {
     failBigEverywhere();
     vi.mocked(loadRawCache).mockReturnValue({
@@ -228,6 +281,7 @@ describe("collect when a repository keeps failing", () => {
       const config = defaultConfig();
       config.history.dir = dir;
       const snapshot: OrgMetrics = {
+        schemaVersion: 2,
         owner: "org",
         ownerType: "org",
         collectedAt: "2026-10-01T00:00:00Z",
@@ -350,6 +404,7 @@ describe("collect when a repository keeps failing", () => {
       const config = defaultConfig();
       config.history.dir = dir;
       const snapshot: OrgMetrics = {
+        schemaVersion: 2,
         owner: "org",
         ownerType: "org",
         collectedAt: "2026-10-01T00:00:00Z",
