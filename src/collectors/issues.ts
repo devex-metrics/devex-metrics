@@ -1,4 +1,5 @@
 import { getOctokit } from "../github-client.js";
+import { countSearchMatches } from "./search-counts.js";
 import type { IssueCounts, IssueLeadTime, MergedPRSummary } from "../types.js";
 
 /**
@@ -19,36 +20,11 @@ export async function collectIssueCounts(
   owner: string,
   repo: string
 ): Promise<IssueCounts> {
-  const octokit = await getOctokit();
-
-  try {
-    const [openRes, closedRes] = await Promise.all([
-      octokit.rest.search.issuesAndPullRequests({
-        q: `repo:${owner}/${repo} type:issue state:open`,
-        per_page: 1,
-        advanced_search: "true",
-      }),
-      octokit.rest.search.issuesAndPullRequests({
-        q: `repo:${owner}/${repo} type:issue state:closed`,
-        per_page: 1,
-        advanced_search: "true",
-      }),
-    ]);
-
-    return {
-      open: Math.max(0, openRes.data.total_count),
-      closed: Math.max(0, closedRes.data.total_count),
-    };
-  } catch (err: unknown) {
-    const status = (err as { status?: number }).status;
-    if (status === 404 || status === 403 || status === 422) {
-      if (status === 403) {
-        console.warn(`  ⚠ issues: skipping ${owner}/${repo}: access denied (403) — token may need SAML SSO authorization`);
-      }
-      return { open: 0, closed: 0 };
-    }
-    throw err;
-  }
+  const {
+    counts: [open, closed],
+    incomplete,
+  } = await countSearchMatches(owner, repo, "issues", ["type:issue state:open", "type:issue state:closed"]);
+  return incomplete ? { open, closed, incomplete } : { open, closed };
 }
 
 /**

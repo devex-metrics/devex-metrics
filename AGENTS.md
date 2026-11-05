@@ -27,6 +27,7 @@ src/
   collect-group.ts      # CLI: collect metrics for repos discovered from a local folder ("group")
   local-repo-discovery.ts # Scans a folder for local git repos and resolves their GitHub owner/repo
   dataset-key.ts        # Slugify a group name into a cache/site key
+  collection-state.ts   # Labels for a repo's collection gaps, shared by report and dashboard
   history.ts            # Append-only rollup + PR event store
   stats.ts              # median / percentile / quantiles
   types.ts              # All shared TypeScript interfaces (source of truth)
@@ -39,6 +40,7 @@ src/
     index.ts            # Re-exports all collectors
     repos.ts            # List repositories
     issues.ts           # Issue open/closed counts
+    search-counts.ts    # Search API totals for one repo, flagged when incomplete
     pull-requests.ts    # PR counts + detailed PR metrics
     contributors.ts     # Committer & reviewer counts (last 90 days)
     dependents.ts       # Dependent repository count
@@ -69,6 +71,12 @@ Team membership and trial metadata are presentation concerns: `applyScope()` re-
 `latest.json` (the newest full snapshot). Prefer adding a raw fact to the event
 stream over adding a derived aggregate to the rollup — events can be recomputed
 into new metrics later, aggregates cannot.
+
+A repository with a `collectionWarning` needs care here: `failed` rows are placeholder zeros and stay out of the rollup, and `rest-fallback` pull requests stay out of the event stream, because rows are never rewritten and a lean one would block the fuller row for good.
+
+## Failing repositories
+
+A transient GitHub failure (`isTransientCollectionError`) on one repository must not end the run; it becomes a `collectionWarning` on that repository, which the report and dashboard show. Anything else (authentication, validation, a bug) still throws, and so does a run in which every repository failed. See "Repositories GitHub struggles to serve" in `docs/CONFIGURATION.md`.
 
 ## Fixtures
 

@@ -1,3 +1,4 @@
+import { CURRENT_SCHEMA_VERSION } from "./cache.js";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import * as fs from "node:fs";
 import * as os from "node:os";
@@ -71,6 +72,42 @@ function metrics(repos: RepoMetrics[]): OrgMetrics {
     repos,
   };
 }
+
+describe("incomplete repositories in the history store", () => {
+  const failed = () =>
+    repo("acme/down", [], {
+      pullRequests: { open: 0, closed: 0, merged: 0 },
+      collectionWarning: { state: "failed", detail: "No data" },
+    });
+
+  it("leaves a placeholder out of the rollup, so it cannot read as a collapse", () => {
+    const rows = buildRollupRows(metrics([repo("acme/ok", [pr(1, 1)]), failed()]), "2026-08-30");
+
+    expect(rows.map((r) => r.repo)).toEqual(["acme/ok", "*"]);
+    expect(rows.find((r) => r.repo === "*")?.committers).toBe(4);
+  });
+
+  it.each(["partial", "stale", "capped", "rest-fallback"] as const)(
+    "keeps a %s repository in the rollup: its figures are real",
+    (state) => {
+      const rows = buildRollupRows(
+        metrics([repo("acme/some", [pr(1, 1)], { collectionWarning: { state, detail: "gap" } })]),
+        "2026-08-30"
+      );
+      expect(rows.map((r) => r.repo)).toEqual(["acme/some", "*"]);
+    }
+  );
+
+  it("does not let lean REST rows take a pull request's only slot in the event stream", () => {
+    const rows = buildEventRows(
+      metrics([
+        repo("acme/lean", [pr(1, 1)], { collectionWarning: { state: "rest-fallback", detail: "lean" } }),
+        repo("acme/rich", [pr(2, 1)], { collectionWarning: { state: "partial", detail: "gap" } }),
+      ])
+    );
+    expect(rows.map((r) => r.repo)).toEqual(["acme/rich"]);
+  });
+});
 
 describe("buildRollupRows", () => {
   it("emits one row per repo plus an org row", () => {
@@ -221,9 +258,17 @@ describe("buildEventRows", () => {
   });
 });
 
+describe("loadLatest", () => {
+  it("ignores a snapshot written under another schema version", () => {
+    const m = metrics([repo("acme/api", [pr(1, 1)])]);
+    appendRun(dir, { ...m, schemaVersion: CURRENT_SCHEMA_VERSION - 1 });
+    expect(loadLatest(dir, "acme")).toBeNull();
+  });
+});
+
 describe("appendRun", () => {
   it("writes rollup, events and latest on a first run", () => {
-    const m = metrics([repo("acme/api", [pr(1, 1)])]);
+    const m = { ...metrics([repo("acme/api", [pr(1, 1)])]), schemaVersion: CURRENT_SCHEMA_VERSION };
     const result = appendRun(dir, m);
     expect(result.rollupRowsWritten).toBe(2); // repo + org
     expect(result.eventsAppended).toBe(1);

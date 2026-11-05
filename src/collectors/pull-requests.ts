@@ -1,6 +1,6 @@
 import { getOctokit } from "../github-client.js";
 import { isCopilotLogin } from "./repo-graphql.js";
-import { getCountFromLinkHeader } from "../link-header.js";
+import { countSearchMatches } from "./search-counts.js";
 import type {
   PullRequestCounts,
   PullRequestDetail,
@@ -316,51 +316,23 @@ function hoursBetween(a: string, b: string): number {
 /**
  * Count open, closed and merged pull requests for a repository.
  *
- * Uses the list-pull-requests endpoint.  Open PRs are counted via the
- * Link header; closed PRs are paginated so we can separate merged from
- * unmerged.
+ * REST fallback path. Uses the Search API, which returns `total_count` in a
+ * single request per state: this runs when a repository is too large for
+ * GraphQL to answer, so its cost must not grow with the size of its history.
  */
 export async function collectPullRequestCounts(
   owner: string,
   repo: string
 ): Promise<PullRequestCounts> {
-  const octokit = await getOctokit();
-
-  try {
-    // Open count via Link header (single request)
-    const openRes = await octokit.rest.pulls.list({
-      owner,
-      repo,
-      state: "open",
-      per_page: 1,
-    });
-    const open = getCountFromLinkHeader(openRes);
-
-    // Paginate closed PRs to distinguish merged from unmerged
-    const closedPrs = await octokit.paginate(octokit.rest.pulls.list, {
-      owner,
-      repo,
-      state: "closed",
-      per_page: 100,
-    });
-    let merged = 0;
-    let closed = 0;
-    for (const pr of closedPrs) {
-      if (pr.merged_at) merged++;
-      else closed++;
-    }
-
-    return { open, closed, merged };
-  } catch (err: unknown) {
-    const status = (err as { status?: number }).status;
-    if (status === 404 || status === 403) {
-      if (status === 403) {
-        console.warn(`  ⚠ pull-requests: skipping ${owner}/${repo}: access denied (403) — token may need SAML SSO authorization`);
-      }
-      return { open: 0, closed: 0, merged: 0 };
-    }
-    throw err;
-  }
+  const {
+    counts: [open, merged, closed],
+    incomplete,
+  } = await countSearchMatches(owner, repo, "pull-requests", [
+    "type:pr state:open",
+    "type:pr is:merged",
+    "type:pr is:unmerged state:closed",
+  ]);
+  return incomplete ? { open, closed, merged, incomplete } : { open, closed, merged };
 }
 
 /**

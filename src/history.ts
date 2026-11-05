@@ -19,6 +19,7 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { CURRENT_SCHEMA_VERSION } from "./cache.js";
 import { gini, quantiles, round } from "./stats.js";
 import type { MergedPRSummary, OrgMetrics, RepoMetrics } from "./types.js";
 
@@ -386,6 +387,9 @@ export function buildRollupRows(metrics: OrgMetrics, date: string): RollupRow[] 
   let orgHuman = 0;
 
   for (const repo of metrics.repos) {
+    // Placeholder zeros are not a measurement; a row would read as a collapse.
+    if (repo.collectionWarning?.state === "failed") continue;
+
     const recent = mergedPRs(repo).filter(
       (pr) => new Date(pr.mergedAt).getTime() >= cutoff
     );
@@ -502,6 +506,10 @@ function orgOpenAgeMedian(repos: readonly RepoMetrics[], date: string): number |
 export function buildEventRows(metrics: OrgMetrics): EventRow[] {
   const rows: EventRow[] = [];
   for (const repo of metrics.repos) {
+    // Events are never rewritten, so a lean REST row would permanently block
+    // the fuller row a later GraphQL run or the backfill can still provide.
+    if (repo.collectionWarning?.state === "rest-fallback") continue;
+
     for (const pr of mergedPRs(repo)) {
       rows.push({
         v: HISTORY_SCHEMA_VERSION,
@@ -655,12 +663,13 @@ export function loadEvents(dir: string, scope: string): EventRow[] {
   return readNdjson<EventRow>(eventsPath(dir, scope));
 }
 
-/** Read back the newest snapshot for a scope, or null when absent. */
+/** Read back the newest snapshot for a scope, or null when absent or from another schema version. */
 export function loadLatest(dir: string, scope: string): OrgMetrics | null {
   const filePath = latestPath(dir, scope);
   if (!fs.existsSync(filePath)) return null;
   try {
-    return JSON.parse(fs.readFileSync(filePath, "utf-8")) as OrgMetrics;
+    const data = JSON.parse(fs.readFileSync(filePath, "utf-8")) as OrgMetrics;
+    return data.schemaVersion === CURRENT_SCHEMA_VERSION ? data : null;
   } catch {
     return null;
   }

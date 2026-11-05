@@ -1,10 +1,13 @@
-import { describe, it, expect, afterEach, vi } from "vitest";
+import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
 import { setOctokit, resetOctokit } from "../github-client.js";
 import type { Octokit } from "@octokit/rest";
 import { collectRepoGraphQL, fetchHistoricalPRPage } from "./repo-graphql.js";
 import type { GraphQLPRNode } from "./repo-graphql.js";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+/** Every backoff wait of one page's five attempts, plus a tick to settle. */
+const ALL_RETRY_WAITS_MS = 5_000 + 15_000 + 30_000 + 30_000 + 1;
 
 function makePRNode(overrides: Partial<GraphQLPRNode> = {}): GraphQLPRNode {
   const now = new Date().toISOString();
@@ -244,20 +247,180 @@ describe("collectRepoGraphQL", () => {
     vi.useRealTimers();
   });
 
-  it("returns null and warns after exhausting all transient retries", async () => {
+  it("reports GraphQL as unavailable and warns after exhausting all transient retries", async () => {
     vi.useFakeTimers();
     const err = Object.assign(new Error("Bad gateway"), { status: 502 });
     setOctokit(buildMockOctokit([err])); // clamped — all attempts throw
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const resultPromise = collectRepoGraphQL("owner", "repo");
-    await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
+    await vi.advanceTimersByTimeAsync(ALL_RETRY_WAITS_MS);
     const result = await resultPromise;
 
-    expect(result).toBeNull();
+    expect(result).toMatchObject({ unavailable: true, category: expect.stringContaining("502/504") });
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("falling back to REST"));
     warnSpy.mockRestore();
     vi.useRealTimers();
+  });
+
+  describe("when a large repository keeps timing out", () => {
+    const gateway = () => Object.assign(new Error("Gateway timeout"), { status: 504 });
+    const page = (n: number, hasNextPage = true) =>
+      makeGraphQLResponse({
+        nodes: [makePRNode({ number: n, updatedAt: new Date().toISOString() })],
+        hasNextPage,
+        endCursor: `cursor${n}`,
+      });
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.spyOn(console, "warn").mockImplementation(() => {});
+    });
+    afterEach(() => {
+      vi.restoreAllMocks();
+      vi.useRealTimers();
+    });
+
+    it("bounds a page to the page-size sequence, shrinking on every attempt", async () => {
+      const graphql = vi.fn(async () => {
+        throw gateway();
+      });
+      setOctokit({ graphql } as unknown as Octokit);
+
+      const p = collectRepoGraphQL("owner", "repo");
+      await vi.advanceTimersByTimeAsync(ALL_RETRY_WAITS_MS);
+      await p;
+
+      const sizes = graphql.mock.calls.map((c) => (c as unknown[])[1]).map((v) => (v as { pageSize: number }).pageSize);
+      expect(sizes).toEqual([100, 50, 25, 12, 10]);
+    });
+
+    it("retries a plain 500 at the same page size, also bounded", async () => {
+      const graphql = vi.fn(async () => {
+        throw Object.assign(new Error("Server error"), { status: 500 });
+      });
+      setOctokit({ graphql } as unknown as Octokit);
+
+      const p = collectRepoGraphQL("owner", "repo");
+      await vi.advanceTimersByTimeAsync(ALL_RETRY_WAITS_MS);
+      const result = await p;
+
+      const sizes = graphql.mock.calls.map((c) => (c as unknown[])[1]).map((v) => (v as { pageSize: number }).pageSize);
+      expect(sizes).toEqual([100, 100, 100, 100, 100]);
+      expect(result).toMatchObject({ unavailable: true, category: "HTTP 500 server error" });
+    });
+
+    it("keeps the size that worked for later pages and still spends the whole PR budget", async () => {
+      const seen: number[] = [];
+      let calls = 0;
+      const graphql = vi.fn(async (_q: string, vars: { pageSize: number }) => {
+        seen.push(vars.pageSize);
+        if (vars.pageSize > 50) throw gateway();
+        return page(++calls);
+      });
+      setOctokit({ graphql } as unknown as Octokit);
+
+      const p = collectRepoGraphQL("owner", "repo", 1);
+      await vi.advanceTimersByTimeAsync(5_001);
+      const result = await p;
+
+      // A budget of one page is 100 PRs, which takes two pages at size 50.
+      expect(seen).toEqual([100, 50, 50]);
+      expect(result).toMatchObject({ truncation: { reason: "page-cap" } });
+    });
+
+    it("never asks for more PRs than the budget has left", async () => {
+      const seen: number[] = [];
+      let calls = 0;
+      const graphql = vi.fn(async (_q: string, vars: { pageSize: number }) => {
+        seen.push(vars.pageSize);
+        if (vars.pageSize > 12) throw gateway();
+        return page(++calls);
+      });
+      setOctokit({ graphql } as unknown as Octokit);
+
+      const p = collectRepoGraphQL("owner", "repo", 1);
+      await vi.advanceTimersByTimeAsync(60_000);
+      await p;
+
+      // Eight pages of 12 leave 4 of the 100, so the last request is cut to fit.
+      expect(seen.filter((size) => size <= 12)).toEqual([12, 12, 12, 12, 12, 12, 12, 12, 4]);
+    });
+
+    it("keeps the retry floor inside what the budget has left", async () => {
+      const seen: number[] = [];
+      let calls = 0;
+      const graphql = vi.fn(async (_q: string, vars: { pageSize: number }) => {
+        seen.push(vars.pageSize);
+        // The first pages settle at 12; the final 4 fails once, then succeeds.
+        if (vars.pageSize > 12) throw gateway();
+        if (vars.pageSize === 4 && seen.filter((size) => size === 4).length === 1) throw gateway();
+        return page(++calls);
+      });
+      setOctokit({ graphql } as unknown as Octokit);
+
+      const p = collectRepoGraphQL("owner", "repo", 1);
+      await vi.advanceTimersByTimeAsync(60_000);
+      await p;
+
+      expect(seen.slice(-2)).toEqual([4, 4]);
+    });
+
+    it("keeps the pages already fetched when a later page keeps failing", async () => {
+      let calls = 0;
+      const graphql = vi.fn(async () => {
+        calls++;
+        if (calls <= 2) return page(calls);
+        throw gateway();
+      });
+      setOctokit({ graphql } as unknown as Octokit);
+
+      const p = collectRepoGraphQL("owner", "repo");
+      await vi.advanceTimersByTimeAsync(ALL_RETRY_WAITS_MS);
+      const result = await p;
+
+      expect(result).toMatchObject({ truncation: { reason: "transient" }, openIssueCount: 0 });
+      expect((result as { prNodes: unknown[] }).prNodes).toHaveLength(2);
+      expect(calls).toBe(7);
+    });
+
+    it("does not shrink when adaptive sizing is off, and still stops", async () => {
+      const graphql = vi.fn(async () => {
+        throw gateway();
+      });
+      setOctokit({ graphql } as unknown as Octokit);
+
+      const p = collectRepoGraphQL("owner", "repo", 10, { minPageSize: 10, adaptive: false });
+      await vi.advanceTimersByTimeAsync(ALL_RETRY_WAITS_MS);
+      const result = await p;
+
+      expect(graphql).toHaveBeenCalledTimes(4);
+      expect(result).toMatchObject({ unavailable: true });
+    });
+
+    it("does not retry or absorb an authentication failure part-way through", async () => {
+      let calls = 0;
+      setOctokit({
+        graphql: async () => {
+          if (++calls === 1) return page(1);
+          throw Object.assign(new Error("Bad credentials"), { status: 401 });
+        },
+      } as unknown as Octokit);
+
+      await expect(collectRepoGraphQL("owner", "repo")).rejects.toMatchObject({ status: 401 });
+    });
+
+    it("flags a repository stopped by the PR budget", async () => {
+      setOctokit({ graphql: async () => page(1) } as unknown as Octokit);
+      const result = await collectRepoGraphQL("owner", "repo", 2);
+      expect(result).toMatchObject({ truncation: { reason: "page-cap" } });
+    });
+
+    it("does not flag a repository that reached its last page exactly at the budget", async () => {
+      setOctokit({ graphql: async () => page(1, false) } as unknown as Octokit);
+      const result = await collectRepoGraphQL("owner", "repo", 1);
+      expect((result as { truncation?: unknown }).truncation).toBeUndefined();
+    });
   });
 
   it("retries a generic 'something went wrong executing your query' error and succeeds on retry", async () => {
@@ -277,17 +440,20 @@ describe("collectRepoGraphQL", () => {
     vi.useRealTimers();
   });
 
-  it("returns null and warns with the GitHub request id after exhausting retries on a generic execution error", async () => {
+  it("reports GraphQL as unavailable and warns with the GitHub request id after exhausting retries on a generic execution error", async () => {
     vi.useFakeTimers();
     const err = makeGenericExecutionError("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655");
     setOctokit(buildMockOctokit([err])); // clamped — all attempts throw
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
     const resultPromise = collectRepoGraphQL("owner", "repo");
-    await vi.advanceTimersByTimeAsync(5_000 + 15_000 + 30_000 + 1);
+    await vi.advanceTimersByTimeAsync(ALL_RETRY_WAITS_MS);
     const result = await resultPromise;
 
-    expect(result).toBeNull();
+    expect(result).toMatchObject({
+      unavailable: true,
+      requestId: "D6C0:19B1D2:B22842F:AD07EE0:6AA2B655",
+    });
     expect(warnSpy).toHaveBeenCalledWith(
       expect.stringContaining("D6C0:19B1D2:B22842F:AD07EE0:6AA2B655")
     );
@@ -361,7 +527,7 @@ describe("collectRepoGraphQL", () => {
     expect(result!.isFork).toBe(true);
   });
 
-  it("returns null and warns when API returns an empty/undefined response body", async () => {
+  it("reports GraphQL as unavailable and warns when API returns an empty/undefined response body", async () => {
     // GitHub occasionally returns HTTP 200 with data: null or no data field;
     // @octokit/graphql passes through undefined in that case.
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
@@ -369,7 +535,7 @@ describe("collectRepoGraphQL", () => {
 
     const result = await collectRepoGraphQL("owner", "repo");
 
-    expect(result).toBeNull();
+    expect(result).toMatchObject({ unavailable: true, category: "empty GraphQL response" });
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("empty response"));
     warnSpy.mockRestore();
   });
@@ -726,13 +892,26 @@ describe("fetchHistoricalPRPage (adaptive page sizing)", () => {
     await expect(fetchHistoricalPRPage("owner", "repo", null, PAGE_SIZE_OPTIONS)).rejects.toThrow();
   });
 
-  it("does not reduce the page size for a general 5xx status outside 502/504 — it is fatal instead", async () => {
+  it("defers on a general 5xx status outside 502/504 without reducing the page size", async () => {
     // A plain 500/503 is a general server-side outage, not the documented
     // "expensive query" signal (502/504 or the generic execution error), so
-    // it must not trigger a page-size reduction and is left fatal instead.
+    // a smaller page would not help. It is still no reason to end the whole
+    // run, particularly as Octokit reports network failures as status 500.
     const err = Object.assign(new Error("Internal server error"), { status: 500 });
-    setOctokit(buildMockOctokit([err]));
-    await expect(fetchHistoricalPRPage("owner", "repo", null, PAGE_SIZE_OPTIONS)).rejects.toThrow();
+    const graphql = vi.fn(async () => {
+      throw err;
+    });
+    setOctokit({ graphql } as unknown as Octokit);
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const outcome = await fetchHistoricalPRPage("owner", "repo", null, PAGE_SIZE_OPTIONS);
+
+    expect(graphql).toHaveBeenCalledTimes(1);
+    expect(outcome).toMatchObject({
+      ok: false,
+      failure: { kind: "transient", category: "HTTP 500 server error", attempts: 1 },
+    });
+    warnSpy.mockRestore();
   });
 
   it("returns a not-found failure for a repository-not-found error", async () => {
