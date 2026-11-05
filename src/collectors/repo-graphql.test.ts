@@ -329,6 +329,43 @@ describe("collectRepoGraphQL", () => {
       expect(result).toMatchObject({ truncation: { reason: "page-cap" } });
     });
 
+    it("never asks for more PRs than the budget has left", async () => {
+      const seen: number[] = [];
+      let calls = 0;
+      const graphql = vi.fn(async (_q: string, vars: { pageSize: number }) => {
+        seen.push(vars.pageSize);
+        if (vars.pageSize > 12) throw gateway();
+        return page(++calls);
+      });
+      setOctokit({ graphql } as unknown as Octokit);
+
+      const p = collectRepoGraphQL("owner", "repo", 1);
+      await vi.advanceTimersByTimeAsync(60_000);
+      await p;
+
+      // Eight pages of 12 leave 4 of the 100, so the last request is cut to fit.
+      expect(seen.filter((size) => size <= 12)).toEqual([12, 12, 12, 12, 12, 12, 12, 12, 4]);
+    });
+
+    it("keeps the retry floor inside what the budget has left", async () => {
+      const seen: number[] = [];
+      let calls = 0;
+      const graphql = vi.fn(async (_q: string, vars: { pageSize: number }) => {
+        seen.push(vars.pageSize);
+        // The first pages settle at 12; the final 4 fails once, then succeeds.
+        if (vars.pageSize > 12) throw gateway();
+        if (vars.pageSize === 4 && seen.filter((size) => size === 4).length === 1) throw gateway();
+        return page(++calls);
+      });
+      setOctokit({ graphql } as unknown as Octokit);
+
+      const p = collectRepoGraphQL("owner", "repo", 1);
+      await vi.advanceTimersByTimeAsync(60_000);
+      await p;
+
+      expect(seen.slice(-2)).toEqual([4, 4]);
+    });
+
     it("keeps the pages already fetched when a later page keeps failing", async () => {
       let calls = 0;
       const graphql = vi.fn(async () => {

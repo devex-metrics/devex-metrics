@@ -272,12 +272,17 @@ export async function collectRepoGraphQL(
 
   while (requested < prBudget) {
     let response: GraphQLPageResponse;
+    const remaining = prBudget - requested;
     try {
       const fetched = await fetchRepoPage(
         octokit,
         { owner, name: repo, cursor, firstPage },
         `${owner}/${repo}`,
-        { ...sizing, pageSize }
+        {
+          ...sizing,
+          pageSize: Math.min(pageSize, remaining),
+          minPageSize: Math.min(sizing.minPageSize, remaining),
+        }
       );
       response = fetched.response;
       pageSize = fetched.pageSize;
