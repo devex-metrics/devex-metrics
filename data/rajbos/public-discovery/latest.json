@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-04T14:12:52.000Z",
+  "generated_at": "2026-11-05T14:22:44.000Z",
   "scanner_version": "0.1.2",
   "repositories": [
     {
@@ -34,7 +34,6 @@
       "commits_30d": 0,
       "commits_90d": 9,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -123,6 +122,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -133,25 +133,25 @@
     },
     {
       "full_name": "rajbos/ai-engineering-fluency",
-      "head_sha": "1e6d9b97789a5a0df5d3e8135138b24342295e0f",
-      "files": 1373,
-      "bytes": 26101942,
-      "source_loc": 275918,
+      "head_sha": "b138c2bd4100459715d394f5ccd6ea75126d3405",
+      "files": 1376,
+      "bytes": 26156165,
+      "source_loc": 276779,
       "languages": [
         {
           "name": "TypeScript",
-          "files": 657,
-          "loc": 224679
+          "files": 660,
+          "loc": 225350
         },
         {
           "name": "JavaScript",
           "files": 90,
-          "loc": 27367
+          "loc": 27541
         },
         {
           "name": "CSS",
           "files": 20,
-          "loc": 9955
+          "loc": 9972
         },
         {
           "name": "Python",
@@ -165,9 +165,8 @@
         }
       ],
       "commits_30d": 220,
-      "commits_90d": 887,
+      "commits_90d": 893,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -256,7 +255,8 @@
         1,
         8,
         0,
-        2
+        7,
+        1
       ],
       "contributor_count": 29,
       "adr_count": 14,
@@ -297,8 +297,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -415,7 +415,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -435,6 +434,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -538,7 +538,6 @@
         0,
         0,
         0,
-        0,
         3,
         0,
         0,
@@ -577,6 +576,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -651,8 +651,8 @@
         0,
         0,
         0,
-        0,
         2,
+        0,
         0,
         0,
         0,
@@ -774,8 +774,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -881,8 +881,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -994,8 +994,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1117,8 +1117,8 @@
         0,
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -1224,8 +1224,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1306,9 +1306,9 @@
     },
     {
       "full_name": "rajbos/GHAzDo-widget",
-      "head_sha": "c42863cbfe031d88a62e07acc9b349a70c6f1aef",
+      "head_sha": "5f4de23d7e1c9623f3a416ab3b170c77e74240da",
       "files": 61,
-      "bytes": 1423955,
+      "bytes": 1424364,
       "source_loc": 5758,
       "languages": [
         {
@@ -1337,10 +1337,9 @@
           "loc": 119
         }
       ],
-      "commits_30d": 0,
-      "commits_90d": 23,
+      "commits_30d": 6,
+      "commits_90d": 29,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -1429,7 +1428,8 @@
         0,
         0,
         0,
-        0
+        3,
+        3
       ],
       "contributor_count": 6,
       "adr_count": 0,
@@ -1475,8 +1475,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1600,7 +1600,6 @@
         0,
         0,
         0,
-        0,
         4,
         0,
         0,
@@ -1665,6 +1664,7 @@
         2,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 9,
@@ -1692,9 +1692,8 @@
         }
       ],
       "commits_30d": 4,
-      "commits_90d": 27,
+      "commits_90d": 26,
       "commits_90d_trend": [
-        1,
         0,
         0,
         0,
@@ -1783,6 +1782,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 5,
@@ -1793,9 +1793,9 @@
     },
     {
       "full_name": "rajbos/github-copilot-premium-reqs-usage-fork",
-      "head_sha": "feb3e8090d5d19d771be56d9202ee5e533a69a69",
+      "head_sha": "20da1cb89ab8824f8692beb393d2fb9c044349a1",
       "files": 153,
-      "bytes": 1185379,
+      "bytes": 1185386,
       "source_loc": 17871,
       "languages": [
         {
@@ -1824,10 +1824,9 @@
           "loc": 242
         }
       ],
-      "commits_30d": 0,
-      "commits_90d": 14,
+      "commits_30d": 1,
+      "commits_90d": 15,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -1916,7 +1915,8 @@
         0,
         0,
         0,
-        0
+        0,
+        1
       ],
       "contributor_count": 11,
       "adr_count": 0,
@@ -1957,7 +1957,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -1996,6 +1995,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -2039,21 +2039,20 @@
     },
     {
       "full_name": "rajbos/GitHub-ratelimit-research",
-      "head_sha": "bd63e2b3aa70a5b5030d3c0085827302137dbdd7",
+      "head_sha": "e58a173747ef3a8da7a09cc69d043b9c23ab28ba",
       "files": 6,
-      "bytes": 52782,
-      "source_loc": 853,
+      "bytes": 118467,
+      "source_loc": 2013,
       "languages": [
         {
           "name": "HTML",
           "files": 1,
-          "loc": 853
+          "loc": 2013
         }
       ],
-      "commits_30d": 4,
-      "commits_90d": 9,
+      "commits_30d": 13,
+      "commits_90d": 18,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2142,25 +2141,26 @@
         0,
         0,
         0,
-        4
+        10,
+        3
       ],
       "contributor_count": 5,
       "adr_count": 0,
       "manifest_count": 0,
       "produces_count": 1,
-      "consumes_count": 10
+      "consumes_count": 12
     },
     {
       "full_name": "rajbos/Jarvis",
-      "head_sha": "933d35e1af8aa89ed72ab419842f4406e95d0214",
-      "files": 371,
-      "bytes": 4464554,
-      "source_loc": 78464,
+      "head_sha": "5c0188a2bfbbc3c6a4132ee0012df5514a3d2716",
+      "files": 384,
+      "bytes": 4552977,
+      "source_loc": 80570,
       "languages": [
         {
           "name": "TypeScript",
-          "files": 288,
-          "loc": 69453
+          "files": 301,
+          "loc": 71559
         },
         {
           "name": "CSS",
@@ -2183,10 +2183,9 @@
           "loc": 187
         }
       ],
-      "commits_30d": 89,
-      "commits_90d": 333,
+      "commits_30d": 108,
+      "commits_90d": 353,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2275,7 +2274,8 @@
         0,
         1,
         2,
-        3
+        18,
+        5
       ],
       "contributor_count": 7,
       "adr_count": 0,
@@ -2309,7 +2309,6 @@
       "commits_30d": 0,
       "commits_90d": 5,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2398,6 +2397,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 3,
@@ -2422,7 +2422,6 @@
       "commits_30d": 0,
       "commits_90d": 9,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2511,6 +2510,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 10,
@@ -2537,7 +2537,6 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -2591,6 +2590,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -2686,7 +2686,6 @@
         0,
         0,
         0,
-        0,
         7,
         0,
         0,
@@ -2757,6 +2756,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 11,
@@ -2808,8 +2808,8 @@
         0,
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -2926,7 +2926,6 @@
         0,
         0,
         0,
-        0,
         6,
         1,
         0,
@@ -2965,6 +2964,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
