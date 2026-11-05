@@ -4,6 +4,10 @@ import type { Octokit } from "@octokit/rest";
 import type { DevexConfig } from "./config.js";
 import { scopePath } from "./history.js";
 import {
+  LANDSCAPE_CAPABILITY_WARNINGS, landscapeCapabilities, landscapeCapabilityWarnings,
+  parseLandscapeActivity, parseLandscapeAttention, parseLandscapeTeamActivity,
+} from "./landscape-contract.js";
+import {
   installedLandscapeScannerVersion,
   loadLandscapeSelection,
   unverifiedLandscapeRepositories,
@@ -11,6 +15,7 @@ import {
 import type {
   OrgMetrics,
   PublicDiscoveryConnection,
+  PublicDiscoveryReference,
   PublicDiscoveryRepoView,
   PublicDiscoveryRepository,
   PublicDiscoveryRunStatus,
@@ -172,6 +177,8 @@ export function parsePublicDiscoveryScan(value: unknown): PublicDiscoveryScan {
   if (raw.schema_version !== 1) throw new Error("Unsupported public discovery snapshot schema");
   const generatedAt = iso(raw.generated_at, "generated_at");
   const scannerVersion = text(raw.scanner_version, "scanner_version", 100);
+  const capabilities = landscapeCapabilities(raw.capabilities);
+  const warnings = capabilities === undefined ? undefined : landscapeCapabilityWarnings(raw.capability_warnings);
   if (!Array.isArray(raw.repositories) || !Array.isArray(raw.connections))
     throw new Error("Public discovery repositories and connections must be arrays");
   const repositories: PublicDiscoveryRepository[] = raw.repositories.map(
@@ -205,6 +212,12 @@ export function parsePublicDiscoveryScan(value: unknown): PublicDiscoveryScan {
         produces_count: count(item.produces_count, "produces_count"),
         consumes_count: count(item.consumes_count, "consumes_count"),
       };
+      if (capabilities?.includes("activity_windows_v1") && item.activity !== undefined)
+        result.activity = parseLandscapeActivity(item.activity);
+      if (capabilities?.includes("configured_team_aggregate_v1") && item.team_activity !== undefined)
+        result.team_activity = parseLandscapeTeamActivity(item.team_activity, result.activity);
+      if (capabilities?.includes("attention_rules_v1") && item.attention !== undefined)
+        result.attention = parseLandscapeAttention(item.attention);
       if (
         result.commits_90d !== trend.reduce((sum, point) => sum + point, 0) ||
         result.commits_30d !== trend.slice(-30).reduce((sum, point) => sum + point, 0) ||
@@ -248,12 +261,35 @@ export function parsePublicDiscoveryScan(value: unknown): PublicDiscoveryScan {
       }),
     };
   });
+  let references: PublicDiscoveryReference[] | undefined;
+  if (capabilities?.includes("repository_references_v1") && raw.references !== undefined) {
+    if (!Array.isArray(raw.references))
+      throw new Error("Public discovery references must be an array");
+    references = raw.references.map((value: unknown) => {
+      const item = record(value, "reference");
+      const source = name(item.source, "reference source");
+      const target = name(item.target, "reference target");
+      const evidence = record(item.evidence, "reference evidence");
+      const sourceRepo = repositories.find((repo) => repo.full_name.toLowerCase() === source.toLowerCase());
+      const line = count(evidence.line, "reference line");
+      if (!sourceRepo || !selected.has(target.toLowerCase()) ||
+          source.toLowerCase() === target.toLowerCase() ||
+          item.kind !== "repository reference" || item.confidence !== "low" ||
+          evidence.head_sha !== sourceRepo.head_sha || line < 1)
+        throw new Error("Public discovery reference must link selected pinned public repositories");
+      return { source, target, kind: "repository reference", confidence: "low",
+        evidence: { path: safePath(evidence.path, "reference path"), line, head_sha: sourceRepo.head_sha } };
+    });
+  }
   return {
     schema_version: 1,
     generated_at: generatedAt,
     scanner_version: scannerVersion,
     repositories,
     connections,
+    ...(capabilities === undefined ? {} : { capabilities }),
+    ...(references === undefined ? {} : { references }),
+    ...(warnings === undefined ? {} : { capability_warnings: warnings }),
   };
 }
 
@@ -271,6 +307,7 @@ export function validatePublicDiscoveryOutput(
   const document = record(raw, "CLI output");
   if (document.schema_version !== 1) throw new Error("Unsupported CLI discovery schema");
   const provenance = record(document.provenance, "provenance");
+  const capabilities = landscapeCapabilities(provenance.capabilities);
   if (
     provenance.source !== "local_git" ||
     provenance.analysis !== "full" ||
@@ -318,7 +355,13 @@ export function validatePublicDiscoveryOutput(
     seen.add(key);
     if (
       !Array.isArray(item.analysis_warnings) ||
-      item.analysis_warnings.length ||
+      item.analysis_warnings.some((value: unknown) => {
+        const warning = record(value, "analysis warning");
+        return capabilities === undefined || warning.path !== "" ||
+          typeof warning.reason !== "string" ||
+          (!LANDSCAPE_CAPABILITY_WARNINGS.includes(warning.reason) &&
+            !/^[0-9]+ consumed artifact declarations have no selected producer candidate; see consumes evidence$/.test(warning.reason));
+      }) ||
       !Array.isArray(item.manifests) ||
       !Array.isArray(item.produces) ||
       !Array.isArray(item.consumes) ||
@@ -351,6 +394,12 @@ export function validatePublicDiscoveryOutput(
       manifest_count: item.manifests.length,
       produces_count: item.produces.length,
       consumes_count: item.consumes.length,
+      ...(capabilities?.includes("activity_windows_v1") && item.activity !== undefined
+        ? { activity: item.activity } : {}),
+      ...(capabilities?.includes("configured_team_aggregate_v1") && item.team_activity !== undefined
+        ? { team_activity: item.team_activity } : {}),
+      ...(capabilities?.includes("attention_rules_v1") && item.attention !== undefined
+        ? { attention: item.attention } : {}),
     };
   });
   if (!Array.isArray(document.edges))
@@ -416,6 +465,10 @@ export function validatePublicDiscoveryOutput(
     scanner_version: document.scanner_version,
     repositories,
     connections,
+    ...(capabilities === undefined ? {} : { capabilities }),
+    ...(capabilities === undefined ? {} : { capability_warnings: document.capability_warnings }),
+    ...(capabilities?.includes("repository_references_v1") && document.references !== undefined
+      ? { references: document.references } : {}),
   });
   if (
     scan.scanner_version !== installedLandscapeScannerVersion() ||
@@ -479,9 +532,13 @@ export function scrubPublicDiscovery(dir: string, owner: string, keep: readonly 
     const connections = scan.connections.filter(
       (edge) => allowed.has(edge.source.toLowerCase()) && allowed.has(edge.target.toLowerCase())
     );
+    const references = scan.references?.filter(
+      (reference) => allowed.has(reference.source.toLowerCase()) && allowed.has(reference.target.toLowerCase())
+    );
     fs.writeFileSync(
       `${file}.tmp`,
-      JSON.stringify({ ...scan, repositories, connections }, null, 2) + "\n"
+      JSON.stringify({ ...scan, repositories, connections,
+        ...(references === undefined ? {} : { references }) }, null, 2) + "\n"
     );
     fs.renameSync(`${file}.tmp`, file);
   }
@@ -522,6 +579,7 @@ export function loadPublicDiscoveryView(
 ): {
   rows: PublicDiscoveryRepoView[];
   connections: PublicDiscoveryConnection[];
+  references?: PublicDiscoveryReference[];
   status?: PublicDiscoveryRunStatus;
 } {
   const latest = discoveryLatestPath(dir, metrics.owner);
@@ -600,6 +658,11 @@ export function loadPublicDiscoveryView(
       scan?.connections.filter(
         (edge) => visible.has(edge.source.toLowerCase()) && visible.has(edge.target.toLowerCase())
       ) ?? [],
+    ...(scan?.references === undefined ? {} : {
+      references: scan.references.filter(
+        (reference) => visible.has(reference.source.toLowerCase()) && visible.has(reference.target.toLowerCase())
+      ),
+    }),
     status: loadPublicDiscoveryStatus(dir, metrics.owner),
   };
 }

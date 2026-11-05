@@ -144,7 +144,7 @@ async function ingest(file: string | undefined): Promise<void> {
   );
   const enriched = await enrichLandscapeScan(
     validated, new Octokit({ auth: token, request: { timeout: 20_000 } }),
-    config.team?.handles ?? []
+    config.team?.handles ?? [], config.collection.landscapeStaleAfterDays
   );
   if ((await recheckAndScrub(historyDir, metrics.owner, names, token)).length > 0)
     throw new Error("Landscape visibility changed during enrichment; refusing to persist paths");

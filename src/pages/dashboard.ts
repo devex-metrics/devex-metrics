@@ -3,6 +3,7 @@ import type {
   LandscapeRepoView,
   LandscapeRunStatus,
   PublicDiscoveryConnection,
+  PublicDiscoveryReference,
   PublicDiscoveryRepoView,
   PublicDiscoveryRunStatus,
   OrgMetrics,
@@ -92,6 +93,8 @@ export interface DashboardExtras {
   publicDiscovery?: PublicDiscoveryRepoView[];
   /** Heuristic links only between observed public repositories. */
   publicDiscoveryConnections?: PublicDiscoveryConnection[];
+  /** Textual public repository mentions, separate from artifact dependency evidence. */
+  publicDiscoveryReferences?: PublicDiscoveryReference[];
   /** The most recent independent discovery attempt. */
   publicDiscoveryStatus?: PublicDiscoveryRunStatus;
 }
@@ -729,7 +732,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
   </section>
 
   ${extras.landscape ? buildLandscapeSection(extras.landscape, extras.landscapeStatus, data) : ""}
-  ${extras.publicDiscovery ? buildPublicDiscoverySection(extras.publicDiscovery, extras.publicDiscoveryConnections ?? [], extras.publicDiscoveryStatus) : ""}
+  ${extras.publicDiscovery ? buildPublicDiscoverySection(extras.publicDiscovery, extras.publicDiscoveryConnections ?? [], extras.publicDiscoveryStatus, extras.publicDiscoveryReferences) : ""}
 </main>
 
 <footer>Data cached on ${escapeHtml(date)}.${deployedFrom} Served via GitHub Pages. <a href="data.json">Raw JSON</a> &middot; <a href="report.md">Markdown</a></footer>

@@ -177,7 +177,9 @@ function main(): void {
   const discoveryFile = path.join(siteDir, "public-discovery.json");
   if (discovery) {
     fs.writeFileSync(discoveryFile, JSON.stringify({
-      schema_version: 1, rows: discovery.rows, connections: discovery.connections, status: discovery.status ?? null,
+      schema_version: 1, rows: discovery.rows, connections: discovery.connections,
+      ...(discovery.references === undefined ? {} : { references: discovery.references }),
+      status: discovery.status ?? null,
     }, null, 2));
   } else if (fs.existsSync(discoveryFile)) {
     fs.unlinkSync(discoveryFile);
@@ -192,6 +194,7 @@ function main(): void {
     landscapeStatus: landscape ? loadLandscapeRunStatus(historyDir, data.owner) : undefined,
     publicDiscovery: discovery?.rows,
     publicDiscoveryConnections: discovery?.connections,
+    publicDiscoveryReferences: discovery?.references,
     publicDiscoveryStatus: discovery?.status,
   });
   fs.writeFileSync(path.join(siteDir, "index.html"), html);

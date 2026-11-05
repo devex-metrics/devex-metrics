@@ -316,7 +316,7 @@ describe("landscape dashboard view", () => {
       "AI instruction file observations by repository"
     );
     expect(doc.querySelector(".landscape-coverage")?.textContent).toContain("1 / 4 observed");
-    expect(doc.querySelectorAll("#landscapeRows > tr .landscape-unknown")).toHaveLength(36);
+    expect(doc.querySelectorAll("#landscapeRows > tr .landscape-unknown")).toHaveLength(37);
     expect(html).toContain("Compared with");
     expect(html).toContain("2026-09-24T10:30:00.000Z");
     expect(html).toContain("Removed since comparison");
@@ -358,6 +358,30 @@ describe("landscape dashboard view", () => {
     expect(html.split("25 points each")).toHaveLength(2);
     expect(html.split("landscape scanner")).toHaveLength(2);
     expect(doc.querySelectorAll(".landscape-detail-row p")).toHaveLength(0);
+  });
+
+  it("distinguishes graph drift, inclusive timestamp counts, kind coverage and legacy-null deltas", () => {
+    const view = aged("acme/public", true);
+    view.files![0].commits_since = 4;
+    view.files![0].commits_since_change = 7;
+    view.summary!.by_kind = [
+      { kind: "agents", count: 1, known_count: 1, stale_count: 1, unknown_count: 0 },
+      { kind: "claude", count: 0, known_count: 0, stale_count: 0, unknown_count: 0 },
+    ];
+    view.attention = { activity: "low", priority: "medium",
+      reasons: ["AI files exceed the configured lag threshold"] };
+    view.drift!.file_deltas = [{ path: "AGENTS.md", age_days: 1, lag_days: 0,
+      commits_since: null, commits_since_change: 2, content_score: null }];
+    const doc = new JSDOM(buildLandscapeSection([view])).window.document;
+    const details = doc.querySelector(".landscape-detail-row")!;
+    expect(details.textContent).toContain("Graph commits since");
+    const cells = details.querySelectorAll(".landscape-file-table tbody td");
+    expect(cells[6].textContent).toBe("7");
+    expect(cells[7].textContent).toBe("4");
+    expect(details.textContent).toContain("graph Unknown; inclusive +2; cues Unknown");
+    expect(details.textContent).toContain("agents: 1 observed, 1 known history");
+    expect(details.textContent).not.toContain("claude: 0");
+    expect(details.textContent).toContain("Separate from DevEx attention ordering");
   });
   it("distinguishes an empty selected scope from unknown observations", () => {
     const doc = new JSDOM(buildLandscapeSection([])).window.document;

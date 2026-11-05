@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import type { Octokit } from "@octokit/rest";
 import type { LandscapeContentSignal, LandscapeFile, LandscapeRepository, LandscapeScan } from "./types.js";
+import { landscapeDetailSummary } from "./landscape-contract.js";
 
 export const MAX_SIGNAL_REPOS = 150;
 export const MAX_SIGNAL_FILES = 1000;
@@ -96,6 +97,48 @@ async function publicHistory(
       return null;
     }
     throw error;
+  }
+}
+
+async function missingFileHistory(
+  repo: LandscapeRepository, files: LandscapeFile[], at: string, staleAfterDays: number,
+  octokit: Octokit
+): Promise<void> {
+  const missing = files.filter((file) => file.last_changed === null);
+  const [owner, name] = repo.full_name.split("/");
+  for (let start = 0; start < missing.length; start += HISTORY_BATCH) {
+    const batch = missing.slice(start, start + HISTORY_BATCH);
+    const parameters = batch.map((_, index) => `$path${index}:String!`).join(",");
+    const fields = batch.map((_, index) =>
+      `path${index}:history(first:1,path:$path${index}){nodes{committedDate}}`).join("\n");
+    const variables: Record<string, string> = { owner, name, head: repo.head_sha };
+    batch.forEach((file, index) => { variables[`path${index}`] = file.path; });
+    const response = await publicHistory(
+      `query($owner:String!,$name:String!,$head:GitObjectID!,${parameters}){
+        repository(owner:$owner,name:$name){nameWithOwner isPrivate
+          object(oid:$head){... on Commit{oid committedDate ${fields}}}}}`, variables, repo, octokit
+    );
+    if (!response) continue;
+    const head = verifiedHead(response, repo);
+    const committed = typeof head?.committedDate === "string" ? Date.parse(head.committedDate) : NaN;
+    if (!head || !Number.isFinite(committed)) {
+      console.warn(`Landscape missing path history remains unverified for ${repo.full_name}`);
+      continue;
+    }
+    batch.forEach((file, index) => {
+      const nodes = record(head[`path${index}`])?.nodes;
+      const date = Array.isArray(nodes) && nodes.length === 1 ? record(nodes[0])?.committedDate : null;
+      const changed = typeof date === "string" ? Date.parse(date) : NaN;
+      if (!Number.isFinite(changed) || changed > Date.parse(at)) {
+        console.warn(`Landscape missing path history remains unavailable for ${repo.full_name}`);
+        return;
+      }
+      file.last_changed = new Date(changed).toISOString();
+      file.age_days ??= Math.max(0, Math.floor((Date.parse(at) - changed) / DAY));
+      file.lag_days ??= Math.max(0, Math.floor((committed - changed) / DAY));
+      file.stale ??= file.lag_days > staleAfterDays;
+      file.status = "known";
+    });
   }
 }
 
@@ -252,21 +295,22 @@ async function fileScore(repo: LandscapeRepository, file: LandscapeFile, octokit
  * Fixed request/file budgets leave unmeasured signals null, never zero.
  */
 export async function enrichLandscapeScan(
-  scan: LandscapeScan, octokit: Octokit, handles: readonly string[] = []
+  scan: LandscapeScan, octokit: Octokit, handles: readonly string[] = [], staleAfterDays = 90
 ): Promise<LandscapeScan> {
   const repositories = scan.repositories.map((repo) =>
-    "head_sha" in repo ? { ...repo, ai_files: repo.ai_files.map((file) => ({ ...file })) } : repo);
+    "head_sha" in repo ? { ...repo, ai_summary: { ...repo.ai_summary },
+      ai_files: repo.ai_files.map((file) => ({ ...file })) } : repo);
   let fileBudget = MAX_SIGNAL_FILES;
   let repoBudget = MAX_SIGNAL_REPOS;
   for (const repo of repositories) {
     if (!("head_sha" in repo)) continue;
-    repo.commits_30d = null;
-    repo.commits_90d = null;
+    repo.commits_30d = repo.activity?.commits_30d ?? null;
+    repo.commits_90d = repo.activity?.commits_90d ?? null;
     repo.team_commits_30d = null;
     repo.team_commits_90d = null;
     for (const file of repo.ai_files) {
-      file.commits_since_change = null;
-      file.content_signal = null;
+      file.commits_since_change ??= null;
+      file.content_signal ??= null;
     }
     if (repoBudget-- <= 0) {
       if (repoBudget === -1) console.warn(`Landscape signals limited to ${MAX_SIGNAL_REPOS} repositories`);
@@ -275,21 +319,44 @@ export async function enrichLandscapeScan(
     const batch = repo.ai_files.slice(0, Math.min(MAX_FILES_PER_REPO, fileBudget));
     if (batch.length < repo.ai_files.length)
       console.warn(`Landscape signals limited to ${batch.length} of ${repo.ai_files.length} files in ${repo.full_name}`);
-    const eligible = batch.filter((file) =>
+    if (scan.capabilities?.includes("ai_commit_drift_v1"))
+      await missingFileHistory(repo, batch, scan.generated_at, staleAfterDays, octokit);
+    const eligible = batch.filter((file) => file.commits_since_change == null &&
       file.last_changed !== null && Date.parse(file.last_changed) <= Date.parse(scan.generated_at));
+    const needsHistory = eligible.length > 0 || !repo.activity?.complete || handles.length > 0;
+    const unscored = batch.filter((file) => file.content_signal == null);
+    fileBudget -= batch.length;
+    if (!needsHistory && unscored.length === 0) continue;
     const history = await commitSignals(repo, scan.generated_at, eligible, handles, octokit);
     if (!history) continue;
-    repo.commits_30d = history.month;
-    repo.commits_90d = history.recent;
+    if (repo.activity?.complete &&
+        (repo.activity.commits_30d !== history.month || repo.activity.commits_90d !== history.recent))
+      throw new Error(`Landscape scanner and authenticated Git history disagree for ${repo.full_name}`);
+    repo.commits_30d ??= history.month;
+    repo.commits_90d ??= history.recent;
     repo.team_commits_30d = history.team?.month ?? null;
     repo.team_commits_90d = history.team?.recent ?? null;
     for (const file of eligible) file.commits_since_change = history.files.get(file.path) ?? null;
-    for (let start = 0; start < batch.length; start += CONTENT_BATCH) {
-      const group = batch.slice(start, start + CONTENT_BATCH);
+    for (let start = 0; start < unscored.length; start += CONTENT_BATCH) {
+      const group = unscored.slice(start, start + CONTENT_BATCH);
       const scores = await Promise.all(group.map((file) => fileScore(repo, file, octokit)));
-      group.forEach((file, index) => { file.content_signal = scores[index]; });
+      group.forEach((file, index) => {
+        file.content_signal = scores[index];
+        if (file.content_signal !== null) delete file.content_signal_reason;
+      });
     }
-    fileBudget -= batch.length;
+  }
+  for (const repo of repositories) {
+    if (!("head_sha" in repo)) continue;
+    const lags = repo.ai_files.flatMap((file) => file.lag_days === null ? [] : [file.lag_days]);
+    const unknown = repo.ai_files.filter((file) => file.status === "unknown").length;
+    Object.assign(repo.ai_summary, {
+      stale_count: repo.ai_files.filter((file) => file.stale === true).length,
+      max_lag_days: lags.length ? Math.max(...lags) : null,
+      unknown_count: unknown, status: unknown ? "partial_unknown" : "known",
+    });
+    if (scan.capabilities?.includes("ai_kind_coverage_v1"))
+      Object.assign(repo.ai_summary, landscapeDetailSummary(repo.ai_files));
   }
   return { ...scan, repositories };
 }

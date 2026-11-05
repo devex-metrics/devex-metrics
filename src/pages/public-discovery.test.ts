@@ -26,6 +26,26 @@ function observed(): PublicDiscoveryRepoView {
 }
 
 describe("public discovery bottom panel", () => {
+  it("labels portable elapsed activity, local-email aggregates and references without dependency claims", () => {
+    const view = observed();
+    view.observation!.activity = { commits_30d: 3, commits_90d: 4, complete: true };
+    view.observation!.team_activity = { available: true, complete: true,
+      matching: "exact_author_email", commit_count: 3, commits_30d: 2, commits_90d: 2 };
+    view.observation!.attention = { activity: "low", priority: "low", reasons: [] };
+    const html = buildPublicDiscoverySection([view], [], undefined, [{
+      source: "acme/consumer", target: "acme/producer", kind: "repository reference",
+      confidence: "low", evidence: { path: "docs/<script>.md", line: 2, head_sha: "a".repeat(40) },
+    }]);
+    const doc = new JSDOM(html).window.document;
+    expect(doc.querySelector("script")).toBeNull();
+    expect(doc.querySelector(".discovery-detail")?.textContent).toContain("3 / 4 commits (30d / 90d)");
+    expect(doc.querySelector(".discovery-detail")?.textContent).toContain("2 / 2 commits (30d / 90d)");
+    expect(doc.querySelector(".discovery-detail")?.textContent).toContain("not linked GitHub handles");
+    expect(doc.querySelector(".discovery-connections")?.textContent).toContain("not a dependency");
+    expect(doc.querySelector(".discovery-connections")?.textContent).toContain("docs/<script>.md:2");
+    expect(doc.querySelector(".discovery-connections")?.textContent).not.toContain("may consume");
+  });
+
   it("renders bounded facts and heuristic public evidence with escaped names", () => {
     const rows: PublicDiscoveryRepoView[] = [
       observed(),
