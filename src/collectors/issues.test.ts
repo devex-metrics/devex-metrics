@@ -61,7 +61,21 @@ describe("collectIssueCounts", () => {
     setOctokit(mockOctokit);
 
     const counts = await collectIssueCounts("owner", "missing-repo");
-    expect(counts).toEqual({ open: 0, closed: 0 });
+    expect(counts).toEqual({ open: 0, closed: 0, incomplete: true });
+  });
+
+  it("flags counts Search reports as partial, keeping the totals it did return", async () => {
+    setOctokit({
+      rest: {
+        search: {
+          issuesAndPullRequests: ({ q }: { q: string }) =>
+            Promise.resolve({ data: { total_count: 3, incomplete_results: q.includes("state:closed"), items: [] } }),
+        },
+      },
+    } as unknown as Octokit);
+
+    const counts = await collectIssueCounts("owner", "repo");
+    expect(counts).toEqual({ open: 3, closed: 3, incomplete: true });
   });
 
   it("should rethrow errors that are not 404/403/422", async () => {
@@ -89,23 +103,46 @@ describe("collectIssueCounts", () => {
     setOctokit(mockOctokit);
 
     const counts = await collectIssueCounts("owner", "repo");
-    expect(counts).toEqual({ open: 0, closed: 0 });
+    expect(counts).toEqual({ open: 0, closed: 0, incomplete: true });
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("403"));
     warnSpy.mockRestore();
   });
 
-  it("should return zero counts on 422 (e.g. archived/empty repo search rejection)", async () => {
+  it("flags zero counts when Search cannot see the repository (422)", async () => {
     const mockOctokit = {
       rest: {
         search: {
-          issuesAndPullRequests: () => Promise.reject(Object.assign(new Error("Unprocessable"), { status: 422 })),
+          issuesAndPullRequests: () =>
+            Promise.reject(
+              Object.assign(new Error("Validation Failed"), {
+                status: 422,
+                response: {
+                  data: {
+                    errors: [{ message: "The listed users and repositories cannot be searched either because the resources do not exist or you do not have permission to view them." }],
+                  },
+                },
+              })
+            ),
         },
       },
     } as unknown as Octokit;
     setOctokit(mockOctokit);
 
     const counts = await collectIssueCounts("owner", "repo");
-    expect(counts).toEqual({ open: 0, closed: 0 });
+    expect(counts).toEqual({ open: 0, closed: 0, incomplete: true });
+  });
+
+  it("rethrows a 422 that is about the query rather than the repository", async () => {
+    const mockOctokit = {
+      rest: {
+        search: {
+          issuesAndPullRequests: () => Promise.reject(Object.assign(new Error("Validation Failed"), { status: 422 })),
+        },
+      },
+    } as unknown as Octokit;
+    setOctokit(mockOctokit);
+
+    await expect(collectIssueCounts("owner", "repo")).rejects.toMatchObject({ status: 422 });
   });
 });
 

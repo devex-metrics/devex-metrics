@@ -534,32 +534,79 @@ describe("sumWeeklyTrends", () => {
 describe("collectWeeklyTrends on a repository it cannot crawl in full", () => {
   afterEach(() => resetOctokit());
 
-  /** An octokit whose PR walk serves one matching PR per page, forever. */
-  function endlessPRs() {
+  /**
+   * An octokit whose issue and PR walks each serve full pages forever. The
+   * issues endpoint returns pull requests too, so those pages count for nothing.
+   */
+  function endlessWalks(issuePage: (now: string) => object[], prPageSize = 100) {
     const now = new Date().toISOString();
-    let pagesServed = 0;
-    async function* iterator() {
+    const served = { issues: 0, prs: 0 };
+    const listForRepo = {};
+    const list = {};
+    async function* iterator(endpoint: object) {
       for (;;) {
-        pagesServed++;
-        yield { data: [{ number: pagesServed, created_at: now, updated_at: now, merged_at: null }] };
+        if (endpoint === listForRepo) {
+          served.issues++;
+          yield { data: issuePage(now) };
+        } else if (endpoint === list) {
+          served.prs++;
+          yield {
+            data: Array.from({ length: prPageSize }, (_, i) => ({
+              number: i,
+              created_at: now,
+              updated_at: now,
+              merged_at: null,
+            })),
+          };
+        }
       }
     }
+    const paginate = Object.assign(
+      async () => {
+        throw new Error("a bounded repo must not use the unbounded walk");
+      },
+      { iterator }
+    );
     const octokit = {
-      rest: { issues: { listForRepo: {} }, pulls: { list: {}, get: async () => ({ data: {} }) } },
-      paginate: Object.assign(async () => [], { iterator }),
+      rest: { issues: { listForRepo }, pulls: { list, get: async () => ({ data: {} }) } },
+      paginate,
     } as unknown as Octokit;
-    return { octokit, pages: () => pagesServed };
+    return { octokit, served };
   }
+  const fullPageOf = (make: (now: string) => object) => (now: string) =>
+    Array.from({ length: 100 }, () => make(now));
+  const prsOnly = fullPageOf((now) => ({ created_at: now, state: "open", pull_request: {} }));
 
-  it("stops the REST PR walk at the repo's page bound", async () => {
-    const { octokit, pages } = endlessPRs();
+  it("stops both REST walks at the repo's page bound and flags the truncation", async () => {
+    const { octokit, served } = endlessWalks(prsOnly);
     setOctokit(octokit);
 
-    const result = await collectWeeklyTrends([{ owner: "o", name: "big", maxPRPages: 3 }], 4);
+    const result = await collectWeeklyTrends([{ owner: "o", name: "big", maxPages: 3 }], 4);
 
-    expect(pages()).toBe(3);
-    expect(result.orgTrends.reduce((sum, w) => sum + w.prsOpened, 0)).toBe(3);
+    expect(served).toEqual({ issues: 3, prs: 3 });
+    expect(result.orgTrends.reduce((sum, w) => sum + w.prsOpened, 0)).toBe(300);
+    expect(result.orgTrends.reduce((sum, w) => sum + w.issuesOpened, 0)).toBe(0);
+    expect([...result.truncatedRepos]).toEqual(["o/big"]);
     expect(result.failedRepos.size).toBe(0);
+  });
+
+  it("keeps the issues from a bounded walk and flags those it left behind", async () => {
+    const { octokit } = endlessWalks(fullPageOf((now) => ({ created_at: now, state: "open" })), 1);
+    setOctokit(octokit);
+
+    const result = await collectWeeklyTrends([{ owner: "o", name: "big", maxPages: 2 }], 4);
+
+    expect(result.orgTrends.reduce((sum, w) => sum + w.issuesOpened, 0)).toBe(200);
+    expect([...result.truncatedRepos]).toEqual(["o/big"]);
+  });
+
+  it("does not flag a walk that ended on a short page at the bound", async () => {
+    const { octokit } = endlessWalks(() => [], 1);
+    setOctokit(octokit);
+
+    const result = await collectWeeklyTrends([{ owner: "o", name: "big", maxPages: 1 }], 4);
+
+    expect(result.truncatedRepos.size).toBe(0);
   });
 
   it("reports a server failure separately from an expected skip", async () => {

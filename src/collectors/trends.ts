@@ -52,6 +52,8 @@ export interface WeeklyTrendsResult {
    * opposed to the expected skips (inaccessible, 404) above.
    */
   failedRepos: Set<string>;
+  /** Full names of repos whose trends stopped at their `maxPages` bound, so undercount. */
+  truncatedRepos: Set<string>;
 }
 
 /** Create a fresh set of zero-filled week buckets starting at `startMonday`. */
@@ -137,11 +139,13 @@ export function sumWeeklyTrends(
  * (which include additions/deletions) are used instead of calling `pulls.get`
  * per merged PR, eliminating up to 200 REST detail fetches per run.
  *
- * `maxPRPages` on a repo bounds its REST pull-request walk; repos on the REST
- * fallback path set it because they are the ones too large to crawl in full.
+ * `maxPages` on a repo bounds each of its REST walks (issues, then pull
+ * requests); repos already flagged as incomplete set it because they are the
+ * ones too large to crawl in full. The issues endpoint returns pull requests
+ * too, so a PR-heavy repo needs the issue walk bounded as much as the PR one.
  */
 export async function collectWeeklyTrends(
-  repos: { owner: string; name: string; maxPRPages?: number }[],
+  repos: { owner: string; name: string; maxPages?: number }[],
   weeksBack = 12,
   maxDetailFetches = 200,
   prDataByRepo?: Map<string, GraphQLPRNode[]>
@@ -156,6 +160,7 @@ export async function collectWeeklyTrends(
   const weeks = createWeekBuckets(startMonday, weeksBack);
   const repoTrends = new Map<string, WeeklyTrendPoint[]>();
   const failedRepos = new Set<string>();
+  const truncatedRepos = new Set<string>();
 
   // cutoff = start of the oldest bucket (inclusive).
   const cutoff = startMonday;
@@ -164,7 +169,7 @@ export async function collectWeeklyTrends(
   // Budget for individual pulls.get() detail calls (to limit API fan-out).
   let detailFetchBudget = maxDetailFetches;
 
-  for (const { owner, name, maxPRPages } of repos) {
+  for (const { owner, name, maxPages } of repos) {
     const repoKey = `${owner}/${name}`;
     const prefetchedPRs = prDataByRepo?.get(repoKey);
     const repoWeeks = createWeekBuckets(startMonday, weeksBack);
@@ -173,13 +178,29 @@ export async function collectWeeklyTrends(
       // ── Issues ────────────────────────────────────────────────────────────
       // `since` filters by updated_at ≥ cutoff, which is a superset of what
       // we want. We apply created_at / closed_at checks client-side.
-      const issues = await octokit.paginate(octokit.rest.issues.listForRepo, {
+      const issueParams = {
         owner,
         repo: name,
-        state: "all",
+        state: "all" as const,
         since: cutoffIso,
         per_page: 100,
-      });
+      };
+      let issues: Awaited<ReturnType<typeof octokit.rest.issues.listForRepo>>["data"] = [];
+      if (maxPages === undefined) {
+        issues = await octokit.paginate(octokit.rest.issues.listForRepo, issueParams);
+      } else {
+        let issuePagesLeft = maxPages;
+        for await (const response of octokit.paginate.iterator(
+          octokit.rest.issues.listForRepo,
+          issueParams
+        )) {
+          issues.push(...response.data);
+          if (--issuePagesLeft <= 0) {
+            if (response.data.length >= 100) truncatedRepos.add(repoKey);
+            break;
+          }
+        }
+      }
 
       for (const issue of issues) {
         if (issue.pull_request) continue; // issues endpoint also returns PRs
@@ -248,7 +269,7 @@ export async function collectWeeklyTrends(
       } else {
         // Slow path: paginate REST pulls.list; fetch details per merged PR.
         // Sorted by updated desc so we can exit early once we pass the cutoff.
-        let pagesLeft = maxPRPages ?? Infinity;
+        let pagesLeft = maxPages ?? Infinity;
         for await (const response of octokit.paginate.iterator(
           octokit.rest.pulls.list,
           {
@@ -307,7 +328,11 @@ export async function collectWeeklyTrends(
               }
             }
           }
-          if (reachedCutoff || --pagesLeft <= 0) break;
+          if (reachedCutoff) break;
+          if (--pagesLeft <= 0) {
+            if (response.data.length >= 100) truncatedRepos.add(repoKey);
+            break;
+          }
         }
       }
 
@@ -328,5 +353,6 @@ export async function collectWeeklyTrends(
     orgTrends: [...weeks.values()].sort((a, b) => a.week.localeCompare(b.week)),
     repoTrends,
     failedRepos,
+    truncatedRepos,
   };
 }

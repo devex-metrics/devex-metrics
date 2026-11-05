@@ -24,6 +24,19 @@ function buildSearchOctokit(search: (q: string) => number | Error) {
   };
 }
 
+/** The 422 GitHub really returns when a `repo:` scope names a repository it cannot see. */
+function unsearchableRepoError() {
+  return Object.assign(new Error("Validation Failed"), {
+    status: 422,
+    response: {
+      data: {
+        message: "Validation Failed",
+        errors: [{ message: "The listed users and repositories cannot be searched either because the resources do not exist or you do not have permission to view them." }],
+      },
+    },
+  });
+}
+
 describe("collectPullRequestCounts", () => {
   afterEach(() => resetOctokit());
 
@@ -62,7 +75,30 @@ describe("collectPullRequestCounts", () => {
     setOctokit(buildSearchOctokit(() => Object.assign(new Error("Not Found"), { status: 404 })).octokit);
 
     const counts = await collectPullRequestCounts("owner", "missing-repo");
-    expect(counts).toEqual({ open: 0, closed: 0, merged: 0 });
+    expect(counts).toEqual({ open: 0, closed: 0, merged: 0, incomplete: true });
+  });
+
+  it("flags zero counts when Search cannot see the repository (422)", async () => {
+    setOctokit(buildSearchOctokit(() => unsearchableRepoError()).octokit);
+
+    const counts = await collectPullRequestCounts("owner", "gone");
+    expect(counts).toEqual({ open: 0, closed: 0, merged: 0, incomplete: true });
+  });
+
+  it("rethrows a 422 that is about the query rather than the repository", async () => {
+    setOctokit(buildSearchOctokit(() => Object.assign(new Error("Validation Failed"), { status: 422 })).octokit);
+
+    await expect(collectPullRequestCounts("owner", "repo")).rejects.toMatchObject({ status: 422 });
+  });
+
+  it("flags counts Search reports as partial, keeping the totals it did return", async () => {
+    const issuesAndPullRequests = vi.fn(async ({ q }: { q: string }) => ({
+      data: { total_count: 5, incomplete_results: q.includes("is:merged"), items: [] },
+    }));
+    setOctokit({ rest: { search: { issuesAndPullRequests } } } as unknown as Octokit);
+
+    const counts = await collectPullRequestCounts("owner", "repo");
+    expect(counts).toEqual({ open: 5, closed: 5, merged: 5, incomplete: true });
   });
 
   it("should rethrow errors that are not 404", async () => {
@@ -76,7 +112,7 @@ describe("collectPullRequestCounts", () => {
     setOctokit(buildSearchOctokit(() => Object.assign(new Error("Forbidden"), { status: 403 })).octokit);
 
     const counts = await collectPullRequestCounts("owner", "repo");
-    expect(counts).toEqual({ open: 0, closed: 0, merged: 0 });
+    expect(counts).toEqual({ open: 0, closed: 0, merged: 0, incomplete: true });
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("403"));
     warnSpy.mockRestore();
   });

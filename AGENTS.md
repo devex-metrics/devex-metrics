@@ -40,6 +40,7 @@ src/
     index.ts            # Re-exports all collectors
     repos.ts            # List repositories
     issues.ts           # Issue open/closed counts
+    search-counts.ts    # Search API totals for one repo, flagged when incomplete
     pull-requests.ts    # PR counts + detailed PR metrics
     contributors.ts     # Committer & reviewer counts (last 90 days)
     dependents.ts       # Dependent repository count

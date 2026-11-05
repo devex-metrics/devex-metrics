@@ -30,6 +30,7 @@ import { describeTransientError, isTransientCollectionError } from "./collectors
 import { loadConfig, describeConfig } from "./config.js";
 import type { DevexConfig } from "./config.js";
 import type { GraphQLPRNode, GraphQLRepoData } from "./collectors/index.js";
+import type { WeeklyTrendsResult } from "./collectors/trends.js";
 import { loadLatest } from "./history.js";
 import type {
   OrgMetrics,
@@ -50,7 +51,10 @@ interface ResolvedRepoRef {
 }
 
 export interface CollectOptions {
-  /** Skip all cached/fixture data and force a fresh API fetch. */
+  /**
+   * Skip all cached/fixture data and force a fresh API fetch. A repo that then
+   * fails still falls back to its last known metrics, flagged as not refreshed.
+   */
   skipCache?: boolean;
   /**
    * Maximum age in hours before a per-repo cache entry is considered stale
@@ -406,16 +410,18 @@ async function collectMetricsForRepoList(
   let unavailableCount = 0;
   let lastUnavailableError: unknown;
   // Read only when a repo fails: the scheduled run starts with no local cache,
-  // so the history store is usually where its last known metrics live.
-  let lastSnapshot: Map<string, RepoMetrics> | undefined;
+  // so the history store is usually where its last known metrics live. This
+  // ignores skipCache on purpose: that decides whether to collect, and this is
+  // what to show once collecting failed, which zeros would only overwrite.
+  let lastKnown: RepoMetrics[] | undefined;
   const previousMetrics = (fullName: string): RepoMetrics | undefined => {
-    if (options.skipCache) return undefined;
-    lastSnapshot ??= new Map(
-      (config.history.enabled ? (loadLatest(config.history.dir, owner)?.repos ?? []) : []).map(
-        (r): [string, RepoMetrics] => [r.fullName, r]
-      )
+    lastKnown ??= [
+      ...(loadRawCache(cacheKey)?.repos ?? []),
+      ...(config.history.enabled ? (loadLatest(config.history.dir, owner)?.repos ?? []) : []),
+    ];
+    return lastKnown.find(
+      (r) => r.fullName === fullName && r.collectionWarning?.state !== "failed"
     );
-    return cachedRepoMap.get(fullName) ?? lastSnapshot.get(fullName);
   };
 
   for (const ref of repoList) {
@@ -482,19 +488,26 @@ async function collectMetricsForRepoList(
     );
   }
 
-  const recordTrendFailures = (failed: ReadonlySet<string>): void => {
+  const trendPageBound = Math.max(1, config.collection.maxPRPages);
+  const recordTrendGaps = ({ failedRepos, truncatedRepos }: WeeklyTrendsResult): void => {
     for (const repo of repos) {
-      if (!failed.has(repo.fullName)) continue;
-      repo.weeklyTrends = [];
-      repo.collectionWarning = addGap(repo.collectionWarning, "partial", "Weekly trends could not be collected.");
+      if (failedRepos.has(repo.fullName)) {
+        repo.weeklyTrends = [];
+        repo.collectionWarning = addGap(repo.collectionWarning, "partial", "Weekly trends could not be collected.");
+      } else if (truncatedRepos.has(repo.fullName)) {
+        repo.collectionWarning = addGap(
+          repo.collectionWarning,
+          "capped",
+          `Weekly trends stop at ${trendPageBound * 100} issues and ${trendPageBound * 100} PRs, so they undercount.`
+        );
+      }
     }
   };
-  // The REST fallback's trend walk is bounded; everything else keeps its window.
-  const toTrendRepo = (r: RepoMetrics): { owner: string; name: string; maxPRPages?: number } => {
+  // A flagged repo is one too large to crawl in full, and one reused from the
+  // cache has no pre-fetched nodes, so its trends would otherwise walk all of REST.
+  const toTrendRepo = (r: RepoMetrics): { owner: string; name: string; maxPages?: number } => {
     const trendRepo = { owner: r.fullName.slice(0, r.fullName.indexOf("/")), name: r.name };
-    return r.collectionWarning?.state === "rest-fallback"
-      ? { ...trendRepo, maxPRPages: Math.max(1, config.collection.maxPRPages) }
-      : trendRepo;
+    return r.collectionWarning ? { ...trendRepo, maxPages: trendPageBound } : trendRepo;
   };
 
   // Reuse cached weekly trends if every repo came from cache and all repos
@@ -518,7 +531,7 @@ async function collectMetricsForRepoList(
       for (const repo of changed) {
         repo.weeklyTrends = result.repoTrends.get(repo.fullName) ?? [];
       }
-      recordTrendFailures(result.failedRepos);
+      recordTrendGaps(result);
     }
     weeklyTrends = sumWeeklyTrends(
       weekLabels(config.collection.historyWeeks),
@@ -546,7 +559,7 @@ async function collectMetricsForRepoList(
     for (const repo of refreshed) {
       repo.weeklyTrends = result.repoTrends.get(repo.fullName) ?? [];
     }
-    recordTrendFailures(result.failedRepos);
+    recordTrendGaps(result);
   } else {
     console.log(`Reusing cached weekly trends (all ${repos.length} repos were fresh)`);
   }
@@ -646,17 +659,22 @@ async function collectFreshRepo(
           ? collectDependentCount(repoOwner, repoName)
           : Promise.resolve(0),
       ]);
-    if (graphql !== null) {
-      collectionWarning = {
-        state: "rest-fallback",
-        detail:
-          `GraphQL unavailable (${graphql.category}), so the REST fallback was used: ` +
-          `counts are complete, the merged-PR timeline covers at most ${maxPRPages * 100} closed PRs, ` +
-          `and line counts, review timings, abandoned PRs and open-PR ages are missing or sampled. ` +
-          `Its PRs are left out of the event history until GraphQL succeeds.`,
-        requestId: graphql.requestId,
-      };
-    }
+    // Flagged even when GraphQL only returned null: these PRs are just as lean,
+    // and an unmarked one would enter the event stream and block its fuller row.
+    const countsNote =
+      issues.incomplete || prCounts.incomplete
+        ? "issue and PR counts may undercount because GitHub search could not answer in full"
+        : "counts are complete";
+    collectionWarning = {
+      state: "rest-fallback",
+      detail:
+        `GraphQL ${graphql === null ? "returned no data for this repository" : `unavailable (${graphql.category})`}, ` +
+        `so the REST fallback was used: ${countsNote}, ` +
+        `the merged-PR timeline covers at most ${maxPRPages * 100} closed PRs, ` +
+        `and line counts, review timings, abandoned PRs and open-PR ages are missing or sampled. ` +
+        `Its PRs are left out of the event history until GraphQL succeeds.`,
+      requestId: graphql?.requestId,
+    };
   }
 
   // Fetch issue lead times for PRs that reference issues

@@ -259,11 +259,14 @@ tried only when the one before it failed:
    than requests, so smaller pages do not mean less history.
 2. **Keep what arrived.** If a later page still fails, the pages already fetched
    are kept and the repository is flagged *Partial data*.
-3. **Bounded REST.** If not even the first page arrives, REST takes over: counts
-   from the Search API (a fixed number of requests) and at most
-   `DEVEX_MAX_PR_PAGES` pages of closed pull requests. REST has no cheap source
-   for line counts or review timings, so the repository is flagged *REST
-   fallback*. Its pull requests stay out of the event stream, because a lean row
+3. **Bounded REST.** If not even the first page arrives, or GraphQL returns no
+   data for the repository, REST takes over: counts from the Search API (a fixed
+   number of requests; the warning says so if search could not answer in full)
+   and at most `DEVEX_MAX_PR_PAGES` pages of closed pull requests. Weekly trends
+   for any flagged repository are held to the same number of pages for issues and
+   for pull requests, and the warning says so if that cut them short. REST has no
+   cheap source for line counts or review timings, so the repository is flagged
+   *REST fallback*. Its pull requests stay out of the event stream, because a lean row
    would permanently block the fuller one for the same pull request; the backfill
    or a later daily run can still record those.
 4. **Last known metrics.** If REST fails too, the repository keeps its metrics

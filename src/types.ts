@@ -421,12 +421,16 @@ export interface RepoCollectionWarning {
 export interface IssueCounts {
   open: number;
   closed: number;
+  /** True when the Search API could not answer in full, so these may undercount. */
+  incomplete?: boolean;
 }
 
 export interface PullRequestCounts {
   open: number;
   closed: number;
   merged: number;
+  /** True when the Search API could not answer in full, so these may undercount. */
+  incomplete?: boolean;
 }
 
 /** Detailed metrics for an individual pull request. */

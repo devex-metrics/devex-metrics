@@ -1,5 +1,6 @@
 import { getOctokit } from "../github-client.js";
 import { isCopilotLogin } from "./repo-graphql.js";
+import { countSearchMatches } from "./search-counts.js";
 import type {
   PullRequestCounts,
   PullRequestDetail,
@@ -323,33 +324,15 @@ export async function collectPullRequestCounts(
   owner: string,
   repo: string
 ): Promise<PullRequestCounts> {
-  const octokit = await getOctokit();
-  const countMatching = async (qualifiers: string): Promise<number> => {
-    const { data } = await octokit.rest.search.issuesAndPullRequests({
-      q: `repo:${owner}/${repo} type:pr ${qualifiers}`,
-      per_page: 1,
-      advanced_search: "true",
-    });
-    return Math.max(0, data.total_count);
-  };
-
-  try {
-    const [open, merged, closed] = await Promise.all([
-      countMatching("state:open"),
-      countMatching("is:merged"),
-      countMatching("is:unmerged state:closed"),
-    ]);
-    return { open, closed, merged };
-  } catch (err: unknown) {
-    const status = (err as { status?: number }).status;
-    if (status === 404 || status === 403) {
-      if (status === 403) {
-        console.warn(`  ⚠ pull-requests: skipping ${owner}/${repo}: access denied (403) — token may need SAML SSO authorization`);
-      }
-      return { open: 0, closed: 0, merged: 0 };
-    }
-    throw err;
-  }
+  const {
+    counts: [open, merged, closed],
+    incomplete,
+  } = await countSearchMatches(owner, repo, "pull-requests", [
+    "type:pr state:open",
+    "type:pr is:merged",
+    "type:pr is:unmerged state:closed",
+  ]);
+  return incomplete ? { open, closed, merged, incomplete } : { open, closed, merged };
 }
 
 /**
