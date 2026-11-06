@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-01T12:00:00Z",
+  "scanner_version": "0.2.0",
+  "provenance": {
+    "source": "github_api",
+    "snapshot": "pinned_head",
+    "analysis": "ai_only",
+    "stale_after_days": 10,
+    "capabilities": [
+      "ai_content_cues_v1",
+      "ai_commit_drift_v1",
+      "ai_kind_coverage_v1",
+      "activity_windows_v1",
+      "attention_rules_v1",
+      "configured_team_aggregate_v1"
+    ]
+  },
+  "selection": {
+    "mode": "explicit",
+    "explicit_repositories": [
+      "example/widget"
+    ],
+    "discovery": [],
+    "selected_repositories": [
+      "example/widget"
+    ]
+  },
+  "repositories": [
+    {
+      "full_name": "example/widget",
+      "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "head_committed_at": "2026-09-20T12:00:00Z",
+      "ai_files": [
+        {
+          "path": "AGENTS.md",
+          "kind": "agents",
+          "sha256": "cd3aba83f15a8a78352153c4cce945041362406a043b060f9081d8b34646fe3e",
+          "last_changed": "2026-09-01T12:00:00Z",
+          "status": "known",
+          "evidence": {
+            "source": "github_api",
+            "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "blob_sha": "9ac4e5013892cca3b91c914022c95eafb3232f5b",
+            "last_commit_sha": "dddddddddddddddddddddddddddddddddddddddd"
+          },
+          "content_signal": {
+            "score": 100,
+            "scope": true,
+            "actions": true,
+            "verification": true,
+            "guardrails": true
+          },
+          "commits_since": 1,
+          "age_days": 30,
+          "lag_days": 19,
+          "stale": true,
+          "commits_since_change": 2
+        }
+      ],
+      "ai_summary": {
+        "count": 1,
+        "stale_count": 1,
+        "max_lag_days": 19,
+        "unknown_count": 0,
+        "status": "known",
+        "min_age_days": 30,
+        "max_age_days": 30,
+        "min_lag_days": 19,
+        "min_commits_since": 1,
+        "max_commits_since": 1,
+        "history_known_count": 1,
+        "commits_since_known_count": 1,
+        "commits_since_change_known_count": 1,
+        "content_scored_count": 1,
+        "content_signal_mean": 100.0,
+        "by_kind": [
+          {
+            "kind": "agent",
+            "count": 0,
+            "known_count": 0,
+            "stale_count": 0,
+            "unknown_count": 0
+          },
+          {
+            "kind": "agents",
+            "count": 1,
+            "known_count": 1,
+            "stale_count": 1,
+            "unknown_count": 0
+          },
+          {
+            "kind": "chatmode",
+            "count": 0,
+            "known_count": 0,
+            "stale_count": 0,
+            "unknown_count": 0
+          },
+          {
+            "kind": "claude",
+            "count": 0,
+            "known_count": 0,
+            "stale_count": 0,
+            "unknown_count": 0
+          },
+          {
+            "kind": "copilot_instructions",
+            "count": 0,
+            "known_count": 0,
+            "stale_count": 0,
+            "unknown_count": 0
+          },
+          {
+            "kind": "cursor",
+            "count": 0,
+            "known_count": 0,
+            "stale_count": 0,
+            "unknown_count": 0
+          },
+          {
+            "kind": "gemini",
+            "count": 0,
+            "known_count": 0,
+            "stale_count": 0,
+            "unknown_count": 0
+          },
+          {
+            "kind": "mcp",
+            "count": 0,
+            "known_count": 0,
+            "stale_count": 0,
+            "unknown_count": 0
+          },
+          {
+            "kind": "prompt",
+            "count": 0,
+            "known_count": 0,
+            "stale_count": 0,
+            "unknown_count": 0
+          },
+          {
+            "kind": "skill",
+            "count": 0,
+            "known_count": 0,
+            "stale_count": 0,
+            "unknown_count": 0
+          },
+          {
+            "kind": "tool_config",
+            "count": 0,
+            "known_count": 0,
+            "stale_count": 0,
+            "unknown_count": 0
+          },
+          {
+            "kind": "waza",
+            "count": 0,
+            "known_count": 0,
+            "stale_count": 0,
+            "unknown_count": 0
+          },
+          {
+            "kind": "windsurf",
+            "count": 0,
+            "known_count": 0,
+            "stale_count": 0,
+            "unknown_count": 0
+          }
+        ]
+      },
+      "activity": {
+        "commits_30d": 2,
+        "commits_90d": 2,
+        "complete": true
+      },
+      "team_activity": {
+        "available": false,
+        "complete": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "commits_30d": null,
+        "commits_90d": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "AI files exceed the configured lag threshold"
+        ]
+      }
+    }
+  ],
+  "edges": [],
+  "references": [],
+  "capability_warnings": [
+    "Static content cues measure textual coverage, not quality, effectiveness or tool setup validity",
+    "Team attribution is opt-in exact local author-email matching; API linked-author attribution remains caller enrichment",
+    "Activity and AI signals may be unknown at request/file budgets; null is not zero",
+    "API analysis is AI-only; source inventory, artifact candidates and repository references are not analyzed"
+  ]
+}

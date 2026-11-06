@@ -1,4 +1,4 @@
-import type { LandscapeFile, LandscapeRepoView, LandscapeRunStatus, OrgMetrics, RepoMetrics } from "../types.js";
+import type { LandscapeFile, LandscapeFileDelta, LandscapeRepoView, LandscapeRunStatus, OrgMetrics, RepoMetrics } from "../types.js";
 import { escapeHtml } from "./utils.js";
 
 interface TriageRow {
@@ -88,7 +88,7 @@ function unknownLabel(reason: LandscapeRepoView["reason"]): string {
   }
 }
 
-function fileRow(file: LandscapeFile, added: Set<string>, changed: Set<string>): string {
+function fileRow(file: LandscapeFile, added: Set<string>, changed: Set<string>, delta?: LandscapeFileDelta): string {
   const change = added.has(file.path)
     ? "Added"
     : changed.has(file.path)
@@ -101,18 +101,21 @@ function fileRow(file: LandscapeFile, added: Set<string>, changed: Set<string>):
   const lag = file.lag_days === null ? "Unknown" : `${file.lag_days} d`;
   const signal = file.stale === null ? "Unknown" : file.stale ? "Older signal" : "Within threshold";
   const rubric = file.content_signal;
-  const cues = rubric === null || rubric === undefined ? `<span class="landscape-unknown">Unknown</span>` :
+  const cues = rubric === null || rubric === undefined ? `<span class="landscape-unknown">Unknown</span>${file.content_signal_reason
+    ? `<span class="landscape-secondary">${escapeHtml(file.content_signal_reason)}</span>` : ""}` :
     `${rubric.score}/100<span class="landscape-secondary">${([
       ["Scope", rubric.scope], ["Actions", rubric.actions],
       ["Checks", rubric.verification], ["Guardrails", rubric.guardrails],
     ] as const).filter(([, present]) => present).map(([name]) => name).join(" · ") || "No rubric cues found"}</span>`;
   const rowClass = older ? ' class="landscape-file-attention"' : "";
+  const difference = (value: number | null) => value === null ? "Unknown" : `${value >= 0 ? "+" : ""}${value}`;
+  const deltas = delta ? `<span class="landscape-secondary">Delta: age ${difference(delta.age_days)} d; lag ${difference(delta.lag_days)} d; graph ${difference(delta.commits_since)}; inclusive ${difference(delta.commits_since_change)}; cues ${difference(delta.content_score)}</span>` : "";
   return `<tr${rowClass}>
     <td class="landscape-path">${escapeHtml(file.path)}</td>
     <td>${escapeHtml(file.kind)}</td>
     <td>${file.last_changed ? `<time datetime="${escapeHtml(file.last_changed)}">${escapeHtml(file.last_changed.slice(0, 10))}</time>` : "Unknown"}</td>
     <td>${age}</td><td>${lag}</td><td>${signal}</td>
-    <td>${countCell(file.commits_since_change, movedOn)}</td><td>${cues}</td><td>${change}</td>
+    <td>${countCell(file.commits_since_change, movedOn)}</td><td>${countCell(file.commits_since)}</td><td>${cues}</td><td>${change}${deltas}</td>
   </tr>`;
 }
 
@@ -149,8 +152,8 @@ function observedRow(item: TriageRow, attributes: string, index: number): string
     : "";
   const fileTable = files.length
     ? `<div class="landscape-file-scroll"><table class="landscape-file-table">
-      <thead><tr><th scope="col">Path</th><th scope="col">Kind</th><th scope="col">Last changed</th><th scope="col">Age</th><th scope="col">Lag</th><th scope="col">Age signal</th><th scope="col">Commits since change</th><th scope="col">Quality cues</th><th scope="col">Drift</th></tr></thead>
-      <tbody>${files.map((file) => fileRow(file, added, changed)).join("")}</tbody>
+      <thead><tr><th scope="col">Path</th><th scope="col">Kind</th><th scope="col">Last changed</th><th scope="col">Age</th><th scope="col">Lag</th><th scope="col">Age signal</th><th scope="col" title="Inclusive committer-timestamp range, including the path change">Commits since change</th><th scope="col" title="Reachable last-path-commit..HEAD range, excluding the path commit">Graph commits since</th><th scope="col">Quality cues</th><th scope="col">Drift</th></tr></thead>
+      <tbody>${files.map((file) => fileRow(file, added, changed, drift?.file_deltas?.find((delta) => delta.path === file.path))).join("")}</tbody>
     </table></div>`
     : `<p class="landscape-note">No AI instruction files observed at this commit.</p>`;
   const removed = drift?.removed.length
@@ -163,6 +166,12 @@ function observedRow(item: TriageRow, attributes: string, index: number): string
     item.oldestAge === null ? "Unknown age" : `Oldest ${item.oldestAge} d`;
   const lag = summary.count === 0 ? "No observed files" :
     summary.max_lag_days === null ? "Unknown lag" : `Lag up to ${summary.max_lag_days} d`;
+  const coverage = summary.by_kind?.filter((kind) => kind.count > 0).map((kind) =>
+    `${escapeHtml(kind.kind)}: ${kind.count} observed, ${kind.known_count} known history, ${kind.stale_count} older, ${kind.unknown_count} unknown`
+  ).join("; ");
+  const scannerAttention = row.attention
+    ? `<p class="landscape-note">Scanner rules: ${escapeHtml(row.attention.priority)} priority; ${escapeHtml(row.attention.activity)} activity${row.attention.reasons.length
+      ? `; ${row.attention.reasons.map(escapeHtml).join("; ")}` : ""}. Separate from DevEx attention ordering.</p>` : "";
   // The file table lives in its own full-width row; landscape-controls.js keeps it
   // attached to its repository row through sorting and pagination.
   const detailId = `landscape-detail-${index}`;
@@ -183,7 +192,7 @@ function observedRow(item: TriageRow, attributes: string, index: number): string
     <td><button type="button" class="landscape-toggle" aria-expanded="false" aria-controls="${detailId}" aria-label="View AI instruction files for ${escapeHtml(row.fullName)}">View files</button></td>
   </tr>
   <tr class="landscape-detail-row" id="${detailId}" hidden><td colspan="11">
-      ${fileTable}${removed}
+      ${fileTable}${removed}${coverage ? `<p class="landscape-note">Observed kind coverage: ${coverage}. Absent kinds are not mandatory requirements.</p>` : ""}${scannerAttention}
   </td></tr>`;
 }
 
@@ -296,7 +305,7 @@ export function buildLandscapeSection(
       <div><strong>${historyUnknown}</strong><span>History incomplete</span></div>
       <div><strong>${unknown}</strong><span>Observation unknown</span></div>
     </div>
-    <p class="landscape-context">Overview categories can overlap. Git commits (30d / 90d) come from pinned-head history ending at the AI scan time; team counts need a complete linked-author history and an explicit GitHub-handle roster. Triage prefers Git activity, falling back to observed merged PRs / 90d at the DevEx collection time when Git history is unknown. The PR timeline can be incomplete. Quality cues score observable content, not correctness: 25 points each for scope, actions, checks and guardrails in hash-verified content. Commits since change include the file's last-changed date, and older age is not evidence of incorrect instructions. Unknown never means zero; this view ignores dashboard PR period and bot filters.${scannedBy}</p>
+    <p class="landscape-context">Overview categories can overlap. Git commits (30d / 90d) come from pinned-head history ending at the AI scan time; team counts need a complete linked-author history and an explicit GitHub-handle roster. Triage prefers Git activity, falling back to observed merged PRs / 90d at the DevEx collection time when Git history is unknown. The PR timeline can be incomplete. Quality cues score observable content, not correctness: 25 points each for scope, actions, checks and guardrails in hash-verified content. Commits since change include the file's last-changed date; graph commits since count last-path-commit..HEAD, excluding the path commit. These counts are not interchangeable. Numeric deltas require both observations; missing legacy facts stay Unknown. Older age is not evidence of incorrect instructions. Unknown never means zero; this view ignores dashboard PR period and bot filters.${scannedBy}</p>
     <div class="landscape-sort-toolbar"><span id="landscapeSortStatus" aria-live="polite">Attention first</span><button type="button" id="landscapeSortReset" aria-controls="landscapeRows" disabled>Restore attention order</button></div>` : ""}
     ${content}
   </section>`;

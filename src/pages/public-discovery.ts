@@ -1,5 +1,6 @@
 import type {
   PublicDiscoveryConnection,
+  PublicDiscoveryReference,
   PublicDiscoveryRepoView,
   PublicDiscoveryRunStatus,
 } from "../types.js";
@@ -66,9 +67,21 @@ function row(view: PublicDiscoveryRepoView, index: number): string {
   const delta = view.delta
     ? `Compared with ${escapeHtml(view.delta.compared_at.slice(0, 10))}: ${signedDelta(view.delta.files)} files; ${signedDelta(view.delta.source_loc)} source LOC. Commit window counts are rolling, not cumulative (${signedDelta(view.delta.commits_90d)} difference).`
     : "First successful observation; no comparison yet.";
+  const activity = observed.activity;
+  const elapsed = activity
+    ? `<p>Elapsed windows, inclusive at scan time: ${activity.complete
+      ? `${activity.commits_30d} / ${activity.commits_90d} commits (30d / 90d)`
+      : "Unknown; history incomplete"}. Separate from the calendar-day trend.</p>` : "";
+  const team = observed.team_activity;
+  const localTeam = team ? `<p>Configured local-email activity: ${team.available && team.complete
+    ? `${team.commits_30d} / ${team.commits_90d} commits (30d / 90d)`
+    : "Unknown; roster unavailable or history incomplete"}. Exact author-email matching, not linked GitHub handles.</p>` : "";
+  const attention = observed.attention
+    ? `<p>Scanner rules: ${escapeHtml(observed.attention.priority)} priority; ${escapeHtml(observed.attention.activity)} activity${observed.attention.reasons.length
+      ? `; ${observed.attention.reasons.map(escapeHtml).join("; ")}` : ""}. Maintenance signals, not a correctness assessment.</p>` : "";
   return `<tr${index >= 20 ? " hidden" : ""}>${repo}
     <td>${compact(observed.files)} files · ${compact(observed.bytes)} bytes · ${compact(observed.source_loc)} LOC
-      <details class="discovery-detail"><summary>Languages &amp; comparison</summary><p>${languages}</p><p>${delta}</p><p>Head ${escapeHtml(observed.head_sha.slice(0, 12))}</p></details></td>
+      <details class="discovery-detail"><summary>Languages &amp; comparison</summary><p>${languages}</p><p>${delta}</p>${elapsed}${localTeam}${attention}<p>Head ${escapeHtml(observed.head_sha.slice(0, 12))}</p></details></td>
     <td>${compact(observed.commits_30d)} / ${compact(observed.commits_90d)} ${trend(observed.commits_90d_trend)}<span class="discovery-authors">${compact(observed.contributor_count)} lifetime commit authors</span></td>
     <td>${compact(observed.adr_count)}</td>
     <td>${compact(observed.manifest_count)} manifests · ${compact(observed.produces_count)} produces · ${compact(observed.consumes_count)} consumes</td></tr>`;
@@ -78,7 +91,8 @@ function row(view: PublicDiscoveryRepoView, index: number): string {
 export function buildPublicDiscoverySection(
   rows: readonly PublicDiscoveryRepoView[],
   connections: readonly PublicDiscoveryConnection[],
-  status?: PublicDiscoveryRunStatus
+  status?: PublicDiscoveryRunStatus,
+  references?: readonly PublicDiscoveryReference[]
 ): string {
   const observed = rows.filter((view) => view.status === "observed").length;
   const asOf = status?.last_success_at;
@@ -98,6 +112,10 @@ export function buildPublicDiscoverySection(
           .join("")}</ul></li>`
     )
     .join("");
+  const mentions = references?.map((reference) =>
+    `<li><strong>${escapeHtml(reference.source)}</strong> mentions <strong>${escapeHtml(reference.target)}</strong>` +
+    ` in ${escapeHtml(reference.evidence.path)}:${reference.evidence.line} at ${escapeHtml(reference.evidence.head_sha.slice(0, 12))}` +
+    ` (low confidence; repository reference, not a dependency).</li>`).join("") ?? "";
   return `<section class="card discovery-section" id="public-discovery" aria-labelledby="discovery-heading">
     <div class="landscape-heading"><div><h2 id="discovery-heading">Public repository discovery</h2>
       <p class="metric-lede">Full-history facts at pinned public repository heads. Source LOC and ADR detection are estimates; commits are separate from DevEx PR/issue metrics and do not follow their filters.</p></div>
@@ -118,6 +136,7 @@ export function buildPublicDiscoverySection(
         : `<p class="landscape-empty">No repositories selected for DevEx collection.</p>`
     }
     ${links ? `<div class="discovery-connections"><h3>Possible public connections</h3><p class="landscape-note">Artifact matches from manifests and CI configuration are heuristic; file evidence is from verified-public repositories only. Artifact identifiers are intentionally omitted.</p><ul>${links}</ul></div>` : ""}
+    ${mentions ? `<div class="discovery-connections"><h3>Repository references</h3><p class="landscape-note">Textual mentions between selected public repositories only. These are not verified dependencies; matched text is omitted.</p><ul>${mentions}</ul></div>` : ""}
   </section>`;
 }
 

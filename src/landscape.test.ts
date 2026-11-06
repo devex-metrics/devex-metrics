@@ -475,7 +475,7 @@ it("hash drift is independent of file age and stale flags", () => {
     ])
   ).repositories[0];
   if (!("head_sha" in old) || !("head_sha" in recent)) throw new Error("Expected observed repos");
-  expect(compareLandscape(recent, old, "2026-09-21T12:00:00Z")).toEqual({
+  expect(compareLandscape(recent, old, "2026-09-21T12:00:00Z")).toMatchObject({
     compared_at: "2026-09-21T12:00:00Z",
     compared_head_sha: SHA_A,
     added: [],

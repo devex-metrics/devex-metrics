@@ -41,7 +41,7 @@ export interface OrgMetrics {
   trial?: TrialSummary;
 }
 
-/** Sanitized, portable v1 repo-landscape scan; never contains file contents or evidence. */
+/** Sanitized, portable v1 repo-landscape scan; never contains file contents or identities. */
 export interface LandscapeScan {
   /** Portable JSON contract version. */
   schema_version: 1;
@@ -51,6 +51,10 @@ export interface LandscapeScan {
   scanner_version: string;
   /** Public repositories observed or explicitly reported unavailable. */
   repositories: (LandscapeRepository | LandscapeUnavailableRepository)[];
+  /** Recognized optional scanner capabilities; absent in legacy snapshots. */
+  capabilities?: string[];
+  /** Fixed scanner caveats only; arbitrary diagnostics are not retained. */
+  capability_warnings?: string[];
 }
 
 /** An explicitly denied or failed scan; it carries no file or path data. */
@@ -71,6 +75,12 @@ export interface LandscapeRepository {
   ai_files: LandscapeFile[];
   /** Counts derived from the observed files. */
   ai_summary: LandscapeSummary;
+  /** Inclusive elapsed-window counts from the portable scanner, separate from calendar trends. */
+  activity?: LandscapeActivity;
+  /** Local author-email aggregates, never equivalent to linked GitHub-handle counts. */
+  team_activity?: LandscapeTeamActivity;
+  /** Scanner's deterministic attention rules, separate from DevEx's PR-aware ordering. */
+  attention?: LandscapeAttention;
   /** Git-history commits in the 30 days ending at generated_at; null if unmeasured. */
   commits_30d?: number | null;
   /** Git-history commits in the 90 days ending at generated_at; null if unmeasured. */
@@ -117,6 +127,10 @@ export interface LandscapeFile {
   commits_since_change?: number | null;
   /** Hash-verified static content rubric, or null when unavailable. */
   content_signal?: LandscapeContentSignal | null;
+  /** Reachable graph commits in last_path_commit..HEAD, excluding the path commit. */
+  commits_since?: number | null;
+  /** Fixed explanation of unavailable content cues, never source text. */
+  content_signal_reason?: string;
 }
 
 /** File counts and known/unknown age-signal coverage. */
@@ -131,6 +145,74 @@ export interface LandscapeSummary {
   unknown_count: number;
   /** Known or partial_unknown when one or more file histories are unknown. */
   status: "known" | "partial_unknown";
+  /** Minimum known age, or null if no age is known. */
+  min_age_days?: number | null;
+  /** Maximum known age, or null if no age is known. */
+  max_age_days?: number | null;
+  /** Minimum known head lag, or null if no lag is known. */
+  min_lag_days?: number | null;
+  /** Minimum known graph-range drift, not an inclusive timestamp count. */
+  min_commits_since?: number | null;
+  /** Maximum known graph-range drift, not an inclusive timestamp count. */
+  max_commits_since?: number | null;
+  /** Files with known history status. */
+  history_known_count?: number;
+  /** Files with a known graph-range count. */
+  commits_since_known_count?: number;
+  /** Files with a known inclusive timestamp count. */
+  commits_since_change_known_count?: number;
+  /** Files with scored content cues. */
+  content_scored_count?: number;
+  /** Mean cue score; null for empty or partially scored file sets. */
+  content_signal_mean?: number | null;
+  /** Coverage of each observed kind, not a list of mandatory instruction kinds. */
+  by_kind?: LandscapeKindCoverage[];
+}
+
+/** Historical coverage for an observed instruction kind. */
+export interface LandscapeKindCoverage {
+  /** Scanner classification. */
+  kind: string;
+  /** Observed file count. */
+  count: number;
+  /** Files with known history. */
+  known_count: number;
+  /** Files with older age signals. */
+  stale_count: number;
+  /** Files with unknown history. */
+  unknown_count: number;
+}
+
+/** Inclusive elapsed 30/90-day commit windows at the scan's pinned head. */
+export interface LandscapeActivity {
+  /** Commits in the elapsed 30-day window, or null if unavailable. */
+  commits_30d: number | null;
+  /** Commits in the elapsed 90-day window, or null if unavailable. */
+  commits_90d: number | null;
+  /** Whether the scanner established complete coverage. */
+  complete: boolean;
+  /** Fixed explanation for missing history, when supplied. */
+  unknown_reason?: string;
+}
+
+/** Explicitly configured local-email aggregate; no author identities are retained. */
+export interface LandscapeTeamActivity extends LandscapeActivity {
+  /** Whether a local-email roster was available. */
+  available: boolean;
+  /** Matching methodology, not GitHub account attribution. */
+  matching: "exact_author_email" | "unavailable";
+  /** Lifetime matching reachable commit count, or null if unavailable. */
+  commit_count: number | null;
+}
+
+/** Deterministic scanner triage, not a quality or correctness assessment. */
+export interface LandscapeAttention {
+  /** Activity band from scanner elapsed commit windows. */
+  activity: "high" | "medium" | "low" | "unknown";
+  /** Rule-derived review priority, never an AI-generated judgement. */
+  priority: "high" | "medium" | "low" | "unknown";
+  /** Fixed rule explanations without source text. */
+  reasons: string[];
 }
 
 /** Observed path changes relative to the last successful scan of this repo. */
@@ -145,6 +227,24 @@ export interface LandscapeDrift {
   removed: string[];
   /** Paths whose SHA-256 changed at the same path. */
   content_changed: string[];
+  /** Numeric changes for comparable paths; old missing facts stay null, not zero. */
+  file_deltas?: LandscapeFileDelta[];
+}
+
+/** Changes in measured facts for one path across two successful observations. */
+export interface LandscapeFileDelta {
+  /** Relative Git path. */
+  path: string;
+  /** Change in file age, or null without both measurements. */
+  age_days: number | null;
+  /** Change in head lag, or null without both measurements. */
+  lag_days: number | null;
+  /** Change in graph-range drift, or null without both measurements. */
+  commits_since: number | null;
+  /** Change in inclusive timestamp drift, or null without both measurements. */
+  commits_since_change: number | null;
+  /** Change in content cue score, or null without both measurements. */
+  content_score: number | null;
 }
 
 /** A DevEx repository joined to landscape observations, including unknowns. */
@@ -179,6 +279,10 @@ export interface LandscapeRepoView {
   qualityScore?: number | null;
   /** Number of files with hash-verified rubric scores. */
   qualityScored?: number;
+  /** Portable elapsed-window coverage and source, when supplied by the scanner. */
+  activity?: LandscapeActivity;
+  /** Optional scanner triage, not a replacement for DevEx attention ordering. */
+  attention?: LandscapeAttention;
 }
 
 /** Outcome of the most recent landscape scan attempt, stored beside latest.json. */
@@ -205,6 +309,12 @@ export interface PublicDiscoveryScan {
   repositories: PublicDiscoveryRepository[];
   /** Evidence-based, heuristic connections between scanned public repositories. */
   connections: PublicDiscoveryConnection[];
+  /** Selected-repository textual references, never artifact dependency edges. */
+  references?: PublicDiscoveryReference[];
+  /** Recognized optional scanner capabilities. */
+  capabilities?: string[];
+  /** Fixed scanner caveats; arbitrary parser diagnostics are not published. */
+  capability_warnings?: string[];
 }
 
 /** A bounded public repository inventory with no README body or author identities. */
@@ -237,6 +347,12 @@ export interface PublicDiscoveryRepository {
   produces_count: number;
   /** Count of consumed artifacts detected from manifests and CI configuration. */
   consumes_count: number;
+  /** Optional elapsed-window activity; legacy commits/trends remain calendar-day counts. */
+  activity?: LandscapeActivity;
+  /** Optional local-email aggregates, separate from linked GitHub-handle activity. */
+  team_activity?: LandscapeTeamActivity;
+  /** Optional rule-based scanner triage, independent of the AI-only scan. */
+  attention?: LandscapeAttention;
 }
 
 /** Evidence paths for one heuristic consumer-to-producer connection. */
@@ -247,6 +363,20 @@ export interface PublicDiscoveryConnection {
   target: string;
   /** At most two matched manifest or CI file-path pairs, with artifact names stripped. */
   evidence: { consumer_file: string; producer_file: string }[];
+}
+
+/** Low-confidence textual reference between selected public repositories. */
+export interface PublicDiscoveryReference {
+  /** Public repository containing the reference. */
+  source: string;
+  /** Selected public repository being mentioned. */
+  target: string;
+  /** Explicitly not a dependency claim. */
+  kind: "repository reference";
+  /** Textual mentions are low-confidence relationships. */
+  confidence: "low";
+  /** Location only; no matched text, URLs, author identities, or file contents. */
+  evidence: { path: string; line: number; head_sha: string };
 }
 
 /** A DevEx repository joined with a discovery observation, including unknown states. */

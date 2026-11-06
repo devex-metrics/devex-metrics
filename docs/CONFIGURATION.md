@@ -441,6 +441,38 @@ Existing portable scanner v1 input stays v1; sanitized history and the `landscap
 array gain only optional, numeric/null signal fields and boolean rubric flags.
 Older snapshots show Unknown rather than invented measurements.
 
+**Additive scanner compatibility:** the installed package and lockfile remain on
+the released `@devex-metrics/repo-landscape` 0.1.2 line. The adapter also accepts
+the proposed 0.2.0 schema-1 capability contract, exercised against actual generated
+API and full-local synthetic fixtures; adopting that release is a separate step
+after it is published. The fixtures match signed CLI commit
+`c426c159097ec6c29119501a2623dac310b91d07` from
+[devex-metrics/repo-landscape-cli#12](https://github.com/devex-metrics/repo-landscape-cli/pull/12).
+Scanner version must still exactly match the installed
+package at ingestion. No workflow pin, repository selection, authorization,
+hosting or privacy behavior changes.
+
+Portable content cues, commit drift, kind coverage, elapsed activity and scanner
+attention are accepted only when their corresponding `provenance.capabilities`
+are declared. The adapter validates/recomputes summaries from the allowlisted
+files and retains fixed caveats, never arbitrary content, author identifiers or
+diagnostic text. Known portable facts are preserved; bounded authenticated
+enrichment fills missing path timestamps, inclusive commit counts and content scores and still
+collects configured linked-GitHub-handle team counts. Complete portable facts
+avoid duplicate content/history requests when no handle roster is configured.
+API history beyond the CLI's 500-commit completeness budget may therefore still
+receive verified GraphQL counts. Missing facts remain Unknown.
+
+The file details distinguish **graph commits since** (`last_path_commit..HEAD`,
+excluding the path commit) from **commits since change** (inclusive committer
+timestamps from `last_changed` through `generated_at`). They are not substituted
+for one another. Per-kind coverage counts known/unknown temporal history, not
+scored content; zero for an absent kind is not a missing mandatory requirement.
+Scanner attention bands/reasons are shown separately and do not replace DevEx's
+existing PR-aware attention order. Per-file numeric deltas are recomputed against
+DevEx's own prior successful snapshot; missing legacy measurements or missing
+paths produce null/Unknown, not zero or a claimed removal of a measurement.
+
 The **merged PRs / 90d** column comes from each repository's DevEx
 `mergedPRTimeline` within the 90 days ending at `OrgMetrics.collectedAt`.
 It counts observed PRs, including bot-authored ones, not Git commits or
@@ -456,6 +488,23 @@ The landscape's 90-day window does not change with dashboard period or
 bot filters; `data.json` is unchanged.
 
 ## Full-history public repository discovery (opt-in)
+
+Capability-declared full-local elapsed activity, rule-based attention and optional
+exact-author-email team aggregates are preserved independently in public
+discovery's sanitized JSON and detail view. Its existing `git` calendar-day
+30/90-day counts and trend remain unchanged: an elapsed window includes its
+boundary instant and can differ from a calendar-day total. Local-email aggregates
+are explicitly labeled and never populate the AI panel's linked-GitHub-handle
+team counts.
+
+Optional **repository references** are a separate low-confidence list, not
+artifact dependency connections. Only selected public source/target repositories,
+a safe evidence path, positive line number and source pinned HEAD are retained;
+matched text and identifiers are omitted. References are re-filtered/scrubbed with
+both endpoints on every selection/privacy change. Existing parser failures or
+partial analysis still reject a scan; recognized fixed methodology caveats and
+count-only unmatched-artifact diagnostics are not parser failures. No full-local
+observation is joined into the independently timed AI-only scan.
 
 This is **separate** from `DEVEX_FEATURE_LANDSCAPE`: enabling either feature
 does not enable or alter the other. The new panel appears after all DevEx and
