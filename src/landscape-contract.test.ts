@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { spawnSync } from "node:child_process";
 import type { Octokit } from "@octokit/rest";
 import {
   compareLandscape, loadLandscapeView, parseLandscapeScan, saveLandscapeScan,
@@ -327,4 +328,70 @@ describe("additive schema-1 readiness compatibility", () => {
     repositories[0].analysis_warnings = [{ path: "package.json", reason: "Malformed JSON" }];
     expect(() => validatePublicDiscoveryOutput(raw, data, config, heads)).toThrow(/missing or partial/);
   });
+
+  it("runs the installed 0.2.0 CLI against pinned local Git checkouts and validates its output", () => {
+    const names = ["example/consumer", "example/widget"];
+    const repositoriesDir = path.join(root, "clones");
+    const heads: Record<string, string> = {};
+    for (const fullName of names) {
+      const checkout = path.join(repositoriesDir, ...fullName.split("/"));
+      fs.mkdirSync(checkout, { recursive: true });
+      fs.writeFileSync(path.join(checkout, "AGENTS.md"),
+        "# Scope\nThis repository documents its purpose.\n- Run npm test\n# Checks\nNever skip validation.\n");
+      fs.writeFileSync(path.join(checkout, "README.md"),
+        fullName === "example/consumer"
+          ? "This consumer has a reference to example/widget.\n"
+          : "This repository provides its own implementation.\n");
+      const git = (args: string[], env: NodeJS.ProcessEnv = {}) => {
+        const result = spawnSync("git", args, {
+          cwd: checkout, encoding: "utf8", env: { ...process.env, ...env },
+        });
+        if (result.status !== 0) throw new Error(result.stderr || `git ${args.join(" ")} failed`);
+        return result.stdout.trim();
+      };
+      git(["init", "--initial-branch=main"]);
+      git(["config", "user.name", "Integration Test"]);
+      git(["config", "user.email", "integration@example.invalid"]);
+      git(["remote", "add", "origin", `https://github.com/${fullName}.git`]);
+      git(["add", "."]);
+      git(["-c", "user.name=Integration Test", "-c", "user.email=integration@example.invalid",
+        "commit", "-m", "fixture"], {
+        GIT_AUTHOR_DATE: "2026-10-01T12:00:00Z",
+        GIT_COMMITTER_DATE: "2026-10-01T12:00:00Z",
+      });
+      const head = git(["rev-parse", "HEAD"]);
+      git(["update-ref", "refs/remotes/origin/main", head]);
+      heads[fullName] = head;
+    }
+
+    const configPath = path.join(root, "landscape.config.json");
+    const headsPath = path.join(root, "heads.json");
+    const outputPath = path.join(root, "landscape.json");
+    fs.writeFileSync(configPath, JSON.stringify({
+      schema_version: 1, repositories: names, stale_after_days: 90,
+    }));
+    fs.writeFileSync(headsPath, JSON.stringify(heads));
+    const bin = path.resolve("node_modules", "@devex-metrics", "repo-landscape",
+      "bin", "repo-landscape.mjs");
+    const run = spawnSync(process.execPath, [bin, "scan", "--config", configPath,
+      "--repos-dir", repositoriesDir, "--expected-heads", headsPath,
+      "--output", outputPath, "--as-of", "2026-10-02T12:00:00Z"], {
+      cwd: process.cwd(), encoding: "utf8", timeout: 60_000,
+    });
+    expect(run.error).toBeUndefined();
+    expect(run.status, run.stderr).toBe(0);
+    const actual = JSON.parse(fs.readFileSync(outputPath, "utf8")) as unknown;
+    const parsed = validatePublicDiscoveryOutput(actual, selection(names), defaultConfig(), heads);
+    expect(parsed.scanner_version).toBe("0.2.0");
+    expect(parsed.repositories).toHaveLength(2);
+    expect(parsed.repositories.every((repo) => repo.activity?.complete)).toBe(true);
+    expect(parsed.repositories.every((repo) => repo.team_activity?.matching === "unavailable")).toBe(true);
+    expect(JSON.stringify(parsed)).not.toContain("integration@example.invalid");
+    expect(parsed.connections).toEqual([]);
+    expect(parsed.references).toContainEqual({
+      source: "example/consumer", target: "example/widget",
+      kind: "repository reference", confidence: "low",
+      evidence: { path: "README.md", line: 1, head_sha: heads["example/consumer"] },
+    });
+  }, 30_000);
 });
