@@ -27,9 +27,10 @@ a{color:var(--accent)}
   padding:2.5rem 2rem;text-align:center;margin-bottom:2rem}
 @media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .hero{background:linear-gradient(135deg,#1158a7 0%,#6639ba 100%)}}
 :root[data-theme="dark"] .hero{background:linear-gradient(135deg,#1158a7 0%,#6639ba 100%)}
-.theme-toggle{background:#fff;border:1px solid #fff;color:#4c2889;
-  border-radius:1.5rem;padding:.3rem .85rem;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit}
-.theme-toggle:hover{background:#efe8fb;border-color:#efe8fb}
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;
+  background:transparent;border:0;color:#fff;border-radius:50%;cursor:pointer;opacity:.85;transition:opacity .15s,background .15s}
+.theme-toggle:hover{opacity:1;background:rgba(255,255,255,.22)}
+.theme-toggle:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .hero h1{font-size:1.8rem;font-weight:700;margin-bottom:.35rem}
 .subtitle{font-size:1rem;font-weight:600;opacity:.85;text-align:left}
 .subtitle-mid,.subtitle-bottom{font-size:.85rem;font-weight:400;opacity:.82;margin-top:.2rem}
