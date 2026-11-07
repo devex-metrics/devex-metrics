@@ -71,3 +71,132 @@ jobs:
         if: always()
         run: node scripts/coverage-summary.mjs >> $GITHUB_STEP_SUMMARY
 
+
+  # Which paths changed, for the path-gated job below. The site build reads
+  # every type and the config, so any src/ change can move the dashboard.
+  check-changes:
+    name: Check changed paths
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    outputs:
+      dashboard-relevant: ${{ steps.filter.outputs.dashboard-relevant }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            dashboard-relevant:
+              - 'src/**'
+              - '.nvmrc'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'tsconfig.json'
+              - '.github/skills/visual-dashboard-diff/**'
+              - '.github/workflows/ci.yml'
+              - '.github/workflows/dependencies/playwright/**'
+              # The screenshot-comment publisher: ui-checks unit-tests it, and
+              # ui-checks-comment.yml runs it from the default branch.
+              - '.github/workflows/scripts/visual-diff-comment*'
+
+  # Renders the dashboard at the PR's merge base and at its head, screenshots
+  # both and uploads before/after/diff images. The comment on the PR is posted
+  # by ui-checks-comment.yml (a workflow_run workflow that runs from main with
+  # the secrets this job deliberately does not have).
+  ui-checks:
+    name: Dashboard UI checks
+    runs-on: ubuntu-latest
+    needs: check-changes
+    if: github.event_name == 'pull_request' && needs.check-changes.outputs.dashboard-relevant == 'true'
+    permissions:
+      contents: read # read-only and secret-free: this job runs the PR's own code
+    # The older head's screenshots are obsolete the moment a new push lands.
+    concurrency:
+      group: ui-checks-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The visual diff builds the merge base in a temporary worktree,
+          # which needs real history rather than a shallow clone.
+          fetch-depth: 0
+          # Everything after checkout runs code from the PR. Nothing here needs
+          # authenticated git, so the token is never written to .git/config.
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Test screenshot comment rendering
+        run: node --test .github/workflows/scripts/visual-diff-comment.test.mjs
+
+      - id: node-modules-cache
+        uses: actions/cache@v6
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+
+      - if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      # The Chromium build Playwright downloads is pinned by the locked
+      # Playwright version, so the lock file hash is an exact cache key.
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('.github/workflows/dependencies/playwright/package-lock.json') }}
+
+      # Playwright is deliberately not a dependency of devex-metrics - it is
+      # tooling, not shipped code - so the harness uses a dedicated locked
+      # install. The browser download is skipped on a cache hit; the apt-level
+      # libraries it needs are installed either way.
+      - name: Install Playwright Chromium
+        working-directory: .github/workflows/dependencies/playwright
+        env:
+          CACHE_HIT: ${{ steps.playwright-cache.outputs.cache-hit }}
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          if [ "$CACHE_HIT" = "true" ]; then
+            npx --no-install playwright install-deps chromium
+          else
+            npx --no-install playwright install --with-deps chromium
+          fi
+
+      - name: Visual dashboard diff vs merge base
+        # A visual change is usually intended, so this reports rather than
+        # gates; the report and the images are the deliverable for the reviewer.
+        continue-on-error: true
+        run: node .github/skills/visual-dashboard-diff/visual-diff.mjs --theme both --base "$BASE_REF"
+        env:
+          # The PR's base branch, not origin/main: the merge base is computed
+          # against whatever the PR is actually targeting.
+          BASE_REF: origin/${{ github.event.pull_request.base.ref }}
+
+      - name: Publish visual diff to the job summary
+        if: always()
+        run: |
+          if [ -f visual-output/diff/report.md ]; then
+            cat visual-output/diff/report.md >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No visual diff report was produced." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f visual-output/timings.md ]; then
+            printf '\n' >> "$GITHUB_STEP_SUMMARY"
+            cat visual-output/timings.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload before/after/diff screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dashboard-screenshots
+          path: |
+            visual-output/baseline/
+            visual-output/current/
+            visual-output/diff/
+          retention-days: 14

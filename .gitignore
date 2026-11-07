@@ -24,3 +24,7 @@ devex.config.json
 # Never project content; ignoring only this path leaves .claude/skills and
 # .claude/settings.json free to be tracked.
 .claude/worktrees/
+
+# Visual dashboard diff output (.github/skills/visual-dashboard-diff)
+visual-output/
+visual-comment/
