@@ -1155,6 +1155,13 @@
       "oldestCreatedAt": "2026-10-27T20:15:45Z",
       "newestCreatedAt": "2026-10-27T20:15:45Z",
       "updatedAt": "2026-10-28T12:24:10.718Z"
+    },
+    "rajbos/repo-landscape-template": {
+      "cursor": null,
+      "complete": true,
+      "pagesFetched": 1,
+      "prsSeen": 0,
+      "updatedAt": "2026-11-07T12:33:13.009Z"
     }
   }
 }
