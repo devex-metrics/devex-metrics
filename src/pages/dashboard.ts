@@ -535,7 +535,7 @@ export function buildDashboardHtml(
     </div>
     <nav class="hero-nav">
       ${datasetSwitcherHtml}
-      <button type="button" id="themeToggle" class="theme-toggle" aria-label="Toggle light or dark mode"></button>
+      <button type="button" id="themeToggle" class="theme-toggle"></button>
       <a href="${escapeHtml(branding.attributionUrl)}" class="hero-nav-link">${escapeHtml(branding.attribution)}</a>
     </nav>
   </div>

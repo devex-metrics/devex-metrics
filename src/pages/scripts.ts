@@ -26,18 +26,28 @@ function setupThemeToggle(){
     var next=currentTheme()==="dark"?"light":"dark";
     document.documentElement.dataset.theme=next;
     try{localStorage.setItem("devex-theme",next);}catch(e){}
-    // Charts bake their colours in at creation; the filter state lives in the URL, so a reload restores the view.
-    window.location.reload();
+    btn.textContent=next==="dark"?"Light mode":"Dark mode";
+    // Charts bake their colours in at creation, so rebuild them in place; the table, sort and paging are untouched.
+    if(typeof Chart==="undefined")return;
+    refreshCssColors();
+    Object.keys(charts).forEach(function(k){if(charts[k]&&charts[k].destroy)charts[k].destroy();});
+    charts={};
+    renderCharts();
+    var activeBtn=document.querySelector(".filter-btn.active");
+    applyFilter(activeBtn?activeBtn.dataset.period:"30days");
   });
 }
-document.addEventListener("DOMContentLoaded",function(){
-  setupThemeToggle();
+function refreshCssColors(){
   var cs=getComputedStyle(document.documentElement);
   var cv=function(v){return cs.getPropertyValue(v).trim();};
   cssColors={warn:cv("--warn"),ok:cv("--ok"),accent:cv("--accent"),
     accentS:cv("--accent-s"),okS:cv("--ok-s"),warnS:cv("--warn-s"),
     err:cv("--err"),errS:cv("--err-s"),muted:cv("--muted"),border:cv("--border"),
     purple:cv("--purple")||"#8250df"};
+}
+document.addEventListener("DOMContentLoaded",function(){
+  setupThemeToggle();
+  refreshCssColors();
   if(typeof Chart!=="undefined"){renderCharts();}
   setupGroups();
   setupControls();
@@ -201,7 +211,7 @@ function formatLineNumbers(){
   });
 }
 function renderCharts(){
-  Chart.register({id:"repoBarGrad",beforeUpdate:function(chart){
+  if(!window.__repoBarGradRegistered){window.__repoBarGradRegistered=true;Chart.register({id:"repoBarGrad",beforeUpdate:function(chart){
     if(chart.canvas.id!=="chartRepos")return;
     var ctx=chart.ctx,ca=chart.chartArea;
     if(!ca)return;
@@ -217,7 +227,7 @@ function renderCharts(){
       ds.borderColor=hexToRgba(base,0.9);
       ds.borderWidth=0;
     });
-  }});
+  }});}
   Chart.defaults.color=cssColors.muted;
   Chart.defaults.plugins.legend.labels.usePointStyle=true;
   Chart.defaults.plugins.legend.labels.padding=16;
