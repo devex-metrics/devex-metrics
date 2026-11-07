@@ -43,6 +43,12 @@ function setupThemeToggle(){
     // Charts bake their colours in at creation, so rebuild them in place; the table, sort and paging are untouched.
     if(typeof Chart==="undefined")return;
     refreshCssColors();
+    // applyFilter rebuilds the review/rework rows, which closes their "See PRs" disclosures.
+    var openPRs=[];
+    document.querySelectorAll("details.review-pr-details[open]").forEach(function(d){
+      var a=d.parentNode&&d.parentNode.querySelector("a");
+      if(a)openPRs.push(a.textContent);
+    });
     // Remember what the user hid via legends so the rebuilt charts match.
     var hidden={};
     Object.keys(charts).forEach(function(k){
@@ -60,6 +66,10 @@ function setupThemeToggle(){
     renderCharts();
     var activeBtn=document.querySelector(".filter-btn.active");
     applyFilter(activeBtn?activeBtn.dataset.period:"30days");
+    document.querySelectorAll("details.review-pr-details").forEach(function(d){
+      var a=d.parentNode&&d.parentNode.querySelector("a");
+      if(a&&openPRs.indexOf(a.textContent)!==-1)d.open=true;
+    });
     Object.keys(hidden).forEach(function(k){
       var c=charts[k];
       if(!c)return;
