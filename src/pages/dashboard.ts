@@ -103,6 +103,7 @@ const DEFAULT_BRANDING: BrandingConfig = {
   title: "DevEx Metrics",
   attribution: "Made with \u2764\uFE0F by rajbos",
   attributionUrl: "https://github.com/rajbos",
+  showAttribution: true,
 };
 
 /** A notice above the key metrics naming every repository whose data has known gaps. */
@@ -534,7 +535,7 @@ export function buildDashboardHtml(
     </div>
     <nav class="hero-nav">
       ${datasetSwitcherHtml}
-      <a href="${escapeHtml(branding.attributionUrl)}" class="hero-nav-link">${escapeHtml(branding.attribution)}</a>
+      ${branding.showAttribution !== false ? `<a href="${escapeHtml(branding.attributionUrl)}" class="hero-nav-link">${escapeHtml(branding.attribution)}</a>` : ''}
     </nav>
   </div>
   <h1>${escapeHtml(branding.title)}</h1>

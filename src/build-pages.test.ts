@@ -1223,6 +1223,13 @@ describe("build-pages · trial and branding", () => {
     expect(html).toContain("rajbos");
   });
 
+  it("hides the attribution only when DEVEX_SHOW_ATTRIBUTION is explicitly off", () => {
+    expect(build({ DEVEX_SHOW_ATTRIBUTION: "false" })).not.toContain("Made with");
+    expect(build({ DEVEX_SHOW_ATTRIBUTION: "off" })).not.toContain("Made with");
+    expect(build({ DEVEX_SHOW_ATTRIBUTION: "" })).toContain("Made with");
+    expect(build({ DEVEX_SHOW_ATTRIBUTION: "true" })).toContain("Made with");
+  });
+
   it("offers the team scope toggle only when the team has repos", () => {
     expect(build({})).not.toContain('data-scope="team"');
     const withTeam = build({

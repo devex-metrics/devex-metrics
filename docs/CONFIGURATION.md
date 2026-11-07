@@ -31,6 +31,7 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_TITLE` | string | Dashboard title. |
 | `DEVEX_ATTRIBUTION` | string | Attribution line in the header. |
 | `DEVEX_ATTRIBUTION_URL` | string | Where the attribution links to. |
+| `DEVEX_SHOW_ATTRIBUTION` | boolean | Show the attribution line. Default `true`; set `false` to hide it. |
 | `DEVEX_REPOS_INCLUDE` | list | Globs to keep. Empty means every repo. |
 | `DEVEX_REPOS_EXCLUDE` | list | Globs to drop, applied after include. |
 | `DEVEX_EXCLUDE_ARCHIVED` | bool | Skip archived repos. Default `true`. |
