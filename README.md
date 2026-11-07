@@ -335,6 +335,10 @@ node .github/skills/visual-dashboard-diff/visual-diff.mjs --theme both
 See [`.github/skills/visual-dashboard-diff/SKILL.md`](.github/skills/visual-dashboard-diff/SKILL.md)
 for how it works and what it needs (Playwright, not a project dependency).
 
+## Hiding the "Made with ❤️" attribution
+
+The dashboard header shows a "Made with ❤️ by rajbos" line. It is visible by default, including when no variable is set. To hide it, create a GitHub Actions **repository variable** (Settings → Secrets and variables → Actions → Variables) named `DEVEX_SHOW_ATTRIBUTION` with the value `false` (`0`, `no` and `off` also work), then re-run the Pages build (`deploy-pages.yml`). No re-collection is needed. Set it back to `true`, or delete the variable, to show the line again. To change the wording instead of hiding it, use `DEVEX_ATTRIBUTION` / `DEVEX_ATTRIBUTION_URL`. See [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
+
 ## License
 
 [CC0 1.0 Universal](LICENSE)
