@@ -80,6 +80,8 @@ export interface BrandingConfig {
   attribution: string;
   /** Where the attribution links to. */
   attributionUrl: string;
+  /** Show the attribution line in the header. Defaults to true. */
+  showAttribution: boolean;
 }
 
 /** Optional, cost-bearing collectors. */
@@ -233,6 +235,7 @@ export function defaultConfig(): DevexConfig {
       title: "DevEx Metrics",
       attribution: "Made with ❤️ by rajbos",
       attributionUrl: "https://github.com/rajbos",
+      showAttribution: true,
     },
     repos: {
       include: [],
@@ -424,6 +427,13 @@ function applyEnv(config: DevexConfig, env: Env): void {
   assign(config.branding, "title", str(env, "DEVEX_TITLE"));
   assign(config.branding, "attribution", str(env, "DEVEX_ATTRIBUTION"));
   assign(config.branding, "attributionUrl", str(env, "DEVEX_ATTRIBUTION_URL"));
+  // Only an explicit "off" value hides it; unset, empty or unrecognised keeps it visible.
+  const showAttribution = str(env, "DEVEX_SHOW_ATTRIBUTION");
+  if (showAttribution !== undefined && /^(0|false|no|off)$/i.test(showAttribution)) {
+    config.branding.showAttribution = false;
+  } else if (showAttribution !== undefined && /^(1|true|yes|on)$/i.test(showAttribution)) {
+    config.branding.showAttribution = true;
+  }
 
   assign(config.repos, "include", list(env, "DEVEX_REPOS_INCLUDE"));
   assign(config.repos, "exclude", list(env, "DEVEX_REPOS_EXCLUDE"));
