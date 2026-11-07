@@ -62,6 +62,7 @@ jobs:
           DEVEX_TITLE: ${{ vars.DEVEX_TITLE }}
           DEVEX_ATTRIBUTION: ${{ vars.DEVEX_ATTRIBUTION }}
           DEVEX_ATTRIBUTION_URL: ${{ vars.DEVEX_ATTRIBUTION_URL }}
+          DEVEX_SHOW_ATTRIBUTION: ${{ vars.DEVEX_SHOW_ATTRIBUTION }}
           DEVEX_TEAM_REPOS: ${{ vars.DEVEX_TEAM_REPOS }}
           DEVEX_TEAM_HANDLES: ${{ vars.DEVEX_TEAM_HANDLES }}
           DEVEX_TEAM_NAME: ${{ vars.DEVEX_TEAM_NAME }}

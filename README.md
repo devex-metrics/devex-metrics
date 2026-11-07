@@ -320,6 +320,10 @@ docs/
 npm test
 ```
 
+## Hiding the "Made with ❤️" attribution
+
+The dashboard header shows a "Made with ❤️ by rajbos" line. It is visible by default, including when no variable is set. To hide it, create a GitHub Actions **repository variable** (Settings → Secrets and variables → Actions → Variables) named `DEVEX_SHOW_ATTRIBUTION` with the value `false` (`0`, `no` and `off` also work), then re-run the Pages build (`deploy-pages.yml`). No re-collection is needed. Set it back to `true`, or delete the variable, to show the line again. To change the wording instead of hiding it, use `DEVEX_ATTRIBUTION` / `DEVEX_ATTRIBUTION_URL`. See [docs/CONFIGURATION.md](docs/CONFIGURATION.md).
+
 ## License
 
 [CC0 1.0 Universal](LICENSE)

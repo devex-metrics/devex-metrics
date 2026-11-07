@@ -19,7 +19,8 @@
   "branding": {
     "title": "DevEx Metrics",
     "attribution": "Made with ❤️ by rajbos",
-    "attributionUrl": "https://github.com/rajbos"
+    "attributionUrl": "https://github.com/rajbos",
+    "showAttribution": true
   },
 
   "repos": {
