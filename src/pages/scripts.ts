@@ -13,7 +13,25 @@ function hexToRgba(hex,a){
   var r=parseInt(h.slice(0,2),16)||0, g=parseInt(h.slice(2,4),16)||0, b=parseInt(h.slice(4,6),16)||0;
   return "rgba("+r+","+g+","+b+","+a+")";
 }
+function currentTheme(){
+  var t=document.documentElement.dataset.theme;
+  if(t==="light"||t==="dark")return t;
+  return window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+}
+function setupThemeToggle(){
+  var btn=document.getElementById("themeToggle");
+  if(!btn)return;
+  btn.textContent=currentTheme()==="dark"?"Light mode":"Dark mode";
+  btn.addEventListener("click",function(){
+    var next=currentTheme()==="dark"?"light":"dark";
+    document.documentElement.dataset.theme=next;
+    try{localStorage.setItem("devex-theme",next);}catch(e){}
+    // Charts bake their colours in at creation; the filter state lives in the URL, so a reload restores the view.
+    window.location.reload();
+  });
+}
 document.addEventListener("DOMContentLoaded",function(){
+  setupThemeToggle();
   var cs=getComputedStyle(document.documentElement);
   var cv=function(v){return cs.getPropertyValue(v).trim();};
   cssColors={warn:cv("--warn"),ok:cv("--ok"),accent:cv("--accent"),
