@@ -21,20 +21,44 @@ function currentTheme(){
 function setupThemeToggle(){
   var btn=document.getElementById("themeToggle");
   if(!btn)return;
-  btn.textContent=currentTheme()==="dark"?"Light mode":"Dark mode";
+  var label=function(){btn.textContent=currentTheme()==="dark"?"Light mode":"Dark mode";};
+  label();
+  if(window.matchMedia){
+    var mq=window.matchMedia("(prefers-color-scheme: dark)");
+    if(mq.addEventListener)mq.addEventListener("change",label);
+  }
   btn.addEventListener("click",function(){
     var next=currentTheme()==="dark"?"light":"dark";
     document.documentElement.dataset.theme=next;
     try{localStorage.setItem("devex-theme",next);}catch(e){}
-    btn.textContent=next==="dark"?"Light mode":"Dark mode";
+    label();
     // Charts bake their colours in at creation, so rebuild them in place; the table, sort and paging are untouched.
     if(typeof Chart==="undefined")return;
     refreshCssColors();
-    Object.keys(charts).forEach(function(k){if(charts[k]&&charts[k].destroy)charts[k].destroy();});
+    // Remember what the user hid via legends so the rebuilt charts match.
+    var hidden={};
+    Object.keys(charts).forEach(function(k){
+      var c=charts[k];
+      if(!c||!c.destroy)return;
+      var h={datasets:[],segments:[]};
+      c.data.datasets.forEach(function(_,i){if(!c.isDatasetVisible(i))h.datasets.push(i);});
+      if(c.config.type==="doughnut"||c.config.type==="pie"){
+        (c.data.labels||[]).forEach(function(_,i){if(!c.getDataVisibility(i))h.segments.push(i);});
+      }
+      hidden[k]=h;
+      c.destroy();
+    });
     charts={};
     renderCharts();
     var activeBtn=document.querySelector(".filter-btn.active");
     applyFilter(activeBtn?activeBtn.dataset.period:"30days");
+    Object.keys(hidden).forEach(function(k){
+      var c=charts[k];
+      if(!c)return;
+      hidden[k].datasets.forEach(function(i){if(c.data.datasets[i])c.setDatasetVisibility(i,false);});
+      hidden[k].segments.forEach(function(i){if(c.getDataVisibility(i))c.toggleDataVisibility(i);});
+      c.update();
+    });
   });
 }
 function refreshCssColors(){
