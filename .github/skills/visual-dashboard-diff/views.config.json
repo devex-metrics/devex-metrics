@@ -1,0 +1,39 @@
+{
+  "$comment": [
+    "Registry of the pages the visual diff renders. Each view names the fixture",
+    "(an OrgMetrics snapshot) and the deployment config the site is built from,",
+    "the selector that proves the page rendered, and the states (filter clicks,",
+    "toggles) screenshotted on top of the initial render. Adding a control to",
+    "the dashboard that reveals new content means adding a state for it here,",
+    "or the visual diff will never see what you built.",
+    "noiseFloorPixels is the per-view tolerance for Chart.js canvas anti-aliasing."
+  ],
+  "defaults": {
+    "viewportWidth": 1280,
+    "settleMs": 800
+  },
+  "views": [
+    {
+      "id": "dashboard",
+      "title": "Dashboard",
+      "fixture": "dashboard.json",
+      "config": "dashboard.config.json",
+      "expect": "section.kpis",
+      "noiseFloorPixels": 800,
+      "states": [
+        {
+          "id": "all-time",
+          "title": "All Time period",
+          "steps": [{ "click": ".filter-btn[data-period=\"all\"]" }],
+          "expect": ".filter-btn[data-period=\"all\"].active"
+        },
+        {
+          "id": "exclude-bots",
+          "title": "Bots excluded",
+          "steps": [{ "click": "#excludeBots" }],
+          "expect": "#excludeBots:checked"
+        }
+      ]
+    }
+  ]
+}

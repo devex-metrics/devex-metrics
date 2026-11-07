@@ -312,6 +312,9 @@ docs/
   collect-metrics.yml   # Scheduled data collection, then calls pages.yml
   pages.yml             # Reusable: build the site from metrics-data and deploy
   deploy-pages.yml      # Rebuild the site without re-collecting
+  ui-checks-comment.yml # Posts dashboard before/after screenshots on pull requests
+.github/skills/
+  visual-dashboard-diff/  # Headless dashboard screenshots + pixel diff (see its SKILL.md)
 ```
 
 ## Testing
@@ -319,6 +322,18 @@ docs/
 ```bash
 npm test
 ```
+
+Dashboard changes are also checked visually: every pull request that touches
+`src/` gets a comment with before/after/diff screenshots of the generated
+dashboard, rendered headlessly from a committed fixture. Run the same diff
+locally with:
+
+```bash
+node .github/skills/visual-dashboard-diff/visual-diff.mjs --theme both
+```
+
+See [`.github/skills/visual-dashboard-diff/SKILL.md`](.github/skills/visual-dashboard-diff/SKILL.md)
+for how it works and what it needs (Playwright, not a project dependency).
 
 ## Hiding the "Made with ❤️" attribution
 

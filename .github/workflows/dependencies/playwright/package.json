@@ -1,0 +1,9 @@
+{
+  "name": "workflow-playwright",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pinned Playwright for the Dashboard UI checks job. Not a dependency of devex-metrics: the visual-dashboard-diff harness is CI/developer tooling, not shipped code.",
+  "dependencies": {
+    "playwright": "1.63.0"
+  }
+}

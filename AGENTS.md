@@ -55,6 +55,12 @@ _site/                  # Generated GitHub Pages output (gitignored)
   collect-metrics.yml   # Scheduled data collection, then calls pages.yml
   pages.yml             # Reusable: build from metrics-data and deploy
   deploy-pages.yml      # Rebuild the site without re-collecting
+  ui-checks-comment.yml # Posts the dashboard before/after/diff screenshots on a PR
+  scripts/visual-diff-comment.mjs  # Renders that comment from the diff report
+  dependencies/playwright/         # Pinned Playwright for the ui-checks job (not a project dependency)
+.github/skills/
+  visual-dashboard-diff/  # Headless dashboard screenshots + pixel diff vs the merge base (see its SKILL.md)
+.claude/skills/           # Mirror of .github/skills for Claude Code; keep both copies identical
 ```
 
 ## Configuration
@@ -159,6 +165,16 @@ import { collect } from "./collect.js";
 - **Edge cases**: empty repos, pagination (multiple pages accumulate), deduplication, null fields with defined fallbacks.
 - Avoid testing implementation details or mocking things that don't need it. Don't aim for 100% coverage — focus on behaviours that could regress.
 
+### Visual dashboard diff
+
+A change to the dashboard (`src/pages/**`, `src/build-pages.ts`, or anything the site build reads) should be looked at, not just unit-tested. `.github/skills/visual-dashboard-diff/` renders the generated `_site/index.html` headlessly from a committed fixture at the merge base and in the working tree, screenshots both in light and dark mode plus the declared filter states, and writes before/after/diff PNGs and a report to `visual-output/`:
+
+```bash
+node .github/skills/visual-dashboard-diff/visual-diff.mjs --theme both
+```
+
+On pull requests the `ui-checks` job in `ci.yml` runs the same diff and `ui-checks-comment.yml` posts the images as one comment on the PR, replaced on every push. A changed screenshot is a finding for the reviewer, not a failure. When you add a control that reveals new content, add a state for it in `views.config.json` or the diff will never see it; when a schema bump adds a field that matters visually, add it to `fixtures/dashboard.json` in the same PR. Playwright is deliberately not a project dependency — see the skill's `SKILL.md` for how it is found.
+
 ## Mutation testing
 
 Mutation testing is provided by [Stryker](https://stryker-mutator.io/) with the vitest runner.
@@ -184,6 +200,8 @@ Mutation testing is provided by [Stryker](https://stryker-mutator.io/) with the 
 - **mutation.yml**: daily (and `workflow_dispatch`). A first job checks for an open `mutation-improvement` issue and skips the run if there is one; otherwise it runs Stryker (which builds `dist` inside its own sandbox via `buildCommand`, since the sandbox copy respects `.gitignore`) and opens an issue when the score is below `break` (see the Mutation testing section above).
 - **collect-metrics.yml**: scheduled daily; checks out `metrics-data`, collects metrics, appends to the history store, pushes it back, then calls `pages.yml`. Does **not** commit to `main`. The scheduled run is a full collection that saves a UTC-date-keyed snapshot to the Actions cache; manual runs restore today's newest snapshot and collect only the delta (`DEVEX_INCREMENTAL`, see "Fast manual refreshes" in `docs/CONFIGURATION.md`).
 - **pages.yml**: reusable (`workflow_call`); builds the site from the `metrics-data` checkout and deploys to Pages.
+- **ci.yml `ui-checks`** (pull requests only, path-gated on `src/**` and the harness): renders the dashboard at the merge base and the PR head with the `visual-dashboard-diff` skill, publishes the report to the job summary and uploads the `dashboard-screenshots` artifact. It runs PR code, so it holds no secrets.
+- **ui-checks-comment.yml**: `workflow_run` on CI; runs from the default branch, downloads that artifact as untrusted data and posts the before/after/diff images as a single sticky PR comment with `gh pr comment --attach`. Inline images need a user token in the `GH_PAT` secret (fine-grained: Contents: write and Pull requests: write on this repository); without it the comment links to the artifact instead. Changes to this workflow or the comment script only take effect once merged to `main`.
 - Always pin action versions to a full SHA or major-version tag.
 
 ## Addressing review feedback

@@ -15,3 +15,12 @@ updates:
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
+
+  # Pinned Playwright for the Dashboard UI checks job (see
+  # .github/skills/visual-dashboard-diff/SKILL.md).
+  - package-ecosystem: "npm"
+    directory: "/.github/workflows/dependencies/playwright"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
