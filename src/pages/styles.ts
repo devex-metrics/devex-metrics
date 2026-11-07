@@ -5,11 +5,19 @@ export function getCSS(): string {
   --warn:#9a6700;--warn-s:#fff8c5;--err:#cf222e;--err-s:#ffebe9;
   --purple:#8250df;--sh:0 1px 3px rgba(31,35,40,.06);--sh-h:0 4px 12px rgba(31,35,40,.1);
   --r:12px;--rs:8px}
-@media(prefers-color-scheme:dark){:root{--bg:#010409;--fg:#e6edf3;--card:#0d1117;
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#010409;--fg:#e6edf3;--card:#0d1117;
   --muted:#8b949e;--border:#30363d;--accent:#58a6ff;--accent-s:#0c2d6b;
   --ok:#3fb950;--ok-s:#0b3d1a;--warn:#d29922;--warn-s:#3d2a04;
   --err:#f85149;--err-s:#4c1119;--purple:#bc8cff;
   --sh:0 1px 3px rgba(0,0,0,.24);--sh-h:0 4px 12px rgba(0,0,0,.32)}}
+:root[data-theme="dark"]{--bg:#010409;--fg:#e6edf3;--card:#0d1117;
+  --muted:#8b949e;--border:#30363d;--accent:#58a6ff;--accent-s:#0c2d6b;
+  --ok:#3fb950;--ok-s:#0b3d1a;--warn:#d29922;--warn-s:#3d2a04;
+  --err:#f85149;--err-s:#4c1119;--purple:#bc8cff;
+  --sh:0 1px 3px rgba(0,0,0,.24);--sh-h:0 4px 12px rgba(0,0,0,.32)}
+:root{color-scheme:light dark}
+:root[data-theme="light"]{color-scheme:light}
+:root[data-theme="dark"]{color-scheme:dark}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
   color:var(--fg);background:var(--bg);line-height:1.55;min-height:100vh}
@@ -17,7 +25,12 @@ main{max-width:1400px;margin:0 auto;padding:1.5rem 1rem 2rem}
 a{color:var(--accent)}
 .hero{background:linear-gradient(135deg,#0969da 0%,#8250df 100%);color:#fff;
   padding:2.5rem 2rem;text-align:center;margin-bottom:2rem}
-@media(prefers-color-scheme:dark){.hero{background:linear-gradient(135deg,#1158a7 0%,#6639ba 100%)}}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .hero{background:linear-gradient(135deg,#1158a7 0%,#6639ba 100%)}}
+:root[data-theme="dark"] .hero{background:linear-gradient(135deg,#1158a7 0%,#6639ba 100%)}
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;
+  background:transparent;border:0;color:#fff;border-radius:50%;cursor:pointer;opacity:.85;transition:opacity .15s,background .15s}
+.theme-toggle:hover{opacity:1;background:rgba(255,255,255,.22)}
+.theme-toggle:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .hero h1{font-size:1.8rem;font-weight:700;margin-bottom:.35rem}
 .subtitle{font-size:1rem;font-weight:600;opacity:.85;text-align:left}
 .subtitle-mid,.subtitle-bottom{font-size:.85rem;font-weight:400;opacity:.82;margin-top:.2rem}
@@ -40,7 +53,8 @@ a{color:var(--accent)}
 .github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}
 @keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}
 @media(max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}
-@media(prefers-color-scheme:dark){.github-corner svg{fill:#58a6ff;color:#010409}}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .github-corner svg{fill:#58a6ff;color:#010409}}
+:root[data-theme="dark"] .github-corner svg{fill:#58a6ff;color:#010409}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem}
 .kpi{background:var(--card);border-radius:var(--r);padding:1.25rem 1rem;text-align:center;
   box-shadow:var(--sh);transition:transform .2s,box-shadow .2s}

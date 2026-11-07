@@ -522,6 +522,7 @@ export function buildDashboardHtml(
   <title>${escapeHtml(branding.title)} &ndash; ${escapeHtml(data.groupName ?? data.owner)}</title>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+  <script>try{var t=localStorage.getItem("devex-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t;}catch(e){}</script>
   <style>${getCSS()}</style>
 </head>
 <body>
@@ -535,6 +536,7 @@ export function buildDashboardHtml(
     </div>
     <nav class="hero-nav">
       ${datasetSwitcherHtml}
+      <button type="button" id="themeToggle" class="theme-toggle"></button>
       ${branding.showAttribution !== false ? `<a href="${escapeHtml(branding.attributionUrl)}" class="hero-nav-link">${escapeHtml(branding.attribution)}</a>` : ''}
     </nav>
   </div>
