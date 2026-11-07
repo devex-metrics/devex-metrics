@@ -1,0 +1,10 @@
+{
+  "$comment": "Deployment config the visual diff builds the dashboard with. Named explicitly so a developer's local devex.config.json never leaks into a screenshot.",
+  "owner": "visual-fixture",
+  "ownerType": "user",
+  "branding": {
+    "title": "DevEx Metrics",
+    "attribution": "Made with ❤️ by rajbos",
+    "attributionUrl": "https://github.com/rajbos"
+  }
+}

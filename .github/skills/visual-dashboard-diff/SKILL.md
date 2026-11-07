@@ -37,7 +37,7 @@ The dashboard is a single static HTML page that `dist/build-pages.js` writes
 to `_site/index.html`. The harness builds it exactly the way CI does — `tsc`,
 then `build-pages.js` — but from a committed fixture placed where the build
 looks first (the history store's `latest.json`, in a temporary directory), with
-the skill's own `fixtures/devex.config.json` named explicitly so a developer's
+the skill's own `fixtures/dashboard.config.json` named explicitly so a developer's
 local config never leaks into a screenshot. The page is then loaded from a
 `file://` URL in headless Chromium through Playwright and screenshotted.
 
@@ -196,6 +196,6 @@ measured on the noise was zero.
   share button and click sequences beyond the listed states are out of scope.
 - **The fixture is one dataset.** Panels that only appear with a team scope, a
   trial, CI health or the landscape feature are not rendered unless the
-  fixture and `fixtures/devex.config.json` enable them.
+  fixture and `fixtures/dashboard.config.json` enable them.
 - **Not a substitute for looking at the deployed site**, which renders the
   real data with whatever branding the deployment configures.

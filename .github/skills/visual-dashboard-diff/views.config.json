@@ -17,7 +17,7 @@
       "id": "dashboard",
       "title": "Dashboard",
       "fixture": "dashboard.json",
-      "config": "devex.config.json",
+      "config": "dashboard.config.json",
       "expect": "section.kpis",
       "noiseFloorPixels": 800,
       "states": [

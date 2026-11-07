@@ -168,9 +168,12 @@ jobs:
           fi
 
       - name: Visual dashboard diff vs merge base
-        # A visual change is usually intended, so this reports rather than
-        # gates; the report and the images are the deliverable for the reviewer.
-        continue-on-error: true
+        # A visual change is usually intended, so the script reports it and
+        # exits 0; the report and the images are the deliverable for the
+        # reviewer. It exits non-zero only when a render or the comparison
+        # itself failed, and that must be a red check: the first run of this
+        # job sailed through green with "No visual diff report was produced"
+        # because this step was continue-on-error.
         run: node .github/skills/visual-dashboard-diff/visual-diff.mjs --theme both --base "$BASE_REF"
         env:
           # The PR's base branch, not origin/main: the merge base is computed
