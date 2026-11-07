@@ -20,3 +20,11 @@ describe("getCSS", () => {
     expect(css).toContain(".hero{");
   });
 });
+
+describe("theme override", () => {
+  it("lets an explicit data-theme override the OS colour scheme in both directions", () => {
+    const css = getCSS();
+    expect(css).toContain(':root:not([data-theme="light"])');
+    expect(css).toContain(':root[data-theme="dark"]');
+  });
+});
