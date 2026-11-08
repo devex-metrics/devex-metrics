@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-07T12:39:12.000Z",
+  "generated_at": "2026-11-08T12:59:52.000Z",
   "scanner_version": "0.1.2",
   "repositories": [
     {
@@ -34,7 +34,6 @@
       "commits_30d": 0,
       "commits_90d": 9,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -123,6 +122,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -133,15 +133,15 @@
     },
     {
       "full_name": "rajbos/ai-engineering-fluency",
-      "head_sha": "668c9e95c20aadcae3aa7d48dc4fe86978e05999",
-      "files": 1386,
-      "bytes": 26263093,
-      "source_loc": 278377,
+      "head_sha": "a88bc9a2f6b67b37e166b8782777c2fec5e25261",
+      "files": 1388,
+      "bytes": 26278849,
+      "source_loc": 278717,
       "languages": [
         {
           "name": "TypeScript",
-          "files": 668,
-          "loc": 226907
+          "files": 670,
+          "loc": 227229
         },
         {
           "name": "JavaScript",
@@ -151,7 +151,7 @@
         {
           "name": "CSS",
           "files": 20,
-          "loc": 10010
+          "loc": 10028
         },
         {
           "name": "Python",
@@ -164,10 +164,9 @@
           "loc": 3874
         }
       ],
-      "commits_30d": 208,
-      "commits_90d": 910,
+      "commits_30d": 204,
+      "commits_90d": 913,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -256,6 +255,7 @@
         7,
         10,
         8,
+        3,
         0
       ],
       "contributor_count": 29,
@@ -294,8 +294,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -379,9 +379,9 @@
     },
     {
       "full_name": "rajbos/create-github-app-from-manifest",
-      "head_sha": "9fdfeecc1b7c0f8f97a6e9d932201bcfe65f9a4c",
+      "head_sha": "395235e6553ec4025bb9cc66f46f920731b781fb",
       "files": 13,
-      "bytes": 234602,
+      "bytes": 233378,
       "source_loc": 225,
       "languages": [
         {
@@ -395,10 +395,9 @@
           "loc": 55
         }
       ],
-      "commits_30d": 0,
-      "commits_90d": 6,
+      "commits_30d": 2,
+      "commits_90d": 8,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -487,6 +486,7 @@
         0,
         0,
         0,
+        2,
         0
       ],
       "contributor_count": 4,
@@ -521,7 +521,6 @@
       "commits_30d": 0,
       "commits_90d": 5,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -610,6 +609,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -648,8 +648,8 @@
         0,
         0,
         0,
-        0,
         2,
+        0,
         0,
         0,
         0,
@@ -771,8 +771,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -878,8 +878,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -991,8 +991,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1114,8 +1114,8 @@
         0,
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -1221,8 +1221,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1354,7 +1354,6 @@
         0,
         0,
         0,
-        0,
         10,
         0,
         0,
@@ -1429,6 +1428,7 @@
         3,
         3,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -1472,8 +1472,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1597,7 +1597,6 @@
         0,
         0,
         0,
-        0,
         4,
         0,
         0,
@@ -1665,6 +1664,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 9,
@@ -1694,7 +1694,6 @@
       "commits_30d": 3,
       "commits_90d": 26,
       "commits_90d_trend": [
-        0,
         0,
         1,
         0,
@@ -1783,6 +1782,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 5,
@@ -1827,7 +1827,6 @@
       "commits_30d": 1,
       "commits_90d": 15,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -1916,6 +1915,7 @@
         0,
         1,
         0,
+        0,
         0
       ],
       "contributor_count": 11,
@@ -1954,7 +1954,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -1993,6 +1992,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -2053,7 +2053,6 @@
       "commits_30d": 13,
       "commits_90d": 18,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2142,6 +2141,7 @@
         10,
         3,
         0,
+        0,
         0
       ],
       "contributor_count": 5,
@@ -2152,20 +2152,20 @@
     },
     {
       "full_name": "rajbos/Jarvis",
-      "head_sha": "fa121f78a48d4a37047dff909f4b34d1131da85a",
-      "files": 385,
-      "bytes": 4559558,
-      "source_loc": 80718,
+      "head_sha": "d049e84a10fa53dd15be55563065bd0dcc72e904",
+      "files": 396,
+      "bytes": 4673095,
+      "source_loc": 82988,
       "languages": [
         {
           "name": "TypeScript",
-          "files": 302,
-          "loc": 71681
+          "files": 312,
+          "loc": 73740
         },
         {
           "name": "CSS",
           "files": 3,
-          "loc": 6916
+          "loc": 7127
         },
         {
           "name": "JavaScript",
@@ -2183,10 +2183,9 @@
           "loc": 187
         }
       ],
-      "commits_30d": 96,
-      "commits_90d": 356,
+      "commits_30d": 86,
+      "commits_90d": 358,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2275,6 +2274,7 @@
         18,
         8,
         0,
+        2,
         0
       ],
       "contributor_count": 7,
@@ -2309,7 +2309,6 @@
       "commits_30d": 0,
       "commits_90d": 5,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2398,6 +2397,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 3,
@@ -2422,7 +2422,6 @@
       "commits_30d": 0,
       "commits_90d": 9,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2511,6 +2510,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 10,
@@ -2533,9 +2533,8 @@
         }
       ],
       "commits_30d": 0,
-      "commits_90d": 7,
+      "commits_90d": 6,
       "commits_90d_trend": [
-        1,
         0,
         0,
         0,
@@ -2588,6 +2587,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -2683,7 +2683,6 @@
         0,
         0,
         0,
-        0,
         7,
         0,
         0,
@@ -2757,6 +2756,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 11,
@@ -2805,8 +2805,8 @@
         0,
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -2923,7 +2923,6 @@
         0,
         0,
         0,
-        0,
         6,
         1,
         0,
@@ -2962,6 +2961,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
