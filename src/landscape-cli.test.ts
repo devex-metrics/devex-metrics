@@ -182,6 +182,7 @@ describe("landscape workflow adapter", () => {
     expect(workflow).not.toContain("DEVEX_LANDSCAPE_CLI_VERSION");
     expect(workflow).not.toContain("npm install");
     expect(packageJson.dependencies["@devex-metrics/repo-landscape"]).toMatch(/^\^?\d+\.\d+\.\d+/);
+    expect(packageJson.dependencies["@devex-metrics/repo-landscape"]).toBe("^0.2.0");
     expect(packageJson.devDependencies["@devex-metrics/repo-landscape"]).toBeUndefined();
     const scannerManifest = JSON.parse(
       fs.readFileSync(
@@ -192,6 +193,7 @@ describe("landscape workflow adapter", () => {
     expect(lockfile.packages["node_modules/@devex-metrics/repo-landscape"].version).toBe(
       scannerManifest.version
     );
+    expect(scannerManifest.version).toBe("0.2.0");
     expect(ingest).toContain(
       "DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}"
     );

@@ -442,16 +442,15 @@ Existing portable scanner v1 input stays v1; sanitized history and the `landscap
 array gain only optional, numeric/null signal fields and boolean rubric flags.
 Older snapshots show Unknown rather than invented measurements.
 
-**Additive scanner compatibility:** the installed package and lockfile remain on
-the released `@devex-metrics/repo-landscape` 0.1.2 line. The adapter also accepts
-the proposed 0.2.0 schema-1 capability contract, exercised against actual generated
-API and full-local synthetic fixtures; adopting that release is a separate step
-after it is published. The fixtures match signed CLI commit
-`c426c159097ec6c29119501a2623dac310b91d07` from
-[devex-metrics/repo-landscape-cli#12](https://github.com/devex-metrics/repo-landscape-cli/pull/12).
-Scanner version must still exactly match the installed
-package at ingestion. No workflow pin, repository selection, authorization,
-hosting or privacy behavior changes.
+**Additive scanner compatibility:** the installed package and lockfile now use
+the released `@devex-metrics/repo-landscape` `^0.2.0` line. The schema-1
+capability contract is exercised against actual generated API and full-local
+synthetic fixtures from signed CLI commit
+`9b55b7c329f46f3ed4adc1c09e93da9786645cec`, tagged `v0.2.0` and published
+with integrity
+`sha512-O7TPUiLq+BT/zc9i//MZ0RZSrHZlDpJKQl5tfqr4m2EyI3R++n1TiVYeTQcQ==`.
+Scanner version must still exactly match the installed package at ingestion.
+Workflow selection, authorization, hosting and privacy behavior are unchanged.
 
 Portable content cues, commit drift, kind coverage, elapsed activity and scanner
 attention are accepted only when their corresponding `provenance.capabilities`
@@ -553,7 +552,8 @@ CLI runs in `local_git/full` mode with `--repos-dir`, `--expected-heads`, an
 explicit selection config and `--output`. The scanner must be version `0.1.2`
 or newer: earlier versions incorrectly report an ambiguous clone for an
 owner's self-named repository (`owner/owner`) in the owner/repository clone
-layout. This is a scanner error, not a reason to exclude that repository or
+layout. The deployed `^0.2.0` release includes this fix. This is a scanner
+error, not a reason to exclude that repository or
 grant additional permissions. Only then does the adapter re-check
 public visibility using a fresh Contents-read App token scoped to the same
 exact repository list (the pre-clone token may have expired). If refreshing
