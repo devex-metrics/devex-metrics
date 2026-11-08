@@ -1679,6 +1679,8 @@ function updateTrial(cutoff,excludeBots,period){
       gapEl.textContent="Median first-review wait: not enough reviewed merged PRs to compare.";
     }else{
       var reviewGap=cur.reviewWait-base.reviewWait;
+      // A gap that formats as "0min" is noise, not a finding.
+      if(Math.abs(reviewGap)*60<0.5)reviewGap=0;
       var gapText=reviewGap===0?"matches the all-repo baseline":
         "is "+fmtHours(Math.abs(reviewGap))+(reviewGap>0?" longer":" shorter")+" than the all-repo baseline";
       gapEl.textContent="Team median first-review wait "+gapText+
