@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-10T14:42:07.000Z",
+  "generated_at": "2026-11-11T13:57:38.000Z",
   "scanner_version": "0.2.0",
   "repositories": [
     {
@@ -34,7 +34,6 @@
       "commits_30d": 0,
       "commits_90d": 9,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -123,6 +122,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -154,9 +154,9 @@
     },
     {
       "full_name": "rajbos/ai-engineering-fluency",
-      "head_sha": "090a9db2275e6c36647dae7682d19de88a4b92db",
+      "head_sha": "8d4b1bf749adbca34db4eb9c5b43603a826a4bae",
       "files": 1404,
-      "bytes": 27543326,
+      "bytes": 27543533,
       "source_loc": 280628,
       "languages": [
         {
@@ -186,9 +186,8 @@
         }
       ],
       "commits_30d": 179,
-      "commits_90d": 924,
+      "commits_90d": 925,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -277,7 +276,8 @@
         3,
         5,
         5,
-        1
+        2,
+        0
       ],
       "contributor_count": 29,
       "adr_count": 14,
@@ -285,8 +285,8 @@
       "produces_count": 31,
       "consumes_count": 264,
       "activity": {
-        "commits_30d": 187,
-        "commits_90d": 924,
+        "commits_30d": 179,
+        "commits_90d": 925,
         "complete": true
       },
       "team_activity": {
@@ -334,8 +334,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -473,7 +473,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -551,6 +550,7 @@
         2,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 4,
@@ -617,7 +617,6 @@
         0,
         0,
         0,
-        0,
         3,
         0,
         0,
@@ -656,6 +655,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -751,8 +751,8 @@
         0,
         0,
         0,
-        0,
         2,
+        0,
         0,
         0,
         0,
@@ -895,8 +895,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1023,8 +1023,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1157,8 +1157,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1301,8 +1301,8 @@
         0,
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -1429,8 +1429,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1583,7 +1583,6 @@
         0,
         0,
         0,
-        0,
         10,
         0,
         0,
@@ -1661,6 +1660,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -1711,7 +1711,6 @@
       "commits_30d": 2,
       "commits_90d": 14,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -1800,6 +1799,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 9,
@@ -1831,10 +1831,10 @@
     },
     {
       "full_name": "rajbos/github-copilot-model-notifier",
-      "head_sha": "b6427720b9ad68f6182be42b97750baced7c9e84",
+      "head_sha": "6ba06dd91e44adb7e589438b5a3fa9da18687b76",
       "files": 12,
-      "bytes": 138496,
-      "source_loc": 1324,
+      "bytes": 139317,
+      "source_loc": 1330,
       "languages": [
         {
           "name": "Python",
@@ -1844,13 +1844,12 @@
         {
           "name": "HTML",
           "files": 1,
-          "loc": 418
+          "loc": 424
         }
       ],
-      "commits_30d": 4,
-      "commits_90d": 26,
+      "commits_30d": 5,
+      "commits_90d": 27,
       "commits_90d_trend": [
-        0,
         1,
         1,
         0,
@@ -1939,6 +1938,7 @@
         0,
         0,
         0,
+        1,
         1
       ],
       "contributor_count": 5,
@@ -1947,8 +1947,8 @@
       "produces_count": 0,
       "consumes_count": 4,
       "activity": {
-        "commits_30d": 4,
-        "commits_90d": 26,
+        "commits_30d": 5,
+        "commits_90d": 27,
         "complete": true
       },
       "team_activity": {
@@ -2004,7 +2004,6 @@
       "commits_30d": 1,
       "commits_90d": 15,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2093,6 +2092,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 11,
@@ -2149,7 +2149,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -2188,6 +2187,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -2283,7 +2283,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -2361,6 +2360,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 5,
@@ -2426,7 +2426,6 @@
       "commits_30d": 81,
       "commits_90d": 360,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2515,6 +2514,7 @@
         2,
         1,
         1,
+        0,
         0
       ],
       "contributor_count": 7,
@@ -2581,7 +2581,6 @@
         0,
         0,
         0,
-        0,
         4,
         0,
         0,
@@ -2612,6 +2611,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -2790,9 +2790,9 @@
         0,
         0,
         0,
-        0,
         1,
         5,
+        0,
         0
       ],
       "contributor_count": 4,
@@ -2849,7 +2849,6 @@
         0,
         0,
         0,
-        0,
         6,
         0,
         0,
@@ -2888,6 +2887,7 @@
         0,
         0,
         3,
+        0,
         0,
         0,
         0,
@@ -2983,7 +2983,6 @@
         0,
         0,
         0,
-        0,
         2,
         1,
         0,
@@ -3022,6 +3021,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -3138,7 +3138,6 @@
         0,
         0,
         0,
-        0,
         7,
         0,
         0,
@@ -3193,6 +3192,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -3281,8 +3281,8 @@
         0,
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -3420,7 +3420,6 @@
         0,
         0,
         0,
-        0,
         6,
         1,
         0,
@@ -3459,6 +3458,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -3584,7 +3584,7 @@
       "evidence": {
         "path": ".github/workflows/update-model-data.yml",
         "line": 82,
-        "head_sha": "090a9db2275e6c36647dae7682d19de88a4b92db"
+        "head_sha": "8d4b1bf749adbca34db4eb9c5b43603a826a4bae"
       }
     },
     {
@@ -3595,7 +3595,7 @@
       "evidence": {
         "path": ".github/workflows/update-model-data.yml",
         "line": 90,
-        "head_sha": "090a9db2275e6c36647dae7682d19de88a4b92db"
+        "head_sha": "8d4b1bf749adbca34db4eb9c5b43603a826a4bae"
       }
     },
     {
@@ -3606,7 +3606,7 @@
       "evidence": {
         "path": ".github/workflows/update-model-data.yml",
         "line": 93,
-        "head_sha": "090a9db2275e6c36647dae7682d19de88a4b92db"
+        "head_sha": "8d4b1bf749adbca34db4eb9c5b43603a826a4bae"
       }
     },
     {
