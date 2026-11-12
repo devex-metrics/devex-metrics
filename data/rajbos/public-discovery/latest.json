@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-11T13:57:38.000Z",
+  "generated_at": "2026-11-12T15:04:30.000Z",
   "scanner_version": "0.2.0",
   "repositories": [
     {
@@ -34,7 +34,6 @@
       "commits_30d": 0,
       "commits_90d": 9,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -123,6 +122,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -154,9 +154,9 @@
     },
     {
       "full_name": "rajbos/ai-engineering-fluency",
-      "head_sha": "8d4b1bf749adbca34db4eb9c5b43603a826a4bae",
+      "head_sha": "0fa7f8982af6b49b9c4c67f4b0bbb95e362cebec",
       "files": 1404,
-      "bytes": 27543533,
+      "bytes": 27544178,
       "source_loc": 280628,
       "languages": [
         {
@@ -185,10 +185,9 @@
           "loc": 3874
         }
       ],
-      "commits_30d": 179,
-      "commits_90d": 925,
+      "commits_30d": 152,
+      "commits_90d": 927,
       "commits_90d_trend": [
-        0,
         0,
         0,
         18,
@@ -277,7 +276,8 @@
         5,
         5,
         2,
-        0
+        0,
+        2
       ],
       "contributor_count": 29,
       "adr_count": 14,
@@ -285,8 +285,8 @@
       "produces_count": 31,
       "consumes_count": 264,
       "activity": {
-        "commits_30d": 179,
-        "commits_90d": 925,
+        "commits_30d": 172,
+        "commits_90d": 927,
         "complete": true
       },
       "team_activity": {
@@ -333,8 +333,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -472,7 +472,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -551,6 +550,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 4,
@@ -616,7 +616,6 @@
         0,
         0,
         0,
-        0,
         3,
         0,
         0,
@@ -655,6 +654,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -750,8 +750,8 @@
         0,
         0,
         0,
-        0,
         2,
+        0,
         0,
         0,
         0,
@@ -894,8 +894,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1022,8 +1022,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1156,8 +1156,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1300,8 +1300,8 @@
         0,
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -1428,8 +1428,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1582,7 +1582,6 @@
         0,
         0,
         0,
-        0,
         10,
         0,
         0,
@@ -1661,6 +1660,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -1711,7 +1711,6 @@
       "commits_30d": 2,
       "commits_90d": 14,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -1800,6 +1799,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 9,
@@ -1848,9 +1848,8 @@
         }
       ],
       "commits_30d": 5,
-      "commits_90d": 27,
+      "commits_90d": 26,
       "commits_90d_trend": [
-        1,
         1,
         0,
         8,
@@ -1939,7 +1938,8 @@
         0,
         0,
         1,
-        1
+        1,
+        0
       ],
       "contributor_count": 5,
       "adr_count": 0,
@@ -1948,7 +1948,7 @@
       "consumes_count": 4,
       "activity": {
         "commits_30d": 5,
-        "commits_90d": 27,
+        "commits_90d": 26,
         "complete": true
       },
       "team_activity": {
@@ -2004,7 +2004,6 @@
       "commits_30d": 1,
       "commits_90d": 15,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2093,6 +2092,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 11,
@@ -2148,7 +2148,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -2187,6 +2186,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -2282,7 +2282,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -2361,6 +2360,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 5,
@@ -2392,15 +2392,15 @@
     },
     {
       "full_name": "rajbos/Jarvis",
-      "head_sha": "1c437edac0170ba9608ebcb33e567bc167458c6e",
-      "files": 396,
-      "bytes": 4683942,
-      "source_loc": 83213,
+      "head_sha": "e73b71251000524bbbb108dbff83e6c17a11269a",
+      "files": 393,
+      "bytes": 4695173,
+      "source_loc": 83428,
       "languages": [
         {
           "name": "TypeScript",
-          "files": 312,
-          "loc": 73965
+          "files": 316,
+          "loc": 74460
         },
         {
           "name": "CSS",
@@ -2409,8 +2409,8 @@
         },
         {
           "name": "JavaScript",
-          "files": 11,
-          "loc": 1664
+          "files": 4,
+          "loc": 1384
         },
         {
           "name": "PowerShell",
@@ -2423,10 +2423,9 @@
           "loc": 187
         }
       ],
-      "commits_30d": 81,
-      "commits_90d": 360,
+      "commits_30d": 79,
+      "commits_90d": 368,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2515,7 +2514,8 @@
         1,
         1,
         0,
-        0
+        0,
+        8
       ],
       "contributor_count": 7,
       "adr_count": 0,
@@ -2523,8 +2523,8 @@
       "produces_count": 11,
       "consumes_count": 55,
       "activity": {
-        "commits_30d": 81,
-        "commits_90d": 360,
+        "commits_30d": 89,
+        "commits_90d": 368,
         "complete": true
       },
       "team_activity": {
@@ -2580,7 +2580,6 @@
         0,
         0,
         0,
-        0,
         4,
         0,
         0,
@@ -2611,6 +2610,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -2789,9 +2789,9 @@
         0,
         0,
         0,
-        0,
         1,
         5,
+        0,
         0,
         0
       ],
@@ -2848,7 +2848,6 @@
         0,
         0,
         0,
-        0,
         6,
         0,
         0,
@@ -2887,6 +2886,7 @@
         0,
         0,
         3,
+        0,
         0,
         0,
         0,
@@ -2982,7 +2982,6 @@
         0,
         0,
         0,
-        0,
         2,
         1,
         0,
@@ -3021,6 +3020,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -3123,10 +3123,9 @@
           "loc": 1
         }
       ],
-      "commits_30d": 4,
+      "commits_30d": 2,
       "commits_90d": 28,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -3215,6 +3214,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 11,
@@ -3223,7 +3223,7 @@
       "produces_count": 0,
       "consumes_count": 1,
       "activity": {
-        "commits_30d": 4,
+        "commits_30d": 2,
         "commits_90d": 28,
         "complete": true
       },
@@ -3280,8 +3280,8 @@
         0,
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -3419,7 +3419,6 @@
         0,
         0,
         0,
-        0,
         6,
         1,
         0,
@@ -3458,6 +3457,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -3562,7 +3562,7 @@
       "evidence": {
         "path": "package.json",
         "line": 57,
-        "head_sha": "1c437edac0170ba9608ebcb33e567bc167458c6e"
+        "head_sha": "e73b71251000524bbbb108dbff83e6c17a11269a"
       }
     },
     {
@@ -3584,7 +3584,7 @@
       "evidence": {
         "path": ".github/workflows/update-model-data.yml",
         "line": 82,
-        "head_sha": "8d4b1bf749adbca34db4eb9c5b43603a826a4bae"
+        "head_sha": "0fa7f8982af6b49b9c4c67f4b0bbb95e362cebec"
       }
     },
     {
@@ -3595,7 +3595,7 @@
       "evidence": {
         "path": ".github/workflows/update-model-data.yml",
         "line": 90,
-        "head_sha": "8d4b1bf749adbca34db4eb9c5b43603a826a4bae"
+        "head_sha": "0fa7f8982af6b49b9c4c67f4b0bbb95e362cebec"
       }
     },
     {
@@ -3606,7 +3606,7 @@
       "evidence": {
         "path": ".github/workflows/update-model-data.yml",
         "line": 93,
-        "head_sha": "8d4b1bf749adbca34db4eb9c5b43603a826a4bae"
+        "head_sha": "0fa7f8982af6b49b9c4c67f4b0bbb95e362cebec"
       }
     },
     {
