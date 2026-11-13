@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-29T12:39:06.000Z",
-  "scanner_version": "0.1.2",
+  "generated_at": "2026-11-13T14:22:26.000Z",
+  "scanner_version": "0.2.0",
   "repositories": [
     {
       "full_name": "rajbos/actions-marketplace",
@@ -31,24 +31,9 @@
           "loc": 135
         }
       ],
-      "commits_30d": 6,
+      "commits_30d": 0,
       "commits_90d": 9,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -123,35 +108,71 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 6,
       "adr_count": 0,
       "manifest_count": 1,
       "produces_count": 4,
-      "consumes_count": 28
+      "consumes_count": 28,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 9,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/ai-engineering-fluency",
-      "head_sha": "5a987222e37a2e0706aa9373e85900f98455eac1",
-      "files": 1373,
-      "bytes": 26090495,
-      "source_loc": 275866,
+      "head_sha": "dc799aef1569a29404370ad4982a8accecbdace8",
+      "files": 1415,
+      "bytes": 27613076,
+      "source_loc": 281987,
       "languages": [
         {
           "name": "TypeScript",
-          "files": 657,
-          "loc": 224627
+          "files": 692,
+          "loc": 230499
         },
         {
           "name": "JavaScript",
           "files": 90,
-          "loc": 27367
+          "loc": 27541
         },
         {
           "name": "CSS",
           "files": 20,
-          "loc": 9955
+          "loc": 10028
         },
         {
           "name": "Python",
@@ -161,27 +182,12 @@
         {
           "name": "C#",
           "files": 23,
-          "loc": 3872
+          "loc": 3874
         }
       ],
-      "commits_30d": 265,
-      "commits_90d": 881,
+      "commits_30d": 169,
+      "commits_90d": 949,
       "commits_90d_trend": [
-        0,
-        0,
-        4,
-        2,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         18,
         5,
@@ -256,13 +262,50 @@
         13,
         18,
         5,
-        0
+        1,
+        0,
+        0,
+        1,
+        8,
+        0,
+        7,
+        10,
+        8,
+        3,
+        5,
+        5,
+        2,
+        0,
+        6,
+        18
       ],
       "contributor_count": 29,
       "adr_count": 14,
-      "manifest_count": 12,
-      "produces_count": 30,
-      "consumes_count": 263
+      "manifest_count": 13,
+      "produces_count": 31,
+      "consumes_count": 264,
+      "activity": {
+        "commits_30d": 171,
+        "commits_90d": 949,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "high",
+        "priority": "high",
+        "reasons": [
+          "AI files exceed the configured lag threshold",
+          "Readiness evidence is incomplete"
+        ]
+      }
     },
     {
       "full_name": "rajbos/centralPackageVersioningSample",
@@ -289,22 +332,22 @@
         0,
         0,
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         0,
@@ -375,13 +418,34 @@
       "adr_count": 0,
       "manifest_count": 0,
       "produces_count": 0,
-      "consumes_count": 0
+      "consumes_count": 0,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 1,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/create-github-app-from-manifest",
-      "head_sha": "9fdfeecc1b7c0f8f97a6e9d932201bcfe65f9a4c",
+      "head_sha": "395235e6553ec4025bb9cc66f46f920731b781fb",
       "files": 13,
-      "bytes": 234602,
+      "bytes": 233378,
       "source_loc": 225,
       "languages": [
         {
@@ -395,24 +459,9 @@
           "loc": 55
         }
       ],
-      "commits_30d": 0,
-      "commits_90d": 6,
+      "commits_30d": 2,
+      "commits_90d": 8,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -487,13 +536,49 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 4,
       "adr_count": 0,
       "manifest_count": 1,
       "produces_count": 1,
-      "consumes_count": 2
+      "consumes_count": 2,
+      "activity": {
+        "commits_30d": 2,
+        "commits_90d": 8,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/demo-actions",
@@ -518,24 +603,9 @@
           "loc": 2
         }
       ],
-      "commits_30d": 2,
+      "commits_30d": 0,
       "commits_90d": 5,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -610,13 +680,49 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 6,
       "adr_count": 0,
       "manifest_count": 2,
       "produces_count": 2,
-      "consumes_count": 22
+      "consumes_count": 22,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 5,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/demo-javascript-action",
@@ -634,21 +740,6 @@
       "commits_30d": 0,
       "commits_90d": 2,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -723,13 +814,49 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 2,
       "adr_count": 0,
       "manifest_count": 1,
       "produces_count": 2,
-      "consumes_count": 24
+      "consumes_count": 24,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 2,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/demo-webgoat",
@@ -766,22 +893,22 @@
         0,
         0,
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         0,
@@ -852,7 +979,28 @@
       "adr_count": 0,
       "manifest_count": 1,
       "produces_count": 0,
-      "consumes_count": 7
+      "consumes_count": 7,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 1,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/docker-test",
@@ -873,22 +1021,22 @@
         0,
         0,
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         0,
@@ -959,7 +1107,28 @@
       "adr_count": 0,
       "manifest_count": 1,
       "produces_count": 0,
-      "consumes_count": 7
+      "consumes_count": 7,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 1,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/doom-sharp",
@@ -977,21 +1146,6 @@
       "commits_30d": 0,
       "commits_90d": 1,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -1066,13 +1220,49 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 4,
       "adr_count": 0,
       "manifest_count": 0,
       "produces_count": 0,
-      "consumes_count": 4
+      "consumes_count": 4,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 1,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/dotnetcore-webapp",
@@ -1100,21 +1290,6 @@
       "commits_30d": 0,
       "commits_90d": 3,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -1189,13 +1364,49 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 3,
       "adr_count": 0,
       "manifest_count": 0,
       "produces_count": 0,
-      "consumes_count": 12
+      "consumes_count": 12,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 3,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/eco-ci-energy-estimation",
@@ -1207,21 +1418,6 @@
       "commits_30d": 0,
       "commits_90d": 1,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -1296,19 +1492,55 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 6,
       "adr_count": 0,
       "manifest_count": 0,
       "produces_count": 0,
-      "consumes_count": 0
+      "consumes_count": 0,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 1,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/GHAzDo-widget",
-      "head_sha": "c42863cbfe031d88a62e07acc9b349a70c6f1aef",
+      "head_sha": "5f4de23d7e1c9623f3a416ab3b170c77e74240da",
       "files": 61,
-      "bytes": 1423955,
+      "bytes": 1424364,
       "source_loc": 5758,
       "languages": [
         {
@@ -1337,24 +1569,9 @@
           "loc": 119
         }
       ],
-      "commits_30d": 9,
-      "commits_90d": 25,
+      "commits_30d": 6,
+      "commits_90d": 29,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        2,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -1429,17 +1646,53 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 6,
       "adr_count": 0,
       "manifest_count": 3,
       "produces_count": 4,
-      "consumes_count": 33
+      "consumes_count": 33,
+      "activity": {
+        "commits_30d": 6,
+        "commits_90d": 29,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "AI files exceed the configured lag threshold"
+        ]
+      }
     },
     {
       "full_name": "rajbos/github-azure-devops-marketplace-extension-news",
-      "head_sha": "919a759626b688d7395bbea780e974e172a20d84",
+      "head_sha": "1c9fb9f61bc22e056311eb37dc5bcadc4a7ec231",
       "files": 71,
       "bytes": 468409,
       "source_loc": 5153,
@@ -1455,24 +1708,9 @@
           "loc": 646
         }
       ],
-      "commits_30d": 3,
+      "commits_30d": 2,
       "commits_90d": 14,
       "commits_90d_trend": [
-        2,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -1547,20 +1785,56 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 9,
       "adr_count": 0,
       "manifest_count": 1,
       "produces_count": 5,
-      "consumes_count": 33
+      "consumes_count": 33,
+      "activity": {
+        "commits_30d": 2,
+        "commits_90d": 14,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "AI files exceed the configured lag threshold"
+        ]
+      }
     },
     {
       "full_name": "rajbos/github-copilot-model-notifier",
-      "head_sha": "228ade88c06ab0e3180fda20ca1ed2a36de5a3a0",
+      "head_sha": "6ba06dd91e44adb7e589438b5a3fa9da18687b76",
       "files": 12,
-      "bytes": 137644,
-      "source_loc": 1318,
+      "bytes": 139317,
+      "source_loc": 1330,
       "languages": [
         {
           "name": "Python",
@@ -1570,27 +1844,12 @@
         {
           "name": "HTML",
           "files": 1,
-          "loc": 412
+          "loc": 424
         }
       ],
-      "commits_30d": 6,
-      "commits_90d": 29,
+      "commits_30d": 4,
+      "commits_90d": 25,
       "commits_90d_trend": [
-        1,
-        0,
-        0,
-        1,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        1,
-        1,
         0,
         8,
         0,
@@ -1665,19 +1924,55 @@
         0,
         1,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
         0
       ],
       "contributor_count": 5,
       "adr_count": 0,
       "manifest_count": 0,
       "produces_count": 0,
-      "consumes_count": 4
+      "consumes_count": 4,
+      "activity": {
+        "commits_30d": 4,
+        "commits_90d": 25,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/github-copilot-premium-reqs-usage-fork",
-      "head_sha": "feb3e8090d5d19d771be56d9202ee5e533a69a69",
+      "head_sha": "20da1cb89ab8824f8692beb393d2fb9c044349a1",
       "files": 153,
-      "bytes": 1185379,
+      "bytes": 1185386,
       "source_loc": 17871,
       "languages": [
         {
@@ -1706,24 +2001,9 @@
           "loc": 242
         }
       ],
-      "commits_30d": 0,
-      "commits_90d": 14,
+      "commits_30d": 1,
+      "commits_90d": 15,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -1798,13 +2078,49 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 11,
       "adr_count": 0,
       "manifest_count": 1,
       "produces_count": 1,
-      "consumes_count": 96
+      "consumes_count": 96,
+      "activity": {
+        "commits_30d": 1,
+        "commits_90d": 15,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "AI files exceed the configured lag threshold"
+        ]
+      }
     },
     {
       "full_name": "rajbos/github-fork-updater",
@@ -1819,7 +2135,7 @@
           "loc": 623
         }
       ],
-      "commits_30d": 1,
+      "commits_30d": 0,
       "commits_90d": 2,
       "commits_90d_trend": [
         0,
@@ -1831,21 +2147,6 @@
         0,
         0,
         0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         1,
         0,
         0,
@@ -1884,6 +2185,21 @@
         0,
         0,
         1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         0,
@@ -1917,39 +2233,45 @@
       "adr_count": 0,
       "manifest_count": 1,
       "produces_count": 1,
-      "consumes_count": 18
+      "consumes_count": 18,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 2,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "AI files exceed the configured lag threshold"
+        ]
+      }
     },
     {
       "full_name": "rajbos/GitHub-ratelimit-research",
-      "head_sha": "dfd978133eeb9225be624a13a7a7f8a4b07ee7f8",
+      "head_sha": "e58a173747ef3a8da7a09cc69d043b9c23ab28ba",
       "files": 6,
-      "bytes": 52782,
-      "source_loc": 853,
+      "bytes": 118467,
+      "source_loc": 2013,
       "languages": [
         {
           "name": "HTML",
           "files": 1,
-          "loc": 853
+          "loc": 2013
         }
       ],
-      "commits_30d": 4,
-      "commits_90d": 5,
+      "commits_30d": 13,
+      "commits_90d": 18,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -2024,35 +2346,71 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        10,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 5,
       "adr_count": 0,
       "manifest_count": 0,
       "produces_count": 1,
-      "consumes_count": 10
+      "consumes_count": 12,
+      "activity": {
+        "commits_30d": 13,
+        "commits_90d": 18,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "medium",
+        "priority": "high",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/Jarvis",
-      "head_sha": "07fe425008b8ca7c5f94c602c81805a465d96bd4",
-      "files": 364,
-      "bytes": 4414113,
-      "source_loc": 77203,
+      "head_sha": "e73b71251000524bbbb108dbff83e6c17a11269a",
+      "files": 393,
+      "bytes": 4695173,
+      "source_loc": 83428,
       "languages": [
         {
           "name": "TypeScript",
-          "files": 281,
-          "loc": 68364
+          "files": 316,
+          "loc": 74460
         },
         {
           "name": "CSS",
           "files": 3,
-          "loc": 6718
+          "loc": 7127
         },
         {
           "name": "JavaScript",
-          "files": 11,
-          "loc": 1664
+          "files": 4,
+          "loc": 1384
         },
         {
           "name": "PowerShell",
@@ -2065,24 +2423,9 @@
           "loc": 187
         }
       ],
-      "commits_30d": 121,
-      "commits_90d": 327,
+      "commits_30d": 77,
+      "commits_90d": 368,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -2157,13 +2500,49 @@
         3,
         0,
         2,
+        0,
+        0,
+        0,
+        0,
+        1,
+        2,
+        18,
+        8,
+        0,
+        2,
+        1,
+        1,
+        0,
+        0,
+        8,
         0
       ],
       "contributor_count": 7,
       "adr_count": 0,
       "manifest_count": 1,
       "produces_count": 11,
-      "consumes_count": 54
+      "consumes_count": 55,
+      "activity": {
+        "commits_30d": 77,
+        "commits_90d": 368,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "high",
+        "priority": "high",
+        "reasons": [
+          "AI files exceed the configured lag threshold"
+        ]
+      }
     },
     {
       "full_name": "rajbos/mcp-registry-demo",
@@ -2191,21 +2570,6 @@
       "commits_30d": 0,
       "commits_90d": 5,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -2280,29 +2644,65 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 3,
       "adr_count": 0,
       "manifest_count": 1,
       "produces_count": 1,
-      "consumes_count": 14
+      "consumes_count": 14,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 5,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
-      "full_name": "rajbos/openssf-scorecard-monitor",
-      "head_sha": "e7e6c3cfad34d4bdcb0b36557c193332239858f0",
-      "files": 34,
-      "bytes": 3079998,
-      "source_loc": 50477,
+      "full_name": "rajbos/mistral-openapi-spec-checker",
+      "head_sha": "29348cec599a825bb7648e9c56e0e6fe115212f8",
+      "files": 11,
+      "bytes": 25876,
+      "source_loc": 313,
       "languages": [
         {
-          "name": "JavaScript",
-          "files": 8,
-          "loc": 50477
+          "name": "Python",
+          "files": 2,
+          "loc": 313
         }
       ],
-      "commits_30d": 3,
-      "commits_90d": 9,
+      "commits_30d": 6,
+      "commits_90d": 6,
       "commits_90d_trend": [
         0,
         0,
@@ -2319,6 +2719,125 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        5,
+        0,
+        0,
+        0,
+        0
+      ],
+      "contributor_count": 4,
+      "adr_count": 0,
+      "manifest_count": 1,
+      "produces_count": 0,
+      "consumes_count": 11,
+      "activity": {
+        "commits_30d": 6,
+        "commits_90d": 6,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
+    },
+    {
+      "full_name": "rajbos/openssf-scorecard-monitor",
+      "head_sha": "e7e6c3cfad34d4bdcb0b36557c193332239858f0",
+      "files": 34,
+      "bytes": 3079998,
+      "source_loc": 50477,
+      "languages": [
+        {
+          "name": "JavaScript",
+          "files": 8,
+          "loc": 50477
+        }
+      ],
+      "commits_30d": 0,
+      "commits_90d": 9,
+      "commits_90d_trend": [
         0,
         0,
         0,
@@ -2393,13 +2912,49 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 10,
       "adr_count": 0,
       "manifest_count": 1,
       "produces_count": 1,
-      "consumes_count": 20
+      "consumes_count": 20,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 9,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/rajbos",
@@ -2414,8 +2969,8 @@
           "loc": 4488
         }
       ],
-      "commits_30d": 2,
-      "commits_90d": 7,
+      "commits_30d": 0,
+      "commits_90d": 6,
       "commits_90d_trend": [
         0,
         0,
@@ -2426,21 +2981,6 @@
         0,
         0,
         0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         2,
         1,
         0,
@@ -2479,6 +3019,21 @@
         0,
         0,
         2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0,
         0,
         0,
@@ -2512,7 +3067,28 @@
       "adr_count": 0,
       "manifest_count": 1,
       "produces_count": 3,
-      "consumes_count": 26
+      "consumes_count": 26,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 6,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "AI files exceed the configured lag threshold"
+        ]
+      }
     },
     {
       "full_name": "rajbos/rajbos.github.io",
@@ -2547,24 +3123,9 @@
           "loc": 1
         }
       ],
-      "commits_30d": 11,
+      "commits_30d": 2,
       "commits_90d": 28,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -2639,13 +3200,49 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 11,
       "adr_count": 0,
       "manifest_count": 0,
       "produces_count": 0,
-      "consumes_count": 1
+      "consumes_count": 1,
+      "activity": {
+        "commits_30d": 2,
+        "commits_90d": 28,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "AI files exceed the configured lag threshold"
+        ]
+      }
     },
     {
       "full_name": "rajbos/scorecard-ghes",
@@ -2673,21 +3270,6 @@
       "commits_30d": 0,
       "commits_90d": 3,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -2762,13 +3344,49 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 114,
       "adr_count": 0,
       "manifest_count": 10,
       "produces_count": 3,
-      "consumes_count": 591
+      "consumes_count": 591,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 3,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     },
     {
       "full_name": "rajbos/typescript-demo",
@@ -2788,24 +3406,9 @@
           "loc": 57
         }
       ],
-      "commits_30d": 1,
+      "commits_30d": 0,
       "commits_90d": 8,
       "commits_90d_trend": [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
         0,
         0,
         0,
@@ -2880,13 +3483,49 @@
         0,
         0,
         0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
         0
       ],
       "contributor_count": 2,
       "adr_count": 0,
       "manifest_count": 1,
       "produces_count": 2,
-      "consumes_count": 17
+      "consumes_count": 17,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 8,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
     }
   ],
   "connections": [
@@ -2904,5 +3543,428 @@
         }
       ]
     }
+  ],
+  "capabilities": [
+    "activity_windows_v1",
+    "ai_commit_drift_v1",
+    "ai_content_cues_v1",
+    "ai_kind_coverage_v1",
+    "attention_rules_v1",
+    "configured_team_aggregate_v1",
+    "repository_references_v1"
+  ],
+  "references": [
+    {
+      "source": "rajbos/Jarvis",
+      "target": "rajbos/ai-engineering-fluency",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "package.json",
+        "line": 57,
+        "head_sha": "e73b71251000524bbbb108dbff83e6c17a11269a"
+      }
+    },
+    {
+      "source": "rajbos/actions-marketplace",
+      "target": "rajbos/github-fork-updater",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "README.md",
+        "line": 8,
+        "head_sha": "2e228daa6775f0f445b46df2332d87a84b82ec1c"
+      }
+    },
+    {
+      "source": "rajbos/ai-engineering-fluency",
+      "target": "rajbos/github-copilot-model-notifier",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": ".github/workflows/update-model-data.yml",
+        "line": 82,
+        "head_sha": "dc799aef1569a29404370ad4982a8accecbdace8"
+      }
+    },
+    {
+      "source": "rajbos/ai-engineering-fluency",
+      "target": "rajbos/github-copilot-model-notifier",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": ".github/workflows/update-model-data.yml",
+        "line": 90,
+        "head_sha": "dc799aef1569a29404370ad4982a8accecbdace8"
+      }
+    },
+    {
+      "source": "rajbos/ai-engineering-fluency",
+      "target": "rajbos/github-copilot-model-notifier",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": ".github/workflows/update-model-data.yml",
+        "line": 93,
+        "head_sha": "dc799aef1569a29404370ad4982a8accecbdace8"
+      }
+    },
+    {
+      "source": "rajbos/github-copilot-premium-reqs-usage-fork",
+      "target": "rajbos/github-copilot-model-notifier",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": ".github/workflows/update-model-multipliers.yml",
+        "line": 54,
+        "head_sha": "20da1cb89ab8824f8692beb393d2fb9c044349a1"
+      }
+    },
+    {
+      "source": "rajbos/github-copilot-premium-reqs-usage-fork",
+      "target": "rajbos/github-copilot-model-notifier",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": ".github/workflows/update-model-multipliers.yml",
+        "line": 59,
+        "head_sha": "20da1cb89ab8824f8692beb393d2fb9c044349a1"
+      }
+    },
+    {
+      "source": "rajbos/github-copilot-premium-reqs-usage-fork",
+      "target": "rajbos/github-copilot-model-notifier",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": ".github/workflows/update-model-multipliers.yml",
+        "line": 60,
+        "head_sha": "20da1cb89ab8824f8692beb393d2fb9c044349a1"
+      }
+    },
+    {
+      "source": "rajbos/rajbos",
+      "target": "rajbos/actions-marketplace",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "README.md",
+        "line": 30,
+        "head_sha": "cfbfb9611e8885667d16f35a3bffee289edd2c02"
+      }
+    },
+    {
+      "source": "rajbos/rajbos",
+      "target": "rajbos/github-fork-updater",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "README.md",
+        "line": 31,
+        "head_sha": "cfbfb9611e8885667d16f35a3bffee289edd2c02"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/GHAzDo-widget",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2026-05-06-OSS-projects.md",
+        "line": 63,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/Jarvis",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2026-05-06-OSS-projects.md",
+        "line": 75,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/actions-marketplace",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2021-10-14-GitHub-Actions-Internal-Marketplace.md",
+        "line": 153,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/actions-marketplace",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2021-10-14-GitHub-Actions-Internal-Marketplace.md",
+        "line": 163,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/actions-marketplace",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2021-10-14-GitHub-Actions-Internal-Marketplace.md",
+        "line": 166,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/actions-marketplace",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2021-12-04-github-actions-marketplace.md",
+        "line": 15,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/actions-marketplace",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2021-12-11-GitHub-Actions-Maturity-Levels.md",
+        "line": 141,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/actions-marketplace",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2022-08-12-workflows-not-starting.md",
+        "line": 79,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/actions-marketplace",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2022-09-18-Analysing-the-GitHub-marketplace.md",
+        "line": 133,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/ai-engineering-fluency",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2026-05-06-OSS-projects.md",
+        "line": 23,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/ai-engineering-fluency",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2026-05-06-OSS-projects.md",
+        "line": 27,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/ai-engineering-fluency",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2026-05-15-ai-billing-business-value.md",
+        "line": 64,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/ai-engineering-fluency",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2026-05-15-ai-engineering-fluency-extension.md",
+        "line": 8,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/ai-engineering-fluency",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2026-05-15-ai-engineering-fluency-extension.md",
+        "line": 88,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/ai-engineering-fluency",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2026-05-15-ai-engineering-fluency-extension.md",
+        "line": 91,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/create-github-app-from-manifest",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2021-12-27-GitHub-App-from-manifest.md",
+        "line": 35,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/dotnetcore-webapp",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2015-05-19-aspnet-demoproject-started.md",
+        "line": 10,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/dotnetcore-webapp",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2019-10-26-Deploy-dotnetcore-webapp-with-GitHub-Actions.md",
+        "line": 22,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/dotnetcore-webapp",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2020-11-24-github-actions-with-private-runner-iis.md",
+        "line": 15,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/dotnetcore-webapp",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2020-11-24-github-actions-with-private-runner-iis.md",
+        "line": 30,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/dotnetcore-webapp",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2020-11-24-github-actions-with-private-runner-iis.md",
+        "line": 65,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/github-copilot-model-notifier",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2026-07-13-github-governance-resource-map.md",
+        "line": 62,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/github-fork-updater",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2021-02-06-GitHub-Actions-Forking-Repositories.md",
+        "line": 115,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/github-fork-updater",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2021-12-11-GitHub-Actions-Maturity-Levels.md",
+        "line": 138,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/mcp-registry-demo",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2025-12-20-Copilot-Agent-example.md",
+        "line": 94,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/mcp-registry-demo",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2026-03-13-running-mcp-servers-securely.md",
+        "line": 41,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    },
+    {
+      "source": "rajbos/rajbos.github.io",
+      "target": "rajbos/mcp-registry-demo",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
+        "path": "_posts/2026-03-13-running-mcp-servers-securely.md",
+        "line": 69,
+        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
+      }
+    }
+  ],
+  "capability_warnings": [
+    "Static content cues measure textual coverage, not quality, effectiveness or tool setup validity",
+    "Team attribution is opt-in exact local author-email matching; API linked-author attribution remains caller enrichment",
+    "Activity and AI signals may be unknown at request/file budgets; null is not zero"
   ]
 }
