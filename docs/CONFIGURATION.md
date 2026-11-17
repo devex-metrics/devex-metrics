@@ -117,6 +117,13 @@ variables are an overlay on top of it, adding a headline, a hypothesis, an
 intervention date and milestone markers on the charts. Configure the comparison
 first and add the trial framing when an experiment actually starts.
 
+The dashboard offers **Last 30 Days**, **Last 90 Days**, **Last 120 Days**,
+**Last 150 Days**, **Last 180 Days**, **This Year** and **All Time**.
+Rolling windows end at the snapshot's collection timestamp (UTC), not the
+viewer's current date; **This Year** starts on January 1 of that snapshot's year.
+The longer windows provide more pre-experiment context when the collected history
+is available. The selected period is preserved in shared dashboard URLs.
+
 The comparison includes median wait from opening a PR to its first submitted
 review, as well as PR cycle time. Both columns use the selected period by
 default; `DEVEX_BASELINE_FROM` / `DEVEX_BASELINE_TO` pin the all-repos baseline

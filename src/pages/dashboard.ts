@@ -551,6 +551,9 @@ ${buildTrialBanner(data, teamRepoNames.length)}
     <div class="filter-btns">
       <button class="filter-btn" data-period="all">All Time</button>
       <button class="filter-btn" data-period="year">This Year</button>
+      <button class="filter-btn" data-period="180days">Last 180 Days</button>
+      <button class="filter-btn" data-period="150days">Last 150 Days</button>
+      <button class="filter-btn" data-period="120days">Last 120 Days</button>
       <button class="filter-btn" data-period="90days">Last 90 Days</button>
       <button class="filter-btn active" data-period="30days">Last 30 Days</button>
     </div>
