@@ -9,7 +9,7 @@ import type {
   OrgMetrics,
   RepoMetrics,
 } from "../types.js";
-import type { BrandingConfig } from "../config.js";
+import type { BrandingConfig, FocusConfig } from "../config.js";
 import type { RollupRow } from "../history.js";
 import { LARGE_PR_LINES } from "../history.js";
 import { postReviewCommitFacts } from "../review-rework.js";
@@ -18,6 +18,7 @@ import { escapeHtml, computeMedian, weekToDate, formatDurationHtml } from "./uti
 import { getCSS } from "./styles.js";
 import { getJS } from "./scripts.js";
 import { buildRepoRow } from "./repo-row.js";
+import { buildFocusSection, classifyFocusAuthor } from "./focus.js";
 import { buildLandscapeSection } from "./landscape.js";
 import { getLandscapeControlsJS } from "./landscape-controls.js";
 import { buildPublicDiscoverySection, getPublicDiscoveryControlsJS } from "./public-discovery.js";
@@ -72,6 +73,8 @@ export interface DatasetNavEntry {
 
 /** Optional extras threaded in from the site build. */
 export interface DashboardExtras {
+  /** Current build-time roster; only cohort labels, never the roster, enter the page payload. */
+  focus?: FocusConfig;
   /** Site branding. Falls back to the built-in defaults when absent. */
   branding?: BrandingConfig;
   /** Rollup history rows, used by the trial view's baseline. */
@@ -137,6 +140,9 @@ export function buildDashboardHtml(
   const ciSamples = extras.ciSamples ?? [];
   const ciWindowDays = extras.ciWindowDays ?? 90;
   const datasets = extras.datasets;
+  const focus = extras.focus?.users.length ? extras.focus : undefined;
+  const focusUsers = new Set(focus?.users.map((login) => login.trim().toLowerCase()));
+  const cohort = (author: string) => focus ? classifyFocusAuthor(author, focusUsers) : undefined;
   const totals = aggregate(data.repos);
   const teamRepos = data.repos.filter((r) => r.isTeamRepo);
   const teamRepoNames = teamRepos.map((r) => r.name);
@@ -190,7 +196,7 @@ export function buildDashboardHtml(
     .sort((a, b) => b.issues + b.prs - (a.issues + a.prs))
     .slice(0, 15);
 
-  const repoRows = data.repos.map((repo, index) => buildRepoRow(repo, index >= 20)).join("\n");
+  const repoRows = data.repos.map((repo, index) => buildRepoRow(repo, index >= 20, !!focus)).join("\n");
 
   // Build enriched PR details for charts — prefer the mergedPRTimeline
   // (wider history, 1 cheap API call) over the 10-entry pullRequestDetails.
@@ -203,6 +209,7 @@ export function buildDashboardHtml(
         mergedAt: p.mergedAt,
         createdAt: p.createdAt,
         author: p.author,
+        cohort: cohort(p.author),
         isBotAuthor: p.isBotAuthor,
         isCopilotAuthored: p.isCopilotAuthored,
         aiAuthorType: p.aiAuthorType,
@@ -228,7 +235,10 @@ export function buildDashboardHtml(
         mergedAt: pr.mergedAt!,
         createdAt: pr.createdAt,
         author: pr.author,
+        cohort: cohort(pr.author),
         isBotAuthor: false,
+        botAuthorKnown: false,
+        cycleTimeKnown: pr.timeToMergeHours !== undefined,
         isCopilotAuthored: pr.isCopilotAuthored,
         aiAuthorType: pr.aiAuthorType,
         timeToMergeHours: pr.timeToMergeHours ?? 0,
@@ -254,6 +264,7 @@ export function buildDashboardHtml(
       createdAt: p.createdAt,
       closedAt: p.closedAt,
       author: p.author,
+      cohort: cohort(p.author),
       isBotAuthor: p.isBotAuthor,
       aiAuthorType: p.aiAuthorType,
       linesAdded: p.linesAdded,
@@ -413,6 +424,7 @@ export function buildDashboardHtml(
   }));
 
   const chartPayload = JSON.stringify({
+    focus: focus ? { name: focus.name } : null,
     owner: data.owner,
     issues: { open: totals.openIssues, closed: totals.closedIssues },
     prs: {
@@ -568,6 +580,10 @@ ${buildTrialBanner(data, teamRepoNames.length)}
       <button class="scope-btn active" data-scope="all" title="Every collected repository — the baseline">All repos</button>
       <button class="scope-btn" data-scope="team" title="Only the repositories in ${escapeHtml(data.team?.name ?? "the team")}">${escapeHtml(data.team?.name ?? "Team")}</button>
     </div>` : ""}
+    ${focus ? `<div class="scope-btns" role="group" aria-label="PR author comparison">
+      <button type="button" class="focus-mode-btn active" data-comparison="all" aria-pressed="true">All authors</button>
+      <button type="button" class="focus-mode-btn" data-comparison="focus" aria-pressed="false">Focus vs Rest</button>
+    </div>` : ""}
     <div class="repo-picker" id="repoPicker">
       <button class="repo-picker-btn" id="repoPickerBtn" aria-haspopup="true" aria-expanded="false" title="Filter charts by repository">
         <span id="repoPickerLabel">All repos</span> <span class="repo-picker-caret" aria-hidden="true">&#9660;</span>
@@ -589,6 +605,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
 
 <main>
   ${buildIncompleteNotice(data.repos)}
+  ${focus ? buildFocusSection(focus) : ""}
   <section class="kpis" aria-label="Key metrics">
     <div class="kpi">
       <div class="kpi-icon" aria-hidden="true">&#x1F4E6;</div>
@@ -726,6 +743,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
           <th scope="col" class="col-date"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="pushed" data-sort-label="Last Updated" data-sort-default="descending">Last Updated <span class="sort-ind" aria-hidden="true">↕</span></button></th>
           <th scope="col" class="col-lines" title="Lines added/removed in collected merged PRs in the selected period; missing line counts are labelled"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="linesAdded" data-sort-label="Lines Added" data-sort-default="descending">Lines +/- <span class="sort-ind" aria-hidden="true">↕</span></button></th>
           <th scope="col" class="col-num" title="Copilot agent tasks in the 30-day collection window"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="agentTasks" data-sort-label="Agent Tasks" data-sort-default="descending">Agent Tasks (30 d) <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          ${focus ? '<th scope="col" class="focus-repo-cell" hidden>Focus / Rest / Unknown <span class="trial-hint">collected merged PRs</span></th>' : ""}
         </tr></thead>
         <tbody id="repoList">${repoRows}</tbody>
       </table>

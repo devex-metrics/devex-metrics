@@ -41,8 +41,8 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_TEAM_HANDLES` | list | GitHub logins for conservatively attributed Git commit activity in the public AI landscape. No handles means Unknown, not zero. |
 | `DEVEX_TEAM_NAME` | string | Team display name. |
 | `DEVEX_TEAM_ID` | string | Stable id used in history rows and share URLs. |
-| `DEVEX_FOCUS_NAME` | string | Display name for the optional commit-author comparison group. |
-| `DEVEX_FOCUS_USERS` | list | Up to 100 distinct GitHub logins whose linked PR commit authorship is compared with the rest. |
+| `DEVEX_FOCUS_NAME` | string | Display name for the optional dashboard PR-author and report commit-author comparison group. |
+| `DEVEX_FOCUS_USERS` | list | Up to 100 distinct GitHub logins for the build-time focus group. |
 | `DEVEX_DISCOVER_ALL` | bool | Collect the whole org as a baseline. Default `true`. |
 | `DEVEX_TRIAL_TITLE` | string | Intervention headline. |
 | `DEVEX_TRIAL_HYPOTHESIS` | string | What the intervention should change. |
@@ -175,17 +175,58 @@ unavailable rather than zero. The Markdown report also shows per-repository
 sample sizes and lower bounds. Newly collected raw comment and commit facts
 are retained in future events; older append-only events are not rewritten.
 
-### Comparing PR commit authors
+### Comparing a focus group with the rest
 
 Set `DEVEX_FOCUS_NAME` and `DEVEX_FOCUS_USERS` (comma-, semicolon- or
 newline-separated GitHub logins) to add a **Commit author attribution** section
-to the Markdown report. Logins are matched case-insensitively, and Enterprise
+to the Markdown report and an **All authors / Focus vs Rest** control to the
+Pages dashboard. Logins are matched case-insensitively, and Enterprise
 Managed User logins (`handle_shortcode`) are accepted. The roster is a
 build-time setting, so changing it and rebuilding Pages reclassifies the
 identities already present in the latest snapshot without another collection.
 An empty Actions variable is treated as unset, preserving a roster supplied by
 `DEVEX_CONFIG` or the config file. To explicitly clear that roster, set
 `focus.users` to an empty array in the JSON configuration.
+
+#### Dashboard: PR authorship
+
+The comparison uses each PR's **author**, not its merger, individual reviewers,
+commit authors or co-authors. Both cohorts use the same selected repositories,
+period and bot filter. Missing/deleted author identities form a separate
+**Unknown author** category, never “rest.” Bot-authored PRs are not assigned to
+a human sponsor; when excluding bots, detailed-only PR samples without bot
+identity evidence are omitted. Renamed logins need the old and new names in
+the roster to match both generations of stored login facts.
+
+Comparison charts show merged PR counts/share, repository distribution,
+weekly merged PRs, known lines, cycle time, first-review wait and AI-attributed
+share. The comparison table includes approval waits, reviews, comments,
+threads, complete post-review commit evidence and abandonment. Review metrics
+describe reviews **received on the group's PRs**, not reviews performed by its
+members. Medians are calculated independently and empty/missing measurements
+remain unavailable. AI attribution can include human-authored, AI-assisted PRs.
+
+The repository table adds **Focus / Rest / Unknown** merged-PR counts and the
+focus share of all collected merged PRs, including unknown authors. Its merged
+totals use this same sample in comparison mode, including All Time. Sorting
+and pagination continue to operate within the existing repository age groups.
+Open counts, issues, people, dependents, issue lead time, agent tasks and CI
+cannot be split safely by PR author; retained contextual panels are labelled
+repository-wide. The normal all-author view remains available.
+
+Merged metrics use `mergedAt`; unmerged abandonment uses `closedAt`. Counts are
+from the latest snapshot's collected timeline (or a small detailed fallback),
+**not lifetime totals or the append-only event archive**. All Time means all
+collected PRs. Large-monorepo page caps and missing measurements can bias both
+cohorts; collection warnings remain visible for affected periods. No cache
+schema bump or historical enrichment is needed to reclassify existing authors.
+
+Only the group name and derived cohort labels are added to the HTML payload,
+not the configured roster. Existing PR/reviewer identities remain in the page
+and downloadable `data.json`; review Pages access before publishing customer
+data. The raw dataset is unchanged by roster selection.
+
+#### Markdown report: commit authorship
 
 The report counts sampled commits with only focus-group linked authors, only
 other linked authors, both (mixed), or unavailable/incomplete identity evidence.

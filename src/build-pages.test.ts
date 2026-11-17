@@ -67,6 +67,17 @@ describe("build-pages", () => {
     expect(html).toContain("DevEx Metrics");
   });
 
+  it("passes the current focus roster to Pages without publishing unused roster identities", () => {
+    execFileSync("node", ["dist/build-pages.js", "test-pages-owner"], {
+      cwd: process.cwd(),
+      env: { ...process.env, DEVEX_FOCUS_NAME: "Example group", DEVEX_FOCUS_USERS: "unused_roster" },
+    });
+    const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf8");
+    expect(html).toContain('id="focusComparison"');
+    expect(html).toContain("Example group");
+    expect(html).not.toContain("unused_roster");
+  });
+
   it("publishes the opt-in landscape view and sanitized JSON without changing the base data API", () => {
       const historyDir = path.join(dataDir, "test-pages-landscape-history");
       const envelope: CacheEnvelope = JSON.parse(fs.readFileSync(cacheFile, "utf8"));

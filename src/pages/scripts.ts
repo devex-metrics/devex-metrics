@@ -1,3 +1,5 @@
+import { getFocusJS } from "./focus.js";
+
 export function getJS(): string {
   return `
 var charts={};
@@ -6,6 +8,7 @@ var cssColors={};
 var selectedRepos=new Set();
 var repoScope="all";
 var restoringState=false;
+var focusCompare=false;
 var repoListRefresh=null;
 function hexToRgba(hex,a){
   var h=(hex||"").replace("#","");
@@ -43,6 +46,7 @@ function setupThemeToggle(){
     // Charts bake their colours in at creation, so rebuild them in place; the table, sort and paging are untouched.
     if(typeof Chart==="undefined")return;
     refreshCssColors();
+    destroyFocusCharts();
     // applyFilter rebuilds the review/rework rows, which closes their "See PRs" disclosures.
     var openPRs=[];
     document.querySelectorAll("details.review-pr-details[open]").forEach(function(d){
@@ -96,6 +100,7 @@ document.addEventListener("DOMContentLoaded",function(){
   setupFilter();
   setupRepoPicker();
   setupScopeButtons();
+  setupFocusComparison();
   setupTrialTabs();
   setupShare();
   formatLineNumbers();
@@ -107,6 +112,7 @@ document.addEventListener("DOMContentLoaded",function(){
 // into a message or a deck and reopen exactly as it was.
 function readStateFromUrl(){
   var params=new URLSearchParams(window.location.search);
+  focusCompare=params.get("comparison")==="focus"&&!!CHART_DATA.focus;
   var period=params.get("period");
   if(period!=="all"&&period!=="year"&&!getPeriodDays(period))period="30days";
 
@@ -140,6 +146,7 @@ function readStateFromUrl(){
 function writeStateToUrl(period){
   if(restoringState)return;
   var params=new URLSearchParams();
+  if(focusCompare)params.set("comparison","focus");
   if(period&&period!=="30days")params.set("period",period);
   var botCb=document.getElementById("excludeBots");
   if(botCb&&botCb.checked)params.set("bots","exclude");
@@ -345,7 +352,7 @@ function updateCollectionWarnings(cutoff,repoFiltered){
 function updateRepoPeriod(cutoff,period,excludeBots,repoFiltered){
   var byRepo=new Map();
   (CHART_DATA.allPRDetails||[]).forEach(function(p){
-    if(cutoff&&new Date(p.mergedAt)<cutoff||excludeBots&&p.isBotAuthor||
+    if(cutoff&&new Date(p.mergedAt)<cutoff||excludeBots&&(p.isBotAuthor||focusCompare&&p.botAuthorKnown===false)||
       repoFiltered&&!selectedRepos.has(p.repo))return;
     if(!byRepo.has(p.repo))byRepo.set(p.repo,[]);
     byRepo.get(p.repo).push(p);
@@ -362,7 +369,7 @@ function updateRepoPeriod(cutoff,period,excludeBots,repoFiltered){
     var row=rows.get(summary.name.toLowerCase());
     if(!row)return;
     var prs=byRepo.get(summary.name)||[];
-    var lifetime=period==="all"&&!excludeBots&&!repoFiltered;
+    var lifetime=period==="all"&&!excludeBots&&!repoFiltered&&!focusCompare;
     var merged=lifetime?summary.merged:prs.length;
     var mergedText=String(merged)+(!lifetime&&!summary.hasMergedTimeline?" (sample)":"");
     row.querySelector(".td-merged-prs").textContent=mergedText;
@@ -1236,6 +1243,7 @@ function applyFilter(period){
   updateCiHealth(cutoff,repoFiltered,period);
 
   updateTrial(cutoff,excludeBots,period);
+  updateFocusComparison(filteredPR,closedInPeriod,period,excludeBots,repoFiltered);
 }
 
 // ── PR size distribution ──
@@ -2147,5 +2155,6 @@ function toggleRepo(btn){
   btn.setAttribute("aria-expanded",String(!exp));
   if(dr){dr.hidden=exp;dr.style.display=exp?"none":"";}
   row.classList.toggle("expanded");
-}`;
+}
+${getFocusJS()}`;
 }

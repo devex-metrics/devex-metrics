@@ -131,6 +131,7 @@ function writeDatasetPage(
     branch,
     runUrl,
     {
+      focus,
       datasets: nav,
       landscape,
       landscapeStatus:

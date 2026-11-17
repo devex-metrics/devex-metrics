@@ -2,7 +2,7 @@ import type { RepoMetrics } from "../types.js";
 import { collectionStateLabel, collectionWarningDetail } from "../collection-state.js";
 import { escapeHtml, formatDurationHtml } from "./utils.js";
 
-export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string {
+export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false, focus = false): string {
   const sortedPRDetails = [...repo.pullRequestDetails].sort((a, b) => {
     if (!a.mergedAt && !b.mergedAt) return 0;
     if (!a.mergedAt) return 1;
@@ -90,6 +90,7 @@ export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string
     `<td>${pushedDate}</td>` +
     `<td class="td-lines td-period-lines"><span class="add">+${linesAdded}</span><span class="del">-${linesDeleted}</span></td>` +
     `<td>${agentTaskCount > 0 ? agentTaskCount : '<span class="col-muted">&ndash;</span>'}</td>` +
+    (focus ? '<td class="focus-repo-cell" hidden></td>' : "") +
     `</tr>`;
 
   const detailRow =
