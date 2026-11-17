@@ -186,6 +186,7 @@ function main(): void {
   }
 
   const html = buildDashboardHtml(data, date, process.env.GITHUB_REF_NAME, buildRunUrl(), {
+    focus: config.focus,
     branding: config.branding,
     history,
     ciSamples,

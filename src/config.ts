@@ -72,7 +72,7 @@ export interface TrialConfig {
   milestones: TrialMilestone[];
 }
 
-/** GitHub users whose linked commit authorship is compared with all other authors. */
+/** GitHub users compared with other PR authors in Pages and linked commit authors in the report. */
 export interface FocusConfig {
   /** Display name for the comparison group. */
   name: string;
@@ -229,7 +229,7 @@ export interface DevexConfig {
   branding: BrandingConfig;
   repos: RepoFilterConfig;
   team?: TeamConfig;
-  /** Current build-time roster for commit-author comparison. */
+  /** Current build-time roster for PR-author and commit-author comparisons. */
   focus?: FocusConfig;
   trial?: TrialConfig;
   collection: CollectionConfig;

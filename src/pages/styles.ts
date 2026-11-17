@@ -63,7 +63,7 @@ a{color:var(--accent)}
 .kpi-val{font-size:2rem;font-weight:700;line-height:1.1}
 .kpi-lbl{font-size:.85rem;color:var(--muted);margin-top:.15rem}
 .kpi-sub{font-size:.75rem;color:var(--muted);margin-top:.15rem}
-.charts{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:2rem}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;margin-bottom:2rem}
 .card{background:var(--card);border-radius:var(--r);padding:1.25rem;box-shadow:var(--sh)}
 .card h2{font-size:1rem;font-weight:600;margin-bottom:.75rem}
 .card-wide{grid-column:1/-1}
@@ -165,7 +165,7 @@ dl{display:flex;flex-direction:column;gap:.15rem}
 footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.8rem;
   color:var(--muted);border-top:1px solid var(--border)}
 @media(max-width:640px){
-  .charts{grid-template-columns:1fr}
+  .charts{grid-template-columns:minmax(0,1fr)}
   .hero{padding:1.5rem 1rem}.hero h1{font-size:1.4rem}
   .toolbar-ctrls{flex-direction:column;width:100%}
   #repoFilter{width:100%}
@@ -202,6 +202,17 @@ footer{max-width:1400px;margin:0 auto;padding:1rem;text-align:center;font-size:.
 .scope-btn + .scope-btn{border-left:1px solid var(--border)}
 .scope-btn:hover{color:var(--accent)}
 .scope-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.focus-mode-btn{font:inherit;font-size:.78rem;padding:.28rem .8rem;border:0;
+  background:transparent;color:var(--fg);cursor:pointer}
+.focus-mode-btn + .focus-mode-btn{border-left:1px solid var(--border)}
+.focus-mode-btn:hover{color:var(--accent)}
+.focus-mode-btn.active{background:var(--accent);color:var(--card);font-weight:600}
+.focus-mode-btn:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+.focus-comparison>.metric-card{margin-bottom:1.25rem}
+.focus-comparison[hidden],.focus-repo-cell[hidden],.focus-context[hidden],.focus-all-hidden,.focus-chart-empty{display:none!important}
+.focus-repo-cell{white-space:nowrap;font-variant-numeric:tabular-nums}
+.focus-repo-cell small{display:block;color:var(--muted)}
+.focus-sample{color:var(--muted);white-space:nowrap}
 
 /* ── share link ── */
 .share-btn{font:inherit;font-size:.78rem;padding:.28rem .8rem;border:1px solid var(--border);
