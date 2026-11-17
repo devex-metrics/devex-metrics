@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded",function(){
 function readStateFromUrl(){
   var params=new URLSearchParams(window.location.search);
   var period=params.get("period");
-  if(["all","year","90days","30days"].indexOf(period)===-1)period="30days";
+  if(period!=="all"&&period!=="year"&&!getPeriodDays(period))period="30days";
 
   var bots=params.get("bots");
   var botCb=document.getElementById("excludeBots");
@@ -781,13 +781,21 @@ function setupRepoPicker(){
     applyFilter(activeBtn?activeBtn.dataset.period:"30days");
   }
 }
+function getPeriodDays(period){
+  var match=/^(30|90|120|150|180)days$/.exec(period);
+  return match?Number(match[1]):null;
+}
+function getPeriodLabel(period,sentence){
+  if(period==="all")return sentence?"all time":"All Time";
+  if(period==="year")return sentence?"this year":"This Year";
+  var days=getPeriodDays(period);
+  return sentence?"the last "+days+" days":"Last "+days+" Days";
+}
 function getCutoffDate(period){
   var collected=new Date(CHART_DATA.collectedAt);
-  var d;
   if(period==="year")return new Date(Date.UTC(collected.getUTCFullYear(),0,1));
-  d=new Date(collected);
-  if(period==="90days"){d.setUTCDate(d.getUTCDate()-90);return d;}
-  if(period==="30days"){d.setUTCDate(d.getUTCDate()-30);return d;}
+  var days=getPeriodDays(period);
+  if(days){var d=new Date(collected);d.setUTCDate(d.getUTCDate()-days);return d;}
   return null;
 }
 function weekToDate(weekStr){
@@ -917,7 +925,7 @@ function applyFilter(period){
       charts.repos.data.datasets=[
         {label:"Issues",data:selData.map(function(r){return r.issues;}).concat([averageIssues]),xAxisID:"xIssues",_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
         {label:"Pull Requests",data:selData.map(function(r){return r.prs;}).concat([averagePRs]),xAxisID:"xPRs",_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}];
-      var pLabel=period==="all"?"All Time":period==="year"?"This Year":period==="90days"?"Last 90 Days":"Last 30 Days";
+      var pLabel=getPeriodLabel(period);
       if(titleEl)titleEl.textContent="Selected Repositories \u2014 "+pLabel;
     }else if(period==="all"){
       charts.repos.data.labels=CHART_DATA.topRepos.map(function(r){return r.name;});
@@ -936,7 +944,7 @@ function applyFilter(period){
       charts.repos.data.datasets=[
         {label:"Issues",data:topFiltered.map(function(r){return r.issues;}),xAxisID:"xIssues",_gradBase:cssColors.warn,backgroundColor:cssColors.warn,borderRadius:3},
         {label:"Pull Requests",data:topFiltered.map(function(r){return r.prs;}),xAxisID:"xPRs",_gradBase:cssColors.accent,backgroundColor:cssColors.accent,borderRadius:3}];
-      var periodLabel=period==="year"?"This Year":period==="90days"?"Last 90 Days":"Last 30 Days";
+      var periodLabel=getPeriodLabel(period);
       if(titleEl)titleEl.textContent="Top Repositories \u2014 "+periodLabel;
     }
     reposVisibility.forEach(function(vis,i){
@@ -1233,7 +1241,7 @@ function updateFlow(prs,period){
   });
   var note=document.getElementById("flowNote");
   if(!note)return;
-  var pLabel=period==="all"?"all time":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
+  var pLabel=getPeriodLabel(period,true);
   var parts=[];
   if(counts.review===0){
     parts.push("No reviewed pull requests in "+pLabel+" — review timestamps are collected from "+
@@ -1373,7 +1381,7 @@ function updateAIHuman(filteredPR,allPRBase,period,excludeBots){
 
   var note=document.getElementById("aiHumanNote");
   if(!note)return;
-  var pLabel=period==="all"?"all time":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
+  var pLabel=getPeriodLabel(period,true);
   var parts=["AI n="+aiSum.n+" · human n="+humanSum.n+" merged pull requests over "+pLabel+"."];
   if(aiSum.n<SMALL_SAMPLE||humanSum.n<SMALL_SAMPLE){
     parts.push("One side is too small to compare — the difference column is arithmetic, not evidence.");
@@ -1435,7 +1443,7 @@ function updateCiHealth(cutoff,repoFiltered,period){
 
   var note=document.getElementById("ciNote");
   if(!note)return;
-  var pLabel=period==="all"?"the collected window":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
+  var pLabel=period==="all"?"the collected window":getPeriodLabel(period,true);
   var parts=["Measured over "+runs.length+" completed default-branch run"+(runs.length===1?"":"s")+" in "+pLabel+"."];
   if(runs.length<SMALL_SAMPLE)parts.push("Too few runs to read as a rate.");
   parts.push("A run counts as flaky when it passed only after a re-run of the same commit, "+
@@ -1465,7 +1473,7 @@ function updateReviewLoad(repoNames,cutoff,period){
       else if(g<=0.4)badge.classList.add("ok");
     }
   }
-  var pLabel=period==="year"?"this year":period==="90days"?"the last 90 days":period==="30days"?"the last 30 days":"the collected window";
+  var pLabel=period==="all"?"the collected window":getPeriodLabel(period,true);
   if(note){
     if(pairs.length===0){
       note.textContent="No reviews recorded for the selected repositories"+(cutoff?" in "+pLabel:"")+".";
@@ -1714,7 +1722,7 @@ function updateTrial(cutoff,excludeBots,period){
   // rather than letting a two-PR week look like a result.
   var noteEl=document.getElementById("trialNote");
   if(noteEl){
-    var pLabel=period==="all"?"all time":period==="year"?"this year":period==="90days"?"the last 90 days":"the last 30 days";
+    var pLabel=getPeriodLabel(period,true);
     var parts=["Baseline n="+base.n+" merged PRs across all repositories; "+
       (CHART_DATA.team?CHART_DATA.team.name:"team")+" n="+cur.n+" over "+pLabel+"."];
     parts.push("First-review wait: baseline n="+base.reviewedN+", team n="+cur.reviewedN+

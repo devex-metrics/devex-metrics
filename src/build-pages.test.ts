@@ -1879,6 +1879,56 @@ describe("build-pages · dashboard JS executes", () => {
     expect(active?.getAttribute("data-period")).toBe("30days");
   });
 
+  it.each([120, 150, 180])("filters the last %i days from shared URLs and button clicks", (days) => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as CacheEnvelope;
+    const api = cache.data.repos[0];
+    const sample = api.mergedPRTimeline![0];
+    const cutoff = new Date(cache.data.collectedAt);
+    cutoff.setUTCDate(cutoff.getUTCDate() - days);
+    api.mergedPRTimeline = [-1, 0, 1].map((offset, index) => {
+      const mergedAt = cutoff.getTime() + offset;
+      return {
+        ...sample,
+        number: index + 1,
+        mergedAt: new Date(mergedAt).toISOString(),
+        createdAt: new Date(mergedAt - 48 * 3600000).toISOString(),
+        firstReviewAt: new Date(mergedAt - 42 * 3600000).toISOString(),
+      };
+    });
+    cache.data.repos[1].mergedPRTimeline = [];
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+
+    const { dom, errors } = run(`?period=${days}days`, {
+      DEVEX_TEAM_NAME: "Platform",
+      DEVEX_TEAM_REPOS: "js-owner/api",
+    }, true);
+    const doc = dom.window.document;
+    expect(errors).toEqual([]);
+    expect(doc.querySelector(".filter-btn.active")?.textContent).toBe(`Last ${days} Days`);
+    // Include the exact UTC cutoff, but not the PR merged one millisecond earlier.
+    expect(doc.getElementById("kpiPRVal")?.textContent).toBe("2");
+    expect(doc.getElementById("flowN-review")?.textContent).toBe("2");
+    expect(doc.getElementById("chartReposTitle")?.textContent).toBe(
+      `Top Repositories — Last ${days} Days`
+    );
+    for (const id of ["flowNote", "aiHumanNote", "giniNote", "trialNote"]) {
+      expect(doc.getElementById(id)?.textContent).toContain(`the last ${days} days`);
+    }
+
+    doc.querySelector<HTMLButtonElement>('.filter-btn[data-period="30days"]')!.click();
+    expect(doc.getElementById("kpiPRVal")?.textContent).toBe("0");
+    doc.querySelector<HTMLInputElement>('#repoPickerList input[value="api"]')!.click();
+    doc.querySelector<HTMLButtonElement>(`.filter-btn[data-period="${days}days"]`)!.click();
+    expect(doc.getElementById("kpiPRVal")?.textContent).toBe("2");
+    expect(doc.getElementById("chartReposTitle")?.textContent).toBe(
+      `Selected Repositories — Last ${days} Days`
+    );
+    const params = new URL(dom.window.location.href).searchParams;
+    expect(params.get("period")).toBe(`${days}days`);
+    expect(params.get("repos")).toBe("api");
+    dom.window.close();
+  });
+
   it("fills the three review legs with real durations", () => {
     const { dom, errors } = run("?period=all");
     expect(errors).toEqual([]);

@@ -22,6 +22,24 @@
       "noiseFloorPixels": 800,
       "states": [
         {
+          "id": "120-days",
+          "title": "Last 120 Days period",
+          "steps": [{ "click": ".filter-btn[data-period=\"120days\"]" }],
+          "expect": ".filter-btn[data-period=\"120days\"].active"
+        },
+        {
+          "id": "150-days",
+          "title": "Last 150 Days period",
+          "steps": [{ "click": ".filter-btn[data-period=\"150days\"]" }],
+          "expect": ".filter-btn[data-period=\"150days\"].active"
+        },
+        {
+          "id": "180-days",
+          "title": "Last 180 Days period",
+          "steps": [{ "click": ".filter-btn[data-period=\"180days\"]" }],
+          "expect": ".filter-btn[data-period=\"180days\"].active"
+        },
+        {
           "id": "all-time",
           "title": "All Time period",
           "steps": [{ "click": ".filter-btn[data-period=\"all\"]" }],
