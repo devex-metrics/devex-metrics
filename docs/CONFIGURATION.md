@@ -179,7 +179,8 @@ are retained in future events; older append-only events are not rewritten.
 
 Set `DEVEX_FOCUS_NAME` and `DEVEX_FOCUS_USERS` (comma-, semicolon- or
 newline-separated GitHub logins) to add a **Commit author attribution** section
-to the Markdown report. Logins are matched case-insensitively. The roster is a
+to the Markdown report. Logins are matched case-insensitively, and Enterprise
+Managed User logins (`handle_shortcode`) are accepted. The roster is a
 build-time setting, so changing it and rebuilding Pages reclassifies the
 identities already present in the latest snapshot without another collection.
 An empty Actions variable is treated as unset, preserving a roster supplied by

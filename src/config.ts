@@ -555,6 +555,13 @@ function applyEnv(config: DevexConfig, env: Env): void {
  * config file, or `DEVEX_CONFIG` fails loudly and specifically, rather than
  * silently clamping or being accepted and misbehaving during collection.
  */
+// Enterprise Managed User logins append `_shortcode` to the handle; GitHub
+// caps the whole login, suffix included, at 39 characters.
+function isGitHubLogin(login: string): boolean {
+  return login.length <= 39 &&
+    /^[a-z\d](?:[a-z\d-]*[a-z\d])?(?:_[a-z\d]+)?$/i.test(login);
+}
+
 function validateBackfillPageSizes(backfill: BackfillConfig): void {
   for (const [label, value] of [
     ["pageSize", backfill.pageSize],
@@ -635,8 +642,7 @@ export function loadConfig(env: Env = process.env): DevexConfig {
   if (config.team) {
     const handles = config.team.handles ?? [];
     if (!Array.isArray(handles) || handles.length > 100 ||
-      handles.some((handle) => typeof handle !== "string" ||
-        !/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(handle)) ||
+      handles.some((handle) => typeof handle !== "string" || !isGitHubLogin(handle)) ||
       new Set(handles.map((handle) => handle.toLowerCase())).size !== handles.length) {
       throw new Error("Team handles must be at most 100 distinct GitHub logins");
     }
@@ -644,8 +650,7 @@ export function loadConfig(env: Env = process.env): DevexConfig {
   if (config.focus) {
     const users = config.focus.users;
     if (typeof config.focus.name !== "string" || !Array.isArray(users) || users.length > 100 ||
-      users.some((login) => typeof login !== "string" ||
-        !/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(login)) ||
+      users.some((login) => typeof login !== "string" || !isGitHubLogin(login)) ||
       new Set(users.map((login) => login.toLowerCase())).size !== users.length) {
       throw new Error("Focus must have a name and at most 100 distinct GitHub logins");
     }
