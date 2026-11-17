@@ -98,7 +98,9 @@ jobs:
           pattern='^(src/|\.nvmrc$|package\.json$|package-lock\.json$|tsconfig\.json$|\.github/skills/visual-dashboard-diff/|\.github/workflows/ci\.yml$|\.github/workflows/dependencies/playwright/|\.github/workflows/scripts/visual-diff-comment)'
           # --no-renames lists both sides of a rename, so moving a watched
           # file out of scope still counts as a dashboard-relevant change.
-          if git diff --name-only --no-renames HEAD^1 HEAD | grep -qE "$pattern"; then
+          # -z keeps paths unquoted (git C-quotes non-ASCII names otherwise)
+          # and NUL-delimited, so the anchored pattern matches every path.
+          if git diff --name-only --no-renames -z HEAD^1 HEAD | grep -qzE "$pattern"; then
             echo "dashboard-relevant=true" >> "$GITHUB_OUTPUT"
           else
             echo "dashboard-relevant=false" >> "$GITHUB_OUTPUT"
