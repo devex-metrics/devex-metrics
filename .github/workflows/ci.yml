@@ -81,24 +81,30 @@ jobs:
     outputs:
       dashboard-relevant: ${{ steps.filter.outputs.dashboard-relevant }}
     steps:
+      # Plain git instead of a third-party filter action, so this workflow
+      # only needs GitHub-owned actions (mirrors restrict allowed actions).
+      # The PR checkout is a merge commit whose first parent is the base tip,
+      # so diffing against HEAD^1 yields exactly the PR's changed files.
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+          persist-credentials: false
 
       - id: filter
-        uses: dorny/paths-filter@v4
-        with:
-          filters: |
-            dashboard-relevant:
-              - 'src/**'
-              - '.nvmrc'
-              - 'package.json'
-              - 'package-lock.json'
-              - 'tsconfig.json'
-              - '.github/skills/visual-dashboard-diff/**'
-              - '.github/workflows/ci.yml'
-              - '.github/workflows/dependencies/playwright/**'
-              # The screenshot-comment publisher: ui-checks unit-tests it, and
-              # ui-checks-comment.yml runs it from the default branch.
-              - '.github/workflows/scripts/visual-diff-comment*'
+        run: |
+          # The screenshot-comment publisher (visual-diff-comment*) is listed
+          # because ui-checks unit-tests it and ui-checks-comment.yml runs it
+          # from the default branch.
+          pattern='^(src/|\.nvmrc$|package\.json$|package-lock\.json$|tsconfig\.json$|\.github/skills/visual-dashboard-diff/|\.github/workflows/ci\.yml$|\.github/workflows/dependencies/playwright/|\.github/workflows/scripts/visual-diff-comment)'
+          # --no-renames lists both sides of a rename, so moving a watched
+          # file out of scope still counts as a dashboard-relevant change.
+          # -z keeps paths unquoted (git C-quotes non-ASCII names otherwise)
+          # and NUL-delimited, so the anchored pattern matches every path.
+          if git diff --name-only --no-renames -z HEAD^1 HEAD | grep -qzE "$pattern"; then
+            echo "dashboard-relevant=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "dashboard-relevant=false" >> "$GITHUB_OUTPUT"
+          fi
 
   # Renders the dashboard at the PR's merge base and at its head, screenshots
   # both and uploads before/after/diff images. The comment on the PR is posted
