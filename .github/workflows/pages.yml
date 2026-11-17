@@ -31,6 +31,10 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      DEVEX_LANDSCAPE_INCLUDE_PRIVATE: ${{ vars.DEVEX_LANDSCAPE_INCLUDE_PRIVATE }}
+      DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+      DEVEX_HISTORY_DIR: .metrics-data/data
     steps:
       - uses: actions/checkout@v7
 
@@ -56,6 +60,7 @@ jobs:
       - name: Build pages site
         id: build
         env:
+          DEVEX_PUBLICATION_TOKEN: ${{ github.token }}
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
           DEVEX_OWNER_TYPE: ${{ vars.DEVEX_OWNER_TYPE }}
           DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
@@ -87,6 +92,12 @@ jobs:
           mkdir -p _site
           node dist/build-pages.js
 
+      - name: Recheck landscape publication policy before artifact upload
+        if: steps.build.outputs.site-built == 'true'
+        env:
+          DEVEX_PUBLICATION_TOKEN: ${{ github.token }}
+        run: node dist/landscape-cli.js verify-publication
+
       # On a fresh deployment nothing has been collected yet, so there is no
       # site to publish. Skip rather than deploying an empty page over a good one.
       - name: Upload Pages artifact
@@ -94,6 +105,12 @@ jobs:
         uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: _site
+
+      - name: Recheck landscape publication policy before deployment
+        if: steps.build.outputs.site-built == 'true'
+        env:
+          DEVEX_PUBLICATION_TOKEN: ${{ github.token }}
+        run: node dist/landscape-cli.js verify-publication
 
       - name: Deploy to GitHub Pages
         id: deployment

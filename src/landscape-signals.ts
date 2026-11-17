@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import type { Octokit } from "@octokit/rest";
 import type { LandscapeContentSignal, LandscapeFile, LandscapeRepository, LandscapeScan } from "./types.js";
 import { landscapeDetailSummary } from "./landscape-contract.js";
+import { landscapeVisibilityAllowed } from "./landscape-policy.js";
 
 export const MAX_SIGNAL_REPOS = 150;
 export const MAX_SIGNAL_FILES = 1000;
@@ -72,20 +73,22 @@ function teamPageQuery(): string {
   }`;
 }
 
-function verifiedHead(data: unknown, repo: LandscapeRepository): Record<string, unknown> | null {
+function verifiedHead(
+  data: unknown, repo: LandscapeRepository, includePrivate: boolean
+): Record<string, unknown> | null {
   const found = record(record(data)?.repository);
   const head = record(found?.object);
-  if (found?.isPrivate !== false ||
+  if (!found || !landscapeVisibilityAllowed(found.isPrivate, includePrivate) ||
       typeof found.nameWithOwner !== "string" ||
       found.nameWithOwner.toLowerCase() !== repo.full_name.toLowerCase() ||
       head?.oid !== repo.head_sha) {
-    console.warn(`Landscape Git history unavailable at the verified public head of ${repo.full_name}`);
+    console.warn(`Landscape Git history unavailable at the policy-verified head of ${repo.full_name}`);
     return null;
   }
   return head;
 }
 
-async function publicHistory(
+async function landscapeHistory(
   query: string, variables: Record<string, string>, repo: LandscapeRepository, octokit: Octokit
 ): Promise<unknown> {
   try {
@@ -102,7 +105,7 @@ async function publicHistory(
 
 async function missingFileHistory(
   repo: LandscapeRepository, files: LandscapeFile[], at: string, staleAfterDays: number,
-  octokit: Octokit
+  octokit: Octokit, includePrivate: boolean
 ): Promise<void> {
   const missing = files.filter((file) => file.last_changed === null);
   const [owner, name] = repo.full_name.split("/");
@@ -113,13 +116,13 @@ async function missingFileHistory(
       `path${index}:history(first:1,path:$path${index}){nodes{committedDate}}`).join("\n");
     const variables: Record<string, string> = { owner, name, head: repo.head_sha };
     batch.forEach((file, index) => { variables[`path${index}`] = file.path; });
-    const response = await publicHistory(
+    const response = await landscapeHistory(
       `query($owner:String!,$name:String!,$head:GitObjectID!,${parameters}){
         repository(owner:$owner,name:$name){nameWithOwner isPrivate
           object(oid:$head){... on Commit{oid committedDate ${fields}}}}}`, variables, repo, octokit
     );
     if (!response) continue;
-    const head = verifiedHead(response, repo);
+    const head = verifiedHead(response, repo, includePrivate);
     const committed = typeof head?.committedDate === "string" ? Date.parse(head.committedDate) : NaN;
     if (!head || !Number.isFinite(committed)) {
       console.warn(`Landscape missing path history remains unverified for ${repo.full_name}`);
@@ -144,7 +147,7 @@ async function missingFileHistory(
 
 async function teamCounts(
   first: unknown, total: number, repo: LandscapeRepository, variables: Record<string, string>,
-  at: string, handles: readonly string[], octokit: Octokit
+  at: string, handles: readonly string[], octokit: Octokit, includePrivate: boolean
 ): Promise<{ month: number; recent: number } | null> {
   if (total > MAX_TEAM_COMMITS) {
     console.warn(`Landscape team history exceeds ${MAX_TEAM_COMMITS} commits for ${repo.full_name}`);
@@ -195,10 +198,10 @@ async function teamCounts(
       console.warn(`Landscape team pagination is incomplete for ${repo.full_name}`);
       return null;
     }
-    const response = await publicHistory(teamPageQuery(),
+    const response = await landscapeHistory(teamPageQuery(),
       { ...variables, after: info.endCursor }, repo, octokit);
     if (!response) return null;
-    const head = verifiedHead(response, repo);
+    const head = verifiedHead(response, repo, includePrivate);
     if (!head) return null;
     page = head.team;
   }
@@ -207,7 +210,7 @@ async function teamCounts(
 
 async function commitSignals(
   repo: LandscapeRepository, at: string, files: LandscapeFile[],
-  handles: readonly string[], octokit: Octokit
+  handles: readonly string[], octokit: Octokit, includePrivate: boolean
 ): Promise<{ month: number; recent: number; team: { month: number; recent: number } | null;
   files: Map<string, number> } | null> {
   const [owner, name] = repo.full_name.split("/");
@@ -224,11 +227,11 @@ async function commitSignals(
     const batch = files.slice(start, start + HISTORY_BATCH);
     const batchVariables = { ...variables };
     batch.forEach((file, index) => { batchVariables[`file${index}`] = file.last_changed!; });
-    const response = await publicHistory(
+    const response = await landscapeHistory(
       historyQuery(batch.length, start === 0 && handles.length > 0), batchVariables, repo, octokit
     );
     if (!response) return null;
-    const head = verifiedHead(response, repo);
+    const head = verifiedHead(response, repo, includePrivate);
     if (!head) return null;
     const thisMonth = count(record(head.month)?.totalCount, `${repo.full_name} 30-day commits`);
     const thisRecent = count(record(head.recent)?.totalCount, `${repo.full_name} 90-day commits`);
@@ -244,7 +247,7 @@ async function commitSignals(
       counts.set(file.path, observed);
     });
     if (start === 0 && handles.length > 0)
-      team = await teamCounts(head.team, recent, repo, variables, at, handles, octokit);
+      team = await teamCounts(head.team, recent, repo, variables, at, handles, octokit, includePrivate);
   }
   return { month, recent, team, files: counts };
 }
@@ -291,11 +294,12 @@ async function fileScore(repo: LandscapeRepository, file: LandscapeFile, octokit
 }
 
 /**
- * Query pinned public Git history and grade hash-verified bytes in memory only.
+ * Query pinned policy-verified Git history and grade hash-verified bytes in memory only.
  * Fixed request/file budgets leave unmeasured signals null, never zero.
  */
 export async function enrichLandscapeScan(
-  scan: LandscapeScan, octokit: Octokit, handles: readonly string[] = [], staleAfterDays = 90
+  scan: LandscapeScan, octokit: Octokit, handles: readonly string[] = [], staleAfterDays = 90,
+  includePrivate = false
 ): Promise<LandscapeScan> {
   const repositories = scan.repositories.map((repo) =>
     "head_sha" in repo ? { ...repo, ai_summary: { ...repo.ai_summary },
@@ -320,14 +324,14 @@ export async function enrichLandscapeScan(
     if (batch.length < repo.ai_files.length)
       console.warn(`Landscape signals limited to ${batch.length} of ${repo.ai_files.length} files in ${repo.full_name}`);
     if (scan.capabilities?.includes("ai_commit_drift_v1"))
-      await missingFileHistory(repo, batch, scan.generated_at, staleAfterDays, octokit);
+      await missingFileHistory(repo, batch, scan.generated_at, staleAfterDays, octokit, includePrivate);
     const eligible = batch.filter((file) => file.commits_since_change == null &&
       file.last_changed !== null && Date.parse(file.last_changed) <= Date.parse(scan.generated_at));
     const needsHistory = eligible.length > 0 || !repo.activity?.complete || handles.length > 0;
     const unscored = batch.filter((file) => file.content_signal == null);
     fileBudget -= batch.length;
     if (!needsHistory && unscored.length === 0) continue;
-    const history = await commitSignals(repo, scan.generated_at, eligible, handles, octokit);
+    const history = await commitSignals(repo, scan.generated_at, eligible, handles, octokit, includePrivate);
     if (!history) continue;
     if (repo.activity?.complete &&
         (repo.activity.commits_30d !== history.month || repo.activity.commits_90d !== history.recent))

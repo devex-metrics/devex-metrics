@@ -6,6 +6,9 @@ import { buildDashboardHtml } from "./pages/dashboard.js";
 import { loadConfig } from "./config.js";
 import type { FocusConfig } from "./config.js";
 import { loadLandscapeRunStatus, loadLandscapeView } from "./landscape.js";
+import {
+  assertLandscapePublication, hasPrivateLandscapeData, markPrivateLandscapeStore,
+} from "./landscape-policy.js";
 import type { DatasetNavEntry } from "./pages/dashboard.js";
 import type { OrgMetrics } from "./types.js";
 
@@ -32,9 +35,13 @@ interface Dataset {
  * Usage:
  *   node dist/build-multi-site.js [primaryDatasetKey]
  */
-function main(): void {
+async function main(): Promise<void> {
   const config = loadConfig();
   const siteDir = path.resolve(process.cwd(), "_site");
+  const historyDir = path.resolve(config.history.dir);
+  const privateOutput = config.collection.landscapeIncludePrivate ||
+    hasPrivateLandscapeData(historyDir) || hasPrivateLandscapeData(siteDir);
+  await assertLandscapePublication(historyDir, privateOutput);
   const primaryArg = process.argv[2];
 
   const datasets: Dataset[] = [];
@@ -61,6 +68,7 @@ function main(): void {
   const teamHandlesConfigured = (config.team?.handles?.length ?? 0) > 0;
 
   fs.mkdirSync(siteDir, { recursive: true });
+  if (privateOutput) markPrivateLandscapeStore(siteDir);
 
   for (const ds of datasets) {
     const folder = path.join(siteDir, ds.key);
@@ -71,7 +79,8 @@ function main(): void {
       current: d.key === ds.key,
     }));
     writeDatasetPage(folder, ds, branch, runUrl, nav, config.collection.features.landscape
-      ? path.resolve(config.history.dir) : undefined, teamHandlesConfigured, config.focus);
+      ? path.resolve(config.history.dir) : undefined, teamHandlesConfigured, config.focus,
+      config.collection.landscapeIncludePrivate);
   }
 
   // Mirror the primary dataset at the site root so the multi-dataset site
@@ -82,7 +91,8 @@ function main(): void {
     current: d.key === primary.key,
   }));
   writeDatasetPage(siteDir, primary, branch, runUrl, rootNav, config.collection.features.landscape
-    ? path.resolve(config.history.dir) : undefined, teamHandlesConfigured, config.focus);
+    ? path.resolve(config.history.dir) : undefined, teamHandlesConfigured, config.focus,
+    config.collection.landscapeIncludePrivate);
 
   fs.writeFileSync(
     path.join(siteDir, "manifest.json"),
@@ -113,12 +123,13 @@ function writeDatasetPage(
   landscapeHistoryDir?: string,
   teamHandlesConfigured = false,
   focus?: FocusConfig,
+  includePrivate = false,
 ): void {
   const markdown = generateReport(ds.data, focus);
   fs.writeFileSync(path.join(folder, "report.md"), markdown);
   fs.writeFileSync(path.join(folder, "data.json"), JSON.stringify(ds.data, null, 2));
   const landscape = landscapeHistoryDir && !ds.data.groupName
-    ? loadLandscapeView(landscapeHistoryDir, ds.data, teamHandlesConfigured) : undefined;
+    ? loadLandscapeView(landscapeHistoryDir, ds.data, teamHandlesConfigured, includePrivate) : undefined;
   const landscapeFile = path.join(folder, "landscape.json");
   if (landscape) {
     fs.writeFileSync(landscapeFile, JSON.stringify(landscape, null, 2));
@@ -153,4 +164,7 @@ function buildRunUrl(): string | undefined {
   return undefined;
 }
 
-main();
+main().catch((error: unknown) => {
+  console.error(error);
+  process.exitCode = 1;
+});

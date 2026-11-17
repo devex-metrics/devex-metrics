@@ -38,7 +38,7 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_EXCLUDE_FORKS` | bool | Skip forks. Default `false`. |
 | `DEVEX_MAX_IDLE_DAYS` | int | Skip repos with no push in N days. `0` disables. |
 | `DEVEX_TEAM_REPOS` | list | Globs marking the trial team's repos. |
-| `DEVEX_TEAM_HANDLES` | list | GitHub logins for conservatively attributed Git commit activity in the public AI landscape. No handles means Unknown, not zero. |
+| `DEVEX_TEAM_HANDLES` | list | GitHub logins for conservatively attributed Git commit activity in the AI landscape. No handles means Unknown, not zero. |
 | `DEVEX_TEAM_NAME` | string | Team display name. |
 | `DEVEX_TEAM_ID` | string | Stable id used in history rows and share URLs. |
 | `DEVEX_FOCUS_NAME` | string | Display name for the optional dashboard PR-author and report commit-author comparison group. |
@@ -57,7 +57,8 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_FEATURE_DEPENDENTS` | bool | Dependent-repo counts. Default `false`. |
 | `DEVEX_FEATURE_COPILOT_AGENT` | bool | Copilot agent metrics. Default `true`. |
 | `DEVEX_FEATURE_CI_HEALTH` | bool | CI health crawl (build success, duration, queue time, flaky re-runs). Default `false`. |
-| `DEVEX_FEATURE_LANDSCAPE` | bool | Opt in to the public-repository landscape scan and show its results on Pages. Default `false`; disabled preparation skips scanning and requesting an additional token. The scanner is installed by the normal `npm ci` regardless of this flag. |
+| `DEVEX_FEATURE_LANDSCAPE` | bool | Opt in to the repository landscape scan and show its results on Pages. Default `false`; public sources only unless private scanning is explicitly enabled. Disabled preparation skips scanning and requesting an additional source token. The scanner is installed by the normal `npm ci` regardless of this flag. |
+| `DEVEX_LANDSCAPE_INCLUDE_PRIVATE` | bool | Explicitly allow private landscape sources (`collection.landscapeIncludePrivate`). Default `false`. Requires a verified private destination repository and access-controlled Pages; see *Private landscape deployments*. Does not enable private full-history public discovery. |
 | `DEVEX_LANDSCAPE_STALE_AFTER_DAYS` | int | Landscape file staleness threshold in days (`collection.landscapeStaleAfterDays`). Default `90`. |
 | `DEVEX_FEATURE_PUBLIC_DISCOVERY` | bool | Separate full-history public repository discovery panel (`collection.features.publicDiscovery`). Default `false`. |
 | `DEVEX_PUBLIC_DISCOVERY_MAX_REPOS` | int | Optional number of public repositories to scan ranked by merged PRs in the collected 90-day timeline (`collection.publicDiscoveryMaxRepos`). Default `0` means all eligible repositories. Set `20` for the initial public deployment. |
@@ -377,11 +378,13 @@ A run still fails when every repository fails, since that is a GitHub outage and
 the last good data should stay published, and on any authentication or validation
 error, since those would affect every repository alike.
 
-## Public repository landscape (opt-in)
+## Repository landscape (opt-in)
 
 The landscape scan is **off by default**. The published
 `@devex-metrics/repo-landscape` scanner is a production npm dependency installed
 with the rest of the application by `npm ci` and updated through Dependabot.
+Sources are public-only by default; private deployments can explicitly opt in
+as described below.
 No additional token is created and no repositories are scanned unless the
 feature is enabled via `DEVEX_FEATURE_LANDSCAPE` or `DEVEX_CONFIG`:
 
@@ -396,6 +399,64 @@ feature is enabled via `DEVEX_FEATURE_LANDSCAPE` or `DEVEX_CONFIG`:
    `collection.features.landscape=true` in `DEVEX_CONFIG`) and run **Collect
    DevEx Metrics**. Disable that setting to stop scans and hide landscape
    results on Pages.
+
+### Private landscape deployments
+
+The scanner supports private repositories, but collecting their facts is a
+separate publication decision. To enable the AI instruction landscape for a
+private deployment:
+
+1. Keep the destination repository (including its `metrics-data` branch)
+   private and configure **access-controlled GitHub Pages**. A private
+   repository alone does not guarantee a private Pages site.
+2. Set `DEVEX_FEATURE_LANDSCAPE=true` and
+   `DEVEX_LANDSCAPE_INCLUDE_PRIVATE=true`, or set
+   `collection.features.landscape=true` and
+   `collection.landscapeIncludePrivate=true` in `DEVEX_CONFIG`.
+3. Give the GitHub App `Contents: read` on every selected source repository.
+   The workflow still requests a short-lived source token scoped only to
+   the explicit same-owner selection; unknown visibility and other owners
+   remain excluded.
+4. Run **Collect DevEx Metrics**. Redeploying alone cannot create missing
+   observations. `DEVEX_TEAM_HANDLES` separately enables linked-author team
+   commit counts; `DEVEX_FOCUS_USERS` is not silently reused.
+
+The workflows verify the actual destination through the GitHub API using the
+job's token (`Contents` access and `Pages: read` or greater), separate from the
+source App token. Both repository `private=true` and Pages `public=false`
+are required. An inaccessible/missing Pages configuration, denied API call,
+public destination, or unknown visibility stops the operation; there is no
+public fallback. No repository or Pages visibility settings are changed.
+For a deliberate local build/CLI invocation of private observations, supply
+`GITHUB_REPOSITORY=owner/dashboard` and `DEVEX_PUBLICATION_TOKEN` with read
+access to that destination's repository metadata and Pages settings. Local
+private builds use the same checks, not an unchecked preview bypass.
+
+Checks run before private scan preparation/ingestion, history publication,
+site generation, Pages artifact upload and deployment, including failure
+recovery. Only sanitized facts (including private file paths and hashes)
+are persisted; source contents, raw evidence and roster configuration are
+not added to landscape output. Access to the private repository, Actions
+artifacts and Pages still needs to be limited to the intended audience.
+
+A `.private-landscape` marker in the history root permanently marks stores
+that have prepared or persisted scans with the private policy, even if the
+selection was public when last collected (source visibility can change).
+Generated `_site` output is also marked to prevent reusing private output
+files in a later public build. Disabling
+the feature or the private opt-in does **not** release that store for public
+publication: previous git commits may still contain private facts even after
+current snapshots are scrubbed. Do not remove the marker to bypass checks
+or make that repository public. For a public deployment, use a separate
+public-only store/repository with no private history and a clean site build.
+These checks do not revoke artifacts or deployments that were already
+published, or prevent an administrator from changing access outside the
+workflow.
+
+This setting only widens the AI-only landscape scan. The separate
+`DEVEX_FEATURE_PUBLIC_DISCOVERY` full-history pipeline remains public-only.
+
+### Default public-only behavior
 
 After the normal collection, `landscape-cli.js prepare` always runs. It
 resolves `DEVEX_CONFIG` and discrete variables (discrete variables take

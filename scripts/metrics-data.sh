@@ -63,6 +63,8 @@ cmd_publish() {
 
   [ -d "$dir/.git" ] || die "$dir is not a git checkout — run 'checkout' first"
 
+  DEVEX_HISTORY_DIR="$dir/data" node dist/landscape-cli.js verify-publication
+
   git -C "$dir" config user.name "github-actions[bot]"
   git -C "$dir" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
   git -C "$dir" add -A
@@ -78,6 +80,8 @@ cmd_publish() {
   # landed and retry rather than forcing over another run's data.
   local attempt
   for attempt in 1 2 3; do
+    # A rebase may have pulled in the private-store marker from a concurrent run.
+    DEVEX_HISTORY_DIR="$dir/data" node dist/landscape-cli.js verify-publication
     if git -C "$dir" push --quiet origin "HEAD:$branch" 2>/dev/null; then
       echo "metrics-data: published to '$branch'"
       return 0

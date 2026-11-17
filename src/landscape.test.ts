@@ -7,6 +7,7 @@ import {
   installedLandscapeScannerVersion,
   parseLandscapeScan,
   publicLandscapeSelection,
+  landscapeSelection,
   saveLandscapeScan,
   validateLandscapeScannerOutput,
   loadLandscapeRunStatus,
@@ -212,6 +213,7 @@ describe("landscape history and DevEx join", () => {
       qualityScore: 75, qualityScored: 1,
       files: [{ commits_since_change: 7, content_signal: { score: 75 } }],
     });
+
     expect(loadLandscapeView(root, data, false)[0]).toMatchObject({
       commits30d: 2, teamCommits30d: null, teamCommits90d: null,
     });
@@ -227,6 +229,43 @@ describe("landscape history and DevEx join", () => {
     expect(loadLandscapeView(root, data)[0]).toMatchObject({
       commits30d: null, teamCommits90d: null, qualityScore: null, qualityScored: 0,
     });
+  });
+
+  it.each([true, false])("marks opted-in stores even if the snapshot's private flag is %s, and joins only allowed observations", (isPrivate) => {
+    const data = metrics([{ name: "private", isPrivate }, { name: "unverified" }]);
+    const raw = scan([{
+      ...repository("acme/private", [file("internal/AGENTS.md")]),
+      evidence: { content: "PRIVATE SOURCE CONTENT" },
+    }]);
+    if (isPrivate) expect(() => saveLandscapeScan(root, data, raw)).toThrow(/verified public/);
+    saveLandscapeScan(root, data, raw, undefined, true);
+    expect(fs.readFileSync(landscapeLatestPath(root, "acme"), "utf8"))
+      .not.toContain("PRIVATE SOURCE CONTENT");
+    expect(fs.existsSync(path.join(root, ".private-landscape"))).toBe(true);
+    if (isPrivate) expect(loadLandscapeView(root, data)[0]).toMatchObject({ status: "unknown", reason: "private" });
+    expect(loadLandscapeView(root, data, false, true)[0]).toMatchObject({
+      status: "observed", files: [{ path: "internal/AGENTS.md" }],
+    });
+    expect(loadLandscapeView(root, data, false, true)[1]).toMatchObject({
+      status: "unknown", reason: "visibility_unknown",
+    });
+    expect(scrubLandscapeOutsideSelection(root, data, true)).toBe(0);
+    expect(scrubLandscapeOutsideSelection(root, data)).toBe(isPrivate ? 2 : 0);
+    expect(fs.existsSync(path.join(root, ".private-landscape"))).toBe(true);
+  });
+
+  it("does not widen the private policy to other owners, unknown visibility, or empty repositories", () => {
+    const data = metrics([
+      { name: "public", isPrivate: false }, { name: "private", isPrivate: true },
+      { name: "unknown" }, { name: "empty", isPrivate: true, sizeKb: 0 },
+      { name: "cross-owner", isPrivate: true },
+    ]);
+    data.repos[4].fullName = "another/cross-owner";
+    expect(landscapeSelection(data, true).map((repo) => repo.name)).toEqual(["public", "private"]);
+    expect(landscapeSelection(data).map((repo) => repo.name)).toEqual(["public"]);
+    expect(() => saveLandscapeScan(root, data,
+      scan([repository("acme/public"), repository("another/cross-owner")]), undefined, true))
+      .toThrow(/outside/);
   });
 
   it("compares each repo with its last successful observation across denied scans", () => {
@@ -368,7 +407,7 @@ describe("landscape history and DevEx join", () => {
       { name: "missing", isPrivate: false },
     ]);
     expect(() => saveLandscapeScan(root, data, scan([repository()]))).toThrow(
-      /cover every selected public/
+      /cover every selected repository/
     );
     expect(fs.existsSync(landscapeLatestPath(root, "acme"))).toBe(false);
   });
@@ -485,6 +524,22 @@ it("hash drift is independent of file age and stale flags", () => {
 });
 
 describe("visibility re-check before ingestion", () => {
+  it("allows verified private sources only with opt-in, never unknown or mismatched identities", async () => {
+    const get = vi.fn().mockResolvedValue({ data: { full_name: "acme/private", private: true } });
+    const api = { rest: { repos: { get } } } as Parameters<typeof unverifiedLandscapeRepositories>[1];
+    expect(await unverifiedLandscapeRepositories(["acme/private"], api, true)).toEqual([]);
+    for (const data of [
+      { full_name: "acme/private" },
+      { full_name: "other/private", private: true },
+      { full_name: "acme/private", private: "false" },
+    ]) {
+      get.mockResolvedValueOnce({ data });
+      expect(await unverifiedLandscapeRepositories(["acme/private"], api, true)).toEqual(["acme/private"]);
+    }
+    get.mockRejectedValueOnce(new Error("404 source access lost"));
+    expect(await unverifiedLandscapeRepositories(["acme/private"], api, true)).toEqual(["acme/private"]);
+  });
+
   it("accepts a still-public repository and flags a privacy change", async () => {
     const get = vi.fn().mockResolvedValue({
       data: { full_name: "acme/public", private: false },
@@ -556,6 +611,14 @@ describe("visibility re-check before ingestion", () => {
       expect(
         validateLandscapeScannerOutput(engineOutput, data, 90, installedVersion).scanner_version
       ).toBe(manifest.version);
+    });
+
+    it("validates the private scanner selection only when the policy explicitly allows it", () => {
+      const privateMetrics = metrics([{ name: "public", isPrivate: true }]);
+      expect(() => validateLandscapeScannerOutput(engineOutput, privateMetrics, 90, installedVersion))
+        .toThrow(/selection differs/);
+      expect(validateLandscapeScannerOutput(engineOutput, privateMetrics, 90, installedVersion, true)
+        .repositories[0].full_name).toBe("acme/public");
     });
 
     it("accepts the released portable payload and drops provenance/evidence from public files", () => {

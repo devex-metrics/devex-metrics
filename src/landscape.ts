@@ -3,6 +3,7 @@ import * as path from "node:path";
 import { createRequire } from "node:module";
 import type { Octokit } from "@octokit/rest";
 import { latestPath, scopePath } from "./history.js";
+import { landscapeVisibilityAllowed, markPrivateLandscapeStore } from "./landscape-policy.js";
 import {
   landscapeCapabilities, landscapeCapabilityWarnings, landscapeContentReason, landscapeDetailSummary,
   parseLandscapeActivity, parseLandscapeAttention, parseLandscapeTeamActivity,
@@ -383,9 +384,14 @@ export function compareLandscape(
  * owner. Empty repositories are left out: they have no HEAD commit to scan.
  */
 export function publicLandscapeSelection(metrics: OrgMetrics): RepoMetrics[] {
+  return landscapeSelection(metrics);
+}
+
+/** Same-owner, nonempty repositories with verified visibility allowed by the deployment policy. */
+export function landscapeSelection(metrics: OrgMetrics, includePrivate = false): RepoMetrics[] {
   return metrics.repos.filter(
     (repo) =>
-      repo.isPrivate === false &&
+      landscapeVisibilityAllowed(repo.isPrivate, includePrivate) &&
       repo.sizeKb !== 0 &&
       repo.fullName.slice(0, repo.fullName.indexOf("/")).toLowerCase() ===
         metrics.owner.toLowerCase()
@@ -409,7 +415,8 @@ export function validateLandscapeScannerOutput(
   raw: unknown,
   metrics: OrgMetrics,
   staleAfterDays: number,
-  version: string
+  version: string,
+  includePrivate = false
 ): LandscapeScan {
   const document = object(raw, "scanner output");
   const provenance = object(document.provenance, "provenance");
@@ -422,7 +429,7 @@ export function validateLandscapeScannerOutput(
     throw new Error("Landscape scanner provenance does not match the configured GitHub API scan");
   }
   const selection = object(document.selection, "selection");
-  const selected = publicLandscapeSelection(metrics)
+  const selected = landscapeSelection(metrics, includePrivate)
     .map((repo) => repo.fullName.toLowerCase())
     .sort();
   const sameSelection = (value: unknown) =>
@@ -441,7 +448,7 @@ export function validateLandscapeScannerOutput(
     selection.discovery.length !== 0
   ) {
     throw new Error(
-      "Landscape scanner selection differs from the DevEx-selected public repositories"
+      "Landscape scanner selection differs from the DevEx-selected repositories allowed by policy"
     );
   }
   if (!Array.isArray(document.edges) || document.edges.length !== 0) {
@@ -458,14 +465,15 @@ export function validateLandscapeScannerOutput(
 }
 
 /**
- * Persist only approved metadata for public DevEx-selected repositories.
- * An unexpected or private repo in CLI output is an error, not a publishable fallback.
+ * Persist only approved metadata for policy-selected repositories.
+ * Private stores are marked permanently before any private observation is written.
  */
 export function saveLandscapeScan(
   historyDir: string,
   metrics: OrgMetrics,
   raw: unknown,
-  enrichment?: LandscapeScan
+  enrichment?: LandscapeScan,
+  includePrivate = false
 ): LandscapeScan {
   const source = parseLandscapeScan(raw);
   const scan = enrichment ? parseLandscapeScan(enrichment, true) : source;
@@ -522,16 +530,16 @@ export function saveLandscapeScan(
     throw new Error("Landscape scan predates the DevEx repository selection");
   }
   const selected = new Map(
-    publicLandscapeSelection(metrics).map((repo) => [repo.fullName.toLowerCase(), repo])
+    landscapeSelection(metrics, includePrivate).map((repo) => [repo.fullName.toLowerCase(), repo])
   );
   if (selected.size === 0 || scan.repositories.length !== selected.size) {
-    throw new Error("Landscape output must cover every selected public repository exactly once");
+    throw new Error("Landscape output must cover every selected repository exactly once (verified public unless private scanning is enabled)");
   }
   for (const repo of scan.repositories) {
     const match = selected.get(repo.full_name.toLowerCase());
     if (!match) {
       throw new Error(
-        "Landscape output contains a repository outside the verified public DevEx selection"
+        "Landscape output contains a repository outside the verified public or explicitly private DevEx selection"
       );
     }
     repo.full_name = match.fullName;
@@ -546,6 +554,9 @@ export function saveLandscapeScan(
   if (fs.existsSync(snapshot) && fs.readFileSync(snapshot, "utf8") !== contents) {
     throw new Error("A different landscape snapshot already exists for this generated_at");
   }
+  if (includePrivate) {
+    markPrivateLandscapeStore(historyDir);
+  }
   fs.mkdirSync(path.dirname(snapshot), { recursive: true });
   fs.writeFileSync(snapshot, contents);
   fs.writeFileSync(`${latest}.tmp`, contents);
@@ -555,7 +566,7 @@ export function saveLandscapeScan(
 
 /** Join a sanitized scan to the current DevEx selection without conflating missing with absent. */
 export function loadLandscapeView(
-  historyDir: string, metrics: OrgMetrics, teamHandlesConfigured = false
+  historyDir: string, metrics: OrgMetrics, teamHandlesConfigured = false, includePrivate = false
 ): LandscapeRepoView[] {
   const currentFile = landscapeLatestPath(historyDir, metrics.owner);
   const scan = fs.existsSync(currentFile) ? readScan(currentFile) : undefined;
@@ -573,7 +584,7 @@ export function loadLandscapeView(
   return metrics.repos.map((repo: RepoMetrics) => {
     const fullName = repo.fullName;
     const reason =
-      repo.isPrivate === true
+      repo.isPrivate === true && !includePrivate
         ? "private"
         : repo.isPrivate === undefined
           ? "visibility_unknown"
@@ -653,12 +664,13 @@ export function loadLandscapeSelection(historyDir: string, owner: string): OrgMe
 }
 
 /**
- * Repositories that can no longer be verified public. A failed lookup counts
+ * Repositories that can no longer be verified under the visibility policy. A failed lookup counts
  * as unverified: publishing paths is only safe on a positive check.
  */
 export async function unverifiedLandscapeRepositories(
   names: readonly string[],
-  octokit: Pick<Octokit, "rest">
+  octokit: Pick<Octokit, "rest">,
+  includePrivate = false
 ): Promise<string[]> {
   const unverified: string[] = [];
   for (const fullName of names) {
@@ -666,7 +678,7 @@ export async function unverifiedLandscapeRepositories(
     try {
       const response = await octokit.rest.repos.get({ owner, repo: name });
       if (
-        response.data.private === false &&
+        landscapeVisibilityAllowed(response.data.private, includePrivate) &&
         response.data.full_name.toLowerCase() === fullName.toLowerCase()
       ) {
         continue;
@@ -711,7 +723,7 @@ function dropLandscapeObservations(
 }
 
 /**
- * Drop stored observations for repositories that are no longer verified public
+ * Drop stored observations for repositories that are no longer allowed
  * from the latest scan and every snapshot, so neither the next Pages build nor
  * the persisted landscape stream keeps their paths. Returns how many
  * observations were removed across all files.
@@ -726,13 +738,15 @@ export function scrubLandscapeRepositories(
 }
 
 /**
- * Drop stored observations for every repository outside the current verified
- * public selection: ones now private, of unknown visibility, or no longer
+ * Drop stored observations for every repository outside the current policy
+ * selection: ones disallowed by visibility, of unknown visibility, or no longer
  * selected at all. Returns how many observations were removed across all files.
  */
-export function scrubLandscapeOutsideSelection(historyDir: string, metrics: OrgMetrics): number {
+export function scrubLandscapeOutsideSelection(
+  historyDir: string, metrics: OrgMetrics, includePrivate = false
+): number {
   const keep = new Set(
-    publicLandscapeSelection(metrics).map((repo) => repo.fullName.toLowerCase())
+    landscapeSelection(metrics, includePrivate).map((repo) => repo.fullName.toLowerCase())
   );
   return dropLandscapeObservations(
     historyDir,

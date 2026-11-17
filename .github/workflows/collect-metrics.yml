@@ -47,6 +47,10 @@ jobs:
     permissions:
       # The job also publishes the append-only metrics-data branch.
       contents: write
+      # Verify access-controlled Pages before collecting/publishing private landscape data.
+      pages: read
+    env:
+      DEVEX_LANDSCAPE_INCLUDE_PRIVATE: ${{ vars.DEVEX_LANDSCAPE_INCLUDE_PRIVATE }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -116,6 +120,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: scripts/metrics-data.sh checkout .metrics-data
+
+      - name: Verify landscape publication policy
+        env:
+          DEVEX_PUBLICATION_TOKEN: ${{ github.token }}
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
+          DEVEX_HISTORY_DIR: .metrics-data/data
+        run: node dist/landscape-cli.js verify-publication
 
       - name: Replay committed snapshots into the history store
         if: inputs.replay_snapshots
@@ -198,9 +209,10 @@ jobs:
 
       # Prepare resolves DEVEX_CONFIG and the discrete variables; it returns
       # without scanning when landscape is disabled.
-      - name: Prepare public landscape scan
+      - name: Prepare landscape scan
         id: landscape
         env:
+          DEVEX_PUBLICATION_TOKEN: ${{ github.token }}
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
           DEVEX_HISTORY_DIR: .metrics-data/data
           DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
@@ -262,10 +274,10 @@ jobs:
             echo "4. Alternatively, narrow the landscape repository selection to repositories the installation already covers."
             echo "5. Re-run **Collect DevEx Metrics** to confirm."
             echo
-            echo "See the *Public landscape* section of \`docs/CONFIGURATION.md\` for details."
+            echo "See the *Repository landscape* section of \`docs/CONFIGURATION.md\` for details."
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Scan selected public repositories
+      - name: Scan selected repositories
         id: landscape-scan
         if: steps.landscape-token.outcome == 'success'
         env:
@@ -273,12 +285,13 @@ jobs:
         run: npx --no-install repo-landscape scan --config data/landscape.config.json --output data/landscape-raw.json
 
       # Any failure after the scan token exists (including a scanner 403/404
-      # on a repo that just went private) skips ingestion; re-check visibility
-      # so repos no longer public are scrubbed before recording the failure.
+      # on a repo whose access changed) skips ingestion; re-check visibility
+      # so repos no longer allowed are scrubbed before recording the failure.
       - name: Re-check landscape visibility after a failure
         id: landscape-recheck
         if: failure() && steps.landscape-token.outcome == 'success'
         env:
+          DEVEX_PUBLICATION_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
           DEVEX_HISTORY_DIR: .metrics-data/data
@@ -292,6 +305,7 @@ jobs:
         if: steps.landscape-token.outcome == 'success'
         timeout-minutes: 20
         env:
+          DEVEX_PUBLICATION_TOKEN: ${{ github.token }}
           GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
           DEVEX_HISTORY_DIR: .metrics-data/data
@@ -302,7 +316,7 @@ jobs:
         run: node dist/landscape-cli.js ingest data/landscape-raw.json
 
       # On any failure with landscape enabled, keep the last good landscape
-      # data, scrub repos outside the current public selection, and record the
+      # data, scrub repos outside the current allowed selection, and record the
       # failure so the dashboard marks the data as stale. The store is then
       # published and Pages rebuilt, and the run still reports its failure
       # (except for a missing scan token, which is only a warning).
@@ -310,6 +324,7 @@ jobs:
         id: landscape-failed
         if: failure() || steps.landscape-token.outcome == 'failure'
         env:
+          DEVEX_PUBLICATION_TOKEN: ${{ github.token }}
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
           DEVEX_HISTORY_DIR: .metrics-data/data
           DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
@@ -440,7 +455,9 @@ jobs:
         id: publish-history
         if: success() || (failure() && (steps.landscape-failed.outputs.landscape-publish == 'true' || steps.discovery-failed.outputs.discovery-publish == 'true'))
         env:
+          DEVEX_PUBLICATION_TOKEN: ${{ github.token }}
           GH_TOKEN: ${{ github.token }}
+          DEVEX_CONFIG: ${{ vars.DEVEX_CONFIG }}
         run: |
           scripts/metrics-data.sh publish .metrics-data \
             "data: ${{ inputs.owner || vars.DEVEX_OWNER }} ${{ steps.date.outputs.date }}"
