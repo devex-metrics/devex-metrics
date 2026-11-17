@@ -1,5 +1,5 @@
 import type { RepoMetrics } from "../types.js";
-import { collectionStateLabel } from "../collection-state.js";
+import { collectionStateLabel, collectionWarningDetail } from "../collection-state.js";
 import { escapeHtml, formatDurationHtml } from "./utils.js";
 
 export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string {
@@ -13,7 +13,7 @@ export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string
   const prRows = sortedPRDetails
     .map(
       (pr) =>
-        `<tr><td>#${pr.number} ${escapeHtml(pr.title)}</td>` +
+        `<tr data-pr-number="${pr.number}" data-merged-at="${escapeHtml(pr.mergedAt ?? "")}"><td>#${pr.number} ${escapeHtml(pr.title)}</td>` +
         `<td>${pr.mergedAt ? pr.mergedAt.slice(0, 10) : ""}</td>` +
         `<td class="td-lines"><span class="add">+${pr.linesAdded}</span><span class="del">-${pr.linesDeleted}</span></td>` +
         `<td>${pr.commentCount}</td><td>${pr.commitCount}</td><td>${pr.actionsMinutes}</td></tr>`,
@@ -22,7 +22,8 @@ export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string
 
   const prTable =
     sortedPRDetails.length > 0
-      ? `<div class="pr-wrap"><h4>Recent Pull Requests</h4>
+      ? `<div class="pr-wrap"><h4>Recent Pull Requests (sample)</h4>
+      <p class="pr-sample-empty" hidden>No sampled merged PRs in the selected period.</p>
       <table class="pr-tbl"><thead><tr><th>PR</th><th>Merged</th><th>Lines</th><th>Comments</th><th>Commits</th><th>CI&nbsp;min</th></tr></thead>
       <tbody>${prRows}</tbody></table></div>`
       : "";
@@ -51,11 +52,14 @@ export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string
 
   const agentTaskCount = repo.copilotAgentMetrics?.totalTasks ?? 0;
   const warning = repo.collectionWarning;
+  const warningAttrs = warning
+    ? `data-collection-warning="${escapeHtml(warning.state)}" data-warning-repo="${escapeHtml(repo.name)}" data-complete-since="${escapeHtml(warning.completeSince ?? "")}"`
+    : "";
   const warningBadge = warning
-    ? `<span class="bdg bdg-warn" title="${escapeHtml(warning.detail)}">&#9888; ${escapeHtml(collectionStateLabel(warning.state))}</span>`
+    ? `<span class="bdg bdg-warn" ${warningAttrs} title="${escapeHtml(collectionWarningDetail(warning))}">&#9888; ${escapeHtml(collectionStateLabel(warning.state))}</span>`
     : "";
   const warningDetail = warning
-    ? `<p class="repo-incomplete" role="note"><strong>Incomplete data:</strong> ${escapeHtml(warning.detail)}</p>`
+    ? `<p class="repo-incomplete" ${warningAttrs} role="note"><strong>Incomplete data:</strong> ${escapeHtml(collectionWarningDetail(warning))}</p>`
     : "";
   const dataRow =
     `<tr class="repo-row"${initiallyHidden ? " hidden" : ""} ` +
@@ -78,13 +82,13 @@ export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string
     `<span class="bdg bdg-age"></span>` +
     warningBadge +
     `</div></td>` +
-    `<td>${repo.issues.open}<span class="col-muted"> / ${repo.issues.closed}</span></td>` +
+    `<td title="Open now / closed all time">${repo.issues.open}<span class="col-muted"> / ${repo.issues.closed}</span></td>` +
     `<td class="td-merged-prs">${repo.pullRequests.merged}</td>` +
     `<td>${repo.pullRequests.open}</td>` +
-    `<td title="${repo.committerCount} committers, ${repo.reviewerCount} reviewers">${totalContrib}</td>` +
+    `<td title="${repo.committerCount} committers (90 d), ${repo.reviewerCount} reviewers (collected history)">${totalContrib}</td>` +
     `<td>${repo.dependentCount}</td>` +
     `<td>${pushedDate}</td>` +
-    `<td class="td-lines"><span class="add">+${linesAdded}</span><span class="del">-${linesDeleted}</span></td>` +
+    `<td class="td-lines td-period-lines"><span class="add">+${linesAdded}</span><span class="del">-${linesDeleted}</span></td>` +
     `<td>${agentTaskCount > 0 ? agentTaskCount : '<span class="col-muted">&ndash;</span>'}</td>` +
     `</tr>`;
 
@@ -93,10 +97,10 @@ export function buildRepoRow(repo: RepoMetrics, initiallyHidden = false): string
     `<td colspan="9" class="repo-detail-cell"><div class="repo-detail-inner">` +
     warningDetail +
     `<div class="stats-grid">` +
-    `<div class="sg"><h4>Issues</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.issues.open}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.issues.closed}</dd></div></dl></div>` +
-    `<div class="sg"><h4>Pull Requests</h4><dl><div class="dr"><dt>Open</dt><dd>${repo.pullRequests.open}</dd></div><div class="dr"><dt>Merged</dt><dd>${repo.pullRequests.merged}</dd></div><div class="dr"><dt>Closed</dt><dd>${repo.pullRequests.closed}</dd></div></dl></div>` +
-    `<div class="sg"><h4>People (90 d)</h4><dl><div class="dr"><dt>Committers</dt><dd>${repo.committerCount}</dd></div><div class="dr"><dt>Reviewers</dt><dd>${repo.reviewerCount}</dd></div></dl></div>` +
-    `<div class="sg"><h4>Dependents</h4><dl><div class="dr"><dt>Repos</dt><dd>${repo.dependentCount}</dd></div></dl></div>` +
+    `<div class="sg"><h4>Issues</h4><dl><div class="dr"><dt>Open now</dt><dd>${repo.issues.open}</dd></div><div class="dr"><dt>Closed (all time)</dt><dd>${repo.issues.closed}</dd></div></dl></div>` +
+    `<div class="sg"><h4>Pull Requests</h4><dl><div class="dr"><dt>Open now</dt><dd>${repo.pullRequests.open}</dd></div><div class="dr"><dt>Merged <span class="repo-period-label"></span></dt><dd class="detail-merged-prs">${repo.pullRequests.merged}</dd></div><div class="dr"><dt>Closed, unmerged <span class="repo-period-label"></span></dt><dd class="detail-closed-prs">${repo.pullRequests.closed}</dd></div></dl></div>` +
+    `<div class="sg"><h4>People (fixed windows)</h4><dl><div class="dr"><dt>Committers (90 d)</dt><dd>${repo.committerCount}</dd></div><div class="dr"><dt>Reviewers (collected history)</dt><dd>${repo.reviewerCount}</dd></div></dl></div>` +
+    `<div class="sg"><h4>Dependents (now)</h4><dl><div class="dr"><dt>Repos</dt><dd>${repo.dependentCount}</dd></div></dl></div>` +
     (repo.copilotAgentMetrics && repo.copilotAgentMetrics.totalTasks > 0
       ? `<div class="sg"><h4>Agent Tasks (30 d)</h4><dl>` +
         `<div class="dr"><dt>Total</dt><dd>${repo.copilotAgentMetrics.totalTasks}</dd></div>` +

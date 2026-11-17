@@ -13,7 +13,7 @@ import type { BrandingConfig } from "../config.js";
 import type { RollupRow } from "../history.js";
 import { LARGE_PR_LINES } from "../history.js";
 import { postReviewCommitFacts } from "../review-rework.js";
-import { collectionStateLabel } from "../collection-state.js";
+import { collectionStateLabel, collectionWarningDetail } from "../collection-state.js";
 import { escapeHtml, computeMedian, weekToDate, formatDurationHtml } from "./utils.js";
 import { getCSS } from "./styles.js";
 import { getJS } from "./scripts.js";
@@ -111,8 +111,8 @@ export function buildIncompleteNotice(repos: readonly RepoMetrics[]): string {
   const items = repos.flatMap((repo) =>
     repo.collectionWarning
       ? [
-          `<li><strong>${escapeHtml(repo.fullName)}</strong> (${escapeHtml(collectionStateLabel(repo.collectionWarning.state))}): ` +
-            `${escapeHtml(repo.collectionWarning.detail)}</li>`,
+          `<li data-collection-warning="${escapeHtml(repo.collectionWarning.state)}" data-warning-repo="${escapeHtml(repo.name)}" data-complete-since="${escapeHtml(repo.collectionWarning.completeSince ?? "")}"><strong>${escapeHtml(repo.fullName)}</strong> (${escapeHtml(collectionStateLabel(repo.collectionWarning.state))}): ` +
+            `${escapeHtml(collectionWarningDetail(repo.collectionWarning))}</li>`,
         ]
       : [],
   );
@@ -120,7 +120,7 @@ export function buildIncompleteNotice(repos: readonly RepoMetrics[]): string {
   const subject = repos.length === 1 ? "repository has" : "repositories have";
   return (
     `<div class="incomplete-notice" role="status"><strong>Incomplete data:</strong> ` +
-    `${items.length} of ${repos.length} ${subject} incomplete metrics, so totals on this page may undercount.` +
+    `<span id="incompleteSummary">${items.length} of ${repos.length} ${subject} incomplete metrics, so totals on this page may undercount.</span>` +
     `<ul>${items.join("")}</ul></div>`
   );
 }
@@ -406,6 +406,10 @@ export function buildDashboardHtml(
     name: r.name,
     issues: Math.max(0, r.issues.open) + Math.max(0, r.issues.closed),
     prs: r.pullRequests.open + r.pullRequests.merged + r.pullRequests.closed,
+    merged: r.pullRequests.merged,
+    closed: r.pullRequests.closed,
+    hasMergedTimeline: r.mergedPRTimeline !== undefined,
+    hasClosedTimeline: r.closedPRTimeline !== undefined,
   }));
 
   const chartPayload = JSON.stringify({
@@ -709,19 +713,19 @@ ${buildTrialBanner(data, teamRepoNames.length)}
       </div>
     </div>
     <div class="repo-sort-toolbar"><span id="repoSortStatus" aria-live="polite">Original order</span><button type="button" id="repoSortReset" aria-controls="repoList" disabled>Clear sort</button></div>
-    <p class="repos-period-note" id="reposPeriodNote">&#9432; The <strong>merged PR</strong> count reflects the selected period. Expand a row for all-time details.</p>
+    <p class="repos-period-note" id="reposPeriodNote">&#9432; Merged and closed PRs, lines and the detailed PR sample follow the selected period. Lines cover collected merged PRs, not lifetime totals. Open counts and dependents are current; issue closed counts are all-time. People use fixed windows (committers: 90 d; reviewers: collected history); agent tasks use 30 d. Missing timelines are labelled as samples or unavailable.</p>
     <div class="table-wrap">
       <table class="repo-table" aria-label="Repositories">
         <thead><tr>
           <th scope="col" class="col-repo"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="name" data-sort-label="Repository" data-sort-default="ascending">Repository <span class="sort-ind" aria-hidden="true">↕</span></button></th>
-          <th scope="col" class="col-num"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="openIssues" data-sort-label="Issues" data-sort-default="descending">Issues <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th scope="col" class="col-num"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="openIssues" data-sort-label="Issues" data-sort-default="descending">Issues (now / all-time closed) <span class="sort-ind" aria-hidden="true">↕</span></button></th>
           <th scope="col" class="col-num"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="mergedPrs" data-sort-label="Merged PRs" data-sort-default="descending">Merged PRs <span class="sort-ind" aria-hidden="true">↕</span></button></th>
-          <th scope="col" class="col-num"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="openPrs" data-sort-label="Open PRs" data-sort-default="descending">Open PRs <span class="sort-ind" aria-hidden="true">↕</span></button></th>
-          <th scope="col" class="col-num"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="contributors" data-sort-label="Contributors" data-sort-default="descending">Contributors <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th scope="col" class="col-num"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="openPrs" data-sort-label="Open PRs" data-sort-default="descending">Open PRs (now) <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th scope="col" class="col-num"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="contributors" data-sort-label="Contributors" data-sort-default="descending">Contributors (fixed windows) <span class="sort-ind" aria-hidden="true">↕</span></button></th>
           <th scope="col" class="col-num"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="dependents" data-sort-label="Dependents" data-sort-default="descending">Dependents <span class="sort-ind" aria-hidden="true">↕</span></button></th>
           <th scope="col" class="col-date"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="pushed" data-sort-label="Last Updated" data-sort-default="descending">Last Updated <span class="sort-ind" aria-hidden="true">↕</span></button></th>
-          <th scope="col" class="col-lines" title="Sort by lines added. Displays total lines added/removed across merged PRs in the last ~13 months (or last 10 detailed PRs when full timeline data is unavailable)"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="linesAdded" data-sort-label="Lines Added" data-sort-default="descending">Lines +/- <span class="sort-ind" aria-hidden="true">↕</span></button></th>
-          <th scope="col" class="col-num" title="Copilot agent tasks in the 30-day collection window"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="agentTasks" data-sort-label="Agent Tasks" data-sort-default="descending">Agent Tasks <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th scope="col" class="col-lines" title="Lines added/removed in collected merged PRs in the selected period; missing line counts are labelled"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="linesAdded" data-sort-label="Lines Added" data-sort-default="descending">Lines +/- <span class="sort-ind" aria-hidden="true">↕</span></button></th>
+          <th scope="col" class="col-num" title="Copilot agent tasks in the 30-day collection window"><button type="button" class="repo-sort" aria-controls="repoList" data-sort="agentTasks" data-sort-label="Agent Tasks" data-sort-default="descending">Agent Tasks (30 d) <span class="sort-ind" aria-hidden="true">↕</span></button></th>
         </tr></thead>
         <tbody id="repoList">${repoRows}</tbody>
       </table>

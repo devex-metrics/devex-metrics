@@ -209,6 +209,7 @@ function truncationWarning(data: GraphQLRepoData): RepoCollectionWarning | undef
   if (truncation.reason === "page-cap") {
     return {
       state: "capped",
+      completeSince: prNodes.at(-1)?.updatedAt,
       detail:
         `Only the ${prNodes.length} most recently updated closed PRs were collected; older PRs ` +
         `in the two-year window are missing. Raise DEVEX_MAX_PR_PAGES to collect more.`,
@@ -489,17 +490,23 @@ async function collectMetricsForRepoList(
   }
 
   const trendPageBound = Math.max(1, config.collection.maxPRPages);
-  const recordTrendGaps = ({ failedRepos, truncatedRepos }: WeeklyTrendsResult): void => {
+  const recordTrendGaps = ({ failedRepos, truncatedRepos, truncatedBefore }: WeeklyTrendsResult): void => {
     for (const repo of repos) {
       if (failedRepos.has(repo.fullName)) {
         repo.weeklyTrends = [];
         repo.collectionWarning = addGap(repo.collectionWarning, "partial", "Weekly trends could not be collected.");
       } else if (truncatedRepos.has(repo.fullName)) {
+        const previous = repo.collectionWarning;
+        const trendBoundary = truncatedBefore?.get(repo.fullName);
+        const completeSince = trendBoundary && (!previous || previous.completeSince)
+          ? [trendBoundary, previous?.completeSince ?? trendBoundary].sort().at(-1)
+          : undefined;
         repo.collectionWarning = addGap(
           repo.collectionWarning,
           "capped",
           `Weekly trends stop at ${trendPageBound * 100} issues and ${trendPageBound * 100} PRs, so they undercount.`
         );
+        repo.collectionWarning.completeSince = completeSince;
       }
     }
   };

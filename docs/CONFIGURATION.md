@@ -124,6 +124,22 @@ viewer's current date; **This Year** starts on January 1 of that snapshot's year
 The longer windows provide more pre-experiment context when the collected history
 is available. The selected period is preserved in shared dashboard URLs.
 
+The repository table and expanded details use the selected period for merged
+and unmerged-closed PR counts, merged-PR line totals and the detailed PR sample.
+All Time restores lifetime PR counts; its line totals still cover only collected
+merged PRs. Missing timelines are labelled as sampled or unavailable rather
+than shown as lifetime values. Open issue/PR counts and dependents are current
+snapshots; closed issue counts are lifetime. Contributor counts retain their
+fixed windows (committers: 90 days; reviewers: collected PR history), and agent
+tasks retain their 30-day window because individual timestamps are not stored.
+
+Both the top incomplete-data notice and repository badges/details hide a capped
+warning when the selected period starts strictly after every capped stream's
+oldest collected updated timestamp. The top notice also follows the repository
+picker. Other collection failures remain visible. Older snapshots without a cap
+timestamp conservatively retain the warning with an unknown-coverage explanation;
+a fresh collection records this optional metadata without invalidating caches.
+
 The comparison includes median wait from opening a PR to its first submitted
 review, as well as PR cycle time. Both columns use the selected period by
 default; `DEVEX_BASELINE_FROM` / `DEVEX_BASELINE_TO` pin the all-repos baseline

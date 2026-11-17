@@ -22,6 +22,21 @@
       "noiseFloorPixels": 800,
       "states": [
         {
+          "id": "repo-details-30-days",
+          "title": "Repository details, cap outside selected period",
+          "steps": [{ "click": "[data-repo-name=\"issue-comment-tag\"] .repo-expand-btn" }],
+          "expect": "#detail-devops-actions-issue-comment-tag:not([hidden]) .pr-tbl"
+        },
+        {
+          "id": "repo-details-capped",
+          "title": "Repository details, cap inside selected period",
+          "steps": [
+            { "click": ".filter-btn[data-period=\"120days\"]" },
+            { "click": "[data-repo-name=\"issue-comment-tag\"] .repo-expand-btn" }
+          ],
+          "expect": "#detail-devops-actions-issue-comment-tag:not([hidden]) .repo-incomplete:not([hidden])"
+        },
+        {
           "id": "120-days",
           "title": "Last 120 Days period",
           "steps": [{ "click": ".filter-btn[data-period=\"120days\"]" }],

@@ -506,6 +506,39 @@ describe("collect when a repository keeps failing", () => {
     expect(result.repos[0].collectionWarning?.detail).toContain("DEVEX_MAX_PR_PAGES");
   });
 
+  it.each([
+    ["2026-09-01T00:00:00Z", "2026-09-01T00:00:00Z"],
+    ["2026-06-01T00:00:00Z", "2026-07-01T00:00:00Z"],
+    [undefined, undefined],
+  ])("combines PR and trend cap boundaries conservatively (%s)", async (trendBoundary, expected) => {
+    vi.mocked(collectRepos).mockResolvedValue([twoRepos[0]]);
+    vi.mocked(collectRepoGraphQL).mockResolvedValue(graphqlData({
+      truncation: { reason: "page-cap" },
+      prNodes: [{
+        number: 1, title: "PR", state: "MERGED", createdAt: "2026-01-01T00:00:00Z",
+        mergedAt: "2026-01-02T00:00:00Z", closedAt: "2026-01-02T00:00:00Z",
+        updatedAt: "2026-08-01T00:00:00Z", headRefOid: "abc", body: null, author: null,
+        additions: 1, deletions: 1, commits: { totalCount: 1, nodes: [] },
+        comments: { totalCount: 0 }, reviewThreads: { totalCount: 0 },
+        reviews: { nodes: [] }, mergeCommit: null,
+      }, {
+        number: 2, title: "PR", state: "CLOSED", createdAt: "2026-01-01T00:00:00Z",
+        mergedAt: null, closedAt: "2026-01-02T00:00:00Z",
+        updatedAt: "2026-07-01T00:00:00Z", headRefOid: "def", body: null, author: null,
+        additions: 0, deletions: 0, commits: { totalCount: 0, nodes: [] },
+        comments: { totalCount: 0 }, reviewThreads: { totalCount: 0 },
+        reviews: { nodes: [] }, mergeCommit: null,
+      }],
+    }));
+    vi.mocked(collectWeeklyTrends).mockResolvedValue({
+      orgTrends: [], repoTrends: new Map(), failedRepos: new Set(),
+      truncatedRepos: new Set(["org/big"]),
+      truncatedBefore: trendBoundary ? new Map([["org/big", trendBoundary]]) : new Map(),
+    });
+    const result = await collect("org", "org");
+    expect(result.repos[0].collectionWarning?.completeSince).toBe(expected);
+  });
+
   it("keeps the PR data when only an issue lead-time lookup fails", async () => {
     vi.mocked(collectRepos).mockResolvedValue([twoRepos[0]]);
     vi.mocked(collectRepoGraphQL).mockResolvedValue(graphqlData({ truncation: { reason: "page-cap" } }));

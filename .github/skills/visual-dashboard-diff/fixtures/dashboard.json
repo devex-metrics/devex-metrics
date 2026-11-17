@@ -8,6 +8,15 @@
   {
    "name": "issue-comment-tag",
    "fullName": "devops-actions/issue-comment-tag",
+   "collectionWarning": {
+    "state": "capped",
+    "detail": "PR history and weekly trends stopped at the page budget. Raise DEVEX_MAX_PR_PAGES to collect more.",
+    "completeSince": "2026-06-01T00:00:00Z"
+   },
+   "closedPRTimeline": [
+    { "number": 508, "createdAt": "2026-07-20T00:00:00Z", "closedAt": "2026-07-21T00:00:00Z", "author": "fixture-user", "isBotAuthor": false },
+    { "number": 480, "createdAt": "2026-05-01T00:00:00Z", "closedAt": "2026-05-02T00:00:00Z", "author": "fixture-user", "isBotAuthor": false }
+   ],
    "pushedAt": "2026-08-05T16:48:47Z",
    "collectedAt": "2026-08-09T06:44:32.324Z",
    "issues": {

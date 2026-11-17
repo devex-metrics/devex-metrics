@@ -55,6 +55,8 @@ export interface WeeklyTrendsResult {
   failedRepos: Set<string>;
   /** Full names of repos whose trends stopped at their `maxPages` bound, so undercount. */
   truncatedRepos: Set<string>;
+  /** Latest updated-at boundary of bounded REST walks; absent if unknown. */
+  truncatedBefore?: Map<string, string>;
 }
 
 /** Create a fresh set of zero-filled week buckets starting at `startMonday`. */
@@ -162,6 +164,20 @@ export async function collectWeeklyTrends(
   const repoTrends = new Map<string, WeeklyTrendPoint[]>();
   const failedRepos = new Set<string>();
   const truncatedRepos = new Set<string>();
+  const truncatedBefore = new Map<string, string>();
+  const unknownBoundaries = new Set<string>();
+  const recordCap = (repo: string, updatedAt: string | undefined): void => {
+    truncatedRepos.add(repo);
+    if (!updatedAt || !Number.isFinite(Date.parse(updatedAt))) {
+      unknownBoundaries.add(repo);
+      truncatedBefore.delete(repo);
+    } else if (!unknownBoundaries.has(repo)) {
+      const previous = truncatedBefore.get(repo);
+      if (!previous || Date.parse(updatedAt) > Date.parse(previous)) {
+        truncatedBefore.set(repo, updatedAt);
+      }
+    }
+  };
 
   // cutoff = start of the oldest bucket (inclusive).
   const cutoff = startMonday;
@@ -184,6 +200,8 @@ export async function collectWeeklyTrends(
         repo: name,
         state: "all" as const,
         since: cutoffIso,
+        sort: "updated" as const,
+        direction: "desc" as const,
         per_page: 100,
       };
       let issues: Awaited<ReturnType<typeof octokit.rest.issues.listForRepo>>["data"] = [];
@@ -197,7 +215,7 @@ export async function collectWeeklyTrends(
         )) {
           issues.push(...response.data);
           if (--issuePagesLeft <= 0) {
-            if (hasNextPage(response.headers)) truncatedRepos.add(repoKey);
+            if (hasNextPage(response.headers)) recordCap(repoKey, response.data.at(-1)?.updated_at);
             break;
           }
         }
@@ -331,7 +349,7 @@ export async function collectWeeklyTrends(
           }
           if (reachedCutoff) break;
           if (--pagesLeft <= 0) {
-            if (hasNextPage(response.headers)) truncatedRepos.add(repoKey);
+            if (hasNextPage(response.headers)) recordCap(repoKey, response.data.at(-1)?.updated_at);
             break;
           }
         }
@@ -355,5 +373,6 @@ export async function collectWeeklyTrends(
     repoTrends,
     failedRepos,
     truncatedRepos,
+    truncatedBefore,
   };
 }

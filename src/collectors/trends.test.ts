@@ -611,6 +611,25 @@ describe("collectWeeklyTrends on a repository it cannot crawl in full", () => {
     expect(result.truncatedRepos.size).toBe(0);
   });
 
+  it("records the latest boundary across capped streams ordered by updated time", async () => {
+    const updatedAt = new Date(Date.now() - 86_400_000).toISOString();
+    const { octokit } = endlessWalks(fullPageOf((now) => ({
+      created_at: now, updated_at: updatedAt, state: "open",
+    })));
+    setOctokit(octokit);
+    const result = await collectWeeklyTrends([{ owner: "o", name: "big", maxPages: 1 }], 4);
+    const boundary = result.truncatedBefore?.get("o/big");
+    // The PR walk is newer than the issue walk, so it limits complete coverage.
+    expect(Date.parse(boundary!)).toBeGreaterThan(Date.parse(updatedAt));
+  });
+
+  it("does not claim complete coverage when one capped stream has no boundary", async () => {
+    const { octokit } = endlessWalks(prsOnly);
+    setOctokit(octokit);
+    const result = await collectWeeklyTrends([{ owner: "o", name: "big", maxPages: 1 }], 4);
+    expect(result.truncatedBefore?.has("o/big")).toBe(false);
+  });
+
   it("reports a server failure separately from an expected skip", async () => {
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     setOctokit(buildMockOctokit({ issueError: { status: 502 } }));
