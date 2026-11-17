@@ -15,6 +15,7 @@ import {
   validateLandscapeScannerOutput,
 } from "./landscape.js";
 import { enrichLandscapeScan } from "./landscape-signals.js";
+import { resolveLandscapeTeam } from "./landscape-team.js";
 import {
   assertLandscapePublication, hasPrivateLandscapeData, markPrivateLandscapeStore,
 } from "./landscape-policy.js";
@@ -156,7 +157,7 @@ async function ingest(file: string | undefined): Promise<void> {
   );
   const enriched = await enrichLandscapeScan(
     validated, new Octokit({ auth: token, request: { timeout: 20_000 } }),
-    config.team?.handles ?? [], config.collection.landscapeStaleAfterDays, includePrivate
+    resolveLandscapeTeam(config).handles, config.collection.landscapeStaleAfterDays, includePrivate
   );
   if ((await recheckAndScrub(historyDir, metrics.owner, names, token, includePrivate)).length > 0)
     throw new Error("Landscape visibility changed during enrichment; refusing to persist paths");

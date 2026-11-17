@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import type { Octokit } from "@octokit/rest";
 import { enrichLandscapeScan, MAX_FILES_PER_REPO, scoreLandscapeContent } from "./landscape-signals.js";
 import { parseLandscapeScan } from "./landscape.js";
+import { landscapeRosterKey } from "./landscape-team.js";
 import type { LandscapeRepository } from "./types.js";
 
 const HEAD = "a".repeat(40);
@@ -152,6 +153,7 @@ describe("pinned public landscape signals", () => {
     const result = observed(await enrichLandscapeScan(scan(), api.octokit, ["alice"]));
     expect(result.team_commits_30d).toBe(1);
     expect(result.team_commits_90d).toBe(2);
+    expect(result.team_roster_key).toBe(landscapeRosterKey(["ALICE"]));
     expect(JSON.stringify(result)).not.toMatch(/Alice|outsider/i);
     expect(api.graphql).toHaveBeenCalledTimes(2);
   });

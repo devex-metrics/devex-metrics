@@ -249,6 +249,11 @@ function parseRepository(
   if (capabilities.includes("attention_rules_v1") && repo.attention !== undefined)
     result.attention = parseLandscapeAttention(repo.attention);
   if (includeSignals) {
+    if (repo.team_roster_key !== undefined) {
+      if (typeof repo.team_roster_key !== "string" || !HASH.test(repo.team_roster_key))
+        throw new Error(`Landscape ${label}.team_roster_key must be SHA-256`);
+      result.team_roster_key = repo.team_roster_key.toLowerCase();
+    }
     for (const key of ["commits_30d", "commits_90d", "team_commits_30d", "team_commits_90d"] as const) {
       if (repo[key] !== undefined) result[key] = nullableCount(repo[key], `${label}.${key}`);
     }
@@ -566,7 +571,7 @@ export function saveLandscapeScan(
 
 /** Join a sanitized scan to the current DevEx selection without conflating missing with absent. */
 export function loadLandscapeView(
-  historyDir: string, metrics: OrgMetrics, teamHandlesConfigured = false, includePrivate = false
+  historyDir: string, metrics: OrgMetrics, teamRosterKey?: string, includePrivate = false
 ): LandscapeRepoView[] {
   const currentFile = landscapeLatestPath(historyDir, metrics.owner);
   const scan = fs.existsSync(currentFile) ? readScan(currentFile) : undefined;
@@ -608,6 +613,7 @@ export function loadLandscapeView(
     }
     const known = observation as LandscapeRepository;
     const prior = previous.get(fullName.toLowerCase());
+    const rosterMatches = teamRosterKey !== undefined && known.team_roster_key === teamRosterKey;
     return {
       fullName,
       status: "observed",
@@ -621,8 +627,9 @@ export function loadLandscapeView(
       commits90d: known.activity?.commits_90d ?? known.commits_90d ?? null,
       activity: known.activity,
       attention: known.attention,
-      teamCommits30d: teamHandlesConfigured ? known.team_commits_30d ?? null : null,
-      teamCommits90d: teamHandlesConfigured ? known.team_commits_90d ?? null : null,
+      teamCommits30d: rosterMatches ? known.team_commits_30d ?? null : null,
+      teamCommits90d: rosterMatches ? known.team_commits_90d ?? null : null,
+      teamRosterChanged: teamRosterKey !== undefined && !rosterMatches,
       qualityScored: known.ai_files.filter((file) => file.content_signal != null).length,
       qualityScore: known.ai_files.length > 0 &&
         known.ai_files.every((file) => file.content_signal != null)

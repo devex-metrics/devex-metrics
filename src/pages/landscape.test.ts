@@ -94,6 +94,25 @@ function visibleNames(dom: JSDOM): string[] {
 }
 
 describe("landscape dashboard view", () => {
+  it("labels the effective group safely, keeps verified zeros, and explains when recollection is needed", () => {
+    const current = { ...observed(), teamCommits30d: 0, teamCommits90d: 4 };
+    const pending = { ...observed(), fullName: "acme/pending", teamRosterChanged: true,
+      teamCommits30d: null, teamCommits90d: null };
+    const name = 'Example <img src=x onerror="alert(1)">';
+    const doc = new JSDOM(buildLandscapeSection([current, pending], undefined, undefined, name))
+      .window.document;
+    const button = doc.querySelector('[data-landscape-sort="team90"]');
+    expect(button?.textContent).toContain(`${name} commits`);
+    expect(button?.getAttribute("data-landscape-label")).toBe(`${name} Git commits in 90 days`);
+    expect(doc.querySelector("img")).toBeNull();
+    expect(doc.querySelector('[role="status"]')?.textContent).toContain("Run Collect DevEx Metrics");
+    const rows = doc.querySelectorAll<HTMLTableRowElement>("#landscapeRows > tr:not(.landscape-detail-row)");
+    expect(Array.from(rows).find((row) => row.cells[1].textContent === "acme/public")
+      ?.cells[4].textContent).toContain("0");
+    expect(Array.from(rows).find((row) => row.cells[1].textContent === "acme/pending")
+      ?.cells[4].textContent).toContain("Unknown");
+  });
+
   it("prioritizes older age signals before active coverage gaps without scoring unknown or private repositories", () => {
     const rows = [
       aged("acme/quiet-fresh", false),

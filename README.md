@@ -168,9 +168,10 @@ attention-first summary (observed gaps, older file signals, unavailable
 observations) and expandable public file paths, plus `landscape.json`. The
 dashboard shows pinned-head **Git commits in 30/90 days**, file-level commits
 since the last change, and a four-cue content quality score where verified
-evidence is available. With `DEVEX_TEAM_HANDLES`, it also counts linked commits
-from those GitHub accounts; missing identity or incomplete history is unknown,
-not zero. The separate observed merged-PR timeline remains context and may be
+evidence is available. Linked-author group commit counts use `DEVEX_TEAM_HANDLES`
+when nonempty, otherwise the `DEVEX_FOCUS_USERS` roster and focus-group name.
+Missing identity, incomplete history or a changed/unverified roster is unknown,
+not zero; a roster change requires a fresh collection, not just a Pages rebuild. The separate observed merged-PR timeline remains context and may be
 incomplete. The cue score is not a correctness or readiness verdict. File contents,
 scanner evidence and private repository paths are never included. Drift means
 files were added, removed or changed content since the last successful scan —

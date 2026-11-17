@@ -38,11 +38,11 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_EXCLUDE_FORKS` | bool | Skip forks. Default `false`. |
 | `DEVEX_MAX_IDLE_DAYS` | int | Skip repos with no push in N days. `0` disables. |
 | `DEVEX_TEAM_REPOS` | list | Globs marking the trial team's repos. |
-| `DEVEX_TEAM_HANDLES` | list | GitHub logins for conservatively attributed Git commit activity in the AI landscape. No handles means Unknown, not zero. |
+| `DEVEX_TEAM_HANDLES` | list | GitHub logins for linked-author commit counts in the AI landscape. A nonempty roster overrides `DEVEX_FOCUS_USERS`; without either roster, counts are Unknown. |
 | `DEVEX_TEAM_NAME` | string | Team display name. |
 | `DEVEX_TEAM_ID` | string | Stable id used in history rows and share URLs. |
 | `DEVEX_FOCUS_NAME` | string | Display name for the optional dashboard PR-author and report commit-author comparison group. |
-| `DEVEX_FOCUS_USERS` | list | Up to 100 distinct GitHub logins for the build-time focus group. |
+| `DEVEX_FOCUS_USERS` | list | Up to 100 distinct GitHub logins for the focus group; also the landscape commit roster when no team handles are configured. |
 | `DEVEX_DISCOVER_ALL` | bool | Collect the whole org as a baseline. Default `true`. |
 | `DEVEX_TRIAL_TITLE` | string | Intervention headline. |
 | `DEVEX_TRIAL_HYPOTHESIS` | string | What the intervention should change. |
@@ -185,6 +185,10 @@ Pages dashboard. Logins are matched case-insensitively, and Enterprise
 Managed User logins (`handle_shortcode`) are accepted. The roster is a
 build-time setting, so changing it and rebuilding Pages reclassifies the
 identities already present in the latest snapshot without another collection.
+The AI landscape also uses this roster for linked Git commit attribution when
+no nonempty `DEVEX_TEAM_HANDLES` / `team.handles` roster is configured. Unlike
+the PR comparison and Markdown report, landscape aggregates need a fresh
+collection after a roster change; a Pages rebuild cannot reattribute them.
 An empty Actions variable is treated as unset, preserving a roster supplied by
 `DEVEX_CONFIG` or the config file. To explicitly clear that roster, set
 `focus.users` to an empty array in the JSON configuration.
@@ -418,8 +422,9 @@ private deployment:
    the explicit same-owner selection; unknown visibility and other owners
    remain excluded.
 4. Run **Collect DevEx Metrics**. Redeploying alone cannot create missing
-   observations. `DEVEX_TEAM_HANDLES` separately enables linked-author team
-   commit counts; `DEVEX_FOCUS_USERS` is not silently reused.
+   observations. Linked-author commit counts use a nonempty `DEVEX_TEAM_HANDLES`
+   roster first, otherwise `DEVEX_FOCUS_USERS`. With the focus fallback, the
+   column uses `DEVEX_FOCUS_NAME`, for example **Example group commits**.
 
 The workflows verify the actual destination through the GitHub API using the
 job's token (`Contents` access and `Pages: read` or greater), separate from the
@@ -558,17 +563,25 @@ pinned public HEAD in the 30 and 90 days ending at `generated_at`, via GitHub's
 commit-history API. These are not merged PRs or a substitute for public
 discovery's separate full-history clone metrics; enabling public discovery is
 not required. Its independently selected head and observation window are never
-joined to the AI scan. The **Team commits** column counts commits whose linked
-GitHub `author.user.login` matches a login explicitly configured in
-`DEVEX_TEAM_HANDLES` (or `team.handles` in `DEVEX_CONFIG`), case-insensitively.
+joined to the AI scan. The group commits column counts commits whose linked
+GitHub `author.user.login` matches the effective roster, case-insensitively:
+a nonempty `DEVEX_TEAM_HANDLES` (or `team.handles` in `DEVEX_CONFIG`) takes
+precedence, otherwise `DEVEX_FOCUS_USERS` / `focus.users` is reused. The fallback
+uses the focus display name, such as **Example group commits**. With an explicit
+team roster, or no roster, the label remains **Team commits**.
 Team repo globs, PR authors, generic contributor counts and unlinked email/name
 matches do **not** establish team identity. When no roster is configured, any
 commit lacks a linked login, the 90-day history exceeds 500 commits, or
 pagination/HEAD verification is incomplete, team counts are **Unknown**, not
-zero. Removing the roster hides stored team counts on the next Pages build;
-changing one configured roster to another requires a fresh collection because
-stored counts reflect the roster at scan time. The 30/90-day windows are fixed
-and do not follow PR filters.
+zero. Removing both rosters hides stored group counts on the next Pages build.
+Changing membership, or upgrading from snapshots without roster provenance,
+requires running **Collect DevEx Metrics**, not just deploying Pages. A
+case/order-independent roster fingerprint is stored alongside the aggregates;
+only counts matching the current roster are displayed. Legacy or mismatched
+counts stay **Unknown** with a recollection notice. Raw roster logins and the
+fingerprint are not added to HTML or `landscape.json`. Changing only the
+display name or roster case/order does not require recollection. The 30/90-day
+windows are fixed and do not follow PR filters.
 
 Each observed AI file shows **commits since change**, the number of branch
 commits from the pinned HEAD since the scanner's `last_changed` timestamp
