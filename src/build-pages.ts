@@ -160,7 +160,7 @@ function main(): void {
 
   const siteDir = path.resolve(process.cwd(), "_site");
   fs.mkdirSync(siteDir, { recursive: true });
-  fs.writeFileSync(path.join(siteDir, "report.md"), generateReport(data));
+  fs.writeFileSync(path.join(siteDir, "report.md"), generateReport(data, config.focus));
   fs.writeFileSync(path.join(siteDir, "data.json"), JSON.stringify(data, null, 2));
   const landscape = config.collection.features.landscape
     ? loadLandscapeView(historyDir, data, (config.team?.handles?.length ?? 0) > 0)

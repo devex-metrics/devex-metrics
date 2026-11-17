@@ -41,6 +41,8 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_TEAM_HANDLES` | list | GitHub logins for conservatively attributed Git commit activity in the public AI landscape. No handles means Unknown, not zero. |
 | `DEVEX_TEAM_NAME` | string | Team display name. |
 | `DEVEX_TEAM_ID` | string | Stable id used in history rows and share URLs. |
+| `DEVEX_FOCUS_NAME` | string | Display name for the optional commit-author comparison group. |
+| `DEVEX_FOCUS_USERS` | list | Up to 100 distinct GitHub logins whose linked PR commit authorship is compared with the rest. |
 | `DEVEX_DISCOVER_ALL` | bool | Collect the whole org as a baseline. Default `true`. |
 | `DEVEX_TRIAL_TITLE` | string | Intervention headline. |
 | `DEVEX_TRIAL_HYPOTHESIS` | string | What the intervention should change. |
@@ -156,6 +158,28 @@ provide these review/comment/commit facts for the timeline and is shown as
 unavailable rather than zero. The Markdown report also shows per-repository
 sample sizes and lower bounds. Newly collected raw comment and commit facts
 are retained in future events; older append-only events are not rewritten.
+
+### Comparing PR commit authors
+
+Set `DEVEX_FOCUS_NAME` and `DEVEX_FOCUS_USERS` (comma-, semicolon- or
+newline-separated GitHub logins) to add a **Commit author attribution** section
+to the Markdown report. Logins are matched case-insensitively. The roster is a
+build-time setting, so changing it and rebuilding Pages reclassifies the
+identities already present in the latest snapshot without another collection.
+
+The report counts sampled commits with only focus-group linked authors, only
+other linked authors, both (mixed), or unavailable/incomplete identity evidence.
+A commit is counted once; unresolved authors and capped samples are never
+quietly counted as “rest.” This is GitHub-linked Git author/co-author metadata,
+not PR ownership or a measure of human effort. No lines or PR latency are
+assigned to a group. The daily GraphQL query samples up to 10 commits per PR
+and up to 10 author records per commit; the report exposes missing/capped
+evidence rather than treating that sample as complete. REST fallback and older
+snapshots without these optional facts remain unavailable. New collection
+captures facts in the latest snapshot and newly appended events; existing
+append-only events are not rewritten, and the historical backfill does not
+enrich them. Enriching old events would require a separately designed,
+explicit historical crawl/update, not a schema bump or Pages rebuild.
 
 To collect *only* the team's repos — much cheaper, but no baseline — set
 `DEVEX_DISCOVER_ALL=false`. Repos are then filtered to `DEVEX_TEAM_REPOS`

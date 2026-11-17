@@ -94,6 +94,7 @@ describe("loadConfig", () => {
     expect(c.collection.landscapeStaleAfterDays).toBe(90);
     expect(c.collection.incremental).toBe(false);
     expect(c.team).toBeUndefined();
+    expect(c.focus).toBeUndefined();
     expect(c.trial).toBeUndefined();
   });
 
@@ -200,6 +201,20 @@ describe("loadConfig", () => {
     expect(() => loadConfig({ DEVEX_CONFIG_FILE: "does-not-exist.json" })).toThrow(
       /missing file/
     );
+  });
+
+  it("resolves and validates the optional commit-author focus roster", () => {
+    const c = loadConfig({
+      DEVEX_CONFIG: JSON.stringify({ focus: { name: "Configured group", users: ["alice"] } }),
+      DEVEX_FOCUS_NAME: "Focus group",
+      DEVEX_FOCUS_USERS: "Alice, bob",
+    });
+    expect(c.focus).toEqual({ name: "Focus group", users: ["Alice", "bob"] });
+
+    expect(() => loadConfig({ DEVEX_FOCUS_USERS: "Alice,alice" }))
+      .toThrow(/distinct GitHub logins/);
+    expect(() => loadConfig({ DEVEX_FOCUS_USERS: "not a login" }))
+      .toThrow(/distinct GitHub logins/);
   });
 
   it("builds a team from discrete variables alone", () => {

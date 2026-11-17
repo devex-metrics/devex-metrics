@@ -72,6 +72,14 @@ export interface TrialConfig {
   milestones: TrialMilestone[];
 }
 
+/** GitHub users whose linked commit authorship is compared with all other authors. */
+export interface FocusConfig {
+  /** Display name for the comparison group. */
+  name: string;
+  /** GitHub logins, matched case-insensitively. */
+  users: string[];
+}
+
 /** Site branding. */
 export interface BrandingConfig {
   /** Page title and H1. */
@@ -221,6 +229,8 @@ export interface DevexConfig {
   branding: BrandingConfig;
   repos: RepoFilterConfig;
   team?: TeamConfig;
+  /** Current build-time roster for commit-author comparison. */
+  focus?: FocusConfig;
   trial?: TrialConfig;
   collection: CollectionConfig;
   history: HistoryConfig;
@@ -406,6 +416,12 @@ function mergePartial(target: DevexConfig, partial: Partial<DevexConfig>): void 
       discoverAll: partial.team.discoverAll ?? true,
     };
   }
+  if (partial.focus) {
+    target.focus = {
+      name: partial.focus.name?.trim() || "Focus group",
+      users: partial.focus.users ?? [],
+    };
+  }
   if (partial.trial) {
     target.trial = {
       title: partial.trial.title ?? "Improvement trial",
@@ -440,6 +456,15 @@ function applyEnv(config: DevexConfig, env: Env): void {
   assign(config.repos, "excludeArchived", bool(env, "DEVEX_EXCLUDE_ARCHIVED"));
   assign(config.repos, "excludeForks", bool(env, "DEVEX_EXCLUDE_FORKS"));
   assign(config.repos, "maxIdleDays", int(env, "DEVEX_MAX_IDLE_DAYS"));
+
+  const focusName = str(env, "DEVEX_FOCUS_NAME");
+  const focusUsers = list(env, "DEVEX_FOCUS_USERS");
+  if (focusName !== undefined || focusUsers !== undefined) {
+    config.focus = {
+      name: focusName ?? config.focus?.name ?? "Focus group",
+      users: focusUsers ?? config.focus?.users ?? [],
+    };
+  }
 
   assign(config.collection, "historyWeeks", int(env, "DEVEX_HISTORY_WEEKS"));
   assign(config.collection, "maxPRPages", int(env, "DEVEX_MAX_PR_PAGES"));
@@ -612,6 +637,15 @@ export function loadConfig(env: Env = process.env): DevexConfig {
         !/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(handle)) ||
       new Set(handles.map((handle) => handle.toLowerCase())).size !== handles.length) {
       throw new Error("Team handles must be at most 100 distinct GitHub logins");
+    }
+  }
+  if (config.focus) {
+    const users = config.focus.users;
+    if (typeof config.focus.name !== "string" || !Array.isArray(users) || users.length > 100 ||
+      users.some((login) => typeof login !== "string" ||
+        !/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(login)) ||
+      new Set(users.map((login) => login.toLowerCase())).size !== users.length) {
+      throw new Error("Focus must have a name and at most 100 distinct GitHub logins");
     }
   }
   validateBackfillPageSizes(config.collection.backfill);

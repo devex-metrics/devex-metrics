@@ -594,6 +594,16 @@ export interface PullRequestDetail {
   mergedAt?: string;
 }
 
+/** Linked GitHub authors on one sampled PR commit; email addresses are never retained. */
+export interface PRCommitAuthorSample {
+  /** Resolved GitHub logins associated with the commit, including co-authors. */
+  authors: string[];
+  /** Number of author records GitHub reports for this commit. */
+  authorCount: number;
+  /** False when the nested author connection was capped or otherwise incomplete. */
+  complete: boolean;
+}
+
 /** Lightweight timeline entry for each merged PR (from paginated pulls.list). */
 export interface MergedPRSummary {
   /** PR number. */
@@ -664,6 +674,12 @@ export interface MergedPRSummary {
   recentCommitDates?: string[];
   /** Total number of PR commits; compare with recentCommitDates.length for sample coverage. */
   totalCommitCount?: number;
+  /** Linked GitHub author facts for sampled commits; absent in legacy or REST data. */
+  commitAuthorSamples?: PRCommitAuthorSample[];
+  /** Total commit count reported alongside the author sample. */
+  commitAuthorSampleTotalCount?: number;
+  /** Whether the outer commit connection was fully sampled. */
+  commitAuthorSampleComplete?: boolean;
   /** Reviews that requested changes — one per review round. */
   changesRequestedCount?: number;
   /**
@@ -697,6 +713,12 @@ export interface ClosedPRSummary {
   linesAdded?: number;
   /** Lines deleted by this PR. */
   linesDeleted?: number;
+  /** Linked GitHub author facts for sampled commits; absent in legacy or REST data. */
+  commitAuthorSamples?: PRCommitAuthorSample[];
+  /** Total commit count reported alongside the author sample. */
+  commitAuthorSampleTotalCount?: number;
+  /** Whether the outer commit connection was fully sampled. */
+  commitAuthorSampleComplete?: boolean;
 }
 
 /** A pull request still open when the collection ran. */

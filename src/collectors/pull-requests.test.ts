@@ -1214,6 +1214,61 @@ describe("buildMergedPRTimeline", () => {
     expect(result[0].linesAdded).toBe(123);
     expect(result[0].linesDeleted).toBe(45);
   });
+
+  it("retains linked commit and co-author logins without raw emails and marks capped evidence", () => {
+    const node = makePRNode({
+      commits: {
+        totalCount: 2,
+        pageInfo: { hasNextPage: true },
+        nodes: [{
+          commit: {
+            authors: {
+              totalCount: 2,
+              pageInfo: { hasNextPage: false },
+              nodes: [
+                { email: "private@example.test", user: { login: "Alice", __typename: "User" } },
+                { email: "unlinked@example.test", user: null },
+              ],
+            },
+          },
+        }],
+      },
+    });
+    const [result] = buildMergedPRTimeline([node]);
+
+    expect(result.commitAuthorSamples).toEqual([
+      { authors: ["Alice"], authorCount: 2, complete: true },
+    ]);
+    expect(result.commitAuthorSampleTotalCount).toBe(2);
+    expect(result.commitAuthorSampleComplete).toBe(false);
+    expect(JSON.stringify(result)).not.toContain("private@example.test");
+    expect(JSON.stringify(result)).not.toContain("unlinked@example.test");
+  });
+
+  it("marks a capped nested co-author connection incomplete", () => {
+    const node = makePRNode({
+      commits: {
+        totalCount: 1,
+        pageInfo: { hasNextPage: false },
+        nodes: [{
+          commit: {
+            authors: {
+              totalCount: 11,
+              pageInfo: { hasNextPage: true },
+              nodes: Array.from({ length: 10 }, (_, index) => ({
+                email: `author-${index}@example.test`,
+                user: { login: `author-${index}`, __typename: "User" },
+              })),
+            },
+          },
+        }],
+      },
+    });
+    const [result] = buildMergedPRTimeline([node]);
+
+    expect(result.commitAuthorSamples?.[0].complete).toBe(false);
+    expect(result.commitAuthorSamples?.[0].authorCount).toBe(11);
+  });
 });
 
 describe("collectPullRequestDetailsFromNodes", () => {

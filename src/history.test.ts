@@ -256,6 +256,22 @@ describe("buildEventRows", () => {
       totalCommitCount: 101,
     });
   });
+
+  it("stores linked commit-author logins but never their raw emails", () => {
+    const [row] = buildEventRows(metrics([repo("acme/api", [pr(1, 1, {
+      commitAuthorSamples: [
+        { authors: ["alice"], authorCount: 1, complete: true },
+      ],
+      commitAuthorSampleTotalCount: 2,
+      commitAuthorSampleComplete: false,
+    })])]));
+    expect(row).toMatchObject({
+      commitAuthorSamples: [{ authors: ["alice"], authorCount: 1, complete: true }],
+      commitAuthorSampleTotalCount: 2,
+      commitAuthorSampleComplete: false,
+    });
+    expect(JSON.stringify(row)).not.toContain("@");
+  });
 });
 
 describe("loadLatest", () => {

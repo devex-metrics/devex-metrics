@@ -2,6 +2,8 @@ import type { OrgMetrics, RepoMetrics, CopilotAdoption, CopilotAgentMetrics } fr
 import { gini, quantiles, shareAtLeast } from "./stats.js";
 import { LARGE_PR_LINES } from "./history.js";
 import { postReviewCommitFacts } from "./review-rework.js";
+import { summarizeCommitAttribution } from "./commit-attribution.js";
+import type { FocusConfig } from "./config.js";
 import { renderMarkdownTableRow } from "./markdown.js";
 import { collectionStateLabel } from "./collection-state.js";
 
@@ -30,7 +32,7 @@ const WINDOW = {
 /**
  * Produce a human-readable Markdown report from collected metrics.
  */
-export function generateReport(metrics: OrgMetrics): string {
+export function generateReport(metrics: OrgMetrics, focus?: FocusConfig): string {
   const lines: string[] = [];
 
   lines.push(`# DevEx Metrics – ${metrics.owner}`);
@@ -230,6 +232,39 @@ export function generateReport(metrics: OrgMetrics): string {
       `| Credits per agent PR | ` +
         `${(agentTotals.totalCreditsUsed / agentTotals.agentCreatedPRs).toFixed(1)} | ${WINDOW.last30d} |`
     );
+  }
+
+  if (focus && focus.users.length > 0) {
+    const prs = metrics.repos.flatMap((repo) => repo.mergedPRTimeline ?? []);
+    const attribution = summarizeCommitAttribution(prs, focus.users);
+    const groupName = (focus.name.trim() || "Focus group")
+      .replace(/[\r\n]/g, " ")
+      .replace(/[\\`*_{}\[\]()#+.!|>]/g, "\\$&");
+    lines.push("");
+    lines.push("## Commit author attribution");
+    lines.push("");
+    lines.push(
+      `Configured focus group: **${groupName}** (${new Set(focus.users.map((user) => user.toLowerCase())).size} GitHub users). ` +
+        `${attribution.totalPRs} merged PRs in the collected snapshot.`
+    );
+    lines.push("");
+    lines.push("| Commit sample | Count |");
+    lines.push("| ------------- | ----- |");
+    lines.push(`| Focus-only linked authors | ${attribution.focusCommits} |`);
+    lines.push(`| Rest-only linked authors | ${attribution.restCommits} |`);
+    lines.push(`| Mixed focus and rest authors | ${attribution.mixedCommits} |`);
+    lines.push(`| Unavailable or incomplete identity evidence | ${attribution.unavailableCommits} |`);
+    lines.push(`| PRs with no author data | ${attribution.unavailablePRs} |`);
+    lines.push(`| PRs with incomplete commit samples | ${attribution.incompletePRs} |`);
+    lines.push("");
+    lines.push(
+      "> These are GitHub-linked commit-author samples, not measures of human effort. " +
+        "The GraphQL query samples up to 10 commits and up to 10 author records per commit; " +
+        "uncaptured or unresolved evidence is reported as unavailable/incomplete, never as rest. " +
+        "Each commit is counted once; co-authored commits with focus and other linked users are kept in the mixed row. " +
+        "Lines and PR latency are not allocated to either group. Roster changes are applied at site-build time."
+    );
+    lines.push("");
   }
 
   lines.push("");
