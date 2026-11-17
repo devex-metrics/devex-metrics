@@ -260,6 +260,7 @@ describe("landscape workflow adapter", () => {
       "DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}"
     );
     expect(ingest).toContain("DEVEX_TEAM_HANDLES: ${{ vars.DEVEX_TEAM_HANDLES }}");
+    expect(ingest).toContain("DEVEX_FOCUS_USERS: ${{ vars.DEVEX_FOCUS_USERS }}");
     const pages = fs.readFileSync(
       path.resolve(".github", "workflows", "pages.yml"), "utf8"
     );

@@ -9,6 +9,7 @@ import { JSDOM, VirtualConsole } from "jsdom";
 import { CURRENT_SCHEMA_VERSION } from "./cache.js";
 import { landscapeLatestPath } from "./landscape.js";
 import { markPrivateLandscapeStore } from "./landscape-policy.js";
+import { landscapeRosterKey } from "./landscape-team.js";
 import { discoveryLatestPath } from "./public-discovery.js";
 import type { CacheEnvelope, WeeklyTrendPoint } from "./types.js";
 
@@ -82,7 +83,7 @@ describe("build-pages", () => {
     expect(html).not.toContain("unused_roster");
   });
 
-  it("publishes the opt-in landscape view and sanitized JSON without changing the base data API", () => {
+  it.each(["explicit", "focus"])("publishes landscape counts for the %s roster without exposing its membership", (rosterSource) => {
       const historyDir = path.join(dataDir, "test-pages-landscape-history");
       const envelope: CacheEnvelope = JSON.parse(fs.readFileSync(cacheFile, "utf8"));
       envelope.data.repos[0].isPrivate = false;
@@ -103,6 +104,7 @@ describe("build-pages", () => {
           }],
           ai_summary: { count: 1, stale_count: 0, max_lag_days: null, unknown_count: 1 },
           commits_30d: 2, commits_90d: 5, team_commits_30d: 1, team_commits_90d: 1,
+          team_roster_key: landscapeRosterKey(["Alice"]),
         }],
         content: "NEVER PUBLISH",
       }));
@@ -113,7 +115,9 @@ describe("build-pages", () => {
             ...process.env,
             DEVEX_HISTORY_DIR: historyDir,
             DEVEX_FEATURE_LANDSCAPE: "true",
-            DEVEX_TEAM_HANDLES: "Alice",
+            DEVEX_TEAM_HANDLES: rosterSource === "explicit" ? "Alice" : "",
+            DEVEX_FOCUS_NAME: "Example group",
+            DEVEX_FOCUS_USERS: rosterSource === "focus" ? "Alice" : "",
           },
         });
         const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf8");
@@ -131,6 +135,11 @@ describe("build-pages", () => {
         });
         expect(html).toContain("Quality cues");
         expect(html).toContain("75/100");
+        const doc = new JSDOM(html).window.document;
+        expect(doc.querySelector('[data-landscape-sort="team90"]')?.textContent)
+          .toContain(rosterSource === "focus" ? "Example group commits" : "Team commits");
+        expect(fs.readFileSync(path.join(siteDir, "landscape.json"), "utf8"))
+          .not.toMatch(/Alice|team_roster_key/i);
         expect(html).not.toContain("NEVER PUBLISH");
         expect(fs.readFileSync(path.join(siteDir, "landscape.json"), "utf8"))
           .not.toContain("NEVER PUBLISH");

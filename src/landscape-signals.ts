@@ -3,6 +3,7 @@ import type { Octokit } from "@octokit/rest";
 import type { LandscapeContentSignal, LandscapeFile, LandscapeRepository, LandscapeScan } from "./types.js";
 import { landscapeDetailSummary } from "./landscape-contract.js";
 import { landscapeVisibilityAllowed } from "./landscape-policy.js";
+import { landscapeRosterKey } from "./landscape-team.js";
 
 export const MAX_SIGNAL_REPOS = 150;
 export const MAX_SIGNAL_FILES = 1000;
@@ -312,6 +313,7 @@ export async function enrichLandscapeScan(
     repo.commits_90d = repo.activity?.commits_90d ?? null;
     repo.team_commits_30d = null;
     repo.team_commits_90d = null;
+    repo.team_roster_key = landscapeRosterKey(handles);
     for (const file of repo.ai_files) {
       file.commits_since_change ??= null;
       file.content_signal ??= null;

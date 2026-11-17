@@ -85,10 +85,12 @@ export interface LandscapeRepository {
   commits_30d?: number | null;
   /** Git-history commits in the 90 days ending at generated_at; null if unmeasured. */
   commits_90d?: number | null;
-  /** Linked commits by explicitly configured GitHub team handles in 30 days; null if unverified. */
+  /** Linked commits by the effective team/focus roster in 30 days; null if unverified. */
   team_commits_30d?: number | null;
-  /** Linked commits by explicitly configured GitHub team handles in 90 days; null if unverified. */
+  /** Linked commits by the effective team/focus roster in 90 days; null if unverified. */
   team_commits_90d?: number | null;
+  /** Internal roster fingerprint for linked-author counts; never the roster itself. */
+  team_roster_key?: string;
 }
 
 /** Static rubric signals derived from a hash-verified instruction file. */
@@ -271,10 +273,12 @@ export interface LandscapeRepoView {
   commits30d?: number | null;
   /** Pinned-head repository Git commits in the 90-day scan window. */
   commits90d?: number | null;
-  /** Commits attributed to a fully verified, explicitly configured roster (30 days). */
+  /** Commits attributed to the fully verified effective team/focus roster (30 days). */
   teamCommits30d?: number | null;
-  /** Commits attributed to a fully verified, explicitly configured roster (90 days). */
+  /** Commits attributed to the fully verified effective team/focus roster (90 days). */
   teamCommits90d?: number | null;
+  /** Configured roster differs from the collected roster, or legacy counts have no provenance. */
+  teamRosterChanged?: boolean;
   /** Mean of all hash-verified file rubric scores, or null when any file is unmeasured. */
   qualityScore?: number | null;
   /** Number of files with hash-verified rubric scores. */

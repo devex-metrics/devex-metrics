@@ -38,7 +38,7 @@ export interface TeamConfig {
   name: string;
   /** Glob patterns matching the team's repositories. */
   repos: string[];
-  /** GitHub logins whose linked Git commits count as team activity; empty leaves it unknown. */
+  /** GitHub logins for landscape team commits; empty falls back to focus.users, then Unknown. */
   handles?: string[];
   /**
    * When true, collect every repo the owner has (subject to `repos` filters)

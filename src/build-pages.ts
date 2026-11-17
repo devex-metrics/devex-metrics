@@ -6,6 +6,7 @@ import { loadConfig, applyScope } from "./config.js";
 import { latestPath, loadRollup } from "./history.js";
 import { loadCiRuns, toCiSamples } from "./ci-health.js";
 import { loadLandscapeRunStatus, loadLandscapeView } from "./landscape.js";
+import { resolveLandscapeTeam } from "./landscape-team.js";
 import {
   assertLandscapePublication, hasPrivateLandscapeData, markPrivateLandscapeStore,
 } from "./landscape-policy.js";
@@ -169,8 +170,9 @@ async function main(): Promise<void> {
   if (privateOutput) markPrivateLandscapeStore(siteDir);
   fs.writeFileSync(path.join(siteDir, "report.md"), generateReport(data, config.focus));
   fs.writeFileSync(path.join(siteDir, "data.json"), JSON.stringify(data, null, 2));
+  const landscapeTeam = resolveLandscapeTeam(config);
   const landscape = config.collection.features.landscape
-    ? loadLandscapeView(historyDir, data, (config.team?.handles?.length ?? 0) > 0,
+    ? loadLandscapeView(historyDir, data, landscapeTeam.key,
       config.collection.landscapeIncludePrivate)
     : undefined;
   const landscapeFile = path.join(siteDir, "landscape.json");
@@ -200,6 +202,7 @@ async function main(): Promise<void> {
     ciSamples,
     ciWindowDays: config.collection.ciHealth.windowDays,
     landscape,
+    landscapeTeamName: landscapeTeam.name,
     landscapeStatus: landscape ? loadLandscapeRunStatus(historyDir, data.owner) : undefined,
     publicDiscovery: discovery?.rows,
     publicDiscoveryConnections: discovery?.connections,

@@ -313,6 +313,8 @@ jobs:
           DEVEX_FEATURE_LANDSCAPE: ${{ vars.DEVEX_FEATURE_LANDSCAPE }}
           DEVEX_LANDSCAPE_STALE_AFTER_DAYS: ${{ vars.DEVEX_LANDSCAPE_STALE_AFTER_DAYS }}
           DEVEX_TEAM_HANDLES: ${{ vars.DEVEX_TEAM_HANDLES }}
+          DEVEX_FOCUS_NAME: ${{ vars.DEVEX_FOCUS_NAME }}
+          DEVEX_FOCUS_USERS: ${{ vars.DEVEX_FOCUS_USERS }}
         run: node dist/landscape-cli.js ingest data/landscape-raw.json
 
       # On any failure with landscape enabled, keep the last good landscape

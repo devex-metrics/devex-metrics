@@ -90,6 +90,8 @@ export interface DashboardExtras {
   datasets?: DatasetNavEntry[];
   /** Opt-in sanitized landscape observations; absent when the feature is disabled. */
   landscape?: LandscapeRepoView[];
+  /** Display name of the effective landscape roster (explicit team or fallback focus group). */
+  landscapeTeamName?: string;
   /** Outcome of the latest landscape scan attempt; a failure marks the data as stale. */
   landscapeStatus?: LandscapeRunStatus;
   /** Independently collected and sanitized public repository discovery rows. */
@@ -759,7 +761,7 @@ ${buildTrialBanner(data, teamRepoNames.length)}
     <p class="repo-count"><span id="shown">${Math.min(20, data.repos.length)}</span> of ${data.repos.length} ${data.repos.length === 1 ? "repository" : "repositories"} shown</p>
   </section>
 
-  ${extras.landscape ? buildLandscapeSection(extras.landscape, extras.landscapeStatus, data) : ""}
+  ${extras.landscape ? buildLandscapeSection(extras.landscape, extras.landscapeStatus, data, extras.landscapeTeamName) : ""}
   ${extras.publicDiscovery ? buildPublicDiscoverySection(extras.publicDiscovery, extras.publicDiscoveryConnections ?? [], extras.publicDiscoveryStatus, extras.publicDiscoveryReferences) : ""}
 </main>
 

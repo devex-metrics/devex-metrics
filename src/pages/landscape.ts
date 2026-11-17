@@ -227,7 +227,8 @@ function staleNotice(status: LandscapeRunStatus | undefined): string {
 export function buildLandscapeSection(
   rows: readonly LandscapeRepoView[],
   status?: LandscapeRunStatus,
-  metrics?: Pick<OrgMetrics, "repos" | "collectedAt">
+  metrics?: Pick<OrgMetrics, "repos" | "collectedAt">,
+  teamName = "Team"
 ): string {
   const observed = rows.filter((row) => row.status === "observed").length;
   const repos = new Map(metrics?.repos.map((repo) => [repo.fullName.toLowerCase(), repo]) ?? []);
@@ -247,7 +248,7 @@ export function buildLandscapeSection(
         <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="name" data-landscape-default="ascending" data-landscape-label="Repository">Repository <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
         <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="activity" data-landscape-default="descending" data-landscape-label="Observed merged PRs in 90 days">Merged PRs / 90d <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
         <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="commits90" data-landscape-default="descending" data-landscape-label="Git commits in 90 days">Git commits <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
-        <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="team90" data-landscape-default="descending" data-landscape-label="Verified team Git commits in 90 days">Team commits <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
+        <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="team90" data-landscape-default="descending" data-landscape-label="${escapeHtml(teamName)} Git commits in 90 days">${escapeHtml(teamName)} commits <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
         <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="count" data-landscape-default="descending" data-landscape-label="AI instruction files">AI instruction files <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
         <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="quality" data-landscape-default="descending" data-landscape-label="AI instruction quality cues">Quality cues <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
         <th scope="col"><button type="button" class="landscape-sort" aria-controls="landscapeRows" data-landscape-sort="age" data-landscape-default="descending" data-landscape-label="Oldest known file age">File age / lag <span class="landscape-sort-ind" aria-hidden="true">↕</span></button></th>
@@ -299,13 +300,15 @@ export function buildLandscapeSection(
       <p class="metric-lede">Review older file signals first, followed by active repositories without AI instruction files, alongside Git commits, configured team activity and measurable instruction cues. Presence and age are maintenance signals; the rubric is not a correctness verdict.</p>
     </div><div class="landscape-actions"><span class="landscape-coverage">${observed} / ${rows.length} observed</span><a href="landscape.json">Sanitized JSON</a></div></div>
     ${staleNotice(status)}
+    ${rows.some((row) => row.teamRosterChanged)
+      ? `<p class="landscape-context" role="status">${escapeHtml(teamName)} commit counts need a new collection for the configured roster. Run Collect DevEx Metrics; a Pages rebuild alone cannot recalculate these counts.</p>` : ""}
     ${rows.length ? `<div class="landscape-triage" aria-label="Landscape overview">
       <div><strong>${missing}</strong><span>No files observed</span></div>
       <div><strong>${older}</strong><span>Older age signals</span></div>
       <div><strong>${historyUnknown}</strong><span>History incomplete</span></div>
       <div><strong>${unknown}</strong><span>Observation unknown</span></div>
     </div>
-    <p class="landscape-context">Overview categories can overlap. Git commits (30d / 90d) come from pinned-head history ending at the AI scan time; team counts need a complete linked-author history and an explicit GitHub-handle roster. Triage prefers Git activity, falling back to observed merged PRs / 90d at the DevEx collection time when Git history is unknown. The PR timeline can be incomplete. Quality cues score observable content, not correctness: 25 points each for scope, actions, checks and guardrails in hash-verified content. Commits since change include the file's last-changed date; graph commits since count last-path-commit..HEAD, excluding the path commit. These counts are not interchangeable. Numeric deltas require both observations; missing legacy facts stay Unknown. Older age is not evidence of incorrect instructions. Unknown never means zero; this view ignores dashboard PR period and bot filters.${scannedBy}</p>
+    <p class="landscape-context">Overview categories can overlap. Git commits (30d / 90d) come from pinned-head history ending at the AI scan time; group counts need a complete linked-author history and the configured team handles, falling back to focus-group users. Triage prefers Git activity, falling back to observed merged PRs / 90d at the DevEx collection time when Git history is unknown. The PR timeline can be incomplete. Quality cues score observable content, not correctness: 25 points each for scope, actions, checks and guardrails in hash-verified content. Commits since change include the file's last-changed date; graph commits since count last-path-commit..HEAD, excluding the path commit. These counts are not interchangeable. Numeric deltas require both observations; missing legacy facts stay Unknown. Older age is not evidence of incorrect instructions. Unknown never means zero; this view ignores dashboard PR period and bot filters.${scannedBy}</p>
     <div class="landscape-sort-toolbar"><span id="landscapeSortStatus" aria-live="polite">Attention first</span><button type="button" id="landscapeSortReset" aria-controls="landscapeRows" disabled>Restore attention order</button></div>` : ""}
     ${content}
   </section>`;

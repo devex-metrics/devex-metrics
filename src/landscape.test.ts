@@ -17,6 +17,7 @@ import {
   unverifiedLandscapeRepositories,
 } from "./landscape.js";
 import type { OrgMetrics, RepoMetrics } from "./types.js";
+import { landscapeRosterKey } from "./landscape-team.js";
 
 const SHA_A = "a".repeat(40);
 const SHA_B = "b".repeat(40);
@@ -194,7 +195,7 @@ describe("landscape history and DevEx join", () => {
     const enriched = {
       ...sanitized, repositories: [{
         ...known, commits_30d: 2, commits_90d: 5, team_commits_30d: 0,
-        team_commits_90d: 1, ai_files: [{
+        team_commits_90d: 1, team_roster_key: landscapeRosterKey(["alice"]), ai_files: [{
           ...known.ai_files[0], commits_since_change: 7,
           content_signal: { score: 75, scope: true, actions: true, verification: false, guardrails: true },
         }],
@@ -208,13 +209,13 @@ describe("landscape history and DevEx join", () => {
     const stored = fs.readFileSync(landscapeLatestPath(root, "acme"), "utf8");
     expect(stored).not.toContain("DO NOT PUBLISH");
     expect(stored).not.toContain("999");
-    expect(loadLandscapeView(root, data, true)[0]).toMatchObject({
+    expect(loadLandscapeView(root, data, landscapeRosterKey(["alice"]))[0]).toMatchObject({
       commits30d: 2, commits90d: 5, teamCommits30d: 0, teamCommits90d: 1,
       qualityScore: 75, qualityScored: 1,
       files: [{ commits_since_change: 7, content_signal: { score: 75 } }],
     });
 
-    expect(loadLandscapeView(root, data, false)[0]).toMatchObject({
+    expect(loadLandscapeView(root, data)[0]).toMatchObject({
       commits30d: 2, teamCommits30d: null, teamCommits90d: null,
     });
     expect(() => parseLandscapeScan({
@@ -243,15 +244,46 @@ describe("landscape history and DevEx join", () => {
       .not.toContain("PRIVATE SOURCE CONTENT");
     expect(fs.existsSync(path.join(root, ".private-landscape"))).toBe(true);
     if (isPrivate) expect(loadLandscapeView(root, data)[0]).toMatchObject({ status: "unknown", reason: "private" });
-    expect(loadLandscapeView(root, data, false, true)[0]).toMatchObject({
+    expect(loadLandscapeView(root, data, undefined, true)[0]).toMatchObject({
       status: "observed", files: [{ path: "internal/AGENTS.md" }],
     });
-    expect(loadLandscapeView(root, data, false, true)[1]).toMatchObject({
+    expect(loadLandscapeView(root, data, undefined, true)[1]).toMatchObject({
       status: "unknown", reason: "visibility_unknown",
     });
     expect(scrubLandscapeOutsideSelection(root, data, true)).toBe(0);
     expect(scrubLandscapeOutsideSelection(root, data)).toBe(isPrivate ? 2 : 0);
     expect(fs.existsSync(path.join(root, ".private-landscape"))).toBe(true);
+  });
+
+  it("does not relabel old, unknown-roster, or changed-roster aggregates as the current group's counts", () => {
+    const data = metrics([{ name: "public", isPrivate: false }]);
+    const source = scan([repository()]);
+    const enriched = parseLandscapeScan(source);
+    const repo = enriched.repositories[0];
+    if (!("head_sha" in repo)) throw new Error("Expected observed repository");
+    Object.assign(repo, {
+      commits_30d: 2, commits_90d: 5, team_commits_30d: 0, team_commits_90d: 1,
+      team_roster_key: landscapeRosterKey(["alice"]),
+    });
+    saveLandscapeScan(root, data, source, enriched);
+    expect(loadLandscapeView(root, data, landscapeRosterKey(["ALICE"]))[0]).toMatchObject({
+      teamCommits30d: 0, teamCommits90d: 1, teamRosterChanged: false,
+    });
+    expect(loadLandscapeView(root, data, landscapeRosterKey(["bob"]))[0]).toMatchObject({
+      teamCommits30d: null, teamCommits90d: null, teamRosterChanged: true,
+    });
+    delete repo.team_roster_key;
+    const legacy = { ...enriched, generated_at: "2026-09-22T12:00:00Z" };
+    saveLandscapeScan(root, data, legacy, legacy);
+    expect(loadLandscapeView(root, data, landscapeRosterKey(["alice"]))[0]).toMatchObject({
+      teamCommits30d: null, teamCommits90d: null, teamRosterChanged: true,
+    });
+    expect(() => parseLandscapeScan({
+      ...legacy, repositories: [{ ...repo, team_roster_key: "not-a-roster-key" }],
+    }, true)).toThrow(/team_roster_key/);
+    expect(parseLandscapeScan({ ...legacy, repositories: [{
+      ...repo, team_roster_key: landscapeRosterKey(["alice"]),
+    }] }).repositories[0]).not.toHaveProperty("team_roster_key");
   });
 
   it("does not widen the private policy to other owners, unknown visibility, or empty repositories", () => {
