@@ -50,7 +50,7 @@ async function main(): Promise<void> {
   const dataDir = path.resolve(process.cwd(), "data");
   fs.mkdirSync(dataDir, { recursive: true });
 
-  const report = generateReport(metrics);
+  const report = generateReport(metrics, config.focus);
   const reportPath = path.join(dataDir, `${config.owner}-report.md`);
   fs.writeFileSync(reportPath, report);
   console.log(`\nReport written to ${reportPath}`);

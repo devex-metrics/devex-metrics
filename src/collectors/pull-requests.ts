@@ -4,6 +4,7 @@ import { countSearchMatches } from "./search-counts.js";
 import type {
   PullRequestCounts,
   PullRequestDetail,
+  PRCommitAuthorSample,
   MergedPRSummary,
   ClosedPRSummary,
   OpenPRSummary,
@@ -545,6 +546,32 @@ export function buildPullRequestCounts(data: GraphQLRepoData): PullRequestCounts
   };
 }
 
+/** Retain linked logins only; raw emails remain transient AI-detection input. */
+function collectCommitAuthorEvidence(node: GraphQLPRNode): {
+  samples: PRCommitAuthorSample[];
+  totalCount: number;
+  complete: boolean;
+} {
+  const samples = node.commits.nodes.map(({ commit }) => {
+    const connection = commit.authors;
+    const authors = connection.nodes.flatMap((author) =>
+      author.user?.login ? [author.user.login] : []
+    );
+    const authorCount = connection.totalCount ?? connection.nodes.length;
+    const complete = connection.pageInfo
+      ? !connection.pageInfo.hasNextPage
+      : connection.totalCount !== undefined
+        ? connection.nodes.length >= connection.totalCount
+        : connection.nodes.length < 10;
+    return { authors, authorCount, complete };
+  });
+  const totalCount = node.commits.totalCount;
+  const complete = node.commits.pageInfo
+    ? !node.commits.pageInfo.hasNextPage
+    : samples.length >= totalCount;
+  return { samples, totalCount, complete };
+}
+
 /**
  * Build a MergedPRSummary timeline from pre-fetched GraphQL PR nodes.
  * Only includes MERGED nodes. No API calls.
@@ -556,6 +583,7 @@ export function buildMergedPRTimeline(nodes: GraphQLPRNode[]): MergedPRSummary[]
     const authorLogin = node.author?.login ?? "unknown";
     const isBot = node.author?.__typename === "Bot" || isBotLogin(authorLogin);
     const aiType = resolveAIType(authorLogin, node.author?.__typename, node.mergeCommit?.message, node.commits.nodes, node.body);
+    const commitAuthors = collectCommitAuthorEvidence(node);
     const reviews = summariseReviews(node.reviews?.nodes, node.reviews?.totalCount);
     timeline.push({
       number: node.number,
@@ -579,6 +607,9 @@ export function buildMergedPRTimeline(nodes: GraphQLPRNode[]): MergedPRSummary[]
         entry?.commit ? [entry.commit.committedDate] : []
       ),
       totalCommitCount: node.recentCommits?.totalCount,
+      commitAuthorSamples: commitAuthors.samples,
+      commitAuthorSampleTotalCount: commitAuthors.totalCount,
+      commitAuthorSampleComplete: commitAuthors.complete,
       changesRequestedCount: reviews.changesRequestedCount,
       revertsPR: parseRevertRef(node.body),
     });
@@ -605,6 +636,7 @@ export function buildClosedPRTimeline(nodes: readonly GraphQLPRNode[]): ClosedPR
       node.commits?.nodes,
       node.body
     );
+    const commitAuthors = collectCommitAuthorEvidence(node);
     closed.push({
       number: node.number,
       createdAt: node.createdAt,
@@ -614,6 +646,9 @@ export function buildClosedPRTimeline(nodes: readonly GraphQLPRNode[]): ClosedPR
       aiAuthorType: aiType ?? undefined,
       linesAdded: node.additions,
       linesDeleted: node.deletions,
+      commitAuthorSamples: commitAuthors.samples,
+      commitAuthorSampleTotalCount: commitAuthors.totalCount,
+      commitAuthorSampleComplete: commitAuthors.complete,
     });
   }
   return closed.sort((a, b) => (b.closedAt > a.closedAt ? 1 : -1));

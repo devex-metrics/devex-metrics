@@ -31,9 +31,12 @@ export interface GraphQLPRNode {
    */
   commits: {
     totalCount: number;
+    pageInfo?: { hasNextPage: boolean };
     nodes: Array<{
       commit: {
         authors: {
+          totalCount?: number;
+          pageInfo?: { hasNextPage: boolean };
           nodes: CommitAuthorNode[];
         };
       };
@@ -196,9 +199,12 @@ const REPO_DATA_QUERY = `
           deletions
           commits(first: 10) {
             totalCount
+            pageInfo { hasNextPage }
             nodes {
               commit {
                 authors(first: 10) {
+                  totalCount
+                  pageInfo { hasNextPage }
                   nodes { email user { login __typename } }
                 }
               }

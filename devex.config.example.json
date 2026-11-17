@@ -39,6 +39,11 @@
     "discoverAll": true
   },
 
+  "focus": {
+    "name": "Focus group",
+    "users": []
+  },
+
   "trial": {
     "title": "Trunk-based development",
     "hypothesis": "Smaller pull requests shorten review latency",

@@ -147,6 +147,12 @@ export interface EventRow {
   recentCommitDates?: string[];
   /** Total commit count, used to recognize incomplete timestamp samples. */
   totalCommitCount?: number;
+  /** Linked GitHub author logins for sampled commits; raw emails are not stored. */
+  commitAuthorSamples?: MergedPRSummary["commitAuthorSamples"];
+  /** Total commits reported by the author-sample query. */
+  commitAuthorSampleTotalCount?: number;
+  /** Whether the outer commit connection was fully sampled. */
+  commitAuthorSampleComplete?: boolean;
   /**
    * When the first review was submitted. The raw fact behind review latency —
    * captured during the historical crawl so the metric can be built later
@@ -531,6 +537,9 @@ export function buildEventRows(metrics: OrgMetrics): EventRow[] {
         reviewThreadCount: pr.reviewThreadCount,
         recentCommitDates: pr.recentCommitDates,
         totalCommitCount: pr.totalCommitCount,
+        commitAuthorSamples: pr.commitAuthorSamples,
+        commitAuthorSampleTotalCount: pr.commitAuthorSampleTotalCount,
+        commitAuthorSampleComplete: pr.commitAuthorSampleComplete,
         firstReviewAt: pr.firstReviewAt,
         firstApprovalAt: pr.firstApprovalAt,
         changesRequestedCount: pr.changesRequestedCount,
@@ -551,6 +560,9 @@ export function buildEventRows(metrics: OrgMetrics): EventRow[] {
         closedAt: pr.closedAt,
         linesAdded: pr.linesAdded,
         linesDeleted: pr.linesDeleted,
+        commitAuthorSamples: pr.commitAuthorSamples,
+        commitAuthorSampleTotalCount: pr.commitAuthorSampleTotalCount,
+        commitAuthorSampleComplete: pr.commitAuthorSampleComplete,
       });
     }
   }

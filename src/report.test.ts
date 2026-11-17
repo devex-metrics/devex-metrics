@@ -117,6 +117,34 @@ describe("generateReport", () => {
     expect(report).toContain("Merged PRs | 18");
   });
 
+  it("reports focus/rest/mixed commit-author samples and caveats only when configured", () => {
+    const metrics = makeSampleMetrics();
+    metrics.repos[0].mergedPRTimeline = [
+      {
+        number: 42, createdAt: "2026-03-01T00:00:00Z", mergedAt: "2026-03-03T00:00:00Z",
+        author: "dev1", isBotAuthor: false, isCopilotAuthored: false, timeToMergeHours: 48, closesIssues: [],
+        commitAuthorSamples: [
+          { authors: ["Alice"], authorCount: 1, complete: true },
+          { authors: ["other"], authorCount: 1, complete: true },
+          { authors: ["Alice", "other"], authorCount: 2, complete: true },
+          { authors: [], authorCount: 1, complete: true },
+        ],
+        commitAuthorSampleTotalCount: 5,
+        commitAuthorSampleComplete: false,
+      },
+    ];
+
+    const withoutFocus = generateReport(metrics);
+    expect(withoutFocus).not.toContain("Commit author attribution");
+
+    const report = generateReport(metrics, { name: "Group", users: ["alice"] });
+    expect(report).toContain("Focus-only linked authors | 1");
+    expect(report).toContain("Rest-only linked authors | 1");
+    expect(report).toContain("Mixed focus and rest authors | 1");
+    expect(report).toContain("Unavailable or incomplete identity evidence | 2");
+    expect(report).toContain("Lines and PR latency are not allocated");
+  });
+
   it("should include Copilot adoption metrics in the summary", () => {
     const report = generateReport(makeSampleMetrics());
 

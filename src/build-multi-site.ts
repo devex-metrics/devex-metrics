@@ -4,6 +4,7 @@ import { listDatasetKeys, loadRawCache } from "./cache.js";
 import { generateReport } from "./report.js";
 import { buildDashboardHtml } from "./pages/dashboard.js";
 import { loadConfig } from "./config.js";
+import type { FocusConfig } from "./config.js";
 import { loadLandscapeRunStatus, loadLandscapeView } from "./landscape.js";
 import type { DatasetNavEntry } from "./pages/dashboard.js";
 import type { OrgMetrics } from "./types.js";
@@ -70,7 +71,7 @@ function main(): void {
       current: d.key === ds.key,
     }));
     writeDatasetPage(folder, ds, branch, runUrl, nav, config.collection.features.landscape
-      ? path.resolve(config.history.dir) : undefined, teamHandlesConfigured);
+      ? path.resolve(config.history.dir) : undefined, teamHandlesConfigured, config.focus);
   }
 
   // Mirror the primary dataset at the site root so the multi-dataset site
@@ -81,7 +82,7 @@ function main(): void {
     current: d.key === primary.key,
   }));
   writeDatasetPage(siteDir, primary, branch, runUrl, rootNav, config.collection.features.landscape
-    ? path.resolve(config.history.dir) : undefined, teamHandlesConfigured);
+    ? path.resolve(config.history.dir) : undefined, teamHandlesConfigured, config.focus);
 
   fs.writeFileSync(
     path.join(siteDir, "manifest.json"),
@@ -111,8 +112,9 @@ function writeDatasetPage(
   nav: DatasetNavEntry[],
   landscapeHistoryDir?: string,
   teamHandlesConfigured = false,
+  focus?: FocusConfig,
 ): void {
-  const markdown = generateReport(ds.data);
+  const markdown = generateReport(ds.data, focus);
   fs.writeFileSync(path.join(folder, "report.md"), markdown);
   fs.writeFileSync(path.join(folder, "data.json"), JSON.stringify(ds.data, null, 2));
   const landscape = landscapeHistoryDir && !ds.data.groupName
