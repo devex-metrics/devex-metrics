@@ -323,6 +323,83 @@ function renderCharts(){
   renderDeliveryCharts();
 }
 function getISOWeek(d){var date=new Date(d);date.setUTCDate(date.getUTCDate()+4-(date.getUTCDay()||7));var y=date.getUTCFullYear();var jan1=new Date(Date.UTC(y,0,1));var wn=Math.ceil(((date.getTime()-jan1.getTime())/86400000+1)/7);return y+"-W"+(wn<10?"0":"")+wn;}
+function updateCollectionWarnings(cutoff,repoFiltered){
+  document.querySelectorAll("[data-collection-warning]").forEach(function(el){
+    var boundary=Date.parse(el.dataset.completeSince);
+    var affected=el.dataset.collectionWarning!=="capped"||!cutoff||
+      !Number.isFinite(boundary)||cutoff.getTime()<=boundary;
+    if(el.tagName==="LI"&&repoFiltered&&!selectedRepos.has(el.dataset.warningRepo))affected=false;
+    el.hidden=!affected;
+    el.style.display=affected?"":"none";
+  });
+  var notice=document.querySelector(".incomplete-notice");
+  if(!notice)return;
+  var count=Array.from(notice.querySelectorAll("li")).filter(function(el){return !el.hidden;}).length;
+  notice.hidden=count===0;
+  notice.style.display=count?"":"none";
+  var total=repoFiltered?selectedRepos.size:(CHART_DATA.repoNames||[]).length;
+  document.getElementById("incompleteSummary").textContent=count+" of "+total+
+    (total===1?" repository has":" repositories have")+
+    " incomplete metrics for the selected period, so totals on this page may undercount.";
+}
+function updateRepoPeriod(cutoff,period,excludeBots,repoFiltered){
+  var byRepo=new Map();
+  (CHART_DATA.allPRDetails||[]).forEach(function(p){
+    if(cutoff&&new Date(p.mergedAt)<cutoff||excludeBots&&p.isBotAuthor||
+      repoFiltered&&!selectedRepos.has(p.repo))return;
+    if(!byRepo.has(p.repo))byRepo.set(p.repo,[]);
+    byRepo.get(p.repo).push(p);
+  });
+  var closedByRepo=new Map();
+  (CHART_DATA.allClosedPRs||[]).forEach(function(p){
+    if(cutoff&&new Date(p.closedAt)<cutoff||excludeBots&&p.isBotAuthor||
+      repoFiltered&&!selectedRepos.has(p.repo))return;
+    closedByRepo.set(p.repo,(closedByRepo.get(p.repo)||0)+1);
+  });
+  var rows=new Map();
+  document.querySelectorAll(".repo-row").forEach(function(row){rows.set(row.dataset.repoName,row);});
+  (CHART_DATA.repoSummaries||[]).forEach(function(summary){
+    var row=rows.get(summary.name.toLowerCase());
+    if(!row)return;
+    var prs=byRepo.get(summary.name)||[];
+    var lifetime=period==="all"&&!excludeBots&&!repoFiltered;
+    var merged=lifetime?summary.merged:prs.length;
+    var mergedText=String(merged)+(!lifetime&&!summary.hasMergedTimeline?" (sample)":"");
+    row.querySelector(".td-merged-prs").textContent=mergedText;
+    row.dataset.mergedPrs=String(merged);
+    var added=0,deleted=0,missing=false;
+    prs.forEach(function(p){
+      if(p.linesAdded===undefined||p.linesDeleted===undefined)missing=true;
+      added+=p.linesAdded||0;deleted+=p.linesDeleted||0;
+    });
+    var lines=row.querySelector(".td-period-lines");
+    lines.querySelector(".add").textContent="+"+added;
+    lines.querySelector(".del").textContent="-"+deleted;
+    var label=lines.querySelector(".line-coverage");
+    if(!label){label=document.createElement("span");label.className="col-muted line-coverage";lines.appendChild(label);}
+    label.textContent=missing?" (partial)":!summary.hasMergedTimeline?" (sample)":"";
+    lines.title=missing?"Some merged PRs have no line counts":"Collected merged PRs in the selected period";
+    row.dataset.linesAdded=String(added);row.dataset.linesDeleted=String(deleted);
+    var detail=document.getElementById("detail-"+row.dataset.repoId);
+    if(!detail)return;
+    detail.querySelector(".detail-merged-prs").textContent=mergedText;
+    detail.querySelector(".detail-closed-prs").textContent=lifetime?String(summary.closed):
+      summary.hasClosedTimeline?String(closedByRepo.get(summary.name)||0):"Unavailable";
+    detail.querySelectorAll(".repo-period-label").forEach(function(el){
+      el.textContent="("+getPeriodLabel(period)+")";
+    });
+    detail.querySelectorAll(".pr-tbl tbody tr").forEach(function(pr){
+      pr.hidden=!!cutoff&&(!pr.dataset.mergedAt||new Date(pr.dataset.mergedAt)<cutoff)||
+        (excludeBots||repoFiltered)&&!prs.some(function(p){return String(p.number)===pr.dataset.prNumber;});
+    });
+    var sample=detail.querySelector(".pr-wrap");
+    if(sample){
+      var hasRows=Array.from(sample.querySelectorAll(".pr-tbl > tbody > tr")).some(function(pr){return !pr.hidden;});
+      sample.querySelector(".pr-tbl").hidden=!hasRows;
+      sample.querySelector(".pr-sample-empty").hidden=hasRows;
+    }
+  });
+}
 function medianOf(arr){if(!arr.length)return 0;var s=arr.slice().sort(function(a,b){return a-b;});var m=Math.floor(s.length/2);return s.length%2?s[m]:(s[m-1]+s[m])/2;}
 function fmtDur(h){if(h<1)return Math.round(h*60)+"m";if(h<24)return h.toFixed(1)+"h";return(h/24).toFixed(1)+"d";}
 /**
@@ -1122,27 +1199,9 @@ function applyFilter(period){
     charts.leadTime.update();
   }
 
-  // ── Repo table merged-PR cells ──
-  if(period==="all"&&!repoFiltered){
-    document.querySelectorAll(".repo-row[data-repo-name]").forEach(function(row){
-      var cell=row.querySelector(".td-merged-prs");
-      var v=String(row.dataset.mergedPrsAll||0);
-      if(cell)cell.textContent=v;
-      row.dataset.mergedPrs=v;
-    });
-  }else{
-    var repoCounts={};
-    filteredPR.forEach(function(p){var key=p.repo.toLowerCase();repoCounts[key]=(repoCounts[key]||0)+1;});
-    document.querySelectorAll(".repo-row[data-repo-name]").forEach(function(row){
-      var cell=row.querySelector(".td-merged-prs");
-      var v=String(repoCounts[row.dataset.repoName]||0);
-      if(cell)cell.textContent=v;
-      row.dataset.mergedPrs=v;
-    });
-  }
-  if(repoListRefresh&&document.getElementById("repoSort").value==="mergedPrs")repoListRefresh(false);
-  var note=document.getElementById("reposPeriodNote");
-  if(note)note.style.display=(period==="all"&&!repoFiltered)?"none":"";
+  updateRepoPeriod(cutoff,period,excludeBots,repoFiltered);
+  updateCollectionWarnings(cutoff,repoFiltered);
+  if(repoListRefresh)repoListRefresh(false);
 
   // ── Wait-for-review trend chart ──
   if(charts.reviewWait){
@@ -1995,7 +2054,7 @@ function setupGroups(){
   dataRows.forEach(function(row){
     drMap.set(row,document.getElementById("detail-"+row.dataset.repoId));
   });
-  var allRows=Array.from(tbody.querySelectorAll("tr"));
+  var allRows=Array.from(tbody.children);
   allRows.forEach(function(r){if(r.parentNode)r.parentNode.removeChild(r);});
   var groups={};
   groupDefs.forEach(function(g){groups[g.id]=[];});

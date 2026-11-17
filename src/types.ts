@@ -546,6 +546,12 @@ export interface RepoCollectionWarning {
   requestId?: string;
   /** True when the latest run fetched nothing and these are older metrics. */
   notRefreshed?: boolean;
+  /**
+   * Exclusive updated-at boundary of complete coverage when state is capped.
+   * Periods starting after this timestamp are unaffected. Absent in older
+   * snapshots or when any capped stream's boundary is unknown.
+   */
+  completeSince?: string;
 }
 
 export interface IssueCounts {

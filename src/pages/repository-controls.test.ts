@@ -46,11 +46,11 @@ function pr(number: number, mergedAt: string) {
   };
 }
 
-function render(repos: RepoMetrics[], team?: OrgMetrics["team"]) {
+function render(repos: RepoMetrics[], team?: OrgMetrics["team"], collectedAt = new Date().toISOString()) {
   const data: OrgMetrics = {
     owner: "example",
     ownerType: "org",
-    collectedAt: new Date().toISOString(),
+    collectedAt,
     repoCount: repos.length,
     repos,
     team,
@@ -70,6 +70,124 @@ function render(repos: RepoMetrics[], team?: OrgMetrics["team"]) {
 }
 
 describe("repository table controls", () => {
+  it("filters row totals, expanded counts, lines and the detailed sample together", () => {
+    const r = repo("period");
+    const dates = ["2026-11-10T00:00:00Z", "2026-09-10T00:00:00Z", "2026-06-10T00:00:00Z"];
+    r.pullRequests = { open: 8, merged: 4000, closed: 500 };
+    r.pullRequestDetails = dates.map((date, i) => pr(i + 1, date));
+    r.mergedPRTimeline = dates.map((date, i) => ({
+      number: i + 1, createdAt: date, mergedAt: date, author: "tester",
+      isBotAuthor: i === 1, isCopilotAuthored: false, timeToMergeHours: 1,
+      closesIssues: [], linesAdded: (i + 1) * 10, linesDeleted: i + 1,
+    }));
+    r.closedPRTimeline = dates.map((date, i) => ({
+      number: i + 4, createdAt: date, closedAt: date, author: "tester", isBotAuthor: false,
+    }));
+    const { dom, doc } = render([r], undefined, "2026-11-17T12:00:00Z");
+    const row = doc.querySelector<HTMLTableRowElement>(".repo-row")!;
+    const detail = doc.getElementById("detail-example-period")!;
+    const select = (period: string) =>
+      doc.querySelector<HTMLButtonElement>(`.filter-btn[data-period="${period}"]`)!.click();
+    const check = (merged: number, closed: number, lines: number, sample: number) => {
+      expect(row.dataset.mergedPrs).toBe(String(merged));
+      expect(row.dataset.linesAdded).toBe(String(lines));
+      expect(detail.querySelector(".detail-merged-prs")?.textContent).toBe(String(merged));
+      expect(detail.querySelector(".detail-closed-prs")?.textContent).toBe(String(closed));
+      expect(Array.from(detail.querySelectorAll<HTMLTableRowElement>(".pr-tbl tbody tr"))
+        .filter((tr) => !tr.hidden)).toHaveLength(sample);
+    };
+    check(1, 1, 10, 1);
+    select("90days");
+    check(2, 2, 30, 2);
+    select("120days");
+    check(2, 2, 30, 2);
+    select("150days");
+    check(2, 2, 30, 2);
+    select("180days");
+    check(3, 3, 60, 3);
+    select("year");
+    check(3, 3, 60, 3);
+    select("all");
+    check(4000, 500, 60, 3);
+    select("30days");
+    check(1, 1, 10, 1);
+    select("180days");
+    doc.querySelector<HTMLInputElement>("#excludeBots")!.click();
+    check(2, 3, 40, 2);
+    dom.window.close();
+  });
+
+  it("reorders a line-count sort when the selected period changes", () => {
+    const old = repo("old-lines");
+    const recent = repo("recent-lines");
+    old.pullRequestDetails = [{ ...pr(1, "2026-09-10T00:00:00Z"), linesAdded: 100 }];
+    recent.pullRequestDetails = [{ ...pr(2, "2026-11-10T00:00:00Z"), linesAdded: 10 }];
+    const { dom, doc } = render([old, recent], undefined, "2026-11-17T12:00:00Z");
+    doc.querySelector<HTMLButtonElement>('.repo-sort[data-sort="linesAdded"]')!.click();
+    expect(visibleRows(doc).map((row) => row.dataset.repoName)).toEqual(["recent-lines", "old-lines"]);
+    doc.querySelector<HTMLButtonElement>('.filter-btn[data-period="90days"]')!.click();
+    expect(visibleRows(doc).map((row) => row.dataset.repoName)).toEqual(["old-lines", "recent-lines"]);
+    dom.window.close();
+  });
+
+  it("labels sampled counts, missing closed timelines and incomplete line data", () => {
+    const sampled = repo("sampled");
+    sampled.pullRequestDetails = [pr(1, "2026-11-10T00:00:00Z")];
+    const lean = repo("lean");
+    lean.mergedPRTimeline = [{
+      number: 2, createdAt: "2026-11-10T00:00:00Z", mergedAt: "2026-11-10T00:00:00Z",
+      author: "tester", isBotAuthor: false, isCopilotAuthored: false,
+      timeToMergeHours: 1, closesIssues: [],
+    }];
+    const { dom, doc } = render([sampled, lean], undefined, "2026-11-17T12:00:00Z");
+    expect(doc.querySelector(".td-merged-prs")?.textContent).toBe("1 (sample)");
+    expect(doc.querySelector(".detail-closed-prs")?.textContent).toBe("Unavailable");
+    expect(doc.querySelector(".line-coverage")?.textContent).toContain("sample");
+    expect(doc.querySelectorAll(".line-coverage")[1].textContent).toContain("partial");
+    expect(doc.getElementById("reposPeriodNote")?.textContent).toContain("fixed windows");
+    dom.window.close();
+  });
+
+  it("uses the same cap boundary for the top notice, row badge and expanded warning", () => {
+    const r = repo("capped");
+    r.collectionWarning = {
+      state: "capped", detail: "History capped.", completeSince: "2026-09-01T00:00:00Z",
+    };
+    const { dom, doc } = render([r], undefined, "2026-11-17T12:00:00Z");
+    const warnings = () => Array.from(doc.querySelectorAll<HTMLElement>("[data-collection-warning]"));
+    expect(warnings()).toHaveLength(3);
+    expect(warnings().every((el) => el.hidden && el.style.display === "none")).toBe(true);
+    expect((doc.querySelector(".incomplete-notice") as HTMLElement).hidden).toBe(true);
+    doc.querySelector<HTMLButtonElement>('.filter-btn[data-period="90days"]')!.click();
+    expect(warnings().every((el) => !el.hidden)).toBe(true);
+    expect(doc.getElementById("incompleteSummary")?.textContent).toContain("1 of 1 repository has");
+    doc.querySelector<HTMLButtonElement>('.filter-btn[data-period="all"]')!.click();
+    expect(warnings().every((el) => !el.hidden)).toBe(true);
+    dom.window.close();
+  });
+
+  it("keeps caps at the exact cutoff, unknown caps and non-cap failures visible", () => {
+    const repos = ["boundary", "unknown", "failed"].map((name) => repo(name));
+    repos[0].collectionWarning = {
+      state: "capped", detail: "Cap.", completeSince: "2026-10-18T12:00:00Z",
+    };
+    repos[1].collectionWarning = { state: "capped", detail: "Legacy cap." };
+    repos[2].collectionWarning = {
+      state: "partial", detail: "Failure.", completeSince: "2020-01-01T00:00:00Z",
+    };
+    const { dom, doc } = render(repos, undefined, "2026-11-17T12:00:00Z");
+    expect(Array.from(doc.querySelectorAll<HTMLElement>("[data-collection-warning]"))
+      .every((el) => !el.hidden)).toBe(true);
+    expect(doc.querySelector(".incomplete-notice")?.textContent).toContain("cap date is unknown");
+    for (const name of ["boundary", "unknown"]) {
+      const checkbox = doc.querySelector<HTMLInputElement>(`#repoPickerList input[value="${name}"]`)!;
+      checkbox.checked = true;
+      checkbox.dispatchEvent(new dom.window.Event("change"));
+    }
+    expect(doc.getElementById("incompleteSummary")?.textContent).toContain("2 of 2 repositories");
+    dom.window.close();
+  });
+
   it.each([0, 1, 20, 21, 143])(
     "caps %i repositories at 20 on first paint and after boot",
     (count) => {
@@ -345,10 +463,12 @@ describe("repository table controls", () => {
     recent.pullRequests.merged = 1;
     recent.pullRequestDetails = [pr(3, new Date().toISOString())];
     const { dom, doc } = render([old, recent]);
+    expect(doc.querySelector<HTMLParagraphElement>("#detail-example-old .pr-sample-empty")?.hidden).toBe(false);
     const sort = doc.querySelector<HTMLButtonElement>('.repo-sort[data-sort="mergedPrs"]')!;
     sort.click();
     expect(visibleRows(doc).map((row) => row.dataset.repoName)).toEqual(["recent", "old"]);
     (doc.querySelector('.filter-btn[data-period="all"]') as HTMLButtonElement).click();
+    expect(doc.querySelector<HTMLParagraphElement>("#detail-example-old .pr-sample-empty")?.hidden).toBe(true);
     expect(visibleRows(doc).map((row) => row.dataset.repoName)).toEqual(["old", "recent"]);
     expect(sort.closest("th")?.getAttribute("aria-sort")).toBe("descending");
     dom.window.close();
