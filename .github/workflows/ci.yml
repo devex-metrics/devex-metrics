@@ -96,7 +96,9 @@ jobs:
           # because ui-checks unit-tests it and ui-checks-comment.yml runs it
           # from the default branch.
           pattern='^(src/|\.nvmrc$|package\.json$|package-lock\.json$|tsconfig\.json$|\.github/skills/visual-dashboard-diff/|\.github/workflows/ci\.yml$|\.github/workflows/dependencies/playwright/|\.github/workflows/scripts/visual-diff-comment)'
-          if git diff --name-only HEAD^1 HEAD | grep -qE "$pattern"; then
+          # --no-renames lists both sides of a rename, so moving a watched
+          # file out of scope still counts as a dashboard-relevant change.
+          if git diff --name-only --no-renames HEAD^1 HEAD | grep -qE "$pattern"; then
             echo "dashboard-relevant=true" >> "$GITHUB_OUTPUT"
           else
             echo "dashboard-relevant=false" >> "$GITHUB_OUTPUT"
