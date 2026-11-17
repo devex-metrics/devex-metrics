@@ -72,4 +72,22 @@ describe("summarizeCommitAttribution", () => {
     expect(result.focusCommits).toBe(1);
     expect(result.incompletePRs).toBe(1);
   });
+
+  it("counts a capped co-author sample as an incomplete PR", () => {
+    const result = summarizeCommitAttribution([
+      pr({
+        commitAuthorSamples: [
+          { authors: ["focus"], authorCount: 11, complete: false },
+        ],
+        commitAuthorSampleTotalCount: 1,
+        commitAuthorSampleComplete: true,
+      }),
+    ], ["focus"]);
+
+    expect(result).toMatchObject({
+      focusCommits: 0,
+      unavailableCommits: 1,
+      incompletePRs: 1,
+    });
+  });
 });

@@ -50,7 +50,10 @@ export function summarizeCommitAttribution(
     const total = pr.commitAuthorSampleTotalCount;
     const complete = pr.commitAuthorSampleComplete === true &&
       total !== undefined && samples.length === total;
-    if (!complete) summary.incompletePRs++;
+    const authorsIncomplete = samples.some((sample) =>
+      !sample.complete || sample.authorCount !== sample.authors.length
+    );
+    if (!complete || authorsIncomplete) summary.incompletePRs++;
 
     for (const sample of samples) {
       const authors = new Set(sample.authors.map((login) => login.trim().toLowerCase()));

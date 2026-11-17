@@ -458,7 +458,9 @@ function applyEnv(config: DevexConfig, env: Env): void {
   assign(config.repos, "maxIdleDays", int(env, "DEVEX_MAX_IDLE_DAYS"));
 
   const focusName = str(env, "DEVEX_FOCUS_NAME");
-  const focusUsers = list(env, "DEVEX_FOCUS_USERS");
+  const focusUsers = str(env, "DEVEX_FOCUS_USERS") === undefined
+    ? undefined
+    : list(env, "DEVEX_FOCUS_USERS");
   if (focusName !== undefined || focusUsers !== undefined) {
     config.focus = {
       name: focusName ?? config.focus?.name ?? "Focus group",

@@ -166,6 +166,9 @@ newline-separated GitHub logins) to add a **Commit author attribution** section
 to the Markdown report. Logins are matched case-insensitively. The roster is a
 build-time setting, so changing it and rebuilding Pages reclassifies the
 identities already present in the latest snapshot without another collection.
+An empty Actions variable is treated as unset, preserving a roster supplied by
+`DEVEX_CONFIG` or the config file. To explicitly clear that roster, set
+`focus.users` to an empty array in the JSON configuration.
 
 The report counts sampled commits with only focus-group linked authors, only
 other linked authors, both (mixed), or unavailable/incomplete identity evidence.

@@ -217,6 +217,25 @@ describe("loadConfig", () => {
       .toThrow(/distinct GitHub logins/);
   });
 
+  it("keeps a JSON-only focus roster when the Actions variable is empty", () => {
+    const c = loadConfig({
+      DEVEX_CONFIG: JSON.stringify({ focus: { name: "Configured group", users: ["alice"] } }),
+      DEVEX_FOCUS_NAME: "",
+      DEVEX_FOCUS_USERS: "",
+    });
+
+    expect(c.focus).toEqual({ name: "Configured group", users: ["alice"] });
+  });
+
+  it("allows an explicitly empty roster in DEVEX_CONFIG", () => {
+    const c = loadConfig({
+      DEVEX_CONFIG: JSON.stringify({ focus: { name: "Configured group", users: [] } }),
+      DEVEX_FOCUS_USERS: "",
+    });
+
+    expect(c.focus).toEqual({ name: "Configured group", users: [] });
+  });
+
   it("builds a team from discrete variables alone", () => {
     const c = loadConfig({
       DEVEX_TEAM_NAME: "Team Alpha",
