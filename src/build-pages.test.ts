@@ -1,10 +1,14 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { execFileSync } from "node:child_process";
+import { execFile, execFileSync } from "node:child_process";
+import { createServer } from "node:http";
+import { once } from "node:events";
+import { promisify } from "node:util";
 import { JSDOM, VirtualConsole } from "jsdom";
 import { CURRENT_SCHEMA_VERSION } from "./cache.js";
 import { landscapeLatestPath } from "./landscape.js";
+import { markPrivateLandscapeStore } from "./landscape-policy.js";
 import { discoveryLatestPath } from "./public-discovery.js";
 import type { CacheEnvelope, WeeklyTrendPoint } from "./types.js";
 
@@ -137,6 +141,52 @@ describe("build-pages", () => {
       }
   });
 
+  it("renders private landscape observations in HTML and JSON only after destination verification", async () => {
+    const historyDir = fs.mkdtempSync(path.join(dataDir, "test-private-pages-"));
+    const envelope: CacheEnvelope = JSON.parse(fs.readFileSync(cacheFile, "utf8"));
+    envelope.data.repos[0].isPrivate = true;
+    fs.writeFileSync(cacheFile, JSON.stringify(envelope));
+    const snapshot = landscapeLatestPath(historyDir, "test-pages-owner");
+    fs.mkdirSync(path.dirname(snapshot), { recursive: true });
+    fs.writeFileSync(snapshot, JSON.stringify({
+      schema_version: 1, generated_at: "2026-03-29T12:00:00Z", scanner_version: "0.2.0",
+      repositories: [{
+        full_name: "test-pages-owner/repo-a", head_sha: "a".repeat(40),
+        ai_files: [{
+          path: "internal/AGENTS.md", kind: "instructions", sha256: "b".repeat(64),
+          last_changed: null, age_days: null, lag_days: null, stale: null,
+        }],
+        ai_summary: { count: 1, stale_count: 0, max_lag_days: null, unknown_count: 1 },
+      }],
+    }));
+    markPrivateLandscapeStore(historyDir);
+    const server = createServer((req, res) => {
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify(req.url?.endsWith("/pages")
+        ? { public: false } : { full_name: "acme/dashboard", private: true }));
+    });
+    server.listen(0, "127.0.0.1");
+    await once(server, "listening");
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Missing test API port");
+    try {
+      await promisify(execFile)(process.execPath, ["dist/build-pages.js", "test-pages-owner"], {
+        cwd: process.cwd(), env: {
+          ...process.env, DEVEX_HISTORY_DIR: historyDir,
+          DEVEX_FEATURE_LANDSCAPE: "true", DEVEX_LANDSCAPE_INCLUDE_PRIVATE: "true",
+          DEVEX_PUBLICATION_TOKEN: "synthetic-destination-token",
+          GITHUB_REPOSITORY: "acme/dashboard", GITHUB_API_URL: `http://127.0.0.1:${address.port}`,
+        },
+      });
+      expect(fs.readFileSync(path.join(siteDir, "index.html"), "utf8")).toContain("internal/AGENTS.md");
+      expect(JSON.parse(fs.readFileSync(path.join(siteDir, "landscape.json"), "utf8"))[0])
+        .toMatchObject({ status: "observed", files: [{ path: "internal/AGENTS.md" }] });
+    } finally {
+      await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+      fs.rmSync(historyDir, { recursive: true, force: true });
+    }
+  });
+
   it("does not show or export landscape files when the feature is disabled", () => {
       fs.mkdirSync(siteDir, { recursive: true });
       fs.writeFileSync(path.join(siteDir, "landscape.json"), '{"stale":"must be removed"}');
@@ -144,9 +194,34 @@ describe("build-pages", () => {
         cwd: process.cwd(),
         env: { ...process.env, DEVEX_FEATURE_LANDSCAPE: "false" },
       });
+
       const html = fs.readFileSync(path.join(siteDir, "index.html"), "utf8");
       expect(html).not.toContain('id="ai-landscape"');
       expect(fs.existsSync(path.join(siteDir, "landscape.json"))).toBe(false);
+  });
+
+  it.each(["history", "site"])("refuses public reuse of private %s even after the feature is disabled", (location) => {
+    const historyDir = fs.mkdtempSync(path.join(dataDir, "test-private-pages-"));
+    markPrivateLandscapeStore(location === "history" ? historyDir : siteDir);
+    try {
+      for (const entry of ["dist/build-pages.js", "dist/build-multi-site.js"]) {
+        expect(() => execFileSync(process.execPath, [entry, "test-pages-owner"], {
+          cwd: process.cwd(), stdio: "pipe",
+          env: {
+            ...process.env,
+            DEVEX_HISTORY_DIR: historyDir,
+            DEVEX_FEATURE_LANDSCAPE: "false",
+            DEVEX_LANDSCAPE_INCLUDE_PRIVATE: "false",
+            DEVEX_PUBLICATION_TOKEN: "",
+          },
+        })).toThrow(/DEVEX_PUBLICATION_TOKEN/);
+      }
+      expect(fs.existsSync(path.join(siteDir, "index.html"))).toBe(false);
+      expect(fs.existsSync(path.join(siteDir, "data.json"))).toBe(false);
+      expect(fs.existsSync(path.join(siteDir, "report.md"))).toBe(false);
+    } finally {
+      fs.rmSync(historyDir, { recursive: true, force: true });
+    }
   });
 
   it("adds public discovery last with its own JSON, leaving data.json, report and AI landscape alone", () => {

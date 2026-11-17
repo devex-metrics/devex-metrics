@@ -6,6 +6,9 @@ import { loadConfig, applyScope } from "./config.js";
 import { latestPath, loadRollup } from "./history.js";
 import { loadCiRuns, toCiSamples } from "./ci-health.js";
 import { loadLandscapeRunStatus, loadLandscapeView } from "./landscape.js";
+import {
+  assertLandscapePublication, hasPrivateLandscapeData, markPrivateLandscapeStore,
+} from "./landscape-policy.js";
 import { loadPublicDiscoveryView } from "./public-discovery.js";
 import type { CacheEnvelope, OrgMetrics } from "./types.js";
 import { buildDashboardHtml } from "./pages/dashboard.js";
@@ -105,7 +108,7 @@ function resolveData(owner: string, historyDir: string): ResolvedData | null {
   return null;
 }
 
-function main(): void {
+async function main(): Promise<void> {
   const config = loadConfig();
   if (process.argv[2]) config.owner = process.argv[2];
   if (!config.owner) {
@@ -116,6 +119,10 @@ function main(): void {
   }
 
   const historyDir = path.resolve(process.cwd(), config.history.dir);
+  const siteDir = path.resolve(process.cwd(), "_site");
+  const privateOutput = config.collection.landscapeIncludePrivate ||
+    hasPrivateLandscapeData(historyDir) || hasPrivateLandscapeData(siteDir);
+  await assertLandscapePublication(historyDir, privateOutput);
   const resolved = resolveData(config.owner, historyDir);
   if (resolved === null) {
     // Tell the workflow to skip the upload and deploy steps rather than
@@ -158,12 +165,13 @@ function main(): void {
     );
   }
 
-  const siteDir = path.resolve(process.cwd(), "_site");
   fs.mkdirSync(siteDir, { recursive: true });
+  if (privateOutput) markPrivateLandscapeStore(siteDir);
   fs.writeFileSync(path.join(siteDir, "report.md"), generateReport(data, config.focus));
   fs.writeFileSync(path.join(siteDir, "data.json"), JSON.stringify(data, null, 2));
   const landscape = config.collection.features.landscape
-    ? loadLandscapeView(historyDir, data, (config.team?.handles?.length ?? 0) > 0)
+    ? loadLandscapeView(historyDir, data, (config.team?.handles?.length ?? 0) > 0,
+      config.collection.landscapeIncludePrivate)
     : undefined;
   const landscapeFile = path.join(siteDir, "landscape.json");
   if (landscape) {
@@ -229,4 +237,7 @@ function buildRunUrl(): string | undefined {
   return undefined;
 }
 
-main();
+main().catch((error: unknown) => {
+  console.error(error);
+  process.exitCode = 1;
+});

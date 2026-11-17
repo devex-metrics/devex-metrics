@@ -107,7 +107,7 @@ export interface FeatureFlags {
    * calls rather than inherit them.
    */
   ciHealth: boolean;
-  /** Scan public repositories for AI instruction files via repo-landscape. Off by default. */
+  /** Scan repositories for AI instruction files via repo-landscape. Public-only unless explicitly opted in. Off by default. */
   landscape: boolean;
   /** Scan full history of selected public repositories for repository discovery. Off by default. */
   publicDiscovery: boolean;
@@ -198,6 +198,8 @@ export interface CollectionConfig {
   incremental: boolean;
   /** Days before the external scanner marks a file-age signal stale. */
   landscapeStaleAfterDays: number;
+  /** Include private landscape sources only with verified private storage and Pages publication. */
+  landscapeIncludePrivate: boolean;
   /** Maximum repositories to scan, ranked by merged PRs in the last 90 days. 0 means all. */
   publicDiscoveryMaxRepos: number;
   /** Maximum GitHub-reported repository size in KiB for a full-history clone. 0 disables. */
@@ -260,6 +262,7 @@ export function defaultConfig(): DevexConfig {
       maxRepoAgeHours: 8,
       incremental: false,
       landscapeStaleAfterDays: 90,
+      landscapeIncludePrivate: false,
       publicDiscoveryMaxRepos: 0,
       publicDiscoveryMaxSizeKb: 512000,
       publicDiscoveryMaxCloneSizeKb: 8388608,
@@ -473,6 +476,7 @@ function applyEnv(config: DevexConfig, env: Env): void {
   assign(config.collection, "maxRepoAgeHours", int(env, "DEVEX_MAX_REPO_AGE_HOURS"));
   assign(config.collection, "incremental", bool(env, "DEVEX_INCREMENTAL"));
   assign(config.collection, "landscapeStaleAfterDays", positiveInt(env, "DEVEX_LANDSCAPE_STALE_AFTER_DAYS"));
+  assign(config.collection, "landscapeIncludePrivate", bool(env, "DEVEX_LANDSCAPE_INCLUDE_PRIVATE"));
   assign(config.collection, "publicDiscoveryMaxRepos", nonnegativeInt(env, "DEVEX_PUBLIC_DISCOVERY_MAX_REPOS"));
   assign(config.collection, "publicDiscoveryMaxSizeKb", nonnegativeInt(env, "DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB"));
   assign(config.collection, "publicDiscoveryMaxCloneSizeKb", positiveInt(env, "DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB"));
@@ -656,6 +660,9 @@ export function loadConfig(env: Env = process.env): DevexConfig {
     }
   }
   validateBackfillPageSizes(config.collection.backfill);
+  if (typeof config.collection.landscapeIncludePrivate !== "boolean") {
+    throw new Error("Landscape include-private must be a boolean");
+  }
   if (!Number.isSafeInteger(config.collection.landscapeStaleAfterDays) ||
     config.collection.landscapeStaleAfterDays < 1) {
     throw new Error("Landscape staleAfterDays must be a positive integer");

@@ -62,6 +62,22 @@ function observed(scanResult: Awaited<ReturnType<typeof enrichLandscapeScan>>): 
 }
 
 describe("pinned public landscape signals", () => {
+  it("enriches private Git history and verified content only with the explicit private policy", async () => {
+    const denied = fakeApi({ private: true });
+    expect(observed(await enrichLandscapeScan(scan(), denied.octokit)).commits_90d).toBeNull();
+    expect(denied.getContent).not.toHaveBeenCalled();
+    const allowed = fakeApi({ private: true });
+    const result = observed(await enrichLandscapeScan(scan(), allowed.octokit, [], 90, true));
+    expect(result.commits_90d).toBe(5);
+    expect(result.ai_files[0].content_signal?.score).toBe(100);
+    expect(allowed.getContent).toHaveBeenCalledOnce();
+    const changedHead = fakeApi({ private: true, head: "b".repeat(40) });
+    expect(observed(await enrichLandscapeScan(scan(), changedHead.octokit, [], 90, true))
+      .commits_90d).toBeNull();
+    expect(changedHead.getContent).not.toHaveBeenCalled();
+    expect(JSON.stringify(result)).not.toContain(CONTENT);
+  });
+
   it("counts real Git-history windows and all commits since the changed date, not PRs", async () => {
     const api = fakeApi();
     const result = observed(await enrichLandscapeScan(scan(), api.octokit));

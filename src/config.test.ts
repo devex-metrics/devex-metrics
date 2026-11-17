@@ -92,6 +92,7 @@ describe("loadConfig", () => {
     expect(c.collection.publicDiscoveryMaxCloneSizeKb).toBe(8388608);
     expect(c.collection.publicDiscoveryCloneMinutes).toBe(60);
     expect(c.collection.landscapeStaleAfterDays).toBe(90);
+    expect(c.collection.landscapeIncludePrivate).toBe(false);
     expect(c.collection.incremental).toBe(false);
     expect(c.team).toBeUndefined();
     expect(c.focus).toBeUndefined();
@@ -269,6 +270,18 @@ describe("loadConfig", () => {
     expect(c.team?.handles).toEqual(["Alice", "bob"]);
     expect(() => loadConfig({ DEVEX_TEAM_HANDLES: "alice,ALICE" })).toThrow(/Team handles/);
     expect(() => loadConfig({ DEVEX_TEAM_HANDLES: "alice@example.com" })).toThrow(/Team handles/);
+  });
+
+  it("requires an explicit boolean private-landscape policy and respects environment overrides", () => {
+    const DEVEX_CONFIG = JSON.stringify({ collection: { landscapeIncludePrivate: true } });
+    expect(loadConfig({ DEVEX_CONFIG }).collection.landscapeIncludePrivate).toBe(true);
+    expect(loadConfig({ DEVEX_CONFIG, DEVEX_LANDSCAPE_INCLUDE_PRIVATE: "false" })
+      .collection.landscapeIncludePrivate).toBe(false);
+    expect(loadConfig({ DEVEX_LANDSCAPE_INCLUDE_PRIVATE: "true" })
+      .collection.landscapeIncludePrivate).toBe(true);
+    expect(() => loadConfig({
+      DEVEX_CONFIG: JSON.stringify({ collection: { landscapeIncludePrivate: "true" } }),
+    })).toThrow(/include-private must be a boolean/);
   });
 
   it("builds a trial from discrete variables alone", () => {

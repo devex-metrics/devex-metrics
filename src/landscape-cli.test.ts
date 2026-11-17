@@ -1,6 +1,9 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { spawnSync } from "node:child_process";
+import { execFile, spawnSync } from "node:child_process";
+import { createServer } from "node:http";
+import { once } from "node:events";
+import { promisify } from "node:util";
 import { latestPath } from "./history.js";
 import { landscapeLatestPath } from "./landscape.js";
 import type { OrgMetrics, RepoMetrics } from "./types.js";
@@ -95,11 +98,70 @@ describe("landscape workflow adapter", () => {
         GITHUB_OUTPUT: output,
       },
     });
+
     expect(result.status).toBe(0);
     expect(fs.readFileSync(output, "utf8")).toBe(
       "landscape-enabled=false\nlandscape-scan-needed=false\n"
     );
     expect(fs.existsSync(path.join(work, "data", "landscape.config.json"))).toBe(false);
+  });
+
+  it("prepares private repositories only after verifying the destination through the API", async () => {
+    let pagesPublic = false;
+    const calls: string[] = [];
+    const server = createServer((req, res) => {
+      calls.push(req.url ?? "");
+      res.setHeader("Content-Type", "application/json");
+      res.end(JSON.stringify(req.url?.endsWith("/pages")
+        ? { public: pagesPublic }
+        : { full_name: "acme/dashboard", private: true }));
+    });
+    server.listen(0, "127.0.0.1");
+    await once(server, "listening");
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("Missing test API port");
+    const options = {
+      cwd: work,
+      env: {
+        ...process.env,
+        DEVEX_OWNER: "acme", DEVEX_CONFIG: "",
+        DEVEX_HISTORY_DIR: history,
+        DEVEX_FEATURE_LANDSCAPE: "true",
+        DEVEX_LANDSCAPE_INCLUDE_PRIVATE: "true",
+        DEVEX_PUBLICATION_TOKEN: "synthetic-destination-token",
+        GITHUB_REPOSITORY: "acme/dashboard",
+        GITHUB_API_URL: `http://127.0.0.1:${address.port}`,
+        GITHUB_OUTPUT: output,
+      },
+    };
+    try {
+      await promisify(execFile)(process.execPath, [ENTRY, "prepare"], options);
+      expect(calls).toEqual(["/repos/acme/dashboard", "/repos/acme/dashboard/pages"]);
+      expect(JSON.parse(fs.readFileSync(path.join(work, "data", "landscape.config.json"), "utf8"))
+        .repositories).toEqual(["acme/private", "acme/public"]);
+      expect(fs.readFileSync(output, "utf8")).toContain("landscape-repositories=private,public");
+      expect(fs.existsSync(path.join(history, ".private-landscape"))).toBe(true);
+
+      pagesPublic = true;
+      fs.unlinkSync(output);
+      // Disabling the feature and opt-in must not bypass private history protection.
+      options.env.DEVEX_FEATURE_LANDSCAPE = "false";
+      options.env.DEVEX_LANDSCAPE_INCLUDE_PRIVATE = "false";
+      await expect(promisify(execFile)(process.execPath, [ENTRY, "verify-publication"], options))
+        .rejects.toThrow(/access-controlled/);
+      expect(fs.existsSync(output)).toBe(false);
+    } finally {
+      await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+    }
+  });
+
+  it("cannot turn a failed private-policy check into a publishable failure result", () => {
+    const result = run("mark-failed", JSON.stringify({
+      collection: { landscapeIncludePrivate: true },
+    }));
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain("DEVEX_PUBLICATION_TOKEN");
+    expect(fs.existsSync(output)).toBe(false);
   });
 
   it("rejects invalid landscape input before requesting a scan token", () => {
@@ -165,7 +227,7 @@ describe("landscape workflow adapter", () => {
     const lockfile = JSON.parse(fs.readFileSync("package-lock.json", "utf8"));
     const collect = workflow
       .split("      - name: Collect metrics\n")[1]
-      ?.split("      - name: Prepare public landscape scan\n")[0];
+      ?.split("      - name: Prepare landscape scan\n")[0];
     const ingest = workflow
       .split("      - name: Ingest sanitized landscape snapshots\n")[1]
       ?.split("      - name: Publish history store\n")[0];
@@ -202,6 +264,22 @@ describe("landscape workflow adapter", () => {
       path.resolve(".github", "workflows", "pages.yml"), "utf8"
     );
     expect(pages).toContain("DEVEX_TEAM_HANDLES: ${{ vars.DEVEX_TEAM_HANDLES }}");
+    expect(workflow).toContain("DEVEX_LANDSCAPE_INCLUDE_PRIVATE: ${{ vars.DEVEX_LANDSCAPE_INCLUDE_PRIVATE }}");
+    expect(workflow).toContain("pages: read");
+    expect(workflow).toContain("run: node dist/landscape-cli.js verify-publication");
+    expect(pages).toContain("DEVEX_LANDSCAPE_INCLUDE_PRIVATE: ${{ vars.DEVEX_LANDSCAPE_INCLUDE_PRIVATE }}");
+    const beforeUpload = pages.indexOf("name: Recheck landscape publication policy before artifact upload");
+    const upload = pages.indexOf("uses: actions/upload-pages-artifact");
+    const beforeDeploy = pages.indexOf("name: Recheck landscape publication policy before deployment");
+    expect(beforeUpload).toBeGreaterThan(0);
+    expect(beforeUpload).toBeLessThan(upload);
+    expect(beforeDeploy).toBeGreaterThan(upload);
+    expect(beforeDeploy).toBeLessThan(pages.indexOf("uses: actions/deploy-pages"));
+    const publisher = fs.readFileSync(path.resolve("scripts", "metrics-data.sh"), "utf8");
+    expect(publisher.indexOf("node dist/landscape-cli.js verify-publication"))
+      .toBeLessThan(publisher.indexOf('git -C "$dir" add -A'));
+    const scanStep = workflow.split("      - name: Scan selected repositories\n")[1]?.split("      - name: ")[0];
+    expect(scanStep).not.toContain("DEVEX_PUBLICATION_TOKEN");
   });
 
   it("records a failed run, then publishes the store and rebuilds Pages", () => {

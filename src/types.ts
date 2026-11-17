@@ -65,7 +65,7 @@ export interface LandscapeUnavailableRepository {
   status: "denied" | "error";
 }
 
-/** One public repository's observed AI instruction files at a specific head. */
+/** One policy-selected repository's observed AI instruction files at a specific head. */
 export interface LandscapeRepository {
   /** Canonical GitHub owner/repository name. */
   full_name: string;
@@ -107,7 +107,7 @@ export interface LandscapeContentSignal {
 
 /** Public instruction-file metadata, sanitized from the scanner's output. */
 export interface LandscapeFile {
-  /** Relative Git path, permitted for public repositories only. */
+  /** Relative Git path; private sources require a verified private deployment. */
   path: string;
   /** Scanner's classification of this instruction file. */
   kind: string;
@@ -261,7 +261,7 @@ export interface LandscapeRepoView {
   scannerVersion?: string;
   /** Head commit for an observed repository. */
   headSha?: string;
-  /** Files from the newest successful observation, for public repositories only. */
+  /** Files from the newest successful observation allowed by the deployment's visibility policy. */
   files?: LandscapeFile[];
   /** Summary for an observed repository. */
   summary?: LandscapeSummary;
