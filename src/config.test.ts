@@ -217,6 +217,19 @@ describe("loadConfig", () => {
       .toThrow(/distinct GitHub logins/);
   });
 
+  it("accepts Enterprise Managed User logins in the focus roster", () => {
+    const c = loadConfig({
+      DEVEX_FOCUS_NAME: "EMU group",
+      DEVEX_FOCUS_USERS: "jane-doe_acme,ab_x1",
+    });
+    expect(c.focus).toEqual({ name: "EMU group", users: ["jane-doe_acme", "ab_x1"] });
+
+    for (const invalid of ["_acme", "jane_", "jane-_acme", "jane_acme_x", `${"a".repeat(35)}_acme`]) {
+      expect(() => loadConfig({ DEVEX_FOCUS_USERS: invalid }))
+        .toThrow(/distinct GitHub logins/);
+    }
+  });
+
   it("keeps a JSON-only focus roster when the Actions variable is empty", () => {
     const c = loadConfig({
       DEVEX_CONFIG: JSON.stringify({ focus: { name: "Configured group", users: ["alice"] } }),
