@@ -691,6 +691,11 @@ ${buildTrialBanner(data, teamRepoNames.length)}
     <div class="card card-chart card-wide"><h2>PR Trends (per week)</h2><canvas id="chartPRTrends"></canvas></div>
     <div class="card card-chart card-wide"><h2>Issue Trends (per week)</h2><canvas id="chartIssueTrends"></canvas></div>
     <div class="card card-chart card-wide"><h2>PR Size Trends (lines/week)</h2><canvas id="chartPRSizeTrends"></canvas></div>
+    <div class="card card-chart card-wide">
+      <h2 id="chartPRTotalSizeTitle">Total PR Lines Changed (lines/week)</h2>
+      <p class="metric-lede" id="chartPRTotalSizeNote">Weekly sum of added + removed lines in collected merged PRs, not average PR size. Totals may undercount when collection or line counts are incomplete. Like the other weekly trends, includes bot authors.</p>
+      <canvas id="chartPRTotalSizeTrends" role="img" aria-labelledby="chartPRTotalSizeTitle" aria-describedby="chartPRTotalSizeNote"></canvas>
+    </div>
   </section>
 
   <section class="charts" aria-label="Delivery metric charts">

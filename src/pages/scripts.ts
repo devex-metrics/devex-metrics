@@ -326,6 +326,11 @@ function renderCharts(){
         {label:"Lines Removed",data:CHART_DATA.weeklyTrends.map(function(t){return t.linesDeleted;}),
           borderColor:cssColors.err,backgroundColor:'transparent',tension:0.3,fill:false,pointRadius:3}]},
       options:lineOpts});
+    charts.prTotalSizeTrends=new Chart(document.getElementById("chartPRTotalSizeTrends"),{type:"line",
+      data:{labels:tLabels,datasets:[
+        {label:"Total Lines Changed",data:CHART_DATA.weeklyTrends.map(prSize),
+          borderColor:cssColors.accent,backgroundColor:'transparent',tension:0.3,fill:false,pointRadius:3}]},
+      options:lineOpts});
   }
   renderDeliveryCharts();
 }
@@ -983,6 +988,20 @@ function applyFilter(period){
     }
     charts.prSizeTrends.options.plugins.annotation=trendAnnotations(prSizeLabels);
     charts.prSizeTrends.update();
+  }
+  if(charts.prTotalSizeTrends){
+    var prTotalSizeLabels=prTrendsPeriod.map(function(t){return t.week;});
+    charts.prTotalSizeTrends.data.labels=prTotalSizeLabels;
+    if(repoFiltered&&allSelectedHaveRepoTrends){
+      charts.prTotalSizeTrends.data.datasets=[
+        {label:"Selected repositories \u2014 Total Lines Changed",data:prTrendsPeriod.map(prSize),borderColor:cssColors.accent,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3},
+        {label:"Other repositories \u2014 Total Lines Changed",data:otherPRTrendsPeriod.map(prSize),borderColor:hexToRgba(cssColors.accent,0.55),backgroundColor:"transparent",borderDash:[5,5],tension:0.3,fill:false,pointRadius:2}];
+    }else{
+      charts.prTotalSizeTrends.data.datasets=[
+        {label:"Total Lines Changed",data:prTrendsPeriod.map(prSize),borderColor:cssColors.accent,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3}];
+    }
+    charts.prTotalSizeTrends.options.plugins.annotation=trendAnnotations(prTotalSizeLabels);
+    charts.prTotalSizeTrends.update();
   }
 
   // ── Apply period + bot filter to repo-filtered PR base ──

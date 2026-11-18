@@ -31,6 +31,13 @@ Collects developer-experience metrics for a GitHub **organization** or **user** 
 | Copilot agent credits used | per repo |
 | PRs and Actions minutes from agent tasks | per repo |
 
+The dashboard keeps weekly added/removed lines and **Total PR Lines Changed**
+in separate charts so the total does not obscure either component. The total is
+the sum of added + removed lines in collected merged PRs each week, not an
+average PR size. Both charts follow the period and repository filters, include
+bot authors like the other weekly trends, and may undercount incomplete
+collection or missing line counts. Opened/Merged PR trends remain separate.
+
 Data is collected once per day and appended to a long-term history store on the
 orphan `metrics-data` branch, so trends survive across runs and nothing is ever
 committed to the default branch. See
