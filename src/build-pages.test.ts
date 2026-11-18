@@ -1543,6 +1543,8 @@ describe("build-pages · dashboard JS executes", () => {
       "chartActorBreakdown",
       "chartCopilotPRTrend",
       "chartReviewWait",
+      "chartPRTotalSizeTrends",
+      "chartPRTotalTrends",
     ]) {
       const annotations = charts[id].options.plugins.annotation.annotations;
       expect(annotations.milestoneLine0?.label.content).toBe("Project start");
@@ -1887,6 +1889,8 @@ describe("build-pages · dashboard JS executes", () => {
       prTrends: { data: { datasets: TrendDataset[] } };
       issueTrends: { data: { datasets: TrendDataset[] } };
       prSizeTrends: { data: { datasets: TrendDataset[] } };
+      prTotalSizeTrends: { data: { datasets: TrendDataset[] } };
+      prTotalTrends: { data: { datasets: TrendDataset[] } };
     } }).charts;
     for (const chart of [charts.prTrends, charts.issueTrends, charts.prSizeTrends]) {
       expect(chart.data.datasets).toHaveLength(4);
@@ -1909,6 +1913,110 @@ describe("build-pages · dashboard JS executes", () => {
       { label: "Other repositories — Lines Added", data: [20], borderDash: [5, 5] },
       { label: "Other repositories — Lines Removed", data: [2], borderDash: [5, 5] },
     ]);
+    expect(charts.prTotalSizeTrends.data.datasets).toMatchObject([
+      { label: "Selected repositories — Total Lines Changed", data: [12] },
+      { label: "Other repositories — Total Lines Changed", data: [22], borderDash: [5, 5] },
+    ]);
+    expect(charts.prTotalTrends.data.datasets).toMatchObject([
+      { label: "Selected repositories — Opened + Merged Events", data: [2] },
+      { label: "Other repositories — Opened + Merged Events", data: [5], borderDash: [5, 5] },
+    ]);
+  });
+
+  it("sums weekly line changes separately and preserves trend series when filters change", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as CacheEnvelope;
+    cache.data.weeklyTrends!.unshift({
+      week: "2020-W01", prsOpened: 5, prsMerged: 6, issuesOpened: 0,
+      issuesClosed: 0, linesAdded: 100, linesDeleted: 40,
+    });
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+    const { dom, errors } = run("?period=all", {}, true);
+    expect(errors).toEqual([]);
+    const charts = (dom.window as unknown as { charts: Record<string, {
+      data: { labels: string[]; datasets: TrendDataset[] };
+    }> }).charts;
+    expect(charts.prTotalSizeTrends.data.labels).toEqual(["2020-W01", "2026-W34"]);
+    expect(charts.prTotalSizeTrends.data.datasets).toMatchObject([
+      { label: "Total Lines Changed", data: [140, 34] },
+    ]);
+    expect(charts.prSizeTrends.data.datasets).toMatchObject([
+      { label: "Lines Added", data: [100, 30] },
+      { label: "Lines Removed", data: [40, 4] },
+    ]);
+    expect(charts.prTrends.data.datasets).toMatchObject([
+      { label: "Opened", data: [5, 3] }, { label: "Merged", data: [6, 4] },
+    ]);
+    expect(charts.prTotalTrends.data.datasets).toMatchObject([
+      { label: "Opened + Merged Events", data: [11, 7] },
+    ]);
+    dom.window.document.getElementById("excludeBots")?.click();
+    expect(charts.prTotalSizeTrends.data.datasets[0].data).toEqual([140, 34]);
+    expect(charts.prTotalTrends.data.datasets[0].data).toEqual([11, 7]);
+    dom.window.document.querySelector<HTMLButtonElement>('[data-period="30days"]')?.click();
+    expect(charts.prTotalSizeTrends.data.labels).not.toContain("2020-W01");
+    expect(charts.prTotalSizeTrends.data.labels).toEqual(charts.prSizeTrends.data.labels);
+    expect(charts.prTotalTrends.data.labels).toEqual(charts.prTrends.data.labels);
+    expect(charts.prTotalTrends.data.labels).not.toContain("2020-W01");
+    dom.window.document.querySelector<HTMLButtonElement>('[data-period="all"]')?.click();
+    expect(charts.prTotalSizeTrends.data.datasets[0].data).toEqual([140, 34]);
+    expect(charts.prTotalTrends.data.datasets[0].data).toEqual([11, 7]);
+    dom.window.close();
+  });
+
+  it("does not present merged-only counts as total activity when opened evidence is missing", () => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as CacheEnvelope;
+    delete cache.data.repos[0].weeklyTrends;
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+    const { dom, errors } = run("?period=all&repos=api", {}, true);
+    expect(errors).toEqual([]);
+    const charts = (dom.window as unknown as { charts: Record<string, {
+      data: { datasets: TrendDataset[] };
+    }> }).charts;
+    expect(charts.prTotalTrends.data.datasets).toMatchObject([
+      { label: "Opened + Merged Events", data: [null] },
+    ]);
+    expect(charts.prTrends.data.datasets[1]).toMatchObject({ label: "Merged", data: [1] });
+    const note = dom.window.document.getElementById("chartPRTotalUnavailable");
+    expect(note?.hidden).toBe(false);
+    expect(dom.window.document.getElementById("chartPRTotalNote")?.textContent)
+      .toContain("not unique PRs");
+    dom.window.document.getElementById("repoPickerReset")?.click();
+    expect(charts.prTotalTrends.data.datasets).toMatchObject([
+      { label: "Opened + Merged Events", data: [7] },
+    ]);
+    expect(note?.hidden).toBe(true);
+    dom.window.close();
+  });
+
+  it.each([
+    { evidence: "partial", linesAdded: 10, expected: 10 },
+    { evidence: "missing", linesAdded: undefined, expected: 0 },
+  ])("handles $evidence line evidence in the repo-detail fallback and discloses undercounts", ({ linesAdded, expected }) => {
+    const cache = JSON.parse(fs.readFileSync(cacheFile, "utf-8")) as CacheEnvelope;
+    const repo = cache.data.repos[0];
+    delete repo.weeklyTrends;
+    repo.collectionWarning = { state: "rest-fallback", detail: "Line counts unavailable for some PRs." };
+    const pr = repo.mergedPRTimeline![0];
+    pr.linesAdded = linesAdded;
+    delete pr.linesDeleted;
+    repo.mergedPRTimeline!.push({
+      ...pr, number: 99, linesAdded: undefined, linesDeleted: undefined,
+    });
+    fs.writeFileSync(cacheFile, JSON.stringify(cache));
+    const { dom, errors } = run("?period=all&repos=api", {}, true);
+    expect(errors).toEqual([]);
+    const charts = (dom.window as unknown as { charts: Record<string, {
+      data: { datasets: TrendDataset[] };
+    }> }).charts;
+    expect(charts.prTotalSizeTrends.data.datasets).toMatchObject([
+      { label: "Total Lines Changed", data: [expected] },
+    ]);
+    expect(charts.prSizeTrends.data.datasets).toMatchObject([
+      { label: "Lines Added", data: [expected] }, { label: "Lines Removed", data: [0] },
+    ]);
+    expect(dom.window.document.getElementById("chartPRTotalSizeNote")?.textContent)
+      .toContain("Totals may undercount");
+    dom.window.close();
   });
 
   it("adds all-repository averages to a selected repository chart", () => {

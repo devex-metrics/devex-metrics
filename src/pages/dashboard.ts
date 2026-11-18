@@ -689,8 +689,19 @@ ${buildTrialBanner(data, teamRepoNames.length)}
 
   <section class="charts" aria-label="Trend charts">
     <div class="card card-chart card-wide"><h2>PR Trends (per week)</h2><canvas id="chartPRTrends"></canvas></div>
+    <div class="card card-chart card-wide">
+      <h2 id="chartPRTotalTitle">Total PR Activity (events/week)</h2>
+      <p class="metric-lede" id="chartPRTotalNote">Weekly sum of opened + merged PR events, not unique PRs. A PR opened and merged in the same week counts twice. Includes bot authors; incomplete collection may undercount.</p>
+      <p class="trial-note" id="chartPRTotalUnavailable" hidden>Total unavailable: opened PR counts were not collected for every selected repository.</p>
+      <canvas id="chartPRTotalTrends" role="img" aria-labelledby="chartPRTotalTitle" aria-describedby="chartPRTotalNote chartPRTotalUnavailable"></canvas>
+    </div>
     <div class="card card-chart card-wide"><h2>Issue Trends (per week)</h2><canvas id="chartIssueTrends"></canvas></div>
     <div class="card card-chart card-wide"><h2>PR Size Trends (lines/week)</h2><canvas id="chartPRSizeTrends"></canvas></div>
+    <div class="card card-chart card-wide">
+      <h2 id="chartPRTotalSizeTitle">Total PR Lines Changed (lines/week)</h2>
+      <p class="metric-lede" id="chartPRTotalSizeNote">Weekly sum of added + removed lines in collected merged PRs, not average PR size. Totals may undercount when collection or line counts are incomplete. Like the other weekly trends, includes bot authors.</p>
+      <canvas id="chartPRTotalSizeTrends" role="img" aria-labelledby="chartPRTotalSizeTitle" aria-describedby="chartPRTotalSizeNote"></canvas>
+    </div>
   </section>
 
   <section class="charts" aria-label="Delivery metric charts">

@@ -22,6 +22,28 @@
       "noiseFloorPixels": 800,
       "states": [
         {
+          "id": "repo-total-lines",
+          "title": "Weekly total lines, selected versus other repositories",
+          "steps": [
+            { "click": ".filter-btn[data-period=\"all\"]" },
+            { "click": "#repoPickerBtn" },
+            { "click": "#repoPickerList input[value=\"issue-comment-tag\"]" },
+            { "click": "#repoPickerBtn" }
+          ],
+          "expect": "#chartPRTotalSizeTrends"
+        },
+        {
+          "id": "repo-total-events",
+          "title": "Weekly total PR events, selected versus other repositories",
+          "steps": [
+            { "click": ".filter-btn[data-period=\"all\"]" },
+            { "click": "#repoPickerBtn" },
+            { "click": "#repoPickerList input[value=\"issue-comment-tag\"]" },
+            { "click": "#repoPickerBtn" }
+          ],
+          "expect": "body:has(#repoPickerList input[value=\"issue-comment-tag\"]:checked) #chartPRTotalTrends"
+        },
+        {
           "id": "focus-comparison",
           "title": "Focus versus rest, last 30 days",
           "steps": [{ "click": ".focus-mode-btn[data-comparison=\"focus\"]" }],
