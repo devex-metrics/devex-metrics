@@ -36,7 +36,13 @@ in separate charts so the total does not obscure either component. The total is
 the sum of added + removed lines in collected merged PRs each week, not an
 average PR size. Both charts follow the period and repository filters, include
 bot authors like the other weekly trends, and may undercount incomplete
-collection or missing line counts. Opened/Merged PR trends remain separate.
+collection or missing line counts.
+
+Similarly, **Total PR Activity (events/week)** sits beneath the unchanged
+Opened/Merged PR trends and sums their weekly counts. This counts events, not
+unique PRs: a PR opened and merged in the same week contributes twice. It uses
+the same filters and includes bots. When opened counts are unavailable for a
+selected repository, the total is shown as unavailable rather than merged-only.
 
 Data is collected once per day and appended to a long-term history store on the
 orphan `metrics-data` branch, so trends survive across runs and nothing is ever

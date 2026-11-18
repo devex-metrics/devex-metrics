@@ -312,6 +312,11 @@ function renderCharts(){
         {label:"Merged",data:CHART_DATA.weeklyTrends.map(function(t){return t.prsMerged;}),
           borderColor:cssColors.ok,backgroundColor:'transparent',tension:0.3,fill:false,pointRadius:3}]},
       options:lineOpts});
+    charts.prTotalTrends=new Chart(document.getElementById("chartPRTotalTrends"),{type:"line",
+      data:{labels:tLabels,datasets:[
+        {label:"Opened + Merged Events",data:CHART_DATA.weeklyTrends.map(prEventCount),
+          borderColor:cssColors.accent,backgroundColor:'transparent',tension:0.3,fill:false,pointRadius:3}]},
+      options:lineOpts});
     charts.issueTrends=new Chart(document.getElementById("chartIssueTrends"),{type:"line",
       data:{labels:tLabels,datasets:[
         {label:"Opened",data:CHART_DATA.weeklyTrends.map(function(t){return t.issuesOpened;}),
@@ -667,6 +672,7 @@ function giniOf(values){
   return (2*weighted)/(n*total)-(n+1)/n;
 }
 function prSize(p){return (p.linesAdded||0)+(p.linesDeleted||0);}
+function prEventCount(t){return (t.prsOpened||0)+(t.prsMerged||0);}
 /**
  * Reviews per reviewer across the selected repositories, heaviest first.
  * Pass a repo name array to restrict it, or null for every collected repo;
@@ -954,6 +960,23 @@ function applyFilter(period){
     charts.prTrends.setDatasetVisibility(0,!repoFiltered||allSelectedHaveRepoTrends);
     charts.prTrends.options.plugins.annotation=trendAnnotations(prTrendLabels);
     charts.prTrends.update();
+  }
+  if(charts.prTotalTrends){
+    var prTotalLabels=prTrendsPeriod.map(function(t){return t.week;});
+    var totalUnavailable=repoFiltered&&!allSelectedHaveRepoTrends;
+    var totalUnavailableNote=document.getElementById("chartPRTotalUnavailable");
+    if(totalUnavailableNote)totalUnavailableNote.hidden=!totalUnavailable;
+    charts.prTotalTrends.data.labels=prTotalLabels;
+    if(repoFiltered&&allSelectedHaveRepoTrends){
+      charts.prTotalTrends.data.datasets=[
+        {label:"Selected repositories \u2014 Opened + Merged Events",data:prTrendsPeriod.map(prEventCount),borderColor:cssColors.accent,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3},
+        {label:"Other repositories \u2014 Opened + Merged Events",data:otherPRTrendsPeriod.map(prEventCount),borderColor:hexToRgba(cssColors.accent,0.55),backgroundColor:"transparent",borderDash:[5,5],tension:0.3,fill:false,pointRadius:2}];
+    }else{
+      charts.prTotalTrends.data.datasets=[
+        {label:"Opened + Merged Events",data:prTrendsPeriod.map(function(t){return totalUnavailable?null:prEventCount(t);}),borderColor:cssColors.accent,backgroundColor:"transparent",tension:0.3,fill:false,pointRadius:3}];
+    }
+    charts.prTotalTrends.options.plugins.annotation=trendAnnotations(prTotalLabels);
+    charts.prTotalTrends.update();
   }
   if(charts.issueTrends){
     var issueTrendLabels=issueTrendsPeriod.map(function(t){return t.week;});
