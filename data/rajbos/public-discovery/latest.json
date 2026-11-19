@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-18T15:29:25.000Z",
+  "generated_at": "2026-11-19T15:33:32.000Z",
   "scanner_version": "0.2.0",
   "repositories": [
     {
@@ -34,7 +34,6 @@
       "commits_30d": 0,
       "commits_90d": 9,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -123,6 +122,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -154,10 +154,10 @@
     },
     {
       "full_name": "rajbos/ai-engineering-fluency",
-      "head_sha": "758670c4e99b91e0be4cec0e36685a2cf2d6bb6a",
-      "files": 1446,
-      "bytes": 27926494,
-      "source_loc": 286124,
+      "head_sha": "bc4b8c9a9034be2d2d907ad8be3abb0e4dd44de8",
+      "files": 1449,
+      "bytes": 27951868,
+      "source_loc": 286241,
       "languages": [
         {
           "name": "TypeScript",
@@ -186,9 +186,8 @@
         }
       ],
       "commits_30d": 151,
-      "commits_90d": 950,
+      "commits_90d": 939,
       "commits_90d_trend": [
-        14,
         0,
         0,
         3,
@@ -277,16 +276,17 @@
         0,
         8,
         14,
-        3
+        6,
+        0
       ],
       "contributor_count": 29,
       "adr_count": 15,
       "manifest_count": 13,
       "produces_count": 32,
-      "consumes_count": 279,
+      "consumes_count": 294,
       "activity": {
-        "commits_30d": 155,
-        "commits_90d": 950,
+        "commits_30d": 151,
+        "commits_90d": 951,
         "complete": true
       },
       "team_activity": {
@@ -326,8 +326,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -465,7 +465,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -551,6 +550,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 4,
@@ -609,7 +609,6 @@
         0,
         0,
         0,
-        0,
         3,
         0,
         0,
@@ -648,6 +647,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -743,8 +743,8 @@
         0,
         0,
         0,
-        0,
         2,
+        0,
         0,
         0,
         0,
@@ -887,8 +887,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1015,8 +1015,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1149,8 +1149,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1293,8 +1293,8 @@
         0,
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -1421,8 +1421,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1575,7 +1575,6 @@
         0,
         0,
         0,
-        0,
         10,
         0,
         0,
@@ -1661,6 +1660,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -1714,8 +1714,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1831,10 +1831,10 @@
     },
     {
       "full_name": "rajbos/github-azure-devops-marketplace-extension-news",
-      "head_sha": "1c9fb9f61bc22e056311eb37dc5bcadc4a7ec231",
-      "files": 71,
-      "bytes": 468409,
-      "source_loc": 5153,
+      "head_sha": "de94e4cdacb2128ceb7be59f2e13d245fb836d70",
+      "files": 69,
+      "bytes": 466646,
+      "source_loc": 5152,
       "languages": [
         {
           "name": "C#",
@@ -1843,14 +1843,13 @@
         },
         {
           "name": "PowerShell",
-          "files": 3,
-          "loc": 646
+          "files": 2,
+          "loc": 645
         }
       ],
-      "commits_30d": 2,
-      "commits_90d": 14,
+      "commits_30d": 8,
+      "commits_90d": 20,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -1922,7 +1921,7 @@
         0,
         0,
         0,
-        2,
+        4,
         0,
         0,
         0,
@@ -1939,16 +1938,17 @@
         0,
         0,
         0,
-        0
+        1,
+        3
       ],
       "contributor_count": 9,
       "adr_count": 0,
-      "manifest_count": 1,
+      "manifest_count": 0,
       "produces_count": 5,
-      "consumes_count": 33,
+      "consumes_count": 32,
       "activity": {
-        "commits_30d": 2,
-        "commits_90d": 14,
+        "commits_30d": 8,
+        "commits_90d": 20,
         "complete": true
       },
       "team_activity": {
@@ -1970,15 +1970,15 @@
     },
     {
       "full_name": "rajbos/github-copilot-premium-reqs-usage-fork",
-      "head_sha": "20da1cb89ab8824f8692beb393d2fb9c044349a1",
+      "head_sha": "1997d51dd4afdee56b4738d73eb2972b8ab74e11",
       "files": 153,
-      "bytes": 1185386,
-      "source_loc": 17871,
+      "bytes": 1187925,
+      "source_loc": 17896,
       "languages": [
         {
           "name": "TypeScript",
           "files": 105,
-          "loc": 16371
+          "loc": 16396
         },
         {
           "name": "CSS",
@@ -2001,10 +2001,9 @@
           "loc": 242
         }
       ],
-      "commits_30d": 1,
-      "commits_90d": 15,
+      "commits_30d": 3,
+      "commits_90d": 14,
       "commits_90d_trend": [
-        3,
         0,
         0,
         0,
@@ -2093,6 +2092,7 @@
         0,
         0,
         0,
+        2,
         0
       ],
       "contributor_count": 11,
@@ -2101,8 +2101,8 @@
       "produces_count": 1,
       "consumes_count": 96,
       "activity": {
-        "commits_30d": 1,
-        "commits_90d": 15,
+        "commits_30d": 3,
+        "commits_90d": 17,
         "complete": true
       },
       "team_activity": {
@@ -2141,7 +2141,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -2180,6 +2179,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -2275,7 +2275,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -2361,6 +2360,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 5,
@@ -2392,20 +2392,20 @@
     },
     {
       "full_name": "rajbos/Jarvis",
-      "head_sha": "818bd9a0140334f21f4d204ee946a8c67c33a669",
-      "files": 395,
-      "bytes": 4702183,
-      "source_loc": 83476,
+      "head_sha": "cd21b4faf59783e3db925e5f49cd7fa128d3f742",
+      "files": 411,
+      "bytes": 4878839,
+      "source_loc": 87286,
       "languages": [
         {
           "name": "TypeScript",
-          "files": 317,
-          "loc": 74508
+          "files": 333,
+          "loc": 78266
         },
         {
           "name": "CSS",
           "files": 3,
-          "loc": 7127
+          "loc": 7179
         },
         {
           "name": "JavaScript",
@@ -2423,10 +2423,9 @@
           "loc": 187
         }
       ],
-      "commits_30d": 58,
-      "commits_90d": 372,
+      "commits_30d": 63,
+      "commits_90d": 381,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2515,6 +2514,7 @@
         0,
         0,
         1,
+        9,
         2
       ],
       "contributor_count": 7,
@@ -2523,8 +2523,8 @@
       "produces_count": 11,
       "consumes_count": 55,
       "activity": {
-        "commits_30d": 60,
-        "commits_90d": 372,
+        "commits_30d": 63,
+        "commits_90d": 381,
         "complete": true
       },
       "team_activity": {
@@ -2573,7 +2573,6 @@
         0,
         0,
         0,
-        0,
         4,
         0,
         0,
@@ -2604,6 +2603,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -2782,9 +2782,9 @@
         0,
         0,
         0,
-        0,
         1,
         5,
+        0,
         0,
         0,
         0,
@@ -2841,7 +2841,6 @@
         0,
         0,
         0,
-        0,
         6,
         0,
         0,
@@ -2880,6 +2879,7 @@
         0,
         0,
         3,
+        0,
         0,
         0,
         0,
@@ -2975,7 +2975,6 @@
         0,
         0,
         0,
-        0,
         2,
         1,
         0,
@@ -3014,6 +3013,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -3130,7 +3130,6 @@
         0,
         0,
         0,
-        0,
         7,
         0,
         0,
@@ -3185,6 +3184,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -3273,8 +3273,8 @@
         0,
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -3412,7 +3412,6 @@
         0,
         0,
         0,
-        0,
         6,
         1,
         0,
@@ -3451,6 +3450,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -3562,7 +3562,7 @@
       "evidence": {
         "path": "package.json",
         "line": 59,
-        "head_sha": "818bd9a0140334f21f4d204ee946a8c67c33a669"
+        "head_sha": "cd21b4faf59783e3db925e5f49cd7fa128d3f742"
       }
     },
     {
