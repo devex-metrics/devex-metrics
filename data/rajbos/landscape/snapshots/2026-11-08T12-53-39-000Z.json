@@ -52,22 +52,6 @@
       "team_commits_90d": null
     },
     {
-      "full_name": "rajbos/actions-marketplace",
-      "head_sha": "2e228daa6775f0f445b46df2332d87a84b82ec1c",
-      "ai_files": [],
-      "ai_summary": {
-        "count": 0,
-        "stale_count": 0,
-        "max_lag_days": null,
-        "unknown_count": 0,
-        "status": "known"
-      },
-      "commits_30d": 0,
-      "commits_90d": 9,
-      "team_commits_30d": null,
-      "team_commits_90d": null
-    },
-    {
       "full_name": "rajbos/actions-marketplace-checks",
       "head_sha": "d5d65716aade01e8693343676aba6c96c73e6c38",
       "ai_files": [
@@ -3861,22 +3845,6 @@
       "team_commits_90d": null
     },
     {
-      "full_name": "rajbos/github-actions-requests",
-      "head_sha": "37e271512f09e80710f19ca4fc0f871e012e9240",
-      "ai_files": [],
-      "ai_summary": {
-        "count": 0,
-        "stale_count": 0,
-        "max_lag_days": null,
-        "unknown_count": 0,
-        "status": "known"
-      },
-      "commits_30d": 0,
-      "commits_90d": 1,
-      "team_commits_30d": null,
-      "team_commits_90d": null
-    },
-    {
       "full_name": "rajbos/github-azure-devops-marketplace-extension-news",
       "head_sha": "1c9fb9f61bc22e056311eb37dc5bcadc4a7ec231",
       "ai_files": [
@@ -4062,59 +4030,6 @@
       },
       "commits_30d": 1,
       "commits_90d": 15,
-      "team_commits_30d": null,
-      "team_commits_90d": null
-    },
-    {
-      "full_name": "rajbos/github-fork-updater",
-      "head_sha": "ec65c39fad77dfb18776caeb4f8620df1df64ea8",
-      "ai_files": [
-        {
-          "path": ".github/copilot-instructions.md",
-          "kind": "copilot_instructions",
-          "sha256": "ae254a4dfa5f212b2a2d8c4e14887ed889876b8fe149c864988ca88077c5580a",
-          "last_changed": "2026-04-20T18:57:30.000Z",
-          "age_days": 201,
-          "lag_days": 163,
-          "stale": true,
-          "status": "known",
-          "commits_since_change": 9,
-          "content_signal": {
-            "score": 50,
-            "scope": true,
-            "actions": true,
-            "verification": false,
-            "guardrails": false
-          }
-        },
-        {
-          "path": "AGENTS.md",
-          "kind": "agents",
-          "sha256": "9cafb398baccff4522ec8070bd74ab65e6a2faf02cf2d3e0ea0581e2993ba9dd",
-          "last_changed": "2026-04-20T18:57:30.000Z",
-          "age_days": 201,
-          "lag_days": 163,
-          "stale": true,
-          "status": "known",
-          "commits_since_change": 9,
-          "content_signal": {
-            "score": 0,
-            "scope": false,
-            "actions": false,
-            "verification": false,
-            "guardrails": false
-          }
-        }
-      ],
-      "ai_summary": {
-        "count": 2,
-        "stale_count": 2,
-        "max_lag_days": 163,
-        "unknown_count": 0,
-        "status": "known"
-      },
-      "commits_30d": 0,
-      "commits_90d": 2,
       "team_commits_30d": null,
       "team_commits_90d": null
     },

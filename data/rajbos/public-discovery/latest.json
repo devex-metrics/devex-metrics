@@ -1,43 +1,21 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-19T15:33:32.000Z",
+  "generated_at": "2026-11-20T15:18:18.000Z",
   "scanner_version": "0.2.0",
   "repositories": [
     {
-      "full_name": "rajbos/actions-marketplace",
-      "head_sha": "2e228daa6775f0f445b46df2332d87a84b82ec1c",
-      "files": 32,
-      "bytes": 116014,
-      "source_loc": 2324,
-      "languages": [
-        {
-          "name": "PowerShell",
-          "files": 7,
-          "loc": 917
-        },
-        {
-          "name": "CSS",
-          "files": 1,
-          "loc": 723
-        },
-        {
-          "name": "JavaScript",
-          "files": 2,
-          "loc": 549
-        },
-        {
-          "name": "HTML",
-          "files": 3,
-          "loc": 135
-        }
-      ],
+      "full_name": "rajbos/.github",
+      "head_sha": "035b6f38db82ef0e67c0e0ebdf4643ac29d82d57",
+      "files": 9,
+      "bytes": 8117,
+      "source_loc": 0,
+      "languages": [],
       "commits_30d": 0,
-      "commits_90d": 9,
+      "commits_90d": 0,
       "commits_90d_trend": [
         0,
         0,
         0,
-        3,
         0,
         0,
         0,
@@ -74,7 +52,8 @@
         0,
         0,
         0,
-        6,
+        0,
+        0,
         0,
         0,
         0,
@@ -125,14 +104,14 @@
         0,
         0
       ],
-      "contributor_count": 6,
+      "contributor_count": 2,
       "adr_count": 0,
-      "manifest_count": 1,
-      "produces_count": 4,
-      "consumes_count": 28,
+      "manifest_count": 0,
+      "produces_count": 0,
+      "consumes_count": 0,
       "activity": {
         "commits_30d": 0,
-        "commits_90d": 9,
+        "commits_90d": 0,
         "complete": true
       },
       "team_activity": {
@@ -185,10 +164,9 @@
           "loc": 3874
         }
       ],
-      "commits_30d": 151,
+      "commits_30d": 146,
       "commits_90d": 939,
       "commits_90d_trend": [
-        0,
         0,
         3,
         12,
@@ -277,6 +255,7 @@
         8,
         14,
         6,
+        0,
         0
       ],
       "contributor_count": 29,
@@ -285,8 +264,8 @@
       "produces_count": 32,
       "consumes_count": 294,
       "activity": {
-        "commits_30d": 151,
-        "commits_90d": 951,
+        "commits_30d": 146,
+        "commits_90d": 939,
         "complete": true
       },
       "team_activity": {
@@ -325,8 +304,8 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -464,7 +443,6 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -551,6 +529,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 4,
@@ -582,9 +561,9 @@
     },
     {
       "full_name": "rajbos/demo-actions",
-      "head_sha": "0e87ee76a8bbff51376c25f0f24ba8336a20318e",
-      "files": 69,
-      "bytes": 62508,
+      "head_sha": "72710b6f6b1c5f8a170e1db5e784f48eb98b463e",
+      "files": 70,
+      "bytes": 62810,
       "source_loc": 205,
       "languages": [
         {
@@ -603,10 +582,9 @@
           "loc": 2
         }
       ],
-      "commits_30d": 0,
-      "commits_90d": 5,
+      "commits_30d": 3,
+      "commits_90d": 8,
       "commits_90d_trend": [
-        0,
         0,
         0,
         3,
@@ -695,7 +673,8 @@
         0,
         0,
         0,
-        0
+        0,
+        3
       ],
       "contributor_count": 6,
       "adr_count": 0,
@@ -703,8 +682,8 @@
       "produces_count": 2,
       "consumes_count": 22,
       "activity": {
-        "commits_30d": 0,
-        "commits_90d": 5,
+        "commits_30d": 3,
+        "commits_90d": 8,
         "complete": true
       },
       "team_activity": {
@@ -742,8 +721,8 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         2,
+        0,
         0,
         0,
         0,
@@ -886,8 +865,8 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1014,8 +993,8 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1148,8 +1127,8 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1292,8 +1271,8 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -1420,8 +1399,8 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1574,7 +1553,6 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         10,
         0,
         0,
@@ -1661,6 +1639,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -1691,147 +1670,8 @@
       }
     },
     {
-      "full_name": "rajbos/github-actions-requests",
-      "head_sha": "37e271512f09e80710f19ca4fc0f871e012e9240",
-      "files": 21,
-      "bytes": 795830,
-      "source_loc": 750,
-      "languages": [
-        {
-          "name": "JavaScript",
-          "files": 7,
-          "loc": 587
-        },
-        {
-          "name": "Shell",
-          "files": 2,
-          "loc": 163
-        }
-      ],
-      "commits_30d": 0,
-      "commits_90d": 1,
-      "commits_90d_trend": [
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "contributor_count": 6,
-      "adr_count": 0,
-      "manifest_count": 0,
-      "produces_count": 2,
-      "consumes_count": 6,
-      "activity": {
-        "commits_30d": 0,
-        "commits_90d": 1,
-        "complete": true
-      },
-      "team_activity": {
-        "commits_30d": null,
-        "commits_90d": null,
-        "complete": false,
-        "available": false,
-        "matching": "unavailable",
-        "commit_count": null,
-        "unknown_reason": "No explicit team author emails configured"
-      },
-      "attention": {
-        "activity": "low",
-        "priority": "medium",
-        "reasons": [
-          "No AI files discovered"
-        ]
-      }
-    },
-    {
       "full_name": "rajbos/github-azure-devops-marketplace-extension-news",
-      "head_sha": "de94e4cdacb2128ceb7be59f2e13d245fb836d70",
+      "head_sha": "8d0edcebdd22fe59715807d42225d0e4d1b60125",
       "files": 69,
       "bytes": 466646,
       "source_loc": 5152,
@@ -1847,10 +1687,9 @@
           "loc": 645
         }
       ],
-      "commits_30d": 8,
-      "commits_90d": 20,
+      "commits_30d": 10,
+      "commits_90d": 22,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -1939,7 +1778,8 @@
         0,
         0,
         1,
-        3
+        4,
+        1
       ],
       "contributor_count": 9,
       "adr_count": 0,
@@ -1947,8 +1787,8 @@
       "produces_count": 5,
       "consumes_count": 32,
       "activity": {
-        "commits_30d": 8,
-        "commits_90d": 20,
+        "commits_30d": 10,
+        "commits_90d": 22,
         "complete": true
       },
       "team_activity": {
@@ -1961,8 +1801,8 @@
         "unknown_reason": "No explicit team author emails configured"
       },
       "attention": {
-        "activity": "low",
-        "priority": "medium",
+        "activity": "medium",
+        "priority": "high",
         "reasons": [
           "AI files exceed the configured lag threshold"
         ]
@@ -2009,7 +1849,6 @@
         0,
         0,
         0,
-        0,
         5,
         5,
         0,
@@ -2093,6 +1932,7 @@
         0,
         0,
         2,
+        0,
         0
       ],
       "contributor_count": 11,
@@ -2102,141 +1942,7 @@
       "consumes_count": 96,
       "activity": {
         "commits_30d": 3,
-        "commits_90d": 17,
-        "complete": true
-      },
-      "team_activity": {
-        "commits_30d": null,
-        "commits_90d": null,
-        "complete": false,
-        "available": false,
-        "matching": "unavailable",
-        "commit_count": null,
-        "unknown_reason": "No explicit team author emails configured"
-      },
-      "attention": {
-        "activity": "low",
-        "priority": "medium",
-        "reasons": [
-          "AI files exceed the configured lag threshold"
-        ]
-      }
-    },
-    {
-      "full_name": "rajbos/github-fork-updater",
-      "head_sha": "ec65c39fad77dfb18776caeb4f8620df1df64ea8",
-      "files": 22,
-      "bytes": 150374,
-      "source_loc": 623,
-      "languages": [
-        {
-          "name": "PowerShell",
-          "files": 5,
-          "loc": 623
-        }
-      ],
-      "commits_30d": 0,
-      "commits_90d": 2,
-      "commits_90d_trend": [
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "contributor_count": 14,
-      "adr_count": 0,
-      "manifest_count": 1,
-      "produces_count": 1,
-      "consumes_count": 18,
-      "activity": {
-        "commits_30d": 0,
-        "commits_90d": 2,
+        "commits_90d": 14,
         "complete": true
       },
       "team_activity": {
@@ -2272,7 +1978,6 @@
       "commits_30d": 13,
       "commits_90d": 18,
       "commits_90d_trend": [
-        0,
         0,
         0,
         1,
@@ -2361,6 +2066,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 5,
@@ -2423,10 +2129,9 @@
           "loc": 187
         }
       ],
-      "commits_30d": 63,
+      "commits_30d": 62,
       "commits_90d": 381,
       "commits_90d_trend": [
-        0,
         0,
         0,
         2,
@@ -2515,7 +2220,8 @@
         0,
         1,
         9,
-        2
+        2,
+        0
       ],
       "contributor_count": 7,
       "adr_count": 0,
@@ -2523,7 +2229,7 @@
       "produces_count": 11,
       "consumes_count": 55,
       "activity": {
-        "commits_30d": 63,
+        "commits_30d": 62,
         "commits_90d": 381,
         "complete": true
       },
@@ -2572,7 +2278,6 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         4,
         0,
         0,
@@ -2603,6 +2308,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -2781,9 +2487,9 @@
         0,
         0,
         0,
-        0,
         1,
         5,
+        0,
         0,
         0,
         0,
@@ -2838,7 +2544,6 @@
       "commits_30d": 0,
       "commits_90d": 9,
       "commits_90d_trend": [
-        0,
         0,
         0,
         6,
@@ -2927,6 +2632,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 10,
@@ -2937,6 +2643,150 @@
       "activity": {
         "commits_30d": 0,
         "commits_90d": 9,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
+    },
+    {
+      "full_name": "rajbos/pipelines",
+      "head_sha": "aec3b5e5be011208602957110389cc896e907f8f",
+      "files": 68,
+      "bytes": 4317464,
+      "source_loc": 39583,
+      "languages": [
+        {
+          "name": "JavaScript",
+          "files": 13,
+          "loc": 25036
+        },
+        {
+          "name": "CSS",
+          "files": 7,
+          "loc": 14181
+        },
+        {
+          "name": "C#",
+          "files": 9,
+          "loc": 366
+        }
+      ],
+      "commits_30d": 0,
+      "commits_90d": 1,
+      "commits_90d_trend": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "contributor_count": 3,
+      "adr_count": 0,
+      "manifest_count": 0,
+      "produces_count": 2,
+      "consumes_count": 9,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 1,
         "complete": true
       },
       "team_activity": {
@@ -2974,7 +2824,6 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         2,
         1,
         0,
@@ -3013,6 +2862,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -3129,7 +2979,6 @@
         0,
         0,
         0,
-        0,
         7,
         0,
         0,
@@ -3184,6 +3033,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -3272,8 +3122,8 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -3411,7 +3261,6 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         6,
         1,
         0,
@@ -3498,6 +3347,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 2,
@@ -3508,6 +3358,145 @@
       "activity": {
         "commits_30d": 0,
         "commits_90d": 8,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
+    },
+    {
+      "full_name": "rajbos/universe-badge-SF-MC",
+      "head_sha": "1666bb09fafa7a0991481fbd2069feff8e8c3be4",
+      "files": 9,
+      "bytes": 45200,
+      "source_loc": 1182,
+      "languages": [
+        {
+          "name": "Python",
+          "files": 4,
+          "loc": 1075
+        },
+        {
+          "name": "PowerShell",
+          "files": 1,
+          "loc": 107
+        }
+      ],
+      "commits_30d": 4,
+      "commits_90d": 4,
+      "commits_90d_trend": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "contributor_count": 2,
+      "adr_count": 0,
+      "manifest_count": 0,
+      "produces_count": 0,
+      "consumes_count": 0,
+      "activity": {
+        "commits_30d": 4,
+        "commits_90d": 4,
         "complete": true
       },
       "team_activity": {
@@ -3566,47 +3555,14 @@
       }
     },
     {
-      "source": "rajbos/actions-marketplace",
-      "target": "rajbos/github-fork-updater",
+      "source": "rajbos/pipelines",
+      "target": "rajbos/dotnetcore-webapp",
       "kind": "repository reference",
       "confidence": "low",
       "evidence": {
-        "path": "README.md",
-        "line": 8,
-        "head_sha": "2e228daa6775f0f445b46df2332d87a84b82ec1c"
-      }
-    },
-    {
-      "source": "rajbos/rajbos",
-      "target": "rajbos/actions-marketplace",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "README.md",
-        "line": 30,
-        "head_sha": "cfbfb9611e8885667d16f35a3bffee289edd2c02"
-      }
-    },
-    {
-      "source": "rajbos/rajbos",
-      "target": "rajbos/github-actions-requests",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "README.md",
-        "line": 34,
-        "head_sha": "cfbfb9611e8885667d16f35a3bffee289edd2c02"
-      }
-    },
-    {
-      "source": "rajbos/rajbos",
-      "target": "rajbos/github-fork-updater",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "README.md",
-        "line": 31,
-        "head_sha": "cfbfb9611e8885667d16f35a3bffee289edd2c02"
+        "path": "src/dotnet-core-webapp/README.md",
+        "line": 7,
+        "head_sha": "aec3b5e5be011208602957110389cc896e907f8f"
       }
     },
     {
@@ -3628,83 +3584,6 @@
       "evidence": {
         "path": "_posts/2026-05-06-OSS-projects.md",
         "line": 75,
-        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
-      }
-    },
-    {
-      "source": "rajbos/rajbos.github.io",
-      "target": "rajbos/actions-marketplace",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "_posts/2021-10-14-GitHub-Actions-Internal-Marketplace.md",
-        "line": 153,
-        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
-      }
-    },
-    {
-      "source": "rajbos/rajbos.github.io",
-      "target": "rajbos/actions-marketplace",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "_posts/2021-10-14-GitHub-Actions-Internal-Marketplace.md",
-        "line": 163,
-        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
-      }
-    },
-    {
-      "source": "rajbos/rajbos.github.io",
-      "target": "rajbos/actions-marketplace",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "_posts/2021-10-14-GitHub-Actions-Internal-Marketplace.md",
-        "line": 166,
-        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
-      }
-    },
-    {
-      "source": "rajbos/rajbos.github.io",
-      "target": "rajbos/actions-marketplace",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "_posts/2021-12-04-github-actions-marketplace.md",
-        "line": 15,
-        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
-      }
-    },
-    {
-      "source": "rajbos/rajbos.github.io",
-      "target": "rajbos/actions-marketplace",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "_posts/2021-12-11-GitHub-Actions-Maturity-Levels.md",
-        "line": 141,
-        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
-      }
-    },
-    {
-      "source": "rajbos/rajbos.github.io",
-      "target": "rajbos/actions-marketplace",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "_posts/2022-08-12-workflows-not-starting.md",
-        "line": 79,
-        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
-      }
-    },
-    {
-      "source": "rajbos/rajbos.github.io",
-      "target": "rajbos/actions-marketplace",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "_posts/2022-09-18-Analysing-the-GitHub-marketplace.md",
-        "line": 133,
         "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
       }
     },
@@ -3837,72 +3716,6 @@
       "evidence": {
         "path": "_posts/2020-11-24-github-actions-with-private-runner-iis.md",
         "line": 65,
-        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
-      }
-    },
-    {
-      "source": "rajbos/rajbos.github.io",
-      "target": "rajbos/github-actions-requests",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "_posts/2021-10-14-GitHub-Actions-Internal-Marketplace.md",
-        "line": 60,
-        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
-      }
-    },
-    {
-      "source": "rajbos/rajbos.github.io",
-      "target": "rajbos/github-actions-requests",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "_posts/2021-10-14-GitHub-Actions-Internal-Marketplace.md",
-        "line": 83,
-        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
-      }
-    },
-    {
-      "source": "rajbos/rajbos.github.io",
-      "target": "rajbos/github-actions-requests",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "_posts/2021-10-14-GitHub-Actions-Internal-Marketplace.md",
-        "line": 174,
-        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
-      }
-    },
-    {
-      "source": "rajbos/rajbos.github.io",
-      "target": "rajbos/github-actions-requests",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "_posts/2021-12-11-GitHub-Actions-Maturity-Levels.md",
-        "line": 150,
-        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
-      }
-    },
-    {
-      "source": "rajbos/rajbos.github.io",
-      "target": "rajbos/github-fork-updater",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "_posts/2021-02-06-GitHub-Actions-Forking-Repositories.md",
-        "line": 115,
-        "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
-      }
-    },
-    {
-      "source": "rajbos/rajbos.github.io",
-      "target": "rajbos/github-fork-updater",
-      "kind": "repository reference",
-      "confidence": "low",
-      "evidence": {
-        "path": "_posts/2021-12-11-GitHub-Actions-Maturity-Levels.md",
-        "line": 138,
         "head_sha": "a1849e81d9813cd19185bbd17240332d3d9dd894"
       }
     },

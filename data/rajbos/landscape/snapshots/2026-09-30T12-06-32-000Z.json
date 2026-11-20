@@ -40,18 +40,6 @@
       }
     },
     {
-      "full_name": "rajbos/actions-marketplace",
-      "head_sha": "49ec0b335d782483487a2586573d7430f636a7dd",
-      "ai_files": [],
-      "ai_summary": {
-        "count": 0,
-        "stale_count": 0,
-        "max_lag_days": null,
-        "unknown_count": 0,
-        "status": "known"
-      }
-    },
-    {
       "full_name": "rajbos/actions-marketplace-checks",
       "head_sha": "71e8f85f6589cc010d9464e3cdbeb6b96d58e96f",
       "ai_files": [
@@ -2063,18 +2051,6 @@
       }
     },
     {
-      "full_name": "rajbos/github-actions-requests",
-      "head_sha": "37e271512f09e80710f19ca4fc0f871e012e9240",
-      "ai_files": [],
-      "ai_summary": {
-        "count": 0,
-        "stale_count": 0,
-        "max_lag_days": null,
-        "unknown_count": 0,
-        "status": "known"
-      }
-    },
-    {
       "full_name": "rajbos/github-azure-devops-marketplace-extension-news",
       "head_sha": "68e2e49541a132e366c4aad1695cc4cfbd774952",
       "ai_files": [
@@ -2195,39 +2171,6 @@
         "count": 2,
         "stale_count": 1,
         "max_lag_days": 131,
-        "unknown_count": 0,
-        "status": "known"
-      }
-    },
-    {
-      "full_name": "rajbos/github-fork-updater",
-      "head_sha": "5e83a41b4acc92e45128b9fa00594c3c31dbac99",
-      "ai_files": [
-        {
-          "path": ".github/copilot-instructions.md",
-          "kind": "copilot_instructions",
-          "sha256": "ae254a4dfa5f212b2a2d8c4e14887ed889876b8fe149c864988ca88077c5580a",
-          "last_changed": "2026-04-20T18:57:30.000Z",
-          "age_days": 162,
-          "lag_days": 126,
-          "stale": true,
-          "status": "known"
-        },
-        {
-          "path": "AGENTS.md",
-          "kind": "agents",
-          "sha256": "9cafb398baccff4522ec8070bd74ab65e6a2faf02cf2d3e0ea0581e2993ba9dd",
-          "last_changed": "2026-04-20T18:57:30.000Z",
-          "age_days": 162,
-          "lag_days": 126,
-          "stale": true,
-          "status": "known"
-        }
-      ],
-      "ai_summary": {
-        "count": 2,
-        "stale_count": 2,
-        "max_lag_days": 126,
         "unknown_count": 0,
         "status": "known"
       }
