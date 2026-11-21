@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-20T15:18:18.000Z",
+  "generated_at": "2026-11-21T14:28:07.000Z",
   "scanner_version": "0.2.0",
   "repositories": [
     {
@@ -164,10 +164,9 @@
           "loc": 3874
         }
       ],
-      "commits_30d": 146,
+      "commits_30d": 145,
       "commits_90d": 939,
       "commits_90d_trend": [
-        0,
         3,
         12,
         0,
@@ -256,6 +255,7 @@
         14,
         6,
         0,
+        0,
         0
       ],
       "contributor_count": 29,
@@ -303,8 +303,8 @@
       "commits_90d": 1,
       "commits_90d_trend": [
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -442,7 +442,6 @@
       "commits_90d": 8,
       "commits_90d_trend": [
         0,
-        0,
         1,
         0,
         0,
@@ -530,6 +529,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 4,
@@ -585,7 +585,6 @@
       "commits_30d": 3,
       "commits_90d": 8,
       "commits_90d_trend": [
-        0,
         0,
         3,
         0,
@@ -674,7 +673,8 @@
         0,
         0,
         0,
-        3
+        3,
+        0
       ],
       "contributor_count": 6,
       "adr_count": 0,
@@ -720,8 +720,8 @@
       "commits_90d": 2,
       "commits_90d_trend": [
         0,
-        0,
         2,
+        0,
         0,
         0,
         0,
@@ -864,8 +864,8 @@
       "commits_90d": 1,
       "commits_90d_trend": [
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -992,8 +992,8 @@
       "commits_90d": 1,
       "commits_90d_trend": [
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1126,8 +1126,8 @@
       "commits_90d": 1,
       "commits_90d_trend": [
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1270,8 +1270,8 @@
       "commits_90d": 3,
       "commits_90d_trend": [
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -1398,8 +1398,8 @@
       "commits_90d": 1,
       "commits_90d_trend": [
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -1552,7 +1552,6 @@
       "commits_90d": 29,
       "commits_90d_trend": [
         0,
-        0,
         10,
         0,
         0,
@@ -1640,6 +1639,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -1690,7 +1690,6 @@
       "commits_30d": 10,
       "commits_90d": 22,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -1779,7 +1778,8 @@
         0,
         1,
         4,
-        1
+        1,
+        0
       ],
       "contributor_count": 9,
       "adr_count": 0,
@@ -1848,7 +1848,6 @@
         0,
         0,
         0,
-        0,
         5,
         5,
         0,
@@ -1933,6 +1932,7 @@
         0,
         2,
         0,
+        0,
         0
       ],
       "contributor_count": 11,
@@ -1978,7 +1978,6 @@
       "commits_30d": 13,
       "commits_90d": 18,
       "commits_90d_trend": [
-        0,
         0,
         1,
         0,
@@ -2067,6 +2066,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 5,
@@ -2129,10 +2129,9 @@
           "loc": 187
         }
       ],
-      "commits_30d": 62,
+      "commits_30d": 60,
       "commits_90d": 381,
       "commits_90d_trend": [
-        0,
         0,
         2,
         0,
@@ -2221,6 +2220,7 @@
         1,
         9,
         2,
+        0,
         0
       ],
       "contributor_count": 7,
@@ -2229,7 +2229,7 @@
       "produces_count": 11,
       "consumes_count": 55,
       "activity": {
-        "commits_30d": 62,
+        "commits_30d": 60,
         "commits_90d": 381,
         "complete": true
       },
@@ -2277,7 +2277,6 @@
       "commits_90d": 5,
       "commits_90d_trend": [
         0,
-        0,
         4,
         0,
         0,
@@ -2308,6 +2307,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -2486,9 +2486,9 @@
         0,
         0,
         0,
-        0,
         1,
         5,
+        0,
         0,
         0,
         0,
@@ -2545,7 +2545,6 @@
       "commits_90d": 9,
       "commits_90d_trend": [
         0,
-        0,
         6,
         0,
         0,
@@ -2584,6 +2583,7 @@
         0,
         0,
         3,
+        0,
         0,
         0,
         0,
@@ -2689,8 +2689,8 @@
       "commits_90d": 1,
       "commits_90d_trend": [
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -2823,7 +2823,6 @@
       "commits_90d": 6,
       "commits_90d_trend": [
         0,
-        0,
         2,
         1,
         0,
@@ -2862,6 +2861,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -2978,7 +2978,6 @@
       "commits_90d_trend": [
         0,
         0,
-        0,
         7,
         0,
         0,
@@ -3033,6 +3032,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -3121,8 +3121,8 @@
       "commits_90d": 3,
       "commits_90d_trend": [
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -3260,7 +3260,6 @@
       "commits_90d": 8,
       "commits_90d_trend": [
         0,
-        0,
         6,
         1,
         0,
@@ -3299,6 +3298,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -3462,8 +3462,8 @@
         0,
         0,
         0,
-        0,
         4,
+        0,
         0,
         0,
         0,
