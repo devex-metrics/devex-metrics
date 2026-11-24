@@ -1,3 +1,4 @@
+import { isRateLimitError } from "../rate-limit.js";
 import { getAgentOctokit, getOctokit } from "../github-client.js";
 import type { Octokit } from "@octokit/rest";
 import {
@@ -526,6 +527,7 @@ export async function collectCopilotAgentMetrics(
       page++;
     }
   } catch (err: unknown) {
+    if (isRateLimitError(err)) throw err;
     const status = (err as { status?: number }).status;
     if (status === 404) return null;
     if (status === 401) {

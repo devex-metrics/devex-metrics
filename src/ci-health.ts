@@ -20,6 +20,7 @@
  * collected.
  */
 
+import { isRateLimitError } from "./rate-limit.js";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import {
@@ -267,13 +268,17 @@ export async function runCiCrawl(
     let touched = false;
 
     while (budget > 0 && pagesThisRepo < config.maxPagesPerRepo && !current.complete) {
-      const page = await fetchWorkflowRunPage(
-        owner,
-        repo,
-        defaultBranch,
-        current.anchor,
-        current.page
-      );
+      let page: Awaited<ReturnType<typeof fetchWorkflowRunPage>>;
+      try {
+        page = await fetchWorkflowRunPage(owner, repo, defaultBranch, current.anchor, current.page);
+      } catch (err: unknown) {
+        if (!isRateLimitError(err)) throw err;
+        // Every remaining repository would hit the same limit; keep the
+        // watermarks so far and resume next run.
+        console.warn(`  ⚠ ci: GitHub API rate limit persisted after retries at ${fullName}; stopping the crawl for this run`);
+        budget = 0;
+        break;
+      }
       budget--;
       pagesThisRepo++;
 

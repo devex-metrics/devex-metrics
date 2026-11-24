@@ -1,3 +1,4 @@
+import { isRateLimitError } from "../rate-limit.js";
 import { getOctokit } from "../github-client.js";
 import { hasNextPage } from "../link-header.js";
 import type { WeeklyTrendPoint } from "../types.js";
@@ -362,7 +363,7 @@ export async function collectWeeklyTrends(
     } catch (err: unknown) {
       // Skip repos that are inaccessible or have features disabled.
       const status = (err as { status?: number }).status;
-      if (status === 404 || status === 410 || status === 403) continue;
+      if ((status === 404 || status === 410 || status === 403) && !isRateLimitError(err)) continue;
       console.warn(`  ⚠ trends: skipping ${owner}/${name}: ${String(err)}`);
       failedRepos.add(repoKey);
     }

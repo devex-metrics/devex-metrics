@@ -291,6 +291,42 @@ describe("runCiCrawl", () => {
     expect(mark.newestCreatedAt).toBe("2026-08-01T00:00:00Z");
     expect(mark.runsSeen).toBe(2);
   });
+
+  it("stops on a persisting rate limit, keeping what it saved, and resumes at the failed page", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const rateLimited = Object.assign(new Error("API rate limit exceeded"), {
+      status: 403,
+      response: { headers: { "x-ratelimit-remaining": "0" }, data: {} },
+    });
+    mockFetch.mockResolvedValueOnce({ runs: [run({ id: 1 })], hasMore: true });
+    mockFetch.mockRejectedValueOnce(rateLimited);
+    const web = { fullName: "acme/web", defaultBranch: "main" };
+
+    const result = await runCiCrawl(dir, "acme", [target, web], config(), "2026-08-30");
+
+    expect(result.pagesFetched).toBe(1);
+    expect(result.rowsAppended).toBe(1);
+    expect(result.allComplete).toBe(false);
+    expect(loadCiRuns(dir, "acme")).toHaveLength(1);
+    const mark = loadCiState(dir, "acme").repos["acme/api"];
+    expect(mark.page).toBe(2);
+    expect(mark.complete).toBe(false);
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+    expect(mockFetch).not.toHaveBeenCalledWith("acme", "web", expect.anything(), expect.anything(), expect.anything());
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("rate limit"));
+
+    mockFetch.mockReset();
+    queuePages([[run({ id: 2 })]]);
+    queuePages([[run({ id: 3 })]]);
+    await runCiCrawl(dir, "acme", [target, web], config(), "2026-09-01");
+    expect(mockFetch).toHaveBeenNthCalledWith(1, "acme", "api", "main", "2026-08-30", 2);
+    warn.mockRestore();
+  });
+
+  it("still fails on an error that is not a rate limit", async () => {
+    mockFetch.mockRejectedValueOnce(new Error("boom"));
+    await expect(runCiCrawl(dir, "acme", [target], config(), "2026-08-30")).rejects.toThrow("boom");
+  });
 });
 
 describe("rearmCompleted", () => {

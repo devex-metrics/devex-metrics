@@ -1,3 +1,4 @@
+import { isRateLimitError } from "../rate-limit.js";
 import { getOctokit } from "../github-client.js";
 import { matchesGlobs } from "../config.js";
 import type { DevexConfig } from "../config.js";
@@ -118,6 +119,8 @@ export async function collectRepos(
       const { data: authUser } = await octokit.rest.users.getAuthenticated();
       useAuthEndpoint = authUser.login.toLowerCase() === owner.toLowerCase();
     } catch (err: unknown) {
+      // Falling back on a rate limit would silently drop private repositories.
+      if (isRateLimitError(err)) throw err;
       const status = (err as { status?: number }).status;
       if (status !== 401 && status !== 403) {
         // Unexpected error — log and fall back gracefully
