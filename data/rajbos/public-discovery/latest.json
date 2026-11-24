@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-23T17:39:39.000Z",
+  "generated_at": "2026-11-24T17:24:38.000Z",
   "scanner_version": "0.2.0",
   "repositories": [
     {
@@ -941,20 +941,20 @@
     },
     {
       "full_name": "rajbos/ai-engineering-fluency",
-      "head_sha": "fc99561ddbe9718a3a42b2fa8fe818b48307d1d6",
-      "files": 1451,
-      "bytes": 27972672,
-      "source_loc": 286559,
+      "head_sha": "d824675786772e645b4e3a10f599334bdb69b851",
+      "files": 1459,
+      "bytes": 28083208,
+      "source_loc": 288178,
       "languages": [
         {
           "name": "TypeScript",
-          "files": 714,
-          "loc": 234191
+          "files": 720,
+          "loc": 235805
         },
         {
           "name": "JavaScript",
           "files": 93,
-          "loc": 28227
+          "loc": 28232
         },
         {
           "name": "CSS",
@@ -972,10 +972,9 @@
           "loc": 3874
         }
       ],
-      "commits_30d": 155,
-      "commits_90d": 935,
+      "commits_30d": 189,
+      "commits_90d": 975,
       "commits_90d_trend": [
-        0,
         0,
         2,
         11,
@@ -1050,7 +1049,7 @@
         8,
         3,
         5,
-        5,
+        7,
         2,
         0,
         6,
@@ -1064,7 +1063,8 @@
         0,
         0,
         10,
-        1
+        37,
+        2
       ],
       "contributor_count": 29,
       "adr_count": 15,
@@ -1072,8 +1072,8 @@
       "produces_count": 32,
       "consumes_count": 294,
       "activity": {
-        "commits_30d": 155,
-        "commits_90d": 935,
+        "commits_30d": 189,
+        "commits_90d": 975,
         "complete": true
       },
       "team_activity": {
@@ -1249,7 +1249,6 @@
       "commits_30d": 0,
       "commits_90d": 12,
       "commits_90d_trend": [
-        0,
         1,
         1,
         0,
@@ -1284,6 +1283,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -1522,6 +1522,140 @@
       }
     },
     {
+      "full_name": "rajbos/Azure-scripts",
+      "head_sha": "89ac4520a17225d65ddd562d09c6d220d9da4a8f",
+      "files": 2,
+      "bytes": 3595,
+      "source_loc": 71,
+      "languages": [
+        {
+          "name": "PowerShell",
+          "files": 1,
+          "loc": 71
+        }
+      ],
+      "commits_30d": 0,
+      "commits_90d": 0,
+      "commits_90d_trend": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "contributor_count": 2,
+      "adr_count": 0,
+      "manifest_count": 0,
+      "produces_count": 0,
+      "consumes_count": 0,
+      "activity": {
+        "commits_30d": 0,
+        "commits_90d": 0,
+        "complete": true
+      },
+      "team_activity": {
+        "commits_30d": null,
+        "commits_90d": null,
+        "complete": false,
+        "available": false,
+        "matching": "unavailable",
+        "commit_count": null,
+        "unknown_reason": "No explicit team author emails configured"
+      },
+      "attention": {
+        "activity": "low",
+        "priority": "medium",
+        "reasons": [
+          "No AI files discovered"
+        ]
+      }
+    },
+    {
       "full_name": "rajbos/create-github-app-from-manifest",
       "head_sha": "395235e6553ec4025bb9cc66f46f920731b781fb",
       "files": 13,
@@ -1542,7 +1676,6 @@
       "commits_30d": 2,
       "commits_90d": 7,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -1616,6 +1749,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -1721,7 +1855,6 @@
         0,
         0,
         0,
-        0,
         2,
         0,
         0,
@@ -1773,6 +1906,7 @@
         0,
         0,
         3,
+        0,
         0,
         0,
         0
@@ -1840,7 +1974,6 @@
       "commits_30d": 6,
       "commits_90d": 19,
       "commits_90d_trend": [
-        0,
         0,
         0,
         4,
@@ -1929,6 +2062,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -1984,7 +2118,6 @@
         0,
         0,
         0,
-        0,
         4,
         0,
         0,
@@ -2066,6 +2199,7 @@
         1,
         4,
         1,
+        0,
         0,
         0,
         0
@@ -2098,160 +2232,6 @@
       }
     },
     {
-      "full_name": "rajbos/github-copilot-premium-reqs-usage-fork",
-      "head_sha": "1997d51dd4afdee56b4738d73eb2972b8ab74e11",
-      "files": 153,
-      "bytes": 1187925,
-      "source_loc": 17896,
-      "languages": [
-        {
-          "name": "TypeScript",
-          "files": 105,
-          "loc": 16396
-        },
-        {
-          "name": "CSS",
-          "files": 3,
-          "loc": 518
-        },
-        {
-          "name": "Shell",
-          "files": 8,
-          "loc": 451
-        },
-        {
-          "name": "JavaScript",
-          "files": 3,
-          "loc": 268
-        },
-        {
-          "name": "Python",
-          "files": 1,
-          "loc": 242
-        }
-      ],
-      "commits_30d": 3,
-      "commits_90d": 14,
-      "commits_90d_trend": [
-        0,
-        0,
-        5,
-        5,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        2,
-        0,
-        0,
-        0,
-        0,
-        0
-      ],
-      "contributor_count": 11,
-      "adr_count": 0,
-      "manifest_count": 1,
-      "produces_count": 1,
-      "consumes_count": 96,
-      "activity": {
-        "commits_30d": 3,
-        "commits_90d": 14,
-        "complete": true
-      },
-      "team_activity": {
-        "commits_30d": null,
-        "commits_90d": null,
-        "complete": false,
-        "available": false,
-        "matching": "unavailable",
-        "commit_count": null,
-        "unknown_reason": "No explicit team author emails configured"
-      },
-      "attention": {
-        "activity": "low",
-        "priority": "medium",
-        "reasons": [
-          "AI files exceed the configured lag threshold"
-        ]
-      }
-    },
-    {
       "full_name": "rajbos/GitHub-ratelimit-research",
       "head_sha": "e58a173747ef3a8da7a09cc69d043b9c23ab28ba",
       "files": 6,
@@ -2267,7 +2247,6 @@
       "commits_30d": 13,
       "commits_90d": 17,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2356,6 +2335,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 5,
@@ -2387,20 +2367,20 @@
     },
     {
       "full_name": "rajbos/Jarvis",
-      "head_sha": "c18cf87e6d79bd988e6448e3b197d980628604b2",
-      "files": 417,
-      "bytes": 4922723,
-      "source_loc": 88264,
+      "head_sha": "8bf5f85c3895de0e98edb9f4eda4b698fa8b2e12",
+      "files": 544,
+      "bytes": 6014430,
+      "source_loc": 88310,
       "languages": [
         {
           "name": "TypeScript",
-          "files": 339,
-          "loc": 79216
+          "files": 340,
+          "loc": 79260
         },
         {
           "name": "CSS",
           "files": 3,
-          "loc": 7207
+          "loc": 7209
         },
         {
           "name": "JavaScript",
@@ -2418,10 +2398,9 @@
           "loc": 187
         }
       ],
-      "commits_30d": 66,
-      "commits_90d": 386,
+      "commits_30d": 76,
+      "commits_90d": 396,
       "commits_90d_trend": [
-        0,
         0,
         0,
         6,
@@ -2510,16 +2489,17 @@
         0,
         0,
         7,
-        0
+        9,
+        1
       ],
       "contributor_count": 7,
-      "adr_count": 0,
+      "adr_count": 2,
       "manifest_count": 1,
       "produces_count": 11,
-      "consumes_count": 55,
+      "consumes_count": 56,
       "activity": {
-        "commits_30d": 66,
-        "commits_90d": 386,
+        "commits_30d": 76,
+        "commits_90d": 396,
         "complete": true
       },
       "team_activity": {
@@ -2592,8 +2572,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -2772,9 +2752,9 @@
         0,
         0,
         0,
-        0,
         1,
         5,
+        0,
         0,
         0,
         0,
@@ -2868,8 +2848,8 @@
         0,
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -2965,9 +2945,8 @@
         }
       ],
       "commits_30d": 0,
-      "commits_90d": 4,
+      "commits_90d": 3,
       "commits_90d_trend": [
-        1,
         0,
         0,
         0,
@@ -3056,6 +3035,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 7,
@@ -3065,7 +3045,7 @@
       "consumes_count": 26,
       "activity": {
         "commits_30d": 0,
-        "commits_90d": 4,
+        "commits_90d": 3,
         "complete": true
       },
       "team_activity": {
@@ -3119,9 +3099,8 @@
         }
       ],
       "commits_30d": 0,
-      "commits_90d": 28,
+      "commits_90d": 21,
       "commits_90d_trend": [
-        7,
         0,
         0,
         0,
@@ -3210,6 +3189,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 11,
@@ -3219,7 +3199,7 @@
       "consumes_count": 1,
       "activity": {
         "commits_30d": 0,
-        "commits_90d": 28,
+        "commits_90d": 26,
         "complete": true
       },
       "team_activity": {
@@ -3258,9 +3238,8 @@
         }
       ],
       "commits_30d": 0,
-      "commits_90d": 2,
+      "commits_90d": 1,
       "commits_90d_trend": [
-        1,
         0,
         0,
         0,
@@ -3297,6 +3276,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -3358,7 +3338,7 @@
       "consumes_count": 17,
       "activity": {
         "commits_30d": 0,
-        "commits_90d": 2,
+        "commits_90d": 1,
         "complete": true
       },
       "team_activity": {
@@ -3460,8 +3440,8 @@
         0,
         0,
         0,
-        0,
         4,
+        0,
         0,
         0,
         0,
@@ -3550,9 +3530,20 @@
       "kind": "repository reference",
       "confidence": "low",
       "evidence": {
+        "path": ".github/workflows/guard-agent-config.yml",
+        "line": 8,
+        "head_sha": "8bf5f85c3895de0e98edb9f4eda4b698fa8b2e12"
+      }
+    },
+    {
+      "source": "rajbos/Jarvis",
+      "target": "rajbos/ai-engineering-fluency",
+      "kind": "repository reference",
+      "confidence": "low",
+      "evidence": {
         "path": "package.json",
         "line": 59,
-        "head_sha": "c18cf87e6d79bd988e6448e3b197d980628604b2"
+        "head_sha": "8bf5f85c3895de0e98edb9f4eda4b698fa8b2e12"
       }
     },
     {

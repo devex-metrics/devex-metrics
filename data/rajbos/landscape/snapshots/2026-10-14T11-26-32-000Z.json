@@ -3909,59 +3909,6 @@
       "team_commits_90d": null
     },
     {
-      "full_name": "rajbos/github-copilot-premium-reqs-usage-fork",
-      "head_sha": "feb3e8090d5d19d771be56d9202ee5e533a69a69",
-      "ai_files": [
-        {
-          "path": ".github/copilot-instructions.md",
-          "kind": "copilot_instructions",
-          "sha256": "325e243fb6852945143ac48b95c247a1cc55be621e797e5cc0553a54cdcaa725",
-          "last_changed": "2026-07-23T10:03:02.000Z",
-          "age_days": 83,
-          "lag_days": 54,
-          "stale": false,
-          "status": "known",
-          "commits_since_change": 22,
-          "content_signal": {
-            "score": 100,
-            "scope": true,
-            "actions": true,
-            "verification": true,
-            "guardrails": true
-          }
-        },
-        {
-          "path": "AGENTS.md",
-          "kind": "agents",
-          "sha256": "f643ad82b678f34cf0da9075e15da2d16d95be9a243542d28f7a1ab91d3c3a6d",
-          "last_changed": "2026-05-06T19:16:55.000Z",
-          "age_days": 160,
-          "lag_days": 131,
-          "stale": true,
-          "status": "known",
-          "commits_since_change": 85,
-          "content_signal": {
-            "score": 0,
-            "scope": false,
-            "actions": false,
-            "verification": false,
-            "guardrails": false
-          }
-        }
-      ],
-      "ai_summary": {
-        "count": 2,
-        "stale_count": 1,
-        "max_lag_days": 131,
-        "unknown_count": 0,
-        "status": "known"
-      },
-      "commits_30d": 1,
-      "commits_90d": 26,
-      "team_commits_30d": null,
-      "team_commits_90d": null
-    },
-    {
       "full_name": "rajbos/github-graphql-examples",
       "head_sha": "7e1848cceb571476353404617ee4805fe785908b",
       "ai_files": [],
