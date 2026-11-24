@@ -25,7 +25,8 @@ export function isRateLimitError(err: unknown): boolean {
   const graphqlErrors = [e.errors, e.data?.errors, e.response?.data?.errors].flatMap((list) =>
     Array.isArray(list) ? (list as Array<{ type?: unknown }>) : []
   );
-  if (graphqlErrors.some((g) => g?.type === "RATE_LIMITED")) return true;
+  // GitHub uses both spellings for an exhausted GraphQL quota.
+  if (graphqlErrors.some((g) => g?.type === "RATE_LIMITED" || g?.type === "RATE_LIMIT")) return true;
 
   if (e.status !== 403) return false;
   if (String(e.response?.headers?.["x-ratelimit-remaining"]) === "0") return true;

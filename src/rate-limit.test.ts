@@ -47,6 +47,11 @@ describe("isRateLimitError", () => {
     ["a 429", Object.assign(new Error("Too Many Requests"), { status: 429 })],
     ["a GraphQL RATE_LIMITED response", graphqlLimit()],
     ["a GraphQL RATE_LIMITED error list", Object.assign(new Error("x"), { errors: [{ type: "RATE_LIMITED" }] })],
+    ["a GraphQL RATE_LIMIT error list with no status", Object.assign(new Error("x"), { errors: [{ type: "RATE_LIMIT" }] })],
+    [
+      "a GraphQL RATE_LIMIT response with no status",
+      Object.assign(new Error("x"), { response: { headers: {}, data: { errors: [{ type: "RATE_LIMIT" }] } } }),
+    ],
   ])("recognises %s", (_label, err) => {
     expect(isRateLimitError(err)).toBe(true);
   });
