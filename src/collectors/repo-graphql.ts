@@ -1,4 +1,5 @@
 import { getOctokit } from "../github-client.js";
+import { isRateLimitError } from "../rate-limit.js";
 
 /** One author entry from a `Commit.authors` GraphQL connection node. */
 export interface CommitAuthorNode {
@@ -433,11 +434,12 @@ function isGenericGraphQLExecutionError(err: unknown): boolean {
 /**
  * True for a GitHub failure that says nothing about the rest of the dataset: a
  * 5xx (Octokit also reports network failures as 500), the generic execution
- * error, or a query timeout. Authentication, permission and validation errors
- * are excluded because they would fail every repository alike.
+ * error, a query timeout, or a rate limit the throttling plugin already waited
+ * out and retried without success. Authentication, permission and validation
+ * errors are excluded because they would fail every repository alike.
  */
 export function isTransientCollectionError(err: unknown): boolean {
-  return isTransientServerError(err) || isExpensiveQuerySignal(err);
+  return isTransientServerError(err) || isExpensiveQuerySignal(err) || isRateLimitError(err);
 }
 
 /**
@@ -461,6 +463,7 @@ export async function allFatalFirst<T extends readonly unknown[] | []>(
 
 /** Concise, log-safe category for a transient failure; never a raw payload. */
 export function describeTransientError(err: unknown): string {
+  if (isRateLimitError(err)) return "GitHub API rate limit that persisted after retries";
   if (isExpensiveQueryHttpError(err)) return "repeated HTTP 502/504 gateway error";
   if (isTransientServerError(err)) return `HTTP ${(err as { status: number }).status} server error`;
   return "GitHub GraphQL transient execution error";
@@ -513,7 +516,8 @@ async function fetchRepoPage(
       });
       return { response, pageSize };
     } catch (err) {
-      if (!isTransientCollectionError(err) || attempt >= maxAttempts) throw err;
+      // The throttling plugin has already waited out the reset and retried.
+      if (!isTransientCollectionError(err) || isRateLimitError(err) || attempt >= maxAttempts) throw err;
       const shrink = isExpensiveQuerySignal(err) && sizeIndex < sizes.length - 1;
       if (shrink) sizeIndex++;
       const wait = TRANSIENT_BACKOFF_MS[Math.min(attempt - 1, TRANSIENT_BACKOFF_MS.length - 1)];
@@ -530,7 +534,7 @@ async function fetchRepoPage(
 
 /** Check if a GraphQL error indicates the resource was not found or is forbidden. */
 function isGraphQLNotFoundOrForbidden(err: unknown): boolean {
-  if (!(err instanceof Error)) return false;
+  if (!(err instanceof Error) || isRateLimitError(err)) return false;
   // Octokit GraphQL throws GraphqlResponseError for server-side errors
   const graphqlError = err as { errors?: Array<{ type?: string; message?: string }> };
   if (graphqlError.errors) {
@@ -848,7 +852,7 @@ export async function fetchHistoricalPRPage(
           },
         };
       }
-      if (isTransientServerError(err)) {
+      if (isTransientServerError(err) || isRateLimitError(err)) {
         // Says nothing about this query's size, so no smaller page is tried,
         // but it is no more fatal to the run than a 502: defer this repository.
         const category = describeTransientError(err);

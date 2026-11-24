@@ -1,3 +1,4 @@
+import { isRateLimitError } from "../rate-limit.js";
 import { getOctokit } from "../github-client.js";
 import { isCopilotLogin } from "./repo-graphql.js";
 import { countSearchMatches } from "./search-counts.js";
@@ -361,7 +362,7 @@ export async function collectPullRequestDetails(
     prs = res.data;
   } catch (err: unknown) {
     const status = (err as { status?: number }).status;
-    if (status === 403 || status === 404) {
+    if ((status === 403 || status === 404) && !isRateLimitError(err)) {
       if (status === 403) {
         console.warn(`  ⚠ pr-details: skipping ${owner}/${repo}: access denied (403) — token may need SAML SSO authorization`);
       }
@@ -509,7 +510,7 @@ export async function collectMergedPRTimeline(
       if (res.data.length < 100) break; // reached the last page
     } catch (err: unknown) {
       const status = (err as { status?: number }).status;
-      if (status === 403 || status === 404) break;
+      if ((status === 403 || status === 404) && !isRateLimitError(err)) break;
       throw err;
     }
   }

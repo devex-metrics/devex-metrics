@@ -1,3 +1,4 @@
+import { isRateLimitError } from "./rate-limit.js";
 import { createHash } from "node:crypto";
 import type { Octokit } from "@octokit/rest";
 import type { LandscapeContentSignal, LandscapeFile, LandscapeRepository, LandscapeScan } from "./types.js";
@@ -96,7 +97,7 @@ async function landscapeHistory(
     return await octokit.graphql(query, variables);
   } catch (error: unknown) {
     const status = record(error)?.status;
-    if (status === 403 || status === 404) {
+    if ((status === 403 || status === 404) && !isRateLimitError(error)) {
       console.warn(`Landscape Git history inaccessible for ${repo.full_name}; counts unknown`);
       return null;
     }
@@ -286,7 +287,7 @@ async function fileScore(repo: LandscapeRepository, file: LandscapeFile, octokit
     return scoreLandscapeContent(text);
   } catch (error: unknown) {
     const status = record(error)?.status;
-    if (status === 403 || status === 404) {
+    if ((status === 403 || status === 404) && !isRateLimitError(error)) {
       console.warn(`Landscape content inaccessible for ${repo.full_name}; rubric unknown`);
       return null;
     }

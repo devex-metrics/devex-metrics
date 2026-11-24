@@ -1,3 +1,4 @@
+import { isRateLimitError } from "../rate-limit.js";
 import { getOctokit } from "../github-client.js";
 import { allFatalFirst } from "./repo-graphql.js";
 
@@ -51,6 +52,7 @@ export async function countSearchMatches(
       incomplete: responses.some(({ data }) => data.incomplete_results === true),
     };
   } catch (err: unknown) {
+    if (isRateLimitError(err)) throw err;
     const status = (err as { status?: number }).status;
     if (status !== 404 && status !== 403 && !isUnsearchableRepoError(err)) throw err;
     if (status === 403) {

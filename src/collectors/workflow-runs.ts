@@ -13,6 +13,7 @@
  * `src/ci-health.ts`.
  */
 
+import { isRateLimitError } from "../rate-limit.js";
 import { getOctokit } from "../github-client.js";
 
 /** One workflow run, reduced to the facts CI health is derived from. */
@@ -136,6 +137,7 @@ export async function fetchWorkflowRunPage(
     const raw = (data.workflow_runs ?? []) as RawRun[];
     return { runs: raw.map(toFacts), hasMore: raw.length === PER_PAGE };
   } catch (err: unknown) {
+    if (isRateLimitError(err)) throw err;
     const status = (err as { status?: number }).status;
     if (status === 404) return null;
     if (status === 403) {

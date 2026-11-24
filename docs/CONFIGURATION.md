@@ -382,6 +382,20 @@ A run still fails when every repository fails, since that is a GitHub outage and
 the last good data should stay published, and on any authentication or validation
 error, since those would affect every repository alike.
 
+### Rate limits
+
+Every API client waits out GitHub's rate limits on its own: on a primary limit
+it sleeps until the reset time, on a secondary limit for the `Retry-After` the
+response asks for (60 seconds when it gives none), and retries each request up
+to 3 times, logging when it will resume. Search requests are also spaced at
+least 2 seconds apart.
+
+A limit that persists past those retries is treated like any other transient
+failure: the repository falls through the steps above and ends up flagged
+rather than silently zeroed. A rate-limited 403 is never read as *access
+denied*. The CI health crawl stops for the run instead, keeping its progress,
+and the backfill defers the repository to the next run.
+
 ## Repository landscape (opt-in)
 
 The landscape scan is **off by default**. The published

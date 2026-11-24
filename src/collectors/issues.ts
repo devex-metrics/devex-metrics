@@ -1,3 +1,4 @@
+import { isRateLimitError } from "../rate-limit.js";
 import { getOctokit } from "../github-client.js";
 import { countSearchMatches } from "./search-counts.js";
 import type { IssueCounts, IssueLeadTime, MergedPRSummary } from "../types.js";
@@ -75,7 +76,7 @@ export async function collectIssueLeadTimes(
       });
     } catch (err: unknown) {
       const status = (err as { status?: number }).status;
-      if (status === 404 || status === 403) continue;
+      if ((status === 404 || status === 403) && !isRateLimitError(err)) continue;
       throw err;
     }
   }
