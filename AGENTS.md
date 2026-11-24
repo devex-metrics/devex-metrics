@@ -82,7 +82,7 @@ A repository with a `collectionWarning` needs care here: `failed` rows are place
 
 ## Failing repositories
 
-A transient GitHub failure (`isTransientCollectionError`) on one repository must not end the run; it becomes a `collectionWarning` on that repository, which the report and dashboard show. Anything else (authentication, validation, a bug) still throws, and so does a run in which every repository failed. A rate limit the throttling plugin gave up on counts as transient. GitHub reports it as 403 like a permission error, so every handler that skips a repository on 403 must check `isRateLimitError` (`src/rate-limit.ts`) first; `src/rate-limit.test.ts` covers each such collector. See "Repositories GitHub struggles to serve" in `docs/CONFIGURATION.md`.
+A transient GitHub failure (`isTransientCollectionError`) on one repository must not end the run; it becomes a `collectionWarning` on that repository, which the report and dashboard show. Anything else (authentication, validation, a bug) still throws, and so does a run in which every repository failed. A rate limit the throttling plugin gave up on counts as transient. GitHub reports it as 403 like a permission error, so every handler that skips a repository on 403 must check `isRateLimitError` (`src/rate-limit.ts`) first; `src/rate-limit.test.ts` covers each such collector and `src/landscape-signals.test.ts` the landscape lookups. See "Repositories GitHub struggles to serve" in `docs/CONFIGURATION.md`.
 
 ## Fixtures
 

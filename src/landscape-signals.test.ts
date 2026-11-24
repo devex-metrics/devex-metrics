@@ -198,6 +198,19 @@ describe("pinned public landscape signals", () => {
       .ai_files[0].content_signal).toBeNull();
   });
 
+  it("fails on a rate limit the client gave up on instead of reporting the repository as inaccessible", async () => {
+    const rateLimited = {
+      status: 403, message: "API rate limit exceeded",
+      response: { headers: { "x-ratelimit-remaining": "0" }, data: {} },
+    };
+    const history = fakeApi();
+    history.graphql.mockRejectedValueOnce(rateLimited);
+    await expect(enrichLandscapeScan(scan(), history.octokit)).rejects.toBe(rateLimited);
+    const content = fakeApi();
+    content.getContent.mockRejectedValueOnce(rateLimited);
+    await expect(enrichLandscapeScan(scan(), content.octokit)).rejects.toBe(rateLimited);
+  });
+
   it("processes 139 files in bounded history batches and marks files beyond the per-repo budget unknown", async () => {
     const api = fakeApi();
     const many = observed(await enrichLandscapeScan(scan(139), api.octokit));
