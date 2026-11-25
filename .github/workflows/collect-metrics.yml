@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     # A daily run takes about half an hour. The cap leaves room for the
     # public-discovery clone phase (60 minutes by default) and for one long
-    # rate-limit wait, instead of GitHub's six-hour default.
+    # rate-limit wait, instead of running into the six-hour limit of a hosted runner.
     timeout-minutes: ${{ fromJSON(vars.DEVEX_COLLECT_TIMEOUT_MINUTES || '120') }}
     outputs:
       landscape-publish: ${{ steps.landscape-failed.outputs.landscape-publish }}
