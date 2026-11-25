@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-25T12:58:52.000Z",
+  "generated_at": "2026-11-25T17:18:25.000Z",
   "scanner_version": "0.2.0",
   "repositories": [
     {
@@ -941,15 +941,15 @@
     },
     {
       "full_name": "rajbos/ai-engineering-fluency",
-      "head_sha": "a69f8849cc653440aededc81660dc00c0c2df0e2",
-      "files": 1468,
-      "bytes": 28279401,
-      "source_loc": 291117,
+      "head_sha": "2a2de4bb447ee3d673d366e58bcf26f73f60e15d",
+      "files": 1491,
+      "bytes": 28482761,
+      "source_loc": 293054,
       "languages": [
         {
           "name": "TypeScript",
-          "files": 728,
-          "loc": 238577
+          "files": 737,
+          "loc": 240417
         },
         {
           "name": "JavaScript",
@@ -959,7 +959,7 @@
         {
           "name": "CSS",
           "files": 20,
-          "loc": 10103
+          "loc": 10200
         },
         {
           "name": "Python",
@@ -972,8 +972,8 @@
           "loc": 3874
         }
       ],
-      "commits_30d": 187,
-      "commits_90d": 986,
+      "commits_30d": 213,
+      "commits_90d": 1012,
       "commits_90d_trend": [
         2,
         11,
@@ -1064,16 +1064,16 @@
         10,
         37,
         8,
-        5
+        31
       ],
       "contributor_count": 29,
       "adr_count": 15,
       "manifest_count": 13,
-      "produces_count": 32,
-      "consumes_count": 294,
+      "produces_count": 33,
+      "consumes_count": 299,
       "activity": {
-        "commits_30d": 190,
-        "commits_90d": 986,
+        "commits_30d": 215,
+        "commits_90d": 1012,
         "complete": true
       },
       "team_activity": {
