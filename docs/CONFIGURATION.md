@@ -65,6 +65,7 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB` | int | Maximum GitHub API repository size in KiB before skipping a full-history clone (`collection.publicDiscoveryMaxSizeKb`). Default `512000` (~500 MiB). `0` disables this safety limit deliberately. |
 | `DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB` | int | Maximum combined on-disk size of all full-history clones in KiB (`collection.publicDiscoveryMaxCloneSizeKb`). Default `8388608` (8 GiB). Must be positive; still enforced if the per-repo size limit is `0`. |
 | `DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES` | int | Maximum elapsed time for the entire full-history clone phase (`collection.publicDiscoveryCloneMinutes`). Default `60`; accepted range `1`–`360`. Each individual clone also has a 15-minute limit. |
+| `DEVEX_COLLECT_TIMEOUT_MINUTES` | int | Read by the collect workflow only: how long the collect job may run before GitHub cancels it. Default `120`. Raise it with `DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES`, keeping about an hour above that value. |
 | `DEVEX_CI_PAGES_PER_RUN` | int | CI crawl budget per run, all repos. Default `20`. |
 | `DEVEX_CI_MAX_PAGES_PER_REPO` | int | CI crawl cap per repo per run. Default `5`. |
 | `DEVEX_CI_WINDOW_DAYS` | int | Days of CI history the dashboard reads back. Default `90`. |
@@ -395,6 +396,11 @@ failure: the repository falls through the steps above and ends up flagged
 rather than silently zeroed. A rate-limited 403 is never read as *access
 denied*. The CI health crawl stops for the run instead, keeping its progress,
 and the backfill defers the repository to the next run.
+
+A primary limit can mean waiting up to an hour for the reset. The collect job
+is capped at `DEVEX_COLLECT_TIMEOUT_MINUTES` (default `120`), so a run stuck
+behind repeated waits is cancelled rather than holding the runner for six
+hours, and shows as a failed run.
 
 ## Repository landscape (opt-in)
 
