@@ -40,10 +40,10 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    # A daily run takes about half an hour. The cap leaves room for the
-    # public-discovery clone phase (60 minutes by default) and for one long
-    # rate-limit wait, instead of running into the six-hour limit of a hosted runner.
-    timeout-minutes: ${{ fromJSON(vars.DEVEX_COLLECT_TIMEOUT_MINUTES || '120') }}
+    # No job-level timeout: a cancelled job skips "Publish history store", which
+    # would throw away a collection that already finished. The long steps are
+    # capped one by one instead, so the optional ones fail on their own and the
+    # history is still published.
     outputs:
       landscape-publish: ${{ steps.landscape-failed.outputs.landscape-publish }}
       discovery-publish: ${{ steps.discovery-failed.outputs.discovery-publish }}
@@ -144,6 +144,9 @@ jobs:
 
       - name: Collect metrics
         id: collect
+        # About 25 minutes on a normal day. The cap leaves room for one
+        # hour-long rate-limit wait instead of holding the runner for hours.
+        timeout-minutes: ${{ fromJSON(vars.DEVEX_COLLECT_TIMEOUT_MINUTES || '120') }}
         env:
           APP_ID: ${{ vars.APP_ID }}
           APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
@@ -284,6 +287,7 @@ jobs:
       - name: Scan selected repositories
         id: landscape-scan
         if: steps.landscape-token.outcome == 'success'
+        timeout-minutes: 30
         env:
           GITHUB_TOKEN: ${{ steps.landscape-token.outputs.token }}
         run: npx --no-install repo-landscape scan --config data/landscape.config.json --output data/landscape-raw.json
@@ -410,6 +414,7 @@ jobs:
         id: discovery-scan
         if: always() && steps.discovery-clone.outcome == 'success'
         continue-on-error: true
+        timeout-minutes: 30
         run: npx --no-install repo-landscape scan --repos-dir data/public-discovery-clones --expected-heads data/public-discovery.heads.json --config data/public-discovery.config.json --output data/public-discovery-raw.json
 
       - name: Refresh public discovery ingestion token
@@ -428,6 +433,7 @@ jobs:
         id: discovery-ingest
         if: always() && steps.discovery-ingest-token.outcome == 'success'
         continue-on-error: true
+        timeout-minutes: 20
         env:
           DEVEX_OWNER: ${{ inputs.owner || vars.DEVEX_OWNER }}
           DEVEX_HISTORY_DIR: .metrics-data/data
