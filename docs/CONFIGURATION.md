@@ -64,7 +64,8 @@ Set these under **Settings → Secrets and variables → Actions → Variables**
 | `DEVEX_PUBLIC_DISCOVERY_MAX_REPOS` | int | Optional number of public repositories to scan ranked by merged PRs in the collected 90-day timeline (`collection.publicDiscoveryMaxRepos`). Default `0` means all eligible repositories. Set `20` for the initial public deployment. |
 | `DEVEX_PUBLIC_DISCOVERY_MAX_SIZE_KB` | int | Maximum GitHub API repository size in KiB before skipping a full-history clone (`collection.publicDiscoveryMaxSizeKb`). Default `512000` (~500 MiB). `0` disables this safety limit deliberately. |
 | `DEVEX_PUBLIC_DISCOVERY_MAX_CLONE_SIZE_KB` | int | Maximum combined on-disk size of all full-history clones in KiB (`collection.publicDiscoveryMaxCloneSizeKb`). Default `8388608` (8 GiB). Must be positive; still enforced if the per-repo size limit is `0`. |
-| `DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES` | int | Maximum elapsed time for the entire full-history clone phase (`collection.publicDiscoveryCloneMinutes`). Default `60`; accepted range `1`–`360`. Each individual clone also has a 15-minute limit. |
+| `DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES` | int | Maximum elapsed time for the entire full-history clone phase (`collection.publicDiscoveryCloneMinutes`). Default `60`; accepted range `1`–`360`. Each individual clone also has a 15-minute limit. On GitHub-hosted runners the whole collect job stops at six hours, and a job stopped that way publishes nothing. The other steps normally need about 30 minutes, but their own limits add up to about 225, so above about `130` a run in which everything is slow can reach that limit; lower it further if you have raised `DEVEX_COLLECT_TIMEOUT_MINUTES`. |
+| `DEVEX_COLLECT_TIMEOUT_MINUTES` | int | How long the *Collect metrics* step (collection, backfill and CI crawl) may run before it is stopped, as a whole number of minutes (at least `1`). Default `120`. Read by the collect workflow only: unlike the other settings it cannot be set through `DEVEX_CONFIG` or `devex.config.json`. Raise it for manual runs with a large `backfill_pages` budget. The optional landscape and discovery steps have fixed limits of their own, and GitHub-hosted runners stop the whole job at six hours (`360`) whatever this says. |
 | `DEVEX_CI_PAGES_PER_RUN` | int | CI crawl budget per run, all repos. Default `20`. |
 | `DEVEX_CI_MAX_PAGES_PER_REPO` | int | CI crawl cap per repo per run. Default `5`. |
 | `DEVEX_CI_WINDOW_DAYS` | int | Days of CI history the dashboard reads back. Default `90`. |
@@ -395,6 +396,20 @@ failure: the repository falls through the steps above and ends up flagged
 rather than silently zeroed. A rate-limited 403 is never read as *access
 denied*. The CI health crawl stops for the run instead, keeping its progress,
 and the backfill defers the repository to the next run.
+
+A primary limit can mean waiting up to an hour for the reset. The *Collect
+metrics* step is capped at `DEVEX_COLLECT_TIMEOUT_MINUTES` (default `120`), so
+a run stuck behind repeated waits fails rather than holding the runner for six
+hours. With landscape and public discovery both off, a run stopped there
+publishes no history and does not rebuild Pages, so the dashboard stays on the
+previous day until the next run succeeds. With either on, their failure
+handling still publishes the history store and rebuilds Pages; the day's
+metrics are in it if the step was stopped during the backfill or CI crawl,
+which run after they are written. The
+optional landscape and public-discovery steps that follow are capped
+separately (30 minutes per scan, 20 per ingest, and the clone phase by
+`DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES`), so a slow one is recorded as a failed
+scan while the day's metrics are still published.
 
 ## Repository landscape (opt-in)
 
