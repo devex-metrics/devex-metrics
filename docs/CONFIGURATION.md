@@ -400,8 +400,12 @@ and the backfill defers the repository to the next run.
 A primary limit can mean waiting up to an hour for the reset. The *Collect
 metrics* step is capped at `DEVEX_COLLECT_TIMEOUT_MINUTES` (default `120`), so
 a run stuck behind repeated waits fails rather than holding the runner for six
-hours. A run stopped there publishes no history and does not rebuild Pages, so
-the dashboard stays on the previous day until the next run succeeds. The
+hours. With landscape and public discovery both off, a run stopped there
+publishes no history and does not rebuild Pages, so the dashboard stays on the
+previous day until the next run succeeds. With either on, their failure
+handling still publishes the history store and rebuilds Pages; the day's
+metrics are in it if the step was stopped during the backfill or CI crawl,
+which run after they are written. The
 optional landscape and public-discovery steps that follow are capped
 separately (30 minutes per scan, 20 per ingest, and the clone phase by
 `DEVEX_PUBLIC_DISCOVERY_CLONE_MINUTES`), so a slow one is recorded as a failed
