@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-26T16:45:20.000Z",
+  "generated_at": "2026-11-27T16:32:51.000Z",
   "scanner_version": "0.2.0",
   "repositories": [
     {
@@ -941,20 +941,20 @@
     },
     {
       "full_name": "rajbos/ai-engineering-fluency",
-      "head_sha": "9201c2ac853b8edec40669259f5674c7f820f172",
-      "files": 1501,
-      "bytes": 28577352,
-      "source_loc": 294795,
+      "head_sha": "e142029c2d2e277548130ae87b956c57479c987e",
+      "files": 1502,
+      "bytes": 28629378,
+      "source_loc": 295742,
       "languages": [
         {
           "name": "TypeScript",
           "files": 744,
-          "loc": 241922
+          "loc": 242666
         },
         {
           "name": "JavaScript",
-          "files": 93,
-          "loc": 28232
+          "files": 94,
+          "loc": 28435
         },
         {
           "name": "CSS",
@@ -972,10 +972,9 @@
           "loc": 3874
         }
       ],
-      "commits_30d": 235,
-      "commits_90d": 1050,
+      "commits_30d": 258,
+      "commits_90d": 1067,
       "commits_90d_trend": [
-        11,
         20,
         40,
         26,
@@ -1063,8 +1062,9 @@
         10,
         37,
         8,
-        66,
-        5
+        72,
+        27,
+        0
       ],
       "contributor_count": 29,
       "adr_count": 15,
@@ -1072,8 +1072,8 @@
       "produces_count": 33,
       "consumes_count": 299,
       "activity": {
-        "commits_30d": 248,
-        "commits_90d": 1050,
+        "commits_30d": 258,
+        "commits_90d": 1070,
         "complete": true
       },
       "team_activity": {
@@ -1254,7 +1254,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         1,
@@ -1281,6 +1280,7 @@
         0,
         0,
         1,
+        0,
         0,
         0,
         0,
@@ -1685,7 +1685,6 @@
         0,
         0,
         0,
-        0,
         3,
         0,
         0,
@@ -1747,6 +1746,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -1852,7 +1852,6 @@
         0,
         0,
         0,
-        0,
         2,
         0,
         0,
@@ -1904,6 +1903,7 @@
         0,
         0,
         3,
+        0,
         0,
         0,
         0,
@@ -1972,9 +1972,8 @@
         }
       ],
       "commits_30d": 6,
-      "commits_90d": 19,
+      "commits_90d": 15,
       "commits_90d_trend": [
-        4,
         0,
         0,
         0,
@@ -2063,6 +2062,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 6,
@@ -2113,7 +2113,6 @@
       "commits_30d": 19,
       "commits_90d": 31,
       "commits_90d_trend": [
-        0,
         0,
         0,
         4,
@@ -2202,7 +2201,8 @@
         0,
         0,
         8,
-        1
+        1,
+        0
       ],
       "contributor_count": 9,
       "adr_count": 0,
@@ -2245,7 +2245,6 @@
       "commits_30d": 13,
       "commits_90d": 17,
       "commits_90d_trend": [
-        0,
         0,
         0,
         0,
@@ -2334,6 +2333,7 @@
         0,
         0,
         0,
+        0,
         0
       ],
       "contributor_count": 5,
@@ -2396,10 +2396,9 @@
           "loc": 187
         }
       ],
-      "commits_30d": 74,
-      "commits_90d": 397,
+      "commits_30d": 72,
+      "commits_90d": 391,
       "commits_90d_trend": [
-        6,
         0,
         28,
         2,
@@ -2488,6 +2487,7 @@
         9,
         1,
         1,
+        0,
         0
       ],
       "contributor_count": 7,
@@ -2496,7 +2496,7 @@
       "produces_count": 11,
       "consumes_count": 56,
       "activity": {
-        "commits_30d": 74,
+        "commits_30d": 72,
         "commits_90d": 397,
         "complete": true
       },
@@ -2567,8 +2567,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -2747,9 +2747,9 @@
         0,
         0,
         0,
-        0,
         1,
         5,
+        0,
         0,
         0,
         0,
@@ -2843,8 +2843,8 @@
         0,
         0,
         0,
-        0,
         3,
+        0,
         0,
         0,
         0,
@@ -2946,7 +2946,6 @@
       "commits_90d": 3,
       "commits_90d_trend": [
         0,
-        0,
         1,
         0,
         0,
@@ -2979,6 +2978,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -3114,7 +3114,6 @@
         0,
         0,
         0,
-        0,
         1,
         0,
         0,
@@ -3150,6 +3149,7 @@
         0,
         0,
         2,
+        0,
         0,
         0,
         0,
@@ -3270,8 +3270,8 @@
         0,
         0,
         0,
-        0,
         1,
+        0,
         0,
         0,
         0,
@@ -3435,8 +3435,8 @@
         0,
         0,
         0,
-        0,
         4,
+        0,
         0,
         0,
         0,
@@ -3474,7 +3474,7 @@
       "produces_count": 0,
       "consumes_count": 0,
       "activity": {
-        "commits_30d": 4,
+        "commits_30d": 0,
         "commits_90d": 4,
         "complete": true
       },
